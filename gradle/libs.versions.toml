@@ -23,5 +23,5 @@ assertj = "org.assertj:assertj-core:3.23.1"
 reflections = "org.reflections:reflections:0.10.2"
 
 [plugins]
-spotless = { id = "com.diffplug.spotless", version = "6.13.0" }
+spotless = { id = "com.diffplug.spotless", version = "6.14.0" }
 shadowJar = { id = "com.github.johnrengelman.shadow", version = "7.1.2" }
