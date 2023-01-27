@@ -1,2 +1,2 @@
-// Copyright $YEAR Twitter, Inc.
+// Copyright $YEAR Nacho Lopez
 // SPDX-License-Identifier: Apache-2.0

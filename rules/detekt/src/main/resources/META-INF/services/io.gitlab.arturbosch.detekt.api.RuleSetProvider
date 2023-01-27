@@ -1,1 +1,1 @@
-com.twitter.compose.rules.detekt.TwitterComposeRuleSetProvider
+io.nlopez.compose.rules.detekt.TwitterComposeRuleSetProvider

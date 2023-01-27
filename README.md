@@ -1,7 +1,7 @@
-# Twitter's Jetpack Compose Rules
+# Jetpack Compose Rules - Static checks for Ktlint and Detekt
 
 
-![build](https://github.com/twitter/compose-rules/actions/workflows/build.yaml/badge.svg) ![Latest version](https://img.shields.io/maven-central/v/com.twitter.compose.rules/common)
+![build](https://github.com/mrmans0n/compose-rules/actions/workflows/build.yaml/badge.svg) ![Latest version](https://img.shields.io/maven-central/v/io.nlopez.compose.rules/common)
 
 It can be challenging for big teams to start adopting Compose, particularly because not everyone will start at same time or with the same patterns. Twitter tried to ease the pain by creating a set of Compose static checks.
 
@@ -9,21 +9,21 @@ Compose has lots of superpowers but also has a bunch of footguns to be aware of 
 
 This is where our static checks come in. We want to detect as many potential issues as we can, as quickly as we can. In this case we want an error to show prior to engineers having to review code. Similar to other static check libraries we hope this leads to a "don't shoot the messengers" philosphy which will foster healthy Compose adoption.
 
-Check out the project website for more information: https://twitter.github.io/compose-rules
+Check out the project website for more information: https://mrmans0n.github.io/compose-rules
 
 ## Static checks for Compose bundled in this repo
 
-You can find the comprehensive list of rules in [the rules documentaton](https://twitter.github.io/compose-rules/rules). It contains both the what and why for each rule, we encourage you to read it prior to adopting our rules.
+You can find the comprehensive list of rules in [the rules documentaton](https://mrmans0n.github.io/compose-rules/rules). It contains both the what and why for each rule, we encourage you to read it prior to adopting our rules.
 
 There are 2 ways you can add these static checks to your build - using ktlint or using Detekt.
 
 ## Using with ktlint
 
-You can refer to the [Using with ktlint](https://twitter.github.io/compose-rules/ktlint) documentation.
+You can refer to the [Using with ktlint](https://mrmans0n.github.io/compose-rules/ktlint) documentation.
 
 ## Using with Detekt
 
-You can refer to the [Using with Detekt](https://twitter.github.io/compose-rules/detekt) documentation.
+You can refer to the [Using with Detekt](https://mrmans0n.github.io/compose-rules/detekt) documentation.
 
 ## Contributing
 
@@ -32,7 +32,7 @@ We love sharing and learning from others; contributing new rules or fixes is wel
 ## License
 
 ```
-    Copyright 2022 Twitter, Inc.
+    Copyright 2023 Nacho Lopez.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
