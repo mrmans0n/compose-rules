@@ -7,5 +7,5 @@ import io.nlopez.rules.core.ComposeKtVisitor
 import io.nlopez.rules.core.ktlint.TwitterKtlintRule
 
 class ComposeRememberMissingCheck :
-    TwitterKtlintRule("twitter-compose:remember-missing-check"),
+    TwitterKtlintRule("compose:remember-missing-check"),
     ComposeKtVisitor by ComposeRememberMissing()

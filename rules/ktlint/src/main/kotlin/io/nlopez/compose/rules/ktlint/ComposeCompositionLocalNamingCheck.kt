@@ -7,5 +7,5 @@ import io.nlopez.rules.core.ComposeKtVisitor
 import io.nlopez.rules.core.ktlint.TwitterKtlintRule
 
 class ComposeCompositionLocalNamingCheck :
-    TwitterKtlintRule("twitter-compose:compositionlocal-naming"),
+    TwitterKtlintRule("compose:compositionlocal-naming"),
     ComposeKtVisitor by ComposeCompositionLocalNaming()

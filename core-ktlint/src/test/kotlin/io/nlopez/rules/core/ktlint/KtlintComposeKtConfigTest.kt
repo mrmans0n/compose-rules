@@ -12,13 +12,13 @@ import org.junit.jupiter.api.Test
 
 class KtlintComposeKtConfigTest {
     private val mapping = mutableMapOf<String, Property>().apply {
-        put("twitter_compose_my_int", "10".prop)
-        put("twitter_compose_my_string", "abcd".prop)
-        put("twitter_compose_my_list", "a,b,c,a".prop)
-        put("twitter_compose_my_list2", "a , b , c,a".prop)
-        put("twitter_compose_my_set", "a,b,c,a,b,c".prop)
-        put("twitter_compose_my_set2", "  a, b,c ,a  , b  ,  c ".prop)
-        put("twitter_compose_my_bool", true.prop)
+        put("compose_my_int", "10".prop)
+        put("compose_my_string", "abcd".prop)
+        put("compose_my_list", "a,b,c,a".prop)
+        put("compose_my_list2", "a , b , c,a".prop)
+        put("compose_my_set", "a,b,c,a,b,c".prop)
+        put("compose_my_set2", "  a, b,c ,a  , b  ,  c ".prop)
+        put("compose_my_bool", true.prop)
     }
 
     private val properties: EditorConfigProperties = mapping

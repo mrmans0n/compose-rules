@@ -28,11 +28,11 @@ dependencies {
 
 ## Using with ktlint CLI or the ktlint (unofficial) IntelliJ plugin
 
-The [releases](https://github.com/twitter/compose-rules/releases) page contains an [uber jar](https://stackoverflow.com/questions/11947037/what-is-an-uber-jar) for each version release that can be used for these purposes.
+The [releases](https://github.com/mrmans0n/compose-rules/releases) page contains an [uber jar](https://stackoverflow.com/questions/11947037/what-is-an-uber-jar) for each version release that can be used for these purposes.
 
 To use with [ktlint CLI](https://ktlint.github.io/#getting-started):
 ```shell
-ktlint -R ktlint-twitter-compose-<VERSION>-all.jar
+ktlint -R ktlint-compose-<VERSION>-all.jar
 ```
 
 You can use this same jar in the [ktlint (unofficial) IntelliJ plugin](https://plugins.jetbrains.com/plugin/15057-ktlint-unofficial-) if the rules are compiled against the same ktlint version used for that release. You can configure the custom ruleset in the preferences page of the plugin.
@@ -41,11 +41,11 @@ You can use this same jar in the [ktlint (unofficial) IntelliJ plugin](https://p
 
 ### Providing custom content emitters
 
-There are some rules (`twitter-compose:content-emitter-returning-values-check` and `twitter-compose:multiple-emitters-check`) that use predefined list of known composables that emit content. But you can add your own too! In your `.editorconfig` file, you'll need to add a `content_emitters` property followed by a list of composable names separated by commas. You would typically want the composables that are part of your custom design system to be in this list.
+There are some rules (`compose:content-emitter-returning-values-check` and `compose:multiple-emitters-check`) that use predefined list of known composables that emit content. But you can add your own too! In your `.editorconfig` file, you'll need to add a `content_emitters` property followed by a list of composable names separated by commas. You would typically want the composables that are part of your custom design system to be in this list.
 
 ```editorconfig
 [*.{kt,kts}]
-twitter_compose_content_emitters = MyComposable,MyOtherComposable
+compose_content_emitters = MyComposable,MyOtherComposable
 ```
 
 ### Providing a list of allowed `CompositionLocal`s
@@ -54,7 +54,7 @@ For `compositionlocal-allowlist` rule you can define a list of `CompositionLocal
 
 ```editorconfig
 [*.{kt,kts}]
-twitter_compose_allowed_composition_locals = LocalSomething,LocalSomethingElse
+compose_allowed_composition_locals = LocalSomething,LocalSomethingElse
 ```
 
 ### Make it so that all @Preview composables must be not public, no exceptions
@@ -63,26 +63,26 @@ In `preview-public-check`, only previews with a `@PreviewParameter` are required
 
 ```editorconfig
 [*.{kt,kts}]
-twitter_compose_preview_public_only_if_params = false
+compose_preview_public_only_if_params = false
 ```
 
 ### Allowing matching function names
 
-The `twitter-compose:naming-check` rule requires all composables that return a value to be lowercased. If you want to allow certain patterns though, you can configure a comma-separated list of matching regexes in your `.editorconfig` file:
+The `compose:naming-check` rule requires all composables that return a value to be lowercased. If you want to allow certain patterns though, you can configure a comma-separated list of matching regexes in your `.editorconfig` file:
 
 ```editorconfig
 [*.{kt,kts}]
-twitter_compose_allowed_composable_function_names = .*Presenter,.*SomethingElse
+compose_allowed_composable_function_names = .*Presenter,.*SomethingElse
 ```
 
 ## Disabling a specific rule
 
-To disable a rule you have to follow the [instructions from the ktlint documentation](https://github.com/pinterest/ktlint#how-do-i-suppress-an-errors-for-a-lineblockfile), and use the id of the rule you want to disable with the `twitter-compose` tag.
+To disable a rule you have to follow the [instructions from the ktlint documentation](https://github.com/pinterest/ktlint#how-do-i-suppress-an-errors-for-a-lineblockfile), and use the id of the rule you want to disable with the `compose` tag.
 
-For example, to disable `compose-naming-check`, the tag you'll need to disable is `twitter-compose:compose-naming-check`.
+For example, to disable `compose-naming-check`, the tag you'll need to disable is `compose:compose-naming-check`.
 
 ```kotlin
-    /* ktlint-disable twitter-compose:compose-naming-check */
+    /* ktlint-disable compose:compose-naming-check */
     ... your code here
-    /* ktlint-enable twitter-compose:compose-naming-check */
+    /* ktlint-enable compose:compose-naming-check */
 ```

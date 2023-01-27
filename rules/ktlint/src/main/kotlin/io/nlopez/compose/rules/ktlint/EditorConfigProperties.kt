@@ -9,7 +9,7 @@ import org.ec4j.core.model.PropertyType.PropertyValueParser
 val contentEmittersProperty: EditorConfigProperty<String> =
     EditorConfigProperty(
         type = PropertyType.LowerCasingPropertyType(
-            "twitter_compose_content_emitters",
+            "compose_content_emitters",
             "A comma separated list of composable functions that emit content (e.g. UI)",
             PropertyType.PropertyValueParser.IDENTITY_VALUE_PARSER,
             emptySet(),
@@ -27,7 +27,7 @@ val contentEmittersProperty: EditorConfigProperty<String> =
 val compositionLocalAllowlistProperty: EditorConfigProperty<String> =
     EditorConfigProperty(
         type = PropertyType.LowerCasingPropertyType(
-            "twitter_compose_allowed_composition_locals",
+            "compose_allowed_composition_locals",
             "A comma separated list of allowed CompositionLocals",
             PropertyType.PropertyValueParser.IDENTITY_VALUE_PARSER,
             emptySet(),
@@ -45,7 +45,7 @@ val compositionLocalAllowlistProperty: EditorConfigProperty<String> =
 val previewPublicOnlyIfParams: EditorConfigProperty<Boolean> =
     EditorConfigProperty(
         type = PropertyType.LowerCasingPropertyType(
-            "twitter_compose_preview_public_only_if_params",
+            "compose_preview_public_only_if_params",
             "If set to true, it means ",
             //
             PropertyValueParser.BOOLEAN_VALUE_PARSER,
@@ -58,7 +58,7 @@ val previewPublicOnlyIfParams: EditorConfigProperty<Boolean> =
 val allowedComposeNamingNames: EditorConfigProperty<String> =
     EditorConfigProperty(
         type = PropertyType.LowerCasingPropertyType(
-            "twitter_compose_allowed_composable_function_names",
+            "compose_allowed_composable_function_names",
             "A comma separated list of regexes of allowed composable function names",
             PropertyType.PropertyValueParser.IDENTITY_VALUE_PARSER,
             emptySet(),

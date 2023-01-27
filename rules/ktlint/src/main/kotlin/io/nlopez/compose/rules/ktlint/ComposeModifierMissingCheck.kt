@@ -7,5 +7,5 @@ import io.nlopez.rules.core.ComposeKtVisitor
 import io.nlopez.rules.core.ktlint.TwitterKtlintRule
 
 class ComposeModifierMissingCheck :
-    TwitterKtlintRule("twitter-compose:modifier-missing-check"),
+    TwitterKtlintRule("compose:modifier-missing-check"),
     ComposeKtVisitor by ComposeModifierMissing()

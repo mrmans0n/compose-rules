@@ -14,7 +14,7 @@ interface ComposeKtConfig {
     fun getBoolean(key: String, default: Boolean): Boolean
 
     companion object {
-        private val Key: Key<ComposeKtConfig> = Key("twitter_compose_rules_config")
+        private val Key: Key<ComposeKtConfig> = Key("compose_rules_config")
         private val ReturnDefaults = object : ComposeKtConfig {
             override fun getInt(key: String, default: Int): Int = default
             override fun getString(key: String, default: String?): String? = default

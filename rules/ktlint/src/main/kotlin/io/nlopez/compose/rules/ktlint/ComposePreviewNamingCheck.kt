@@ -7,5 +7,5 @@ import io.nlopez.rules.core.ComposeKtVisitor
 import io.nlopez.rules.core.ktlint.TwitterKtlintRule
 
 class ComposePreviewNamingCheck :
-    TwitterKtlintRule("twitter-compose:preview-naming"),
+    TwitterKtlintRule("compose:preview-naming"),
     ComposeKtVisitor by ComposePreviewNaming()

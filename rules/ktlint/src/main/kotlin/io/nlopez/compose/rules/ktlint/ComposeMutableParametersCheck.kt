@@ -7,5 +7,5 @@ import io.nlopez.rules.core.ComposeKtVisitor
 import io.nlopez.rules.core.ktlint.TwitterKtlintRule
 
 class ComposeMutableParametersCheck :
-    TwitterKtlintRule("twitter-compose:mutable-params-check"),
+    TwitterKtlintRule("compose:mutable-params-check"),
     ComposeKtVisitor by ComposeMutableParameters()

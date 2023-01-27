@@ -9,7 +9,7 @@ import io.nlopez.rules.core.util.toSnakeCase
 /**
  * Manages the configuration for ktlint rules. In ktlint, configs are typically in snake case, while in the
  * whole project and in detekt they are camel case, so this class will convert all camel case keys to snake case,
- * and add a "twitter_compose_" prefix to all of them.
+ * and add a "compose_" prefix to all of them.
  * Results will be memoized as well, as config shouldn't be changing during the lifetime of a rule.
  */
 internal class KtlintComposeKtConfig(
@@ -39,5 +39,5 @@ internal class KtlintComposeKtConfig(
     override fun getBoolean(key: String, default: Boolean): Boolean =
         getValueAsOrPut(key) { properties[ktlintKey(key)]?.getValueAs<Boolean>() } ?: default
 
-    private fun ktlintKey(key: String): String = "twitter_compose_${key.toSnakeCase()}"
+    private fun ktlintKey(key: String): String = "compose_${key.toSnakeCase()}"
 }

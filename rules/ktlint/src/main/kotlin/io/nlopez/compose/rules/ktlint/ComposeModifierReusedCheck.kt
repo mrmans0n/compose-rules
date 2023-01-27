@@ -7,5 +7,5 @@ import io.nlopez.rules.core.ComposeKtVisitor
 import io.nlopez.rules.core.ktlint.TwitterKtlintRule
 
 class ComposeModifierReusedCheck :
-    TwitterKtlintRule("twitter-compose:modifier-reused-check"),
+    TwitterKtlintRule("compose:modifier-reused-check"),
     ComposeKtVisitor by ComposeModifierReused()

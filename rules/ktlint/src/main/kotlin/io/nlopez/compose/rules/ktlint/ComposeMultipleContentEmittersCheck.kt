@@ -7,5 +7,5 @@ import io.nlopez.rules.core.ComposeKtVisitor
 import io.nlopez.rules.core.ktlint.TwitterKtlintRule
 
 class ComposeMultipleContentEmittersCheck :
-    TwitterKtlintRule("twitter-compose:multiple-emitters-check"),
+    TwitterKtlintRule("compose:multiple-emitters-check"),
     ComposeKtVisitor by ComposeMultipleContentEmitters()

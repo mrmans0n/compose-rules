@@ -8,9 +8,9 @@ import org.assertj.core.api.AssertionsForInterfaceTypes.assertThat
 import org.junit.jupiter.api.Test
 import org.reflections.Reflections
 
-class TwitterComposeRuleSetProviderTest {
+class ComposeRuleSetProviderTest {
 
-    private val ruleSetProvider = TwitterComposeRuleSetProvider()
+    private val ruleSetProvider = ComposeRuleSetProvider()
     private val ruleSet = ruleSetProvider.instance(Config.empty)
 
     @Test

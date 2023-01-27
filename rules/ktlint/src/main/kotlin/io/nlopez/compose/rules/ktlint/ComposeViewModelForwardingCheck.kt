@@ -7,5 +7,5 @@ import io.nlopez.rules.core.ComposeKtVisitor
 import io.nlopez.rules.core.ktlint.TwitterKtlintRule
 
 class ComposeViewModelForwardingCheck :
-    TwitterKtlintRule("twitter-compose:vm-forwarding-check"),
+    TwitterKtlintRule("compose:vm-forwarding-check"),
     ComposeKtVisitor by ComposeViewModelForwarding()

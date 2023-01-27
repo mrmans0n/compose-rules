@@ -9,7 +9,7 @@
    $ git push
    ```
    This will trigger a GitHub Action workflow that will publish the artifacts to Maven Central, and publish them.
-3. Go to [Releases](https://github.com/twitter/compose-rules/releases) and you'll see a draft release with all the PRs listed in the changelog.
+3. Go to [Releases](https://github.com/mrmans0n/compose-rules/releases) and you'll see a draft release with all the PRs listed in the changelog.
    1. Make sure the release name and the tags associated to it match. If not, you make them match.
    2. Publish the draft of the release.
 

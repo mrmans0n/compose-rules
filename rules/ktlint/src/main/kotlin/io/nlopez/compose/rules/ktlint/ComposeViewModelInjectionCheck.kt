@@ -7,5 +7,5 @@ import io.nlopez.rules.core.ComposeKtVisitor
 import io.nlopez.rules.core.ktlint.TwitterKtlintRule
 
 class ComposeViewModelInjectionCheck :
-    TwitterKtlintRule("twitter-compose:vm-injection-check"),
+    TwitterKtlintRule("compose:vm-injection-check"),
     ComposeKtVisitor by ComposeViewModelInjection()

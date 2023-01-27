@@ -7,5 +7,5 @@ import io.nlopez.rules.core.ComposeKtVisitor
 import io.nlopez.rules.core.ktlint.TwitterKtlintRule
 
 class ComposeUnstableCollectionsCheck :
-    TwitterKtlintRule("twitter-compose:unstable-collections"),
+    TwitterKtlintRule("compose:unstable-collections"),
     ComposeKtVisitor by ComposeUnstableCollections()

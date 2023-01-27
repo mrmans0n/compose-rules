@@ -7,7 +7,7 @@ package io.nlopez.compose.rules.ktlint
 import com.pinterest.ktlint.core.RuleProvider
 import com.pinterest.ktlint.core.RuleSetProviderV2
 
-class TwitterComposeRuleSetProvider : RuleSetProviderV2(
+class ComposeRuleSetProvider : RuleSetProviderV2(
     CustomRuleSetId,
     RuleSetAbout,
 ) {
@@ -34,12 +34,12 @@ class TwitterComposeRuleSetProvider : RuleSetProviderV2(
 
     private companion object {
         private val RuleSetAbout = About(
-            maintainer = "Twitter, Inc",
+            maintainer = "Nacho Lopez",
             description = "Static checks to aid with a healthy adoption of Jetpack Compose",
             license = "Apache License, Version 2.0",
-            repositoryUrl = "https://github.com/twitter/compose-rules/",
-            issueTrackerUrl = "https://github.com/twitter/compose-rules/issues",
+            repositoryUrl = "https://github.com/mrmans0n/compose-rules/",
+            issueTrackerUrl = "https://github.com/mrmans0n/compose-rules/issues",
         )
-        const val CustomRuleSetId = "twitter-compose"
+        const val CustomRuleSetId = "compose"
     }
 }

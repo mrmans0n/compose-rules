@@ -7,5 +7,5 @@ import io.nlopez.rules.core.ComposeKtVisitor
 import io.nlopez.rules.core.ktlint.TwitterKtlintRule
 
 class ComposeModifierWithoutDefaultCheck :
-    TwitterKtlintRule("twitter-compose:modifier-without-default-check"),
+    TwitterKtlintRule("compose:modifier-without-default-check"),
     ComposeKtVisitor by ComposeModifierWithoutDefault()

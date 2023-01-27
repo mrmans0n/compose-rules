@@ -7,5 +7,5 @@ import io.nlopez.rules.core.ComposeKtVisitor
 import io.nlopez.rules.core.ktlint.TwitterKtlintRule
 
 class ComposePreviewPublicCheck :
-    TwitterKtlintRule("twitter-compose:preview-public-check"),
+    TwitterKtlintRule("compose:preview-public-check"),
     ComposeKtVisitor by ComposePreviewPublic()

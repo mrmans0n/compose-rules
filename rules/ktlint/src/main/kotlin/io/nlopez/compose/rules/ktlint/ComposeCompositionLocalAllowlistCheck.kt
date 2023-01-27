@@ -6,5 +6,5 @@ import io.nlopez.rules.core.ComposeKtVisitor
 import io.nlopez.rules.core.ktlint.TwitterKtlintRule
 
 class ComposeCompositionLocalAllowlistCheck :
-    TwitterKtlintRule("twitter-compose:compositionlocal-allowlist"),
+    TwitterKtlintRule("compose:compositionlocal-allowlist"),
     ComposeKtVisitor by io.nlopez.compose.rules.ComposeCompositionLocalAllowlist()

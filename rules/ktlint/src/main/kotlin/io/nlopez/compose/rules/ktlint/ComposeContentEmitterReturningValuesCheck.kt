@@ -7,5 +7,5 @@ import io.nlopez.rules.core.ComposeKtVisitor
 import io.nlopez.rules.core.ktlint.TwitterKtlintRule
 
 class ComposeContentEmitterReturningValuesCheck :
-    TwitterKtlintRule("twitter-compose:content-emitter-returning-values-check"),
+    TwitterKtlintRule("compose:content-emitter-returning-values-check"),
     ComposeKtVisitor by ComposeContentEmitterReturningValues()
