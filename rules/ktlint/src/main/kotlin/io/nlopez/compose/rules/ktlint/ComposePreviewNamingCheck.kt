@@ -4,8 +4,8 @@ package io.nlopez.compose.rules.ktlint
 
 import io.nlopez.compose.rules.ComposePreviewNaming
 import io.nlopez.rules.core.ComposeKtVisitor
-import io.nlopez.rules.core.ktlint.TwitterKtlintRule
+import io.nlopez.rules.core.ktlint.KtlintRule
 
 class ComposePreviewNamingCheck :
-    TwitterKtlintRule("compose:preview-naming"),
+    KtlintRule("compose:preview-naming"),
     ComposeKtVisitor by ComposePreviewNaming()

@@ -8,10 +8,10 @@ import io.gitlab.arturbosch.detekt.api.Issue
 import io.gitlab.arturbosch.detekt.api.Severity
 import io.nlopez.compose.rules.ComposePreviewNaming
 import io.nlopez.rules.core.ComposeKtVisitor
-import io.nlopez.rules.core.detekt.TwitterDetektRule
+import io.nlopez.rules.core.detekt.DetektRule
 
 class ComposePreviewNamingCheck(config: Config) :
-    TwitterDetektRule(config),
+    DetektRule(config),
     ComposeKtVisitor by ComposePreviewNaming() {
 
     override val issue: Issue = Issue(

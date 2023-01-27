@@ -28,7 +28,7 @@ class ComposePreviewNaming : ComposeKtVisitor {
         fun createMessage(count: Int, suggestedSuffix: String): String = """
             Preview annotations with $count preview annotations should end with the `$suggestedSuffix` suffix.
 
-            See https://twitter.github.io/compose-rules/rules/#naming-multipreview-annotations-properly for more information.
+            See https://mrmans0n.github.io/compose-rules/rules/#naming-multipreview-annotations-properly for more information.
         """.trimIndent()
     }
 }

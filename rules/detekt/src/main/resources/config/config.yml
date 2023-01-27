@@ -1,4 +1,4 @@
-TwitterCompose:
+Compose:
   CompositionLocalAllowlist:
     active: true
   CompositionLocalNaming:

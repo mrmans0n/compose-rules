@@ -45,7 +45,7 @@ class ComposeModifierMissing : ComposeKtVisitor {
         val MissingModifierContentComposable = """
             This @Composable function emits content but doesn't have a modifier parameter.
 
-            See https://twitter.github.io/compose-rules/rules/#when-should-i-expose-modifier-parameters for more information.
+            See https://mrmans0n.github.io/compose-rules/rules/#when-should-i-expose-modifier-parameters for more information.
         """.trimIndent()
     }
 }

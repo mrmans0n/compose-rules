@@ -4,8 +4,8 @@ package io.nlopez.compose.rules.ktlint
 
 import io.nlopez.compose.rules.ComposeContentEmitterReturningValues
 import io.nlopez.rules.core.ComposeKtVisitor
-import io.nlopez.rules.core.ktlint.TwitterKtlintRule
+import io.nlopez.rules.core.ktlint.KtlintRule
 
 class ComposeContentEmitterReturningValuesCheck :
-    TwitterKtlintRule("compose:content-emitter-returning-values-check"),
+    KtlintRule("compose:content-emitter-returning-values-check"),
     ComposeKtVisitor by ComposeContentEmitterReturningValues()

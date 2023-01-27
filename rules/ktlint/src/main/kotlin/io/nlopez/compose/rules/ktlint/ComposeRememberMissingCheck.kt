@@ -4,8 +4,8 @@ package io.nlopez.compose.rules.ktlint
 
 import io.nlopez.compose.rules.ComposeRememberMissing
 import io.nlopez.rules.core.ComposeKtVisitor
-import io.nlopez.rules.core.ktlint.TwitterKtlintRule
+import io.nlopez.rules.core.ktlint.KtlintRule
 
 class ComposeRememberMissingCheck :
-    TwitterKtlintRule("compose:remember-missing-check"),
+    KtlintRule("compose:remember-missing-check"),
     ComposeKtVisitor by ComposeRememberMissing()

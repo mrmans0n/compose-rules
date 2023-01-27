@@ -2,7 +2,7 @@ When using the [Detekt Gradle Plugin](https://detekt.dev/docs/gettingstarted/gra
 
 ```groovy
 dependencies {
-    detektPlugins "com.twitter.compose.rules:detekt:<VERSION>"
+    detektPlugins "io.nlopez.compose.rules:detekt:<VERSION>"
 }
 ```
 
@@ -19,7 +19,7 @@ detekt -p detekt-compose-<VERSION>-all.jar -c your/config/detekt.yml
 For the rules to be picked up, you will need to enable them in your `detekt.yml` configuration file.
 
 ```yaml
-TwitterCompose:
+Compose:
   CompositionLocalAllowlist:
     active: true
     # You can optionally define a list of CompositionLocals that are allowed here

@@ -4,8 +4,8 @@ package io.nlopez.compose.rules.ktlint
 
 import io.nlopez.compose.rules.ComposeParameterOrder
 import io.nlopez.rules.core.ComposeKtVisitor
-import io.nlopez.rules.core.ktlint.TwitterKtlintRule
+import io.nlopez.rules.core.ktlint.KtlintRule
 
 class ComposeParameterOrderCheck :
-    TwitterKtlintRule("compose:param-order-check"),
+    KtlintRule("compose:param-order-check"),
     ComposeKtVisitor by ComposeParameterOrder()

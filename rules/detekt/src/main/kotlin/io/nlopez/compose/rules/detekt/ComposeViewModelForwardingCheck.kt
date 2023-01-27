@@ -8,10 +8,10 @@ import io.gitlab.arturbosch.detekt.api.Issue
 import io.gitlab.arturbosch.detekt.api.Severity
 import io.nlopez.compose.rules.ComposeViewModelForwarding
 import io.nlopez.rules.core.ComposeKtVisitor
-import io.nlopez.rules.core.detekt.TwitterDetektRule
+import io.nlopez.rules.core.detekt.DetektRule
 
 class ComposeViewModelForwardingCheck(config: Config) :
-    TwitterDetektRule(config),
+    DetektRule(config),
     ComposeKtVisitor by ComposeViewModelForwarding() {
     override val issue: Issue = Issue(
         id = "ViewModelForwarding",

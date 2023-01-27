@@ -4,8 +4,8 @@ package io.nlopez.compose.rules.ktlint
 
 import io.nlopez.compose.rules.ComposeUnstableCollections
 import io.nlopez.rules.core.ComposeKtVisitor
-import io.nlopez.rules.core.ktlint.TwitterKtlintRule
+import io.nlopez.rules.core.ktlint.KtlintRule
 
 class ComposeUnstableCollectionsCheck :
-    TwitterKtlintRule("compose:unstable-collections"),
+    KtlintRule("compose:unstable-collections"),
     ComposeKtVisitor by ComposeUnstableCollections()

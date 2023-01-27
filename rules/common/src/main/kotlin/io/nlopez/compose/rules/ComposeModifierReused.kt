@@ -133,7 +133,7 @@ class ComposeModifierReused : ComposeKtVisitor {
 
             Use Modifier (with a capital 'M') to construct a new Modifier that you can pass to other composables.
 
-            See https://twitter.github.io/compose-rules/rules/#dont-re-use-modifiers for more information.
+            See https://mrmans0n.github.io/compose-rules/rules/#dont-re-use-modifiers for more information.
         """.trimIndent()
     }
 }

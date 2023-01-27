@@ -8,10 +8,10 @@ import io.gitlab.arturbosch.detekt.api.Issue
 import io.gitlab.arturbosch.detekt.api.Severity
 import io.nlopez.compose.rules.ComposeModifierMissing
 import io.nlopez.rules.core.ComposeKtVisitor
-import io.nlopez.rules.core.detekt.TwitterDetektRule
+import io.nlopez.rules.core.detekt.DetektRule
 
 class ComposeModifierMissingCheck(config: Config) :
-    TwitterDetektRule(config),
+    DetektRule(config),
     ComposeKtVisitor by ComposeModifierMissing() {
     override val issue: Issue = Issue(
         id = "ModifierMissing",

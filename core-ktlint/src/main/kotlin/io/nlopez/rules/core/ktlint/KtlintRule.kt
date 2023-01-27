@@ -17,7 +17,7 @@ import org.jetbrains.kotlin.psi.psiUtil.startOffset
 import org.jetbrains.kotlin.psi.stubs.elements.KtStubElementTypes
 import org.jetbrains.kotlin.utils.addToStdlib.cast
 
-abstract class TwitterKtlintRule(id: String) : Rule(id), ComposeKtVisitor {
+abstract class KtlintRule(id: String) : Rule(id), ComposeKtVisitor {
 
     private lateinit var properties: EditorConfigProperties
 

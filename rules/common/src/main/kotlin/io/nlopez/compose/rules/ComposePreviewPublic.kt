@@ -36,7 +36,7 @@ class ComposePreviewPublic : ComposeKtVisitor {
         val ComposablesPreviewShouldNotBePublic = """
             Composables annotated with @Preview that are used only for previewing the UI should not be public.
 
-            See https://twitter.github.io/compose-rules/rules/#preview-composables-should-not-be-public for more information.
+            See https://mrmans0n.github.io/compose-rules/rules/#preview-composables-should-not-be-public for more information.
         """.trimIndent()
     }
 }

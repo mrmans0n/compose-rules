@@ -5,7 +5,7 @@ If using [kotlinter](https://github.com/jeremymailen/kotlinter-gradle), you can 
 ```groovy
 buildscript {
     dependencies {
-        classpath "com.twitter.compose.rules:ktlint:<version>"
+        classpath "io.nlopez.compose.rules:ktlint:<version>"
     }
 }
 ```
@@ -18,7 +18,7 @@ If using [ktlint-gradle](https://github.com/JLLeitschuh/ktlint-gradle), you can 
 
 ```groovy
 dependencies {
-    ktlintRuleset "com.twitter.compose.rules:ktlint:<VERSION>"
+    ktlintRuleset "io.nlopez.compose.rules:ktlint:<VERSION>"
 }
 ```
 

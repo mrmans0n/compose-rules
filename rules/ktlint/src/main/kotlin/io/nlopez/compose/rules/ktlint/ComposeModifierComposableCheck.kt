@@ -4,8 +4,8 @@ package io.nlopez.compose.rules.ktlint
 
 import io.nlopez.compose.rules.ComposeModifierComposable
 import io.nlopez.rules.core.ComposeKtVisitor
-import io.nlopez.rules.core.ktlint.TwitterKtlintRule
+import io.nlopez.rules.core.ktlint.KtlintRule
 
 class ComposeModifierComposableCheck :
-    TwitterKtlintRule("compose:modifier-composable-check"),
+    KtlintRule("compose:modifier-composable-check"),
     ComposeKtVisitor by ComposeModifierComposable()

@@ -52,7 +52,7 @@ class ComposeViewModelForwarding : ComposeKtVisitor {
         val AvoidViewModelForwarding = """
             Forwarding a ViewModel through multiple @Composable functions should be avoided. Consider using state hoisting.
 
-            See https://twitter.github.io/compose-rules/rules/#hoist-all-the-things for more information.
+            See https://mrmans0n.github.io/compose-rules/rules/#hoist-all-the-things for more information.
         """.trimIndent()
     }
 }

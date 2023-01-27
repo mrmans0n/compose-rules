@@ -8,10 +8,10 @@ import io.gitlab.arturbosch.detekt.api.Issue
 import io.gitlab.arturbosch.detekt.api.Severity
 import io.nlopez.compose.rules.ComposeContentEmitterReturningValues
 import io.nlopez.rules.core.ComposeKtVisitor
-import io.nlopez.rules.core.detekt.TwitterDetektRule
+import io.nlopez.rules.core.detekt.DetektRule
 
 class ComposeContentEmitterReturningValuesCheck(config: Config) :
-    TwitterDetektRule(config),
+    DetektRule(config),
     ComposeKtVisitor by ComposeContentEmitterReturningValues() {
 
     override val issue: Issue = Issue(

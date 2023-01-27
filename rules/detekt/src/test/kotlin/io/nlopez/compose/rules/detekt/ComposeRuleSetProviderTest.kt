@@ -3,7 +3,7 @@
 package io.nlopez.compose.rules.detekt
 
 import io.gitlab.arturbosch.detekt.api.Config
-import io.nlopez.rules.core.detekt.TwitterDetektRule
+import io.nlopez.rules.core.detekt.DetektRule
 import org.assertj.core.api.AssertionsForInterfaceTypes.assertThat
 import org.junit.jupiter.api.Test
 import org.reflections.Reflections
@@ -16,8 +16,8 @@ class ComposeRuleSetProviderTest {
     @Test
     fun `ensure all rules in the package are represented in the ruleset`() {
         val reflections = Reflections(ruleSetProvider.javaClass.packageName)
-        val ruleClassesInPackage = reflections.getSubTypesOf(TwitterDetektRule::class.java)
-        val ruleClassesInRuleSet = ruleSet.rules.filterIsInstance<TwitterDetektRule>().map { it::class.java }.toSet()
+        val ruleClassesInPackage = reflections.getSubTypesOf(DetektRule::class.java)
+        val ruleClassesInRuleSet = ruleSet.rules.filterIsInstance<DetektRule>().map { it::class.java }.toSet()
         assertThat(ruleClassesInRuleSet).containsExactlyInAnyOrderElementsOf(ruleClassesInPackage)
     }
 }

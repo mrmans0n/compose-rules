@@ -3,8 +3,8 @@
 package io.nlopez.compose.rules.ktlint
 
 import io.nlopez.rules.core.ComposeKtVisitor
-import io.nlopez.rules.core.ktlint.TwitterKtlintRule
+import io.nlopez.rules.core.ktlint.KtlintRule
 
 class ComposeCompositionLocalAllowlistCheck :
-    TwitterKtlintRule("compose:compositionlocal-allowlist"),
+    KtlintRule("compose:compositionlocal-allowlist"),
     ComposeKtVisitor by io.nlopez.compose.rules.ComposeCompositionLocalAllowlist()

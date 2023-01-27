@@ -33,6 +33,6 @@ class ComposeRuleSetProvider : RuleSetProvider {
     )
 
     private companion object {
-        const val CustomRuleSetId = "TwitterCompose"
+        const val CustomRuleSetId = "Compose"
     }
 }

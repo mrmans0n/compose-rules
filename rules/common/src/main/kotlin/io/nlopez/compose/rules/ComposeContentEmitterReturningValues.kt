@@ -64,7 +64,7 @@ class ComposeContentEmitterReturningValues : ComposeKtVisitor {
             If a composable should offer additional control surfaces to its caller, those control surfaces or callbacks
             should be provided as parameters to the composable function by the caller.
 
-            See https://twitter.github.io/compose-rules/rules/#do-not-emit-content-and-return-a-result for more information.
+            See https://mrmans0n.github.io/compose-rules/rules/#do-not-emit-content-and-return-a-result for more information.
         """.trimIndent()
     }
 }

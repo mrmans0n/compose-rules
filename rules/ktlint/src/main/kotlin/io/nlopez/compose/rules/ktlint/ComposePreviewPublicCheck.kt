@@ -4,8 +4,8 @@ package io.nlopez.compose.rules.ktlint
 
 import io.nlopez.compose.rules.ComposePreviewPublic
 import io.nlopez.rules.core.ComposeKtVisitor
-import io.nlopez.rules.core.ktlint.TwitterKtlintRule
+import io.nlopez.rules.core.ktlint.KtlintRule
 
 class ComposePreviewPublicCheck :
-    TwitterKtlintRule("compose:preview-public-check"),
+    KtlintRule("compose:preview-public-check"),
     ComposeKtVisitor by ComposePreviewPublic()

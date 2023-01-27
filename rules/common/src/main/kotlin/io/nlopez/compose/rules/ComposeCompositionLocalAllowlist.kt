@@ -34,7 +34,7 @@ class ComposeCompositionLocalAllowlist : ComposeKtVisitor {
         val CompositionLocalNotInAllowlist = """
             CompositionLocals are implicit dependencies and creating new ones should be avoided.
 
-            See https://twitter.github.io/compose-rules/rules/#compositionlocals for more information.
+            See https://mrmans0n.github.io/compose-rules/rules/#compositionlocals for more information.
         """.trimIndent()
     }
 }

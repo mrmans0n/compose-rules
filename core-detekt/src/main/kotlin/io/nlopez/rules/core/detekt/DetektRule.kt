@@ -22,7 +22,7 @@ import org.jetbrains.kotlin.psi.KtFunction
 import org.jetbrains.kotlin.psi.stubs.elements.KtStubElementTypes
 import org.jetbrains.kotlin.utils.addToStdlib.cast
 
-abstract class TwitterDetektRule(
+abstract class DetektRule(
     config: Config = Config.empty,
 ) : Rule(config), ComposeKtVisitor {
 

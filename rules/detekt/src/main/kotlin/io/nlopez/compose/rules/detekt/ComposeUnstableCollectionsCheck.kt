@@ -8,10 +8,10 @@ import io.gitlab.arturbosch.detekt.api.Issue
 import io.gitlab.arturbosch.detekt.api.Severity
 import io.nlopez.compose.rules.ComposeUnstableCollections
 import io.nlopez.rules.core.ComposeKtVisitor
-import io.nlopez.rules.core.detekt.TwitterDetektRule
+import io.nlopez.rules.core.detekt.DetektRule
 
 class ComposeUnstableCollectionsCheck(config: Config) :
-    TwitterDetektRule(config),
+    DetektRule(config),
     ComposeKtVisitor by ComposeUnstableCollections() {
     override val issue: Issue = Issue(
         id = "UnstableCollections",
@@ -20,7 +20,7 @@ class ComposeUnstableCollectionsCheck(config: Config) :
             The Compose Compiler cannot infer the stability of a parameter if a List/Set/Map is used in it, even if the item type is stable.
             You should use Kotlinx Immutable Collections instead, or create an `@Immutable` wrapper for this class.
 
-            See https://twitter.github.io/compose-rules/rules/#avoid-using-unstable-collections for more information.
+            See https://mrmans0n.github.io/compose-rules/rules/#avoid-using-unstable-collections for more information.
         """.trimIndent(),
         debt = Debt.TWENTY_MINS,
     )
