@@ -13,7 +13,6 @@ class ComposeRuleSetProvider : RuleSetProvider {
         CustomRuleSetId,
         listOf(
             ComposeCompositionLocalAllowlistCheck(config),
-            ComposeCompositionLocalNamingCheck(config),
             ComposeContentEmitterReturningValuesCheck(config),
             ComposeModifierComposableCheck(config),
             ComposeModifierMissingCheck(config),

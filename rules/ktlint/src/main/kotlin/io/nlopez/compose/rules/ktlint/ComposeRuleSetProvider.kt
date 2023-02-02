@@ -14,7 +14,6 @@ class ComposeRuleSetProvider : RuleSetProviderV2(
 
     override fun getRuleProviders(): Set<RuleProvider> = setOf(
         RuleProvider { ComposeCompositionLocalAllowlistCheck() },
-        RuleProvider { ComposeCompositionLocalNamingCheck() },
         RuleProvider { ComposeContentEmitterReturningValuesCheck() },
         RuleProvider { ComposeModifierComposableCheck() },
         RuleProvider { ComposeModifierMissingCheck() },
