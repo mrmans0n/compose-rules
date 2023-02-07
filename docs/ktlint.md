@@ -12,7 +12,7 @@ buildscript {
 
 ## Using with ktlint-gradle
 
-> **Warning**: This plugin doesn't currently support ktlint versions over 0.46.0, [they are working to support it right now](https://github.com/JLLeitschuh/ktlint-gradle/pull/595).
+> **Note**: You need at least version [11.1.0](https://github.com/JLLeitschuh/ktlint-gradle/releases/tag/v11.1.0) of this plugin.
 
 If using [ktlint-gradle](https://github.com/JLLeitschuh/ktlint-gradle), you can specify the dependency on this set of rules by using the `ktlintRuleset`.
 
