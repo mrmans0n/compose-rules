@@ -4,6 +4,7 @@ package io.nlopez.compose.rules.ktlint
 
 import com.pinterest.ktlint.test.KtLintAssertThat.Companion.assertThatRule
 import com.pinterest.ktlint.test.LintViolation
+import io.nlopez.compose.rules.ComposeCompositionLocalAllowlist
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
 
@@ -26,22 +27,22 @@ class ComposeCompositionLocalAllowlistCheckTest {
                 LintViolation(
                     line = 1,
                     col = 13,
-                    detail = io.nlopez.compose.rules.ComposeCompositionLocalAllowlist.CompositionLocalNotInAllowlist,
+                    detail = ComposeCompositionLocalAllowlist.CompositionLocalNotInAllowlist,
                 ),
                 LintViolation(
                     line = 2,
                     col = 14,
-                    detail = io.nlopez.compose.rules.ComposeCompositionLocalAllowlist.CompositionLocalNotInAllowlist,
+                    detail = ComposeCompositionLocalAllowlist.CompositionLocalNotInAllowlist,
                 ),
                 LintViolation(
                     line = 3,
                     col = 5,
-                    detail = io.nlopez.compose.rules.ComposeCompositionLocalAllowlist.CompositionLocalNotInAllowlist,
+                    detail = ComposeCompositionLocalAllowlist.CompositionLocalNotInAllowlist,
                 ),
                 LintViolation(
                     line = 4,
                     col = 13,
-                    detail = io.nlopez.compose.rules.ComposeCompositionLocalAllowlist.CompositionLocalNotInAllowlist,
+                    detail = ComposeCompositionLocalAllowlist.CompositionLocalNotInAllowlist,
                 ),
             )
     }

@@ -3,6 +3,8 @@
 package io.nlopez.compose.rules.detekt
 
 import io.gitlab.arturbosch.detekt.api.Config
+import io.gitlab.arturbosch.detekt.api.SourceLocation
+import io.gitlab.arturbosch.detekt.test.TestConfig
 import io.gitlab.arturbosch.detekt.test.assertThat
 import io.gitlab.arturbosch.detekt.test.lint
 import io.nlopez.compose.rules.ComposeModifierMissing
@@ -76,7 +78,7 @@ class ComposeModifierMissingCheckTest {
     }
 
     @Test
-    fun `non-public visibility Composables are ignored`() {
+    fun `non-public visibility Composables are ignored (by default)`() {
         @Language("kotlin")
         val code =
             """
@@ -105,6 +107,94 @@ class ComposeModifierMissingCheckTest {
             """.trimIndent()
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
+    }
+
+    @Test
+    fun `public and internal visibility Composables are checked for 'public_and_internal' configuration`() {
+        val newRule = ComposeModifierMissingCheck(
+            TestConfig("checkModifiersForVisibility" to "public_and_internal"),
+        )
+
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun Something() {
+                    Row {
+                    }
+                }
+                @Composable
+                protected fun Something() {
+                    Column(modifier = Modifier.fillMaxSize()) {
+                    }
+                }
+                @Composable
+                internal fun Something() {
+                    SomethingElse {
+                        Box(modifier = Modifier.fillMaxSize()) {
+                        }
+                    }
+                }
+                @Composable
+                private fun Something() {
+                    Whatever(modifier = Modifier.fillMaxSize()) {
+                    }
+                }
+            """.trimIndent()
+        val errors = newRule.lint(code)
+        assertThat(errors).hasSize(2)
+            .hasStartSourceLocations(
+                SourceLocation(2, 5),
+                SourceLocation(12, 14),
+            )
+        for (error in errors) {
+            assertThat(error).hasMessage(ComposeModifierMissing.MissingModifierContentComposable)
+        }
+    }
+
+    @Test
+    fun `all Composables are checked for 'all' configuration`() {
+        val newRule = ComposeModifierMissingCheck(
+            TestConfig("checkModifiersForVisibility" to "all"),
+        )
+
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun Something() {
+                    Row {
+                    }
+                }
+                @Composable
+                protected fun Something() {
+                    Column(modifier = Modifier.fillMaxSize()) {
+                    }
+                }
+                @Composable
+                internal fun Something() {
+                    SomethingElse {
+                        Box(modifier = Modifier.fillMaxSize()) {
+                        }
+                    }
+                }
+                @Composable
+                private fun Something() {
+                    Whatever(modifier = Modifier.fillMaxSize()) {
+                    }
+                }
+            """.trimIndent()
+        val errors = newRule.lint(code)
+        assertThat(errors).hasSize(4)
+            .hasStartSourceLocations(
+                SourceLocation(2, 5),
+                SourceLocation(7, 15),
+                SourceLocation(12, 14),
+                SourceLocation(19, 13),
+            )
+        for (error in errors) {
+            assertThat(error).hasMessage(ComposeModifierMissing.MissingModifierContentComposable)
+        }
     }
 
     @Test

@@ -2,11 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 package io.nlopez.compose.rules
 
+import io.nlopez.rules.core.ComposeKtConfig.Companion.config
 import io.nlopez.rules.core.ComposeKtVisitor
 import io.nlopez.rules.core.Emitter
 import io.nlopez.rules.core.report
 import io.nlopez.rules.core.util.definedInInterface
 import io.nlopez.rules.core.util.emitsContent
+import io.nlopez.rules.core.util.isInternal
 import io.nlopez.rules.core.util.isOverride
 import io.nlopez.rules.core.util.isPreview
 import io.nlopez.rules.core.util.modifierParameter
@@ -18,12 +20,10 @@ class ComposeModifierMissing : ComposeKtVisitor {
 
     override fun visitComposable(function: KtFunction, autoCorrect: Boolean, emitter: Emitter) {
         // We want to find all composable functions that:
-        //  - are public
         //  - emit content
         //  - are not overridden or part of an interface
         //  - are not a @Preview composable
         if (
-            !function.isPublic ||
             function.returnsValue ||
             function.isOverride ||
             function.definedInInterface ||
@@ -31,6 +31,21 @@ class ComposeModifierMissing : ComposeKtVisitor {
         ) {
             return
         }
+
+        // We want to check now the visibility to see whether it's allowed by the configuration
+        // Possible values:
+        // - only_public: will check for modifiers only on public composables
+        // - public_and_internal: will check for public and internal composables
+        // - all: will check all composables (public, internal, protected, private
+        val shouldCheck = when (
+            function.config().getString("checkModifiersForVisibility", "only_public")
+        ) {
+            "only_public" -> function.isPublic
+            "public_and_internal" -> function.isPublic || function.isInternal
+            "all" -> true
+            else -> function.isPublic
+        }
+        if (!shouldCheck) return
 
         // If there is a modifier param, we bail
         if (function.modifierParameter != null) return

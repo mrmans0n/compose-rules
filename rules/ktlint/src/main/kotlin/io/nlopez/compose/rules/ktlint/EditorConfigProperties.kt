@@ -24,6 +24,24 @@ val contentEmittersProperty: EditorConfigProperty<String> =
         },
     )
 
+val checkModifiersForVisibility: EditorConfigProperty<String> =
+    EditorConfigProperty(
+        type = PropertyType.LowerCasingPropertyType(
+            "compose_check_modifiers_for_visibility",
+            "Visibility of the composables where we want to check if a Modifier parameter is missing",
+            PropertyValueParser.IDENTITY_VALUE_PARSER,
+            setOf("only_public", "public_and_internal", "all"),
+        ),
+        defaultValue = "only_public",
+        propertyMapper = { property, _ ->
+            when {
+                property?.isUnset == true -> "only_public"
+                property?.getValueAs<String>() != null -> property.getValueAs<String>()
+                else -> property?.getValueAs()
+            }
+        },
+    )
+
 val compositionLocalAllowlistProperty: EditorConfigProperty<String> =
     EditorConfigProperty(
         type = PropertyType.LowerCasingPropertyType(

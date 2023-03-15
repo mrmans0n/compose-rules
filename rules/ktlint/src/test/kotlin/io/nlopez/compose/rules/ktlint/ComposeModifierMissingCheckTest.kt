@@ -95,7 +95,7 @@ class ComposeModifierMissingCheckTest {
     }
 
     @Test
-    fun `non-public visibility Composables are ignored`() {
+    fun `non-public visibility Composables are ignored (by default)`() {
         @Language("kotlin")
         val code =
             """
@@ -123,6 +123,104 @@ class ComposeModifierMissingCheckTest {
                 }
             """.trimIndent()
         modifierRuleAssertThat(code).hasNoLintViolations()
+    }
+
+    @Test
+    fun `public and internal visibility Composables are checked for 'public_and_internal' configuration`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun Something() {
+                    Row {
+                    }
+                }
+                @Composable
+                protected fun Something() {
+                    Column(modifier = Modifier.fillMaxSize()) {
+                    }
+                }
+                @Composable
+                internal fun Something() {
+                    SomethingElse {
+                        Box(modifier = Modifier.fillMaxSize()) {
+                        }
+                    }
+                }
+                @Composable
+                private fun Something() {
+                    Whatever(modifier = Modifier.fillMaxSize()) {
+                    }
+                }
+            """.trimIndent()
+        modifierRuleAssertThat(code)
+            .withEditorConfigOverride(checkModifiersForVisibility to "public_and_internal")
+            .hasLintViolationsWithoutAutoCorrect(
+                LintViolation(
+                    line = 2,
+                    col = 5,
+                    detail = ComposeModifierMissing.MissingModifierContentComposable,
+                ),
+                LintViolation(
+                    line = 12,
+                    col = 14,
+                    detail = ComposeModifierMissing.MissingModifierContentComposable,
+                ),
+            )
+    }
+
+    @Test
+    fun `all Composables are checked for 'all' configuration`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun Something() {
+                    Row {
+                    }
+                }
+                @Composable
+                protected fun Something() {
+                    Column(modifier = Modifier.fillMaxSize()) {
+                    }
+                }
+                @Composable
+                internal fun Something() {
+                    SomethingElse {
+                        Box(modifier = Modifier.fillMaxSize()) {
+                        }
+                    }
+                }
+                @Composable
+                private fun Something() {
+                    Whatever(modifier = Modifier.fillMaxSize()) {
+                    }
+                }
+            """.trimIndent()
+        modifierRuleAssertThat(code)
+            .withEditorConfigOverride(checkModifiersForVisibility to "all")
+            .hasLintViolationsWithoutAutoCorrect(
+                LintViolation(
+                    line = 2,
+                    col = 5,
+                    detail = ComposeModifierMissing.MissingModifierContentComposable,
+                ),
+                LintViolation(
+                    line = 7,
+                    col = 15,
+                    detail = ComposeModifierMissing.MissingModifierContentComposable,
+                ),
+                LintViolation(
+                    line = 12,
+                    col = 14,
+                    detail = ComposeModifierMissing.MissingModifierContentComposable,
+                ),
+                LintViolation(
+                    line = 19,
+                    col = 13,
+                    detail = ComposeModifierMissing.MissingModifierContentComposable,
+                ),
+            )
     }
 
     @Test

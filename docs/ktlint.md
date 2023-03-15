@@ -75,6 +75,20 @@ The `compose:naming-check` rule requires all composables that return a value to 
 compose_allowed_composable_function_names = .*Presenter,.*SomethingElse
 ```
 
+### Configure the visibility of the composables where to check for missing modifiers
+
+The `compose:modifier-missing-check` rule will, by default, only look for missing modifiers for public composables. If you want to lower the visibility threshold to check also internal compoosables, or all composables, you can configure it in your `.editorconfig` file:
+
+```editorconfig
+[*.{kt,kts}]
+compose_check_modifiers_for_visibility = only_public
+```
+
+Possible values are:
+- `only_public`: (default) Will check for missing modifiers only for public composables.
+- `public_and_internal`: Will check for missing modifiers in both public and internal composables.
+- `all`: Will check for missing modifiers in all composables.
+
 ## Disabling a specific rule
 
 To disable a rule you have to follow the [instructions from the ktlint documentation](https://github.com/pinterest/ktlint#how-do-i-suppress-an-errors-for-a-lineblockfile), and use the id of the rule you want to disable with the `compose` tag.

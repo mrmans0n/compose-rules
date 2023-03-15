@@ -32,6 +32,9 @@ Compose:
     active: true
   ModifierMissing:
     active: true
+    # You can optionally control the visibility of which composables to check for here
+    # Possible values are: only_public, public_and_internal_ all (default is only_public)
+    # checkModifiersForVisibility: only_public
   ModifierReused:
     active: true
   ModifierWithoutDefault:
