@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package io.nlopez.compose.rules
 
+import io.nlopez.rules.core.ComposeKtConfig.Companion.config
 import io.nlopez.rules.core.ComposeKtVisitor
 import io.nlopez.rules.core.Emitter
 import io.nlopez.rules.core.util.definedInInterface
@@ -27,10 +28,13 @@ class ComposeViewModelInjection : ComposeKtVisitor {
 
         val bodyBlock = function.bodyBlockExpression ?: return
 
+        val knownViewModelFactories = DefaultKnownViewModelFactories +
+            function.config().getSet("viewModelFactories", emptySet())
+
         bodyBlock.findChildrenByClass<KtProperty>()
             .flatMap { property ->
                 property.findDirectChildrenByClass<KtCallExpression>()
-                    .filter { KnownViewModelFactories.contains(it.calleeExpression?.text) }
+                    .filter { it.calleeExpression?.text in knownViewModelFactories }
                     .map { property to it.calleeExpression!!.text }
             }
             .forEach { (property, viewModelFactoryName) ->
@@ -103,7 +107,7 @@ class ComposeViewModelInjection : ComposeKtVisitor {
 
     companion object {
 
-        val KnownViewModelFactories by lazy {
+        private val DefaultKnownViewModelFactories by lazy {
             setOf(
                 "viewModel", // AAC VM
                 "weaverViewModel", // Weaver

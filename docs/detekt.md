@@ -65,6 +65,8 @@ Compose:
     active: true
   ViewModelInjection:
     active: true
+    # You can optionally add your own ViewModel factories here
+    # viewModelFactories: hiltViewModel,potatoViewModel
 ```
 
 ### Disabling a specific rule

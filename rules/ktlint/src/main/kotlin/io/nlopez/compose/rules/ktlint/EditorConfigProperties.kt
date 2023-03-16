@@ -90,3 +90,21 @@ val allowedComposeNamingNames: EditorConfigProperty<String> =
             }
         },
     )
+
+val viewModelFactories: EditorConfigProperty<String> =
+    EditorConfigProperty(
+        type = PropertyType.LowerCasingPropertyType(
+            "compose_view_model_factories",
+            "A comma separated list of ViewModel factory methods",
+            PropertyType.PropertyValueParser.IDENTITY_VALUE_PARSER,
+            emptySet(),
+        ),
+        defaultValue = "",
+        propertyMapper = { property, _ ->
+            when {
+                property?.isUnset == true -> ""
+                property?.getValueAs<String>() != null -> property.getValueAs<String>()
+                else -> property?.getValueAs()
+            }
+        },
+    )

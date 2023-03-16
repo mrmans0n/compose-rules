@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 package io.nlopez.compose.rules.detekt
 
-import io.gitlab.arturbosch.detekt.api.Config
 import io.gitlab.arturbosch.detekt.api.SourceLocation
+import io.gitlab.arturbosch.detekt.test.TestConfig
 import io.gitlab.arturbosch.detekt.test.assertThat
 import io.gitlab.arturbosch.detekt.test.lint
 import io.nlopez.compose.rules.ComposeViewModelInjection
@@ -12,11 +12,13 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 
 class ComposeViewModelInjectionCheckTest {
-
-    private val rule = ComposeViewModelInjectionCheck(Config.empty)
+    private val testConfig = TestConfig(
+        "viewModelFactories" to listOf("bananaViewModel", "potatoViewModel"),
+    )
+    private val rule = ComposeViewModelInjectionCheck(testConfig)
 
     @ParameterizedTest
-    @ValueSource(strings = ["viewModel", "weaverViewModel", "hiltViewModel", "injectedViewModel", "mavericksViewModel"])
+    @ValueSource(strings = ["viewModel", "weaverViewModel", "hiltViewModel", "bananaViewModel", "potatoViewModel"])
     fun `passes when a weaverViewModel is used as a default param`(viewModel: String) {
         @Language("kotlin")
         val code =
@@ -33,7 +35,7 @@ class ComposeViewModelInjectionCheckTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = ["viewModel", "weaverViewModel", "hiltViewModel", "injectedViewModel", "mavericksViewModel"])
+    @ValueSource(strings = ["viewModel", "weaverViewModel", "hiltViewModel", "bananaViewModel", "potatoViewModel"])
     fun `overridden functions are ignored`(viewModel: String) {
         @Language("kotlin")
         val code =
@@ -48,7 +50,7 @@ class ComposeViewModelInjectionCheckTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = ["viewModel", "weaverViewModel", "hiltViewModel", "injectedViewModel", "mavericksViewModel"])
+    @ValueSource(strings = ["viewModel", "weaverViewModel", "hiltViewModel", "bananaViewModel", "potatoViewModel"])
     fun `errors when a weaverViewModel is used at the beginning of a Composable`(viewModel: String) {
         @Language("kotlin")
         val code =
@@ -79,7 +81,7 @@ class ComposeViewModelInjectionCheckTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = ["viewModel", "weaverViewModel", "hiltViewModel", "injectedViewModel", "mavericksViewModel"])
+    @ValueSource(strings = ["viewModel", "weaverViewModel", "hiltViewModel", "bananaViewModel", "potatoViewModel"])
     fun `errors when a weaverViewModel is used in different branches`(viewModel: String) {
         @Language("kotlin")
         val code =
