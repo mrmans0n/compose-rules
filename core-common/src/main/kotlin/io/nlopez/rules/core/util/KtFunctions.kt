@@ -35,5 +35,8 @@ val KtFunction.isExpect: Boolean
 val KtFunction.isAbstract: Boolean
     get() = hasModifier(KtTokens.ABSTRACT_KEYWORD)
 
+val KtFunction.isOperator: Boolean
+    get() = hasModifier(KtTokens.OPERATOR_KEYWORD)
+
 val KtFunction.definedInInterface: Boolean
     get() = ((parent as? KtClassBody)?.parent as? KtClass)?.isInterface() ?: false

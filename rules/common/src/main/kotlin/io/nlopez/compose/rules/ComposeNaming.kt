@@ -7,14 +7,19 @@ import io.nlopez.rules.core.ComposeKtVisitor
 import io.nlopez.rules.core.Emitter
 import io.nlopez.rules.core.report
 import io.nlopez.rules.core.util.hasReceiverType
+import io.nlopez.rules.core.util.isOperator
 import io.nlopez.rules.core.util.returnsValue
 import org.jetbrains.kotlin.psi.KtFunction
 
 class ComposeNaming : ComposeKtVisitor {
 
     override fun visitComposable(function: KtFunction, autoCorrect: Boolean, emitter: Emitter) {
-        // If it's a block we can't know if there is a return type or not from ktlint
+        // If it's a block we can't know if there is a return type or not
         if (!function.hasBlockBody()) return
+
+        // Operators have fixed names that we can't modify, so this rule is useless in that case
+        if (function.isOperator) return
+
         val functionName = function.name?.takeUnless(String::isEmpty) ?: return
         val firstLetter = functionName.first()
 

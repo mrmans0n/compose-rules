@@ -125,4 +125,17 @@ class ComposeNamingCheckTest {
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }
+
+    @Test
+    fun `passes when a composable is an operator function even if the naming should be wrong`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                operator fun invoke() { }
+            """.trimIndent()
+
+        val errors = rule.lint(code)
+        assertThat(errors).isEmpty()
+    }
 }

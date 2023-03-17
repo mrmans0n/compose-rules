@@ -25,7 +25,7 @@ class ComposeCompositionLocalAllowlist : ComposeKtVisitor {
         for (compositionLocal in notAllowed) {
             emitter.report(
                 compositionLocal,
-                io.nlopez.compose.rules.ComposeCompositionLocalAllowlist.Companion.CompositionLocalNotInAllowlist,
+                CompositionLocalNotInAllowlist,
             )
         }
     }
