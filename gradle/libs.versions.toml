@@ -24,4 +24,4 @@ reflections = "org.reflections:reflections:0.10.2"
 
 [plugins]
 spotless = { id = "com.diffplug.spotless", version = "6.17.0" }
-shadowJar = { id = "com.github.johnrengelman.shadow", version = "8.1.0" }
+shadowJar = { id = "com.github.johnrengelman.shadow", version = "8.1.1" }
