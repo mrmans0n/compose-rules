@@ -10,7 +10,7 @@ test {
 }
 
 dependencies {
-    api libs.ktlint.core
+    api libs.ktlint.rule.engine
     implementation project(':core-common')
 
     testImplementation libs.ktlint.test

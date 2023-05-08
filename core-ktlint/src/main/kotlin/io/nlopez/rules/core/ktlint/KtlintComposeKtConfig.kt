@@ -3,6 +3,7 @@
 package io.nlopez.rules.core.ktlint
 
 import com.pinterest.ktlint.core.api.EditorConfigProperties
+import com.pinterest.ktlint.rule.engine.core.api.editorconfig.EditorConfig
 import io.nlopez.rules.core.ComposeKtConfig
 import io.nlopez.rules.core.util.toSnakeCase
 
@@ -13,7 +14,7 @@ import io.nlopez.rules.core.util.toSnakeCase
  * Results will be memoized as well, as config shouldn't be changing during the lifetime of a rule.
  */
 internal class KtlintComposeKtConfig(
-    private val properties: EditorConfigProperties,
+    private val properties: EditorConfig,
 ) : ComposeKtConfig {
     private val cache = mutableMapOf<String, Any?>()
 
@@ -22,7 +23,7 @@ internal class KtlintComposeKtConfig(
         cache.getOrPut(key) { value() } as? T
 
     override fun getInt(key: String, default: Int): Int =
-        getValueAsOrPut(key) { properties[ktlintKey(key)]?.getValueAs<String>()?.toInt() } ?: default
+        getValueAsOrPut(key) { properties.getEditorConfigValueOrNull()[ktlintKey(key)]?.getValueAs<String>()?.toInt() } ?: default
 
     override fun getString(key: String, default: String?): String? =
         getValueAsOrPut(key) { properties[ktlintKey(key)]?.getValueAs() } ?: default
