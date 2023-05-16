@@ -20,7 +20,6 @@ import org.jetbrains.kotlin.psi.KtElement
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtFunction
 import org.jetbrains.kotlin.psi.stubs.elements.KtStubElementTypes
-import org.jetbrains.kotlin.utils.addToStdlib.cast
 
 abstract class DetektRule(
     config: Config = Config.empty,
@@ -67,7 +66,7 @@ abstract class DetektRule(
         element.attach(config)
         when (element.node.elementType) {
             KtStubElementTypes.FUNCTION -> {
-                val function = element.cast<KtFunction>()
+                val function = element as KtFunction
                 visitFunction(function, autoCorrect, emitter)
                 if (function.isComposable) {
                     visitComposable(function, autoCorrect, emitter)

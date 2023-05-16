@@ -4,12 +4,12 @@
 
 package io.nlopez.compose.rules.ktlint
 
-import com.pinterest.ktlint.core.RuleProvider
-import com.pinterest.ktlint.core.RuleSetProviderV2
+import com.pinterest.ktlint.cli.ruleset.core.api.RuleSetProviderV3
+import com.pinterest.ktlint.rule.engine.core.api.RuleProvider
+import com.pinterest.ktlint.rule.engine.core.api.RuleSetId
 
-class ComposeRuleSetProvider : RuleSetProviderV2(
+class ComposeRuleSetProvider : RuleSetProviderV3(
     CustomRuleSetId,
-    RuleSetAbout,
 ) {
 
     override fun getRuleProviders(): Set<RuleProvider> = setOf(
@@ -32,13 +32,6 @@ class ComposeRuleSetProvider : RuleSetProviderV2(
     )
 
     private companion object {
-        private val RuleSetAbout = About(
-            maintainer = "Nacho Lopez",
-            description = "Static checks to aid with a healthy adoption of Jetpack Compose",
-            license = "Apache License, Version 2.0",
-            repositoryUrl = "https://github.com/mrmans0n/compose-rules/",
-            issueTrackerUrl = "https://github.com/mrmans0n/compose-rules/issues",
-        )
-        const val CustomRuleSetId = "compose"
+        val CustomRuleSetId = RuleSetId("compose")
     }
 }

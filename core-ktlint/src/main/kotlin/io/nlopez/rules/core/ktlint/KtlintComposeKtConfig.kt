@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 package io.nlopez.rules.core.ktlint
 
-import com.pinterest.ktlint.core.api.EditorConfigProperties
 import com.pinterest.ktlint.rule.engine.core.api.editorconfig.EditorConfig
+import com.pinterest.ktlint.rule.engine.core.api.editorconfig.EditorConfigProperty
 import io.nlopez.rules.core.ComposeKtConfig
 import io.nlopez.rules.core.util.toSnakeCase
 
@@ -15,6 +15,7 @@ import io.nlopez.rules.core.util.toSnakeCase
  */
 internal class KtlintComposeKtConfig(
     private val properties: EditorConfig,
+    private val editorConfigProperties: Set<EditorConfigProperty<*>>,
 ) : ComposeKtConfig {
     private val cache = mutableMapOf<String, Any?>()
 
@@ -23,22 +24,33 @@ internal class KtlintComposeKtConfig(
         cache.getOrPut(key) { value() } as? T
 
     override fun getInt(key: String, default: Int): Int =
-        getValueAsOrPut(key) { properties.getEditorConfigValueOrNull()[ktlintKey(key)]?.getValueAs<String>()?.toInt() } ?: default
+        getValueAsOrPut(key) { find<String>(key).toInt() } ?: default
 
     override fun getString(key: String, default: String?): String? =
-        getValueAsOrPut(key) { properties[ktlintKey(key)]?.getValueAs() } ?: default
+        getValueAsOrPut(key) { find(key) } ?: default
 
     override fun getList(key: String, default: List<String>): List<String> =
         getValueAsOrPut(key) {
-            val original = properties[ktlintKey(key)]?.getValueAs<String>() ?: return@getValueAsOrPut default
-            original.split(',', ';').map { it.trim() }
+            find<String>(key).split(',', ';').map { it.trim() }
         } ?: default
 
     override fun getSet(key: String, default: Set<String>): Set<String> =
         getValueAsOrPut(key) { getList(key, default.toList()).toSet() } ?: default
 
     override fun getBoolean(key: String, default: Boolean): Boolean =
-        getValueAsOrPut(key) { properties[ktlintKey(key)]?.getValueAs<Boolean>() } ?: default
+        getValueAsOrPut(key) { find(key) } ?: default
 
-    private fun ktlintKey(key: String): String = "compose_${key.toSnakeCase()}"
+    private fun <T> find(key: String): T {
+        val name = ktlintKey(key)
+        @Suppress("UNCHECKED_CAST")
+        return editorConfigProperties.filter { it.name == name }.map { properties[it] }.firstOrNull() as T
+            ?: error(
+                "Unable to find config key `$name`. " +
+                    "Make sure it is defined in the KtlintRule `editorConfigProperties` property.",
+            )
+    }
+
+    private companion object {
+        private fun ktlintKey(key: String): String = "compose_${key.toSnakeCase()}"
+    }
 }

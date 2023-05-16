@@ -68,7 +68,7 @@ class ComposeViewModelInjection : ComposeKtVisitor {
 
         // Generate the VALUE_PARAMETER for variableName: VMType = viewModel(...)
         val newCode = "$variableName: $rawViewModelType = $viewModelFactoryName$rawArgumentList"
-        val factory = KtPsiFactory(parameterList)
+        val factory = KtPsiFactory.contextual(parameterList)
         val newParam = factory.createParameter(newCode)
 
         when {

@@ -2,8 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 package io.nlopez.rules.core.ktlint
 
-import com.pinterest.ktlint.core.Rule
-import com.pinterest.ktlint.core.api.EditorConfigProperties
+import com.pinterest.ktlint.rule.engine.core.api.Rule
+import com.pinterest.ktlint.rule.engine.core.api.RuleId
+import com.pinterest.ktlint.rule.engine.core.api.editorconfig.EditorConfig
+import com.pinterest.ktlint.rule.engine.core.api.editorconfig.EditorConfigProperty
 import io.nlopez.rules.core.ComposeKtConfig
 import io.nlopez.rules.core.ComposeKtConfig.Companion.attach
 import io.nlopez.rules.core.ComposeKtVisitor
@@ -12,20 +14,33 @@ import io.nlopez.rules.core.util.isComposable
 import io.nlopez.rules.core.util.startOffsetFromName
 import org.jetbrains.kotlin.com.intellij.lang.ASTNode
 import org.jetbrains.kotlin.com.intellij.psi.PsiNameIdentifierOwner
+import org.jetbrains.kotlin.psi.KtClass
+import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtFunction
 import org.jetbrains.kotlin.psi.psiUtil.startOffset
 import org.jetbrains.kotlin.psi.stubs.elements.KtStubElementTypes
-import org.jetbrains.kotlin.utils.addToStdlib.cast
 
-abstract class KtlintRule(id: String) : Rule(id), ComposeKtVisitor {
+abstract class KtlintRule(
+    id: String,
+    editorConfigProperties: Set<EditorConfigProperty<*>> = emptySet(),
+) : Rule(
+    ruleId = RuleId(id),
+    about = About(
+        maintainer = "Compose Rules",
+        repositoryUrl = "https://github.com/mrmans0n/compose-rules",
+        issueTrackerUrl = "https://github.com/mrmans0n/compose-rules/issues",
+    ),
+    usesEditorConfigProperties = editorConfigProperties,
+),
+    ComposeKtVisitor {
 
-    private lateinit var properties: EditorConfigProperties
+    private lateinit var properties: EditorConfig
 
-    override fun beforeFirstNode(editorConfigProperties: EditorConfigProperties) {
-        properties = editorConfigProperties
+    override fun beforeFirstNode(editorConfig: EditorConfig) {
+        properties = editorConfig
     }
 
-    private val config: ComposeKtConfig by lazy { KtlintComposeKtConfig(properties) }
+    private val config: ComposeKtConfig by lazy { KtlintComposeKtConfig(properties, usesEditorConfigProperties) }
 
     @Suppress("DEPRECATION")
     final override fun beforeVisitChildNodes(
@@ -37,12 +52,12 @@ abstract class KtlintRule(id: String) : Rule(id), ComposeKtVisitor {
         when (node.elementType) {
             KtStubElementTypes.FILE -> {
                 psi.attach(config)
-                visitFile(psi.cast(), autoCorrect, emit.toEmitter())
+                visitFile(psi as KtFile, autoCorrect, emit.toEmitter())
             }
 
-            KtStubElementTypes.CLASS -> visitClass(psi.cast(), autoCorrect, emit.toEmitter())
+            KtStubElementTypes.CLASS -> visitClass(psi as KtClass, autoCorrect, emit.toEmitter())
             KtStubElementTypes.FUNCTION -> {
-                val function = psi.cast<KtFunction>()
+                val function = psi as KtFunction
                 val emitter = emit.toEmitter()
                 visitFunction(function, autoCorrect, emitter)
                 if (function.isComposable) {

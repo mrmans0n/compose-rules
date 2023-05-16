@@ -20,6 +20,7 @@ if (!project.hasProperty("uberJar")) {
 
 dependencies {
     api libs.ktlint.rule.engine
+    api libs.ktlint.cli.ruleset.core
     api project(':rules:common')
     api project(':core-ktlint')
 

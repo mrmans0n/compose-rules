@@ -7,5 +7,8 @@ import io.nlopez.rules.core.ComposeKtVisitor
 import io.nlopez.rules.core.ktlint.KtlintRule
 
 class ComposeNamingCheck :
-    KtlintRule("compose:naming-check"),
+    KtlintRule(
+        id = "compose:naming-check",
+        editorConfigProperties = setOf(allowedComposeNamingNames),
+    ),
     ComposeKtVisitor by ComposeNaming()

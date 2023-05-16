@@ -7,5 +7,8 @@ import io.nlopez.rules.core.ComposeKtVisitor
 import io.nlopez.rules.core.ktlint.KtlintRule
 
 class ComposeMultipleContentEmittersCheck :
-    KtlintRule("compose:multiple-emitters-check"),
+    KtlintRule(
+        id = "compose:multiple-emitters-check",
+        editorConfigProperties = setOf(contentEmittersProperty),
+    ),
     ComposeKtVisitor by ComposeMultipleContentEmitters()

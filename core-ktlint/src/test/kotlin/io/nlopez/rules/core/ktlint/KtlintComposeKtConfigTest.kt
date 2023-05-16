@@ -2,11 +2,14 @@
 // SPDX-License-Identifier: Apache-2.0
 package io.nlopez.rules.core.ktlint
 
-import com.pinterest.ktlint.core.api.EditorConfigProperties
+import com.pinterest.ktlint.rule.engine.core.api.editorconfig.EditorConfig
+import com.pinterest.ktlint.rule.engine.core.api.editorconfig.EditorConfigProperty
 import org.assertj.core.api.AssertionsForInterfaceTypes.assertThat
+import org.assertj.core.api.AssertionsForInterfaceTypes.assertThatThrownBy
 import org.ec4j.core.model.Property
 import org.ec4j.core.model.PropertyType
 import org.ec4j.core.model.PropertyType.LowerCasingPropertyType
+import org.ec4j.core.model.PropertyType.PropertyValue.valid
 import org.ec4j.core.model.PropertyType.PropertyValueParser.BOOLEAN_VALUE_PARSER
 import org.junit.jupiter.api.Test
 
@@ -19,42 +22,48 @@ class KtlintComposeKtConfigTest {
         put("compose_my_set", "a,b,c,a,b,c".prop)
         put("compose_my_set2", "  a, b,c ,a  , b  ,  c ".prop)
         put("compose_my_bool", true.prop)
+        put("compose_this_is_broken", "asdf".prop)
     }
 
-    private val properties: EditorConfigProperties = mapping
-    private val config = KtlintComposeKtConfig(properties)
+    private val properties: EditorConfig = EditorConfig(mapping)
+    private val config = KtlintComposeKtConfig(
+        properties = properties,
+        editorConfigProperties = setOf(
+            stringProperty("compose_my_int"),
+            stringProperty("compose_my_string"),
+            stringProperty("compose_my_list"),
+            stringProperty("compose_my_list2"),
+            stringProperty("compose_my_set"),
+            stringProperty("compose_my_set2"),
+            booleanProperty("compose_my_bool"),
+        ),
+    )
 
     @Test
-    fun `returns ints from properties, and default values when unset`() {
+    fun `returns ints from properties`() {
         assertThat(config.getInt("myInt", 0)).isEqualTo(10)
-        assertThat(config.getInt("myOtherInt", 0)).isEqualTo(0)
     }
 
     @Test
-    fun `returns strings from properties, and default values when unset`() {
+    fun `returns strings from properties`() {
         assertThat(config.getString("myString", null)).isEqualTo("abcd")
-        assertThat(config.getString("myOtherString", "ABCD")).isEqualTo("ABCD")
-        assertThat(config.getString("myOtherStringWithNullDefault", null)).isNull()
     }
 
     @Test
-    fun `returns lists from properties, and default values when unset`() {
+    fun `returns lists from properties`() {
         assertThat(config.getList("myList", emptyList())).containsExactly("a", "b", "c", "a")
         assertThat(config.getList("myList2", emptyList())).containsExactly("a", "b", "c", "a")
-        assertThat(config.getList("myOtherList", listOf("a"))).containsExactly("a")
     }
 
     @Test
-    fun `returns sets from properties, and default values when unset`() {
+    fun `returns sets from properties`() {
         assertThat(config.getSet("mySet", emptySet())).containsExactly("a", "b", "c")
         assertThat(config.getSet("mySet2", emptySet())).containsExactly("a", "b", "c")
-        assertThat(config.getSet("myOtherSet", setOf("a"))).containsExactly("a")
     }
 
     @Test
-    fun `returns boolean from properties, and default values when unset`() {
+    fun `returns boolean from properties`() {
         assertThat(config.getBoolean("myBool", false)).isTrue()
-        assertThat(config.getBoolean("myOtherBool", false)).isFalse()
     }
 
     @Test
@@ -84,6 +93,13 @@ class KtlintComposeKtConfigTest {
         assertThat(config.getBoolean("myBool", false)).isTrue()
     }
 
+    @Test
+    fun `missing predefined property crashes`() {
+        assertThatThrownBy {
+            config.getString("this_is_broken", "")
+        }.hasMessageContaining("Unable to find config key `compose_this_is_broken`")
+    }
+
     private val String.prop: Property
         get() = Property.builder().value(this).build()
 
@@ -92,9 +108,39 @@ class KtlintComposeKtConfigTest {
             .type(LowerCasingPropertyType("", "", BOOLEAN_VALUE_PARSER, "true", "false"))
             .value(
                 when (this) {
-                    true -> PropertyType.PropertyValue.valid("true", true)
-                    false -> PropertyType.PropertyValue.valid("false", false)
+                    true -> valid("true", true)
+                    false -> valid("false", false)
                 },
             )
             .build()
+
+    private fun booleanProperty(key: String, default: Boolean = false): EditorConfigProperty<Boolean> =
+        EditorConfigProperty(
+            type = LowerCasingPropertyType(
+                key,
+                "Internal boolean value for $key",
+                BOOLEAN_VALUE_PARSER,
+                "true",
+                "false",
+            ),
+            defaultValue = default,
+        )
+
+    private fun stringProperty(key: String, default: String = ""): EditorConfigProperty<String> =
+        EditorConfigProperty(
+            type = LowerCasingPropertyType(
+                key,
+                "Internal string value for $key",
+                PropertyType.PropertyValueParser.IDENTITY_VALUE_PARSER,
+                emptySet(),
+            ),
+            defaultValue = default,
+            propertyMapper = { property, _ ->
+                when {
+                    property?.isUnset == true -> ""
+                    property?.getValueAs<String>() != null -> property.getValueAs<String>()
+                    else -> property?.getValueAs()
+                }
+            },
+        )
 }

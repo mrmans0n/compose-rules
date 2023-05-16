@@ -7,5 +7,8 @@ import io.nlopez.rules.core.ComposeKtVisitor
 import io.nlopez.rules.core.ktlint.KtlintRule
 
 class ComposePreviewPublicCheck :
-    KtlintRule("compose:preview-public-check"),
+    KtlintRule(
+        id = "compose:preview-public-check",
+        editorConfigProperties = setOf(previewPublicOnlyIfParams),
+    ),
     ComposeKtVisitor by ComposePreviewPublic()

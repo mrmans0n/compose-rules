@@ -7,5 +7,8 @@ import io.nlopez.rules.core.ComposeKtVisitor
 import io.nlopez.rules.core.ktlint.KtlintRule
 
 class ComposeViewModelInjectionCheck :
-    KtlintRule("compose:vm-injection-check"),
+    KtlintRule(
+        id = "compose:vm-injection-check",
+        editorConfigProperties = setOf(viewModelFactories),
+    ),
     ComposeKtVisitor by ComposeViewModelInjection()

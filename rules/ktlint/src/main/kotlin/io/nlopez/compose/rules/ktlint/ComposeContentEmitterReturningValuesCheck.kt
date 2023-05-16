@@ -7,5 +7,8 @@ import io.nlopez.rules.core.ComposeKtVisitor
 import io.nlopez.rules.core.ktlint.KtlintRule
 
 class ComposeContentEmitterReturningValuesCheck :
-    KtlintRule("compose:content-emitter-returning-values-check"),
+    KtlintRule(
+        id = "compose:content-emitter-returning-values-check",
+        editorConfigProperties = setOf(contentEmittersProperty),
+    ),
     ComposeKtVisitor by ComposeContentEmitterReturningValues()
