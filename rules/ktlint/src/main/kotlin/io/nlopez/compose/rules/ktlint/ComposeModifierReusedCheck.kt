@@ -7,5 +7,8 @@ import io.nlopez.rules.core.ComposeKtVisitor
 import io.nlopez.rules.core.ktlint.KtlintRule
 
 class ComposeModifierReusedCheck :
-    KtlintRule("compose:modifier-reused-check"),
+    KtlintRule(
+        id = "compose:modifier-reused-check",
+        editorConfigProperties = setOf(contentEmittersProperty),
+    ),
     ComposeKtVisitor by ComposeModifierReused()
