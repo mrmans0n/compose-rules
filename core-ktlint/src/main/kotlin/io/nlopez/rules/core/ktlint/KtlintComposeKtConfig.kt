@@ -24,14 +24,14 @@ internal class KtlintComposeKtConfig(
         cache.getOrPut(key) { value() } as? T
 
     override fun getInt(key: String, default: Int): Int =
-        getValueAsOrPut(key) { find<String>(key).toInt() } ?: default
+        getValueAsOrPut(key) { find<String>(key)?.toInt() } ?: default
 
     override fun getString(key: String, default: String?): String? =
         getValueAsOrPut(key) { find(key) } ?: default
 
     override fun getList(key: String, default: List<String>): List<String> =
         getValueAsOrPut(key) {
-            find<String>(key).split(',', ';').map { it.trim() }
+            find<String>(key)?.split(',', ';')?.map { it.trim() }
         } ?: default
 
     override fun getSet(key: String, default: Set<String>): Set<String> =
@@ -40,14 +40,10 @@ internal class KtlintComposeKtConfig(
     override fun getBoolean(key: String, default: Boolean): Boolean =
         getValueAsOrPut(key) { find(key) } ?: default
 
-    private fun <T> find(key: String): T {
+    private fun <T> find(key: String): T? {
         val name = ktlintKey(key)
         @Suppress("UNCHECKED_CAST")
         return editorConfigProperties.filter { it.name == name }.map { properties[it] }.firstOrNull() as T
-            ?: error(
-                "Unable to find config key `$name`. " +
-                    "Make sure it is defined in the KtlintRule `editorConfigProperties` property.",
-            )
     }
 
     private companion object {

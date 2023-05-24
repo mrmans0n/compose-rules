@@ -5,7 +5,6 @@ package io.nlopez.rules.core.ktlint
 import com.pinterest.ktlint.rule.engine.core.api.editorconfig.EditorConfig
 import com.pinterest.ktlint.rule.engine.core.api.editorconfig.EditorConfigProperty
 import org.assertj.core.api.AssertionsForInterfaceTypes.assertThat
-import org.assertj.core.api.AssertionsForInterfaceTypes.assertThatThrownBy
 import org.ec4j.core.model.Property
 import org.ec4j.core.model.PropertyType
 import org.ec4j.core.model.PropertyType.LowerCasingPropertyType
@@ -94,10 +93,8 @@ class KtlintComposeKtConfigTest {
     }
 
     @Test
-    fun `missing predefined property crashes`() {
-        assertThatThrownBy {
-            config.getString("this_is_broken", "")
-        }.hasMessageContaining("Unable to find config key `compose_this_is_broken`")
+    fun `missing predefined property is returned as default`() {
+        assertThat(config.getString("this_is_broken", "")).isEqualTo("")
     }
 
     private val String.prop: Property
