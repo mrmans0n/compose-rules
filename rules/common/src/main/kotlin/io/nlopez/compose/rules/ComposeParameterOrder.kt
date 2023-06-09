@@ -9,6 +9,7 @@ import io.nlopez.rules.core.util.isModifier
 import io.nlopez.rules.core.util.runIf
 import org.jetbrains.kotlin.psi.KtFunction
 import org.jetbrains.kotlin.psi.KtFunctionType
+import org.jetbrains.kotlin.psi.KtNullableType
 import org.jetbrains.kotlin.psi.KtParameter
 
 class ComposeParameterOrder : ComposeKtVisitor {
@@ -52,7 +53,12 @@ class ComposeParameterOrder : ComposeKtVisitor {
     }
 
     private val KtFunction.hasTrailingFunction: Boolean
-        get() = valueParameters.lastOrNull()?.typeReference?.typeElement is KtFunctionType
+        get() =
+            when (val outerType = valueParameters.lastOrNull()?.typeReference?.typeElement) {
+                is KtFunctionType -> true
+                is KtNullableType -> outerType.innerType is KtFunctionType
+                else -> false
+            }
 
     companion object {
         fun createErrorMessage(currentOrder: List<KtParameter>, properOrder: List<KtParameter>): String =
