@@ -66,15 +66,6 @@ For `compositionlocal-allowlist` rule you can define a list of `CompositionLocal
 compose_allowed_composition_locals = LocalSomething,LocalSomethingElse
 ```
 
-### Make it so that all @Preview composables must be not public, no exceptions
-
-In `preview-public-check`, only previews with a `@PreviewParameter` are required to be non-public by default. However, if you want to make it so ALL `@Preview` composables are non-public, you can add this to your `.editorconfig` file:
-
-```editorconfig
-[*.{kt,kts}]
-compose_preview_public_only_if_params = false
-```
-
 ### Allowing matching function names
 
 The `naming-check` rule requires all composables that return a value to be lowercased. If you want to allow certain patterns though, you can configure a comma-separated list of matching regexes in your `.editorconfig` file:

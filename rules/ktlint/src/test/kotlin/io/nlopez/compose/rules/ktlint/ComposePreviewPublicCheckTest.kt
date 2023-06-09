@@ -24,7 +24,7 @@ class ComposePreviewPublicCheckTest {
     }
 
     @Test
-    fun `passes for preview public composables that don't have preview params`() {
+    fun `errors for preview public composables`() {
         @Language("kotlin")
         val code =
             """
@@ -34,23 +34,6 @@ class ComposePreviewPublicCheckTest {
             @CombinedPreviews
             @Composable
             fun MyComposable() { }
-            """.trimIndent()
-        ruleAssertThat(code).hasNoLintViolations()
-    }
-
-    @Test
-    fun `errors when a public preview composable uses preview params`() {
-        @Language("kotlin")
-        val code =
-            """
-            @Preview
-            @Composable
-            fun MyComposable(@PreviewParameter(User::class) user: User) {
-            }
-            @CombinedPreviews
-            @Composable
-            fun MyComposable(@PreviewParameter(User::class) user: User) {
-            }
             """.trimIndent()
         ruleAssertThat(code).hasLintViolations(
             LintViolation(
@@ -59,39 +42,11 @@ class ComposePreviewPublicCheckTest {
                 detail = ComposePreviewPublic.ComposablesPreviewShouldNotBePublic,
             ),
             LintViolation(
-                line = 7,
+                line = 6,
                 col = 5,
                 detail = ComposePreviewPublic.ComposablesPreviewShouldNotBePublic,
             ),
         )
-    }
-
-    @Test
-    fun `errors when a public preview composable is used when previewPublicOnlyIfParams is false`() {
-        @Language("kotlin")
-        val code =
-            """
-            @Preview
-            @Composable
-            fun MyComposable() { }
-            @CombinedPreviews
-            @Composable
-            fun MyComposable() { }
-            """.trimIndent()
-        ruleAssertThat(code)
-            .withEditorConfigOverride(previewPublicOnlyIfParams to false)
-            .hasLintViolations(
-                LintViolation(
-                    line = 3,
-                    col = 5,
-                    detail = ComposePreviewPublic.ComposablesPreviewShouldNotBePublic,
-                ),
-                LintViolation(
-                    line = 6,
-                    col = 5,
-                    detail = ComposePreviewPublic.ComposablesPreviewShouldNotBePublic,
-                ),
-            )
     }
 
     @Test
@@ -101,11 +56,11 @@ class ComposePreviewPublicCheckTest {
             """
             @Preview
             @Composable
-            private fun MyComposable(@PreviewParameter(User::class) user: User) {
+            private fun MyComposable(user: User) {
             }
             @CombinedPreviews
             @Composable
-            internal fun MyComposable(@PreviewParameter(User::class) user: User) {
+            internal fun MyComposable(user: User) {
             }
             """.trimIndent()
         ruleAssertThat(code).hasNoLintViolations()
@@ -117,11 +72,11 @@ class ComposePreviewPublicCheckTest {
         val badCode = """
             @Preview
             @Composable
-            fun MyComposable(@PreviewParameter(User::class) user: User) {
+            fun MyComposable(user: User) {
             }
             @CombinedPreviews
             @Composable
-            fun MyComposable(@PreviewParameter(User::class) user: User) {
+            fun MyComposable(user: User) {
             }
         """.trimIndent()
 
@@ -129,30 +84,13 @@ class ComposePreviewPublicCheckTest {
         val expectedCode = """
             @Preview
             @Composable
-            private fun MyComposable(@PreviewParameter(User::class) user: User) {
+            private fun MyComposable(user: User) {
             }
             @CombinedPreviews
             @Composable
-            private fun MyComposable(@PreviewParameter(User::class) user: User) {
+            private fun MyComposable(user: User) {
             }
         """.trimIndent()
         ruleAssertThat(badCode).isFormattedAs(expectedCode)
-    }
-
-    @Test
-    fun `passes when a private preview composable uses preview params`() {
-        @Language("kotlin")
-        val code =
-            """
-            @Preview
-            @Composable
-            private fun MyComposable(@PreviewParameter(User::class) user: User) {
-            }
-            @CombinedPreviews
-            @Composable
-            private fun MyComposable(@PreviewParameter(User::class) user: User) {
-            }
-            """.trimIndent()
-        ruleAssertThat(code).hasNoLintViolations()
     }
 }

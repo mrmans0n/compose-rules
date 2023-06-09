@@ -2,11 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 package io.nlopez.compose.rules
 
-import io.nlopez.rules.core.ComposeKtConfig.Companion.config
 import io.nlopez.rules.core.ComposeKtVisitor
 import io.nlopez.rules.core.Emitter
 import io.nlopez.rules.core.util.isPreview
-import io.nlopez.rules.core.util.isPreviewParameter
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.KtFunction
 import org.jetbrains.kotlin.psi.psiUtil.isPublic
@@ -19,13 +17,6 @@ class ComposePreviewPublic : ComposeKtVisitor {
         // We only care about public methods
         if (!function.isPublic) return
 
-        // If the method is public, none of it's params should be tagged as preview
-        // This is configurable by the `previewPublicOnlyIfParams` config value
-        if (function.config().getBoolean("previewPublicOnlyIfParams", true)) {
-            if (function.valueParameters.none { it.isPreviewParameter }) return
-        }
-
-        // If we got here, it's a public method in a @Preview composable with a @PreviewParameter parameter
         emitter.report(function, ComposablesPreviewShouldNotBePublic, true)
         if (autoCorrect) {
             function.addModifier(KtTokens.PRIVATE_KEYWORD)

@@ -55,8 +55,6 @@ Compose:
     active: true
   PreviewPublic:
     active: true
-    # You can optionally disable that only previews with @PreviewParameter are flagged
-    # previewPublicOnlyIfParams: false
   RememberMissing:
     active: true
   UnstableCollections:

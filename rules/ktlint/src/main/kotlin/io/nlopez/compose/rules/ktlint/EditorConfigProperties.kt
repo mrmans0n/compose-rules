@@ -60,19 +60,6 @@ val compositionLocalAllowlistProperty: EditorConfigProperty<String> =
         },
     )
 
-val previewPublicOnlyIfParams: EditorConfigProperty<Boolean> =
-    EditorConfigProperty(
-        type = PropertyType.LowerCasingPropertyType(
-            "compose_preview_public_only_if_params",
-            "If set to true, it means ",
-            //
-            PropertyValueParser.BOOLEAN_VALUE_PARSER,
-            "true",
-            "false",
-        ),
-        defaultValue = true,
-    )
-
 val allowedComposeNamingNames: EditorConfigProperty<String> =
     EditorConfigProperty(
         type = PropertyType.LowerCasingPropertyType(
