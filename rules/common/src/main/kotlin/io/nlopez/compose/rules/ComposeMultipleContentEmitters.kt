@@ -22,6 +22,9 @@ class ComposeMultipleContentEmitters : ComposeKtVisitor {
             // We don't want to analyze composables that are extension functions, as they might be things like
             // BoxScope which are legit, and we want to avoid false positives.
             .filter { it.hasBlockBody() }
+            // Same applies to context receivers: we could have a BoxScope/ColumnScope/RowScope and it'd be legit.
+            // We don't have a way to know for sure, so we'd better avoid the issue altogether.
+            .filter { it.contextReceivers.isEmpty() }
             // We want only methods with a body
             .filterNot { it.hasReceiverType }
 
