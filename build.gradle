@@ -26,7 +26,8 @@ subprojects {
     spotless {
         kotlin {
             target "**/*.kt"
-            ktlint(libs.versions.ktlint.get())
+            // TODO update when 0.50.x is supported by spotless ktlint(libs.versions.ktlint.get())
+            ktlint("0.49.1")
             licenseHeaderFile rootProject.file('spotless/copyright.txt')
         }
         groovyGradle {
