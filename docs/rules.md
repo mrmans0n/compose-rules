@@ -267,6 +267,16 @@ More info: [Modifier documentation](https://developer.android.com/reference/kotl
 
 Related rule: [compose:modifier-without-default-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ComposeModifierWithoutDefault.kt)
 
+### Naming modifiers properly
+
+Composables that accept a Modifier as a parameter to be applied to the whole component represented by the composable function should name the parameter `modifier`.
+
+In cases where Composables accept modifiers to be applied to a specific subcomponent should name the parameter `xModifier` (e.g. `fooModifier` for a `Foo` subcomponent) and follow the same guidelines above for default values and behavior.
+
+More info: [Modifier documentation](https://developer.android.com/reference/kotlin/androidx/compose/ui/Modifier)
+
+Related rule: [compose:modifier-naming](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ComposeModifierNaming.kt)
+
 ### Avoid Modifier extension factory functions
 
 Using `@Composable` builder functions for modifiers is not recommended, as they cause unnecessary recompositions. To avoid this, you should use `Modifier.composed` instead, as it limits recomposition to just the modifier instance, rather than the whole function tree.

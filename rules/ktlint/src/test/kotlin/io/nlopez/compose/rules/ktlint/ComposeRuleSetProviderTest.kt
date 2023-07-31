@@ -22,4 +22,17 @@ class ComposeRuleSetProviderTest {
             .toSet()
         assertThat(ruleClassesInRuleSet).containsExactlyInAnyOrderElementsOf(ruleClassesInPackage)
     }
+
+    @Test
+    fun `ensure all rules in the package are listed in alphabetical order`() {
+        val isOrdered = ruleSetProvider.getRuleProviders()
+            .filterIsInstance<KtlintRule>()
+            .asSequence()
+            .map { it::class.java.simpleName }
+            .zipWithNext { a, b -> a <= b }
+            .all { it }
+        assertThat(isOrdered)
+            .describedAs("ComposeRuleSetProvider should have the rules in alphabetical order")
+            .isTrue()
+    }
 }
