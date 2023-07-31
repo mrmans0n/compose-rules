@@ -6,6 +6,7 @@ import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.KtClass
 import org.jetbrains.kotlin.psi.KtClassBody
 import org.jetbrains.kotlin.psi.KtFunction
+import org.jetbrains.kotlin.psi.KtModifierListOwner
 import org.jetbrains.kotlin.psi.psiUtil.visibilityModifierType
 
 val KtFunction.returnsValue: Boolean
@@ -14,13 +15,13 @@ val KtFunction.returnsValue: Boolean
 val KtFunction.hasReceiverType: Boolean
     get() = receiverTypeReference != null
 
-val KtFunction.isPrivate: Boolean
+val KtModifierListOwner.isPrivate: Boolean
     get() = visibilityModifierType() == KtTokens.PRIVATE_KEYWORD
 
-val KtFunction.isProtected: Boolean
+val KtModifierListOwner.isProtected: Boolean
     get() = visibilityModifierType() == KtTokens.PROTECTED_KEYWORD
 
-val KtFunction.isInternal: Boolean
+val KtModifierListOwner.isInternal: Boolean
     get() = visibilityModifierType() == KtTokens.INTERNAL_KEYWORD
 
 val KtFunction.isOverride: Boolean
