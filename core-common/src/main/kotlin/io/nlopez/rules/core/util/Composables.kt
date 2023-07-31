@@ -47,9 +47,9 @@ val KtCallExpression.emitsContent: Boolean
     get() {
         val methodName = calleeExpression?.text ?: return false
         val providedContentEmitters = config().getSet("contentEmitters", emptySet())
-        return ComposableEmittersList.contains(methodName) ||
+        return methodName in ComposableEmittersList ||
             ComposableEmittersListRegex.matches(methodName) ||
-            providedContentEmitters.contains(methodName) ||
+            methodName in providedContentEmitters ||
             containsComposablesWithModifiers
     }
 
@@ -160,10 +160,10 @@ val ModifierNames by lazy(LazyThreadSafetyMode.NONE) {
 }
 
 val KtCallableDeclaration.isModifier: Boolean
-    get() = ModifierNames.contains(typeReference?.text)
+    get() = typeReference?.text in ModifierNames
 
 val KtCallableDeclaration.isModifierReceiver: Boolean
-    get() = ModifierNames.contains(receiverTypeReference?.text)
+    get() = receiverTypeReference?.text in ModifierNames
 
 val KtFunction.modifierParameter: KtParameter?
     get() {
@@ -175,9 +175,7 @@ val KtProperty.declaresCompositionLocal: Boolean
     get() = !isVar &&
         hasInitializer() &&
         initializer is KtCallExpression &&
-        CompositionLocalReferenceExpressions.contains(
-            (initializer as KtCallExpression).referenceExpression()?.text,
-        )
+        (initializer as KtCallExpression).referenceExpression()?.text in CompositionLocalReferenceExpressions
 
 private val CompositionLocalReferenceExpressions by lazy(LazyThreadSafetyMode.NONE) {
     setOf(
@@ -187,7 +185,7 @@ private val CompositionLocalReferenceExpressions by lazy(LazyThreadSafetyMode.NO
 }
 
 val KtCallExpression.isRestartableEffect: Boolean
-    get() = RestartableEffects.contains(calleeExpression?.text)
+    get() = calleeExpression?.text in RestartableEffects
 
 // From https://developer.android.com/jetpack/compose/side-effects#restarting-effects
 private val RestartableEffects by lazy(LazyThreadSafetyMode.NONE) {
