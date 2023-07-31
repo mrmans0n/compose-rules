@@ -7,6 +7,8 @@ Compose:
     active: true
   ModifierMissing:
     active: true
+  ModifierNaming:
+    active: true
   ModifierReused:
     active: true
   ModifierWithoutDefault:

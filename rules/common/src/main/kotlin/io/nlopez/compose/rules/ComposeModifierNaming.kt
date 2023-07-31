@@ -15,21 +15,30 @@ class ComposeModifierNaming : ComposeKtVisitor {
         val modifiers = function.valueParameters.filter { it.isModifier }
 
         // If there are no modifiers, or more than one, we don't care as much about the naming
-        if (modifiers.count() != 1) return
+        if (modifiers.isEmpty()) return
 
-        val modifier = modifiers.first()
+        val count = modifiers.size
 
-        // In case we didn't find any `modifier` parameters, we check if it emits content and report the error if so.
-        if (modifier.name != "modifier") {
-            emitter.report(function, ModifiersAreSupposedToBeCalledLowercaseModifier)
+        for (modifier in modifiers) {
+            val valid = modifier.name?.lowercase()?.endsWith("modifier") ?: false
+            when {
+                !valid && count == 1 -> emitter.report(modifier, ModifiersAreSupposedToBeCalledModifierWhenAlone)
+                !valid -> emitter.report(modifier, ModifiersAreSupposedToEndInModifierWhenMultiple)
+                else -> {
+                    // no-op
+                }
+            }
         }
     }
 
     companion object {
-        val ModifiersAreSupposedToBeCalledLowercaseModifier = """
-            This @Composable has a single modifier, and its name is not `modifier`.
+        val ModifiersAreSupposedToBeCalledModifierWhenAlone = """
+            Modifier parameters should be called `modifier`.
 
-            The parameter should be called `modifier` as that is the convention expected for these types of parameters.
+            See https://mrmans0n.github.io/compose-rules/rules/#TODO for more information.
+        """.trimIndent()
+        val ModifiersAreSupposedToEndInModifierWhenMultiple = """
+            Modifier parameters should be called `modifier` or end in `Modifier` if there are more than one in the same @Composable.
 
             See https://mrmans0n.github.io/compose-rules/rules/#TODO for more information.
         """.trimIndent()
