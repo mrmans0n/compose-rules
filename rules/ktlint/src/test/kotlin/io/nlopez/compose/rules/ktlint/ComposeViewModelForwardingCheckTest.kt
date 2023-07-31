@@ -65,10 +65,30 @@ class ComposeViewModelForwardingCheckTest {
             fun MyComposable(viewModel: MyViewModel) {
                 AnotherComposable(viewModel)
             }
+            @Composable
+            fun MyComposable2(viewModel: MyViewModel) {
+                Row {
+                    AnotherComposable(viewModel)
+                }
+            }
+            @Composable
+            fun MyComposable3(viewModel: MyViewModel) {
+                AnotherComposable(vm = viewModel)
+            }
             """.trimIndent()
         forwardingRuleAssertThat(code).hasLintViolationsWithoutAutoCorrect(
             LintViolation(
                 line = 3,
+                col = 5,
+                detail = ComposeViewModelForwarding.AvoidViewModelForwarding,
+            ),
+            LintViolation(
+                line = 8,
+                col = 9,
+                detail = ComposeViewModelForwarding.AvoidViewModelForwarding,
+            ),
+            LintViolation(
+                line = 13,
                 col = 5,
                 detail = ComposeViewModelForwarding.AvoidViewModelForwarding,
             ),

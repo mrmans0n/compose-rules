@@ -5,7 +5,7 @@ package io.nlopez.compose.rules
 import io.nlopez.rules.core.ComposeKtVisitor
 import io.nlopez.rules.core.Emitter
 import io.nlopez.rules.core.util.definedInInterface
-import io.nlopez.rules.core.util.findDirectChildrenByClass
+import io.nlopez.rules.core.util.findChildrenByClass
 import io.nlopez.rules.core.util.isActual
 import io.nlopez.rules.core.util.isOverride
 import io.nlopez.rules.core.util.isRestartableEffect
@@ -31,7 +31,7 @@ class ComposeViewModelForwarding : ComposeKtVisitor {
 
         // We want now to see if these parameter names are used in any other calls to functions that start with
         // a capital letter (so, most likely, composables).
-        bodyBlock.findDirectChildrenByClass<KtCallExpression>()
+        bodyBlock.findChildrenByClass<KtCallExpression>()
             .filter { callExpression -> callExpression.calleeExpression?.text?.first()?.isUpperCase() ?: false }
             // Avoid LaunchedEffect/DisposableEffect/etc that can use the VM as a key
             .filterNot { callExpression -> callExpression.isRestartableEffect }

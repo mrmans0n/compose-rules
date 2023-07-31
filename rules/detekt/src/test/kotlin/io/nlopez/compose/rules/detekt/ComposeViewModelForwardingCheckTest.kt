@@ -3,6 +3,7 @@
 package io.nlopez.compose.rules.detekt
 
 import io.gitlab.arturbosch.detekt.api.Config
+import io.gitlab.arturbosch.detekt.api.SourceLocation
 import io.gitlab.arturbosch.detekt.test.assertThat
 import io.gitlab.arturbosch.detekt.test.lint
 import io.nlopez.compose.rules.ComposeViewModelForwarding
@@ -69,10 +70,26 @@ class ComposeViewModelForwardingCheckTest {
             fun MyComposable(viewModel: MyViewModel) {
                 AnotherComposable(viewModel)
             }
+            @Composable
+            fun MyComposable2(viewModel: MyViewModel) {
+                Row {
+                    AnotherComposable(viewModel)
+                }
+            }
+            @Composable
+            fun MyComposable3(viewModel: MyViewModel) {
+                AnotherComposable(vm = viewModel)
+            }
             """.trimIndent()
         val errors = rule.lint(code)
-        assertThat(errors).hasSize(1).hasStartSourceLocation(3, 5)
-        assertThat(errors.first()).hasMessage(ComposeViewModelForwarding.AvoidViewModelForwarding)
+        assertThat(errors).hasStartSourceLocations(
+            SourceLocation(3, 5),
+            SourceLocation(8, 9),
+            SourceLocation(13, 5),
+        )
+        for (error in errors) {
+            assertThat(error).hasMessage(ComposeViewModelForwarding.AvoidViewModelForwarding)
+        }
     }
 
     @Test
