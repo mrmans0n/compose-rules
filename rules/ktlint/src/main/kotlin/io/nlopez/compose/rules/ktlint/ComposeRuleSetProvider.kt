@@ -1,7 +1,5 @@
 // Copyright 2023 Nacho Lopez
 // SPDX-License-Identifier: Apache-2.0
-@file:Suppress("DEPRECATION")
-
 package io.nlopez.compose.rules.ktlint
 
 import com.pinterest.ktlint.cli.ruleset.core.api.RuleSetProviderV3
@@ -17,6 +15,7 @@ class ComposeRuleSetProvider : RuleSetProviderV3(
         RuleProvider { ComposeContentEmitterReturningValuesCheck() },
         RuleProvider { ComposeModifierComposableCheck() },
         RuleProvider { ComposeModifierMissingCheck() },
+        RuleProvider { ComposeModifierNamingCheck() },
         RuleProvider { ComposeModifierReusedCheck() },
         RuleProvider { ComposeModifierWithoutDefaultCheck() },
         RuleProvider { ComposeMultipleContentEmittersCheck() },
