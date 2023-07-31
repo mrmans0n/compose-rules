@@ -36,7 +36,7 @@ Compose:
     # Possible values are: `only_public`, `public_and_internal` and `all` (default is `only_public`)
     # checkModifiersForVisibility: only_public
   ModifierNaming:
-      active: true
+    active: true
   ModifierReused:
     active: true
   ModifierWithoutDefault:
