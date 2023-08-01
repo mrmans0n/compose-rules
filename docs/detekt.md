@@ -28,6 +28,8 @@ Compose:
     active: true
     # You can optionally add your own composables here
     # contentEmitters: MyComposable,MyOtherComposable
+  DefaultsVisibility:
+    active: true
   ModifierComposable:
     active: true
   ModifierMissing:

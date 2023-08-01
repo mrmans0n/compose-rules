@@ -25,7 +25,8 @@ class ComposeDefaultsVisibility : ComposeKtVisitor {
 
         val composableNamesForDefaults = composables.mapNotNull { it.name }.map { it + "Defaults" }.toSet()
 
-        // Default holders should be the ones named ${composableName}Defaults and defined in the same .kt file as them.
+        // Default holders should be the ones named ${composableName}Defaults and defined in the same .kt file as them,
+        // as they should be co-located. Maybe a possible future rule would be to check for co-location of these.
         val defaultObjects = file.findChildrenByClass<KtClassOrObject>()
             .filter { it.name in composableNamesForDefaults }
 
@@ -49,21 +50,27 @@ class ComposeDefaultsVisibility : ComposeKtVisitor {
                     if (hasReferenceInParameters) return@filter true
 
                     // If none found, check the code then.
-                    return@filter composable.bodyBlockExpression
-                        ?.findChildrenByClass<KtReferenceExpression>()
-                        ?.any { it.text == defaultObject.name }
-                        ?: false
+                    val body = composable.bodyBlockExpression ?: return@filter false
+                    return@filter body.findChildrenByClass<KtReferenceExpression>()
+                        .any { it.text == defaultObject.name }
                 }
                 // Now we want to obtain just the most visible visibility in case there are more than one hit
-                .maxBy { it.visibilityInt }
+                .maxByOrNull { it.visibilityInt }
 
             defaultObject to mostVisible
         }
 
         // If we find a "defaults" object with less visibility than its composable, we report it
         for ((defaultObject, composable) in defaultToMostVisibleComposable) {
-            if (defaultObject.visibilityInt < composable.visibilityInt) {
-                emitter.report(defaultObject, createMessage(composable, defaultObject))
+            if (composable != null && defaultObject.visibilityInt < composable.visibilityInt) {
+                emitter.report(
+                    element = defaultObject,
+                    errorMessage = createMessage(
+                        composableVisibility = composable.visibilityString,
+                        defaultObjectName = defaultObject.name!!,
+                        defaultObjectVisibility = defaultObject.visibilityString,
+                    ),
+                )
             }
         }
     }
@@ -88,10 +95,14 @@ class ComposeDefaultsVisibility : ComposeKtVisitor {
                 else -> 0
             }
 
-        fun createMessage(composable: KtFunction, defaultObject: KtClassOrObject): String = """
-            @Composable `Defaults` objects should match visibility of the composables they serve.
+        fun createMessage(
+            composableVisibility: String,
+            defaultObjectName: String,
+            defaultObjectVisibility: String,
+        ) = """
+            `Defaults` objects should match visibility of the composables they serve.
 
-            ${defaultObject.name} is ${defaultObject.visibilityString} but it should be ${composable.visibilityString}.
+            `$defaultObjectName` is $defaultObjectVisibility but it should be $composableVisibility.
 
             See https://mrmans0n.github.io/compose-rules/rules/#TODO for more information.
         """.trimIndent()
