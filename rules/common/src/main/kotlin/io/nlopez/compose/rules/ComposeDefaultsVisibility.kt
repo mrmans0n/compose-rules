@@ -104,7 +104,7 @@ class ComposeDefaultsVisibility : ComposeKtVisitor {
 
             `$defaultObjectName` is $defaultObjectVisibility but it should be $composableVisibility.
 
-            See https://mrmans0n.github.io/compose-rules/rules/#TODO for more information.
+            See https://mrmans0n.github.io/compose-rules/rules/#componentdefaults-object-should-match-the-composable-visibility for more information.
         """.trimIndent()
     }
 }
