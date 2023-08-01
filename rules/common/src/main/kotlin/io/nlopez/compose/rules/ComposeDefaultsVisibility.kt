@@ -4,6 +4,7 @@ package io.nlopez.compose.rules
 
 import io.nlopez.rules.core.ComposeKtVisitor
 import io.nlopez.rules.core.Emitter
+import io.nlopez.rules.core.report
 import io.nlopez.rules.core.util.findChildrenByClass
 import io.nlopez.rules.core.util.isComposable
 import io.nlopez.rules.core.util.isInternal
@@ -13,12 +14,12 @@ import org.jetbrains.kotlin.psi.KtClassOrObject
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtFunction
 import org.jetbrains.kotlin.psi.KtModifierListOwner
+import org.jetbrains.kotlin.psi.KtReferenceExpression
 import org.jetbrains.kotlin.psi.psiUtil.isPublic
 
 class ComposeDefaultsVisibility : ComposeKtVisitor {
 
     override fun visitFile(file: KtFile, autoCorrect: Boolean, emitter: Emitter) {
-
         val composables = file.findChildrenByClass<KtFunction>()
             .filter { it.isComposable }
 
@@ -30,16 +31,42 @@ class ComposeDefaultsVisibility : ComposeKtVisitor {
 
         if (defaultObjects.count() == 0) return
 
+        // We want to obtain the pairing of the default objects to their most visible composable counterparts.
+        // Hold on to your butts.
+        val defaultToMostVisibleComposable = defaultObjects.map { defaultObject ->
+            // Find the matching composables to the default object
+            val mostVisible = composables.filter { it.name + "Defaults" == defaultObject.name }
+                .filter { composable ->
+                    // Now we need to check whether anything from the default object is used either in the params
+                    // or in the code of the composable itself. This should be enough for most cases.
 
-        // First we have to make sure the defaults class is used inside of the composable (e.g. in the params
-        // in some way).
+                    // Check parameter defaults first
+                    val hasReferenceInParameters = composable.valueParameters
+                        .mapNotNull { it.defaultValue }
+                        .flatMap { it.findChildrenByClass<KtReferenceExpression>() }
+                        .any { it.text == defaultObject.name }
 
-        // Now we need to cross-reference our default objects with the composables they match to check if the
-        // visibility matches the most visible composable
-        
+                    if (hasReferenceInParameters) return@filter true
+
+                    // If none found, check the code then.
+                    return@filter composable.bodyBlockExpression
+                        ?.findChildrenByClass<KtReferenceExpression>()
+                        ?.any { it.text == defaultObject.name }
+                        ?: false
+                }
+                // Now we want to obtain just the most visible visibility in case there are more than one hit
+                .maxBy { it.visibilityInt }
+
+            defaultObject to mostVisible
+        }
+
         // If we find a "defaults" object with less visibility than its composable, we report it
+        for ((defaultObject, composable) in defaultToMostVisibleComposable) {
+            if (defaultObject.visibilityInt < composable.visibilityInt) {
+                emitter.report(defaultObject, createMessage(composable, defaultObject))
+            }
+        }
     }
-
 
     companion object {
 
@@ -52,6 +79,15 @@ class ComposeDefaultsVisibility : ComposeKtVisitor {
                 else -> "not supported"
             }
 
+        private val KtModifierListOwner.visibilityInt: Int
+            get() = when {
+                isPublic -> 4
+                isInternal -> 3
+                isProtected -> 2
+                isPrivate -> 1
+                else -> 0
+            }
+
         fun createMessage(composable: KtFunction, defaultObject: KtClassOrObject): String = """
             @Composable `Defaults` objects should match visibility of the composables they serve.
 
@@ -60,5 +96,4 @@ class ComposeDefaultsVisibility : ComposeKtVisitor {
             See https://mrmans0n.github.io/compose-rules/rules/#TODO for more information.
         """.trimIndent()
     }
-}
 }
