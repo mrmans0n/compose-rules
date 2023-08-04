@@ -41,7 +41,7 @@ You can use this same jar in the [ktlint (unofficial) IntelliJ plugin](https://p
 
 ### Providing custom content emitters
 
-There are some rules (`compose:content-emitter-returning-values-check` and `compose:multiple-emitters-check`) that use predefined list of known composables that emit content. But you can add your own too! In your `.editorconfig` file, you'll need to add a `content_emitters` property followed by a list of composable names separated by commas. You would typically want the composables that are part of your custom design system to be in this list.
+There are some rules (`compose:content-emitter-returning-values-check`, `compose:modifier-not-used-at-root` and `compose:multiple-emitters-check`) that use predefined list of known composables that emit content. But you can add your own too! In your `.editorconfig` file, you'll need to add a `content_emitters` property followed by a list of composable names separated by commas. You would typically want the composables that are part of your custom design system to be in this list.
 
 ```editorconfig
 [*.{kt,kts}]
