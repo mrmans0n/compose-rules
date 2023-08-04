@@ -45,6 +45,8 @@ subprojects {
             freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
             // Enable default methods in interfaces
             freeCompilerArgs += "-Xjvm-default=all"
+            // Enable context receivers
+            freeCompilerArgs += "-Xcontext-receivers"
             // Enable K2 compiler
             freeCompilerArgs += "-language-version=2.0"
             freeCompilerArgs += "-Xsuppress-version-warnings"

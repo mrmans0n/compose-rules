@@ -5,9 +5,7 @@ package io.nlopez.rules.core.util
 import io.nlopez.rules.core.ComposeKtConfig.Companion.config
 import org.jetbrains.kotlin.com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.psi.KtCallExpression
-import org.jetbrains.kotlin.psi.KtCallableDeclaration
 import org.jetbrains.kotlin.psi.KtFunction
-import org.jetbrains.kotlin.psi.KtParameter
 import org.jetbrains.kotlin.psi.KtProperty
 import org.jetbrains.kotlin.psi.psiUtil.referenceExpression
 
@@ -46,10 +44,9 @@ private val KtCallExpression.emitExplicitlyNoContent: Boolean
 val KtCallExpression.emitsContent: Boolean
     get() {
         val methodName = calleeExpression?.text ?: return false
-        val providedContentEmitters = config().getSet("contentEmitters", emptySet())
         return methodName in ComposableEmittersList ||
             ComposableEmittersListRegex.matches(methodName) ||
-            methodName in providedContentEmitters ||
+            methodName in config().getSet("contentEmitters", emptySet()) ||
             containsComposablesWithModifiers
     }
 
@@ -151,25 +148,6 @@ val ComposableEmittersListRegex by lazy {
         ),
     )
 }
-
-val ModifierNames by lazy(LazyThreadSafetyMode.NONE) {
-    setOf(
-        "Modifier",
-        "GlanceModifier",
-    )
-}
-
-val KtCallableDeclaration.isModifier: Boolean
-    get() = typeReference?.text in ModifierNames
-
-val KtCallableDeclaration.isModifierReceiver: Boolean
-    get() = receiverTypeReference?.text in ModifierNames
-
-val KtFunction.modifierParameter: KtParameter?
-    get() {
-        val modifiers = valueParameters.filter { it.isModifier }
-        return modifiers.firstOrNull { it.name == "modifier" } ?: modifiers.firstOrNull()
-    }
 
 val KtProperty.declaresCompositionLocal: Boolean
     get() = !isVar &&
