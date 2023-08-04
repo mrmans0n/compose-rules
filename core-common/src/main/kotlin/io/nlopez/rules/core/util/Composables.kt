@@ -7,6 +7,7 @@ import org.jetbrains.kotlin.com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtFunction
 import org.jetbrains.kotlin.psi.KtProperty
+import org.jetbrains.kotlin.psi.KtReferenceExpression
 import org.jetbrains.kotlin.psi.psiUtil.referenceExpression
 
 val KtFunction.emitsContent: Boolean
@@ -51,9 +52,19 @@ val KtCallExpression.emitsContent: Boolean
     }
 
 private val KtCallExpression.containsComposablesWithModifiers: Boolean
-    get() = valueArguments
-        .filter { it.isNamed() }
-        .any { it.getArgumentName()?.text == "modifier" }
+    get() {
+        // Check if there is a "modifier" applied
+        val hasNamedModifier = valueArguments
+            .filter { it.isNamed() }
+            .any { it.getArgumentName()?.text == "modifier" }
+
+        if (hasNamedModifier) return true
+
+        // Check if there is any Modifier chain (e.g. `Modifier.fillMaxWidth()`)
+        return valueArguments.mapNotNull { it.getArgumentExpression() }
+            .flatMap { it.findChildrenByClass<KtReferenceExpression>() }
+            .any { it.text == "Modifier" }
+    }
 
 /**
  * This is a denylist with common composables that emit content in their own window. Feel free to add more elements

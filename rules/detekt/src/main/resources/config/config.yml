@@ -11,6 +11,8 @@ Compose:
     active: true
   ModifierNaming:
     active: true
+  ModifierNotUsedAtRoot:
+    active: true
   ModifierReused:
     active: true
   ModifierWithoutDefault:

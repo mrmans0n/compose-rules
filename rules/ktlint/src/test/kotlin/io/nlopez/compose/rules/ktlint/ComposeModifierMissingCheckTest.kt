@@ -35,6 +35,13 @@ class ComposeModifierMissingCheckTest {
                     }
                 }
                 @Composable
+                fun Something(): Unit {
+                    SomethingElse {
+                        Box(Modifier.fillMaxSize()) {
+                        }
+                    }
+                }
+                @Composable
                 fun Something(modifier: Modifier = Modifier) {
                     Row {
                         Text("Hi!")
@@ -55,6 +62,11 @@ class ComposeModifierMissingCheckTest {
             ),
             LintViolation(
                 line = 12,
+                col = 5,
+                detail = ComposeModifierMissing.MissingModifierContentComposable,
+            ),
+            LintViolation(
+                line = 19,
                 col = 5,
                 detail = ComposeModifierMissing.MissingModifierContentComposable,
             ),

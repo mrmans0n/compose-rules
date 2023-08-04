@@ -38,7 +38,14 @@ class ComposeModifierMissingCheckTest {
                     }
                 }
                 @Composable
-                fun Something4(modifier: Modifier = Modifier) {
+                fun Something4(): Unit {
+                    SomethingElse {
+                        Box(modifier = Modifier.fillMaxSize()) {
+                        }
+                    }
+                }
+                @Composable
+                fun Something5(modifier: Modifier = Modifier) {
                     Row {
                         Text("Hi!")
                     }
@@ -46,10 +53,11 @@ class ComposeModifierMissingCheckTest {
             """.trimIndent()
 
         val errors = rule.lint(code)
-        assertThat(errors).hasTextLocations("Something1", "Something2", "Something3")
+        assertThat(errors).hasTextLocations("Something1", "Something2", "Something3", "Something4")
         assertThat(errors[0]).hasMessage(ComposeModifierMissing.MissingModifierContentComposable)
         assertThat(errors[1]).hasMessage(ComposeModifierMissing.MissingModifierContentComposable)
         assertThat(errors[2]).hasMessage(ComposeModifierMissing.MissingModifierContentComposable)
+        assertThat(errors[3]).hasMessage(ComposeModifierMissing.MissingModifierContentComposable)
     }
 
     @Test

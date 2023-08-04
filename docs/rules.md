@@ -228,6 +228,15 @@ More info: [Always provide a Modifier parameter](https://chris.banes.dev/posts/a
 
 Related rule: [compose:modifier-missing-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ComposeModifierMissing.kt)
 
+### Modifiers should be used at the top-most layout of the component
+
+Modifiers should be applied once as a first modifier in the chain to the root-most layout in the component implementation.
+Since modifiers aim to modify the external behaviors and appearance of the component, they must be applied to the top-most layout and be the first modifiers in the hierarchy. It is allowed to chain other modifiers to the modifier passed as a param if needed.
+
+More info: [Compose Component API Guidelines](https://github.com/androidx/androidx/blob/androidx-main/compose/docs/compose-component-api-guidelines.md#modifier-parameter)
+
+Related rule: [compose:modifier-not-used-at-root](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ComposeModifierNotUsedAtRoot.kt)
+
 ### Don't re-use modifiers
 
 Modifiers which are passed in are designed so that they should be used by a single layout node in the composable function. If the provided modifier is used by multiple composables at different levels, unwanted behaviour can happen.

@@ -39,6 +39,10 @@ Compose:
     # checkModifiersForVisibility: only_public
   ModifierNaming:
     active: true
+  ModifierNotUsedAtRoot:
+    active: true
+    # You can optionally add your own composables here
+    # contentEmitters: MyComposable,MyOtherComposable
   ModifierReused:
     active: true
   ModifierWithoutDefault:

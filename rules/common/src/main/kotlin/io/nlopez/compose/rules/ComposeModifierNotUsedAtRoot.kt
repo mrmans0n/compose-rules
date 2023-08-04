@@ -53,7 +53,9 @@ class ComposeModifierNotUsedAtRoot : ComposeKtVisitor {
         val ComposableModifierShouldBeUsedAtTheTopMostPossiblePlace = """
             The main Modifier of a @Composable should be applied once as a first modifier in the chain to the root-most layout in the component implementation.
 
-            See https://mrmans0n.github.io/compose-rules/rules/#TODO for more information.
+            You should move the modifier usage to the appropriate parent Composable.
+
+            See https://mrmans0n.github.io/compose-rules/rules/#modifiers-should-be-used-at-the-top-most-layout-of-the-component for more information.
         """.trimIndent()
     }
 }

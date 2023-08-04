@@ -18,6 +18,7 @@ class ComposeRuleSetProvider : RuleSetProvider {
             ComposeModifierComposableCheck(config),
             ComposeModifierMissingCheck(config),
             ComposeModifierNamingCheck(config),
+            ComposeModifierNotUsedAtRootCheck(config),
             ComposeModifierReusedCheck(config),
             ComposeModifierWithoutDefaultCheck(config),
             ComposeMultipleContentEmittersCheck(config),
