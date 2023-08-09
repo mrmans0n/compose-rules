@@ -5,9 +5,9 @@ package io.nlopez.rules.core.util
 import io.nlopez.rules.core.ComposeKtConfig.Companion.config
 import org.jetbrains.kotlin.com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.psi.KtCallExpression
+import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.KtFunction
 import org.jetbrains.kotlin.psi.KtProperty
-import org.jetbrains.kotlin.psi.KtReferenceExpression
 import org.jetbrains.kotlin.psi.psiUtil.referenceExpression
 
 val KtFunction.emitsContent: Boolean
@@ -62,8 +62,8 @@ private val KtCallExpression.containsComposablesWithModifiers: Boolean
 
         // Check if there is any Modifier chain (e.g. `Modifier.fillMaxWidth()`)
         return valueArguments.mapNotNull { it.getArgumentExpression() }
-            .flatMap { it.findChildrenByClass<KtReferenceExpression>() }
-            .any { it.text == "Modifier" }
+            .filterIsInstance<KtDotQualifiedExpression>()
+            .any { it.rootExpression.text == "Modifier" }
     }
 
 /**
@@ -148,7 +148,7 @@ private val ComposableEmittersList by lazy {
     )
 }
 
-val ComposableEmittersListRegex by lazy {
+private val ComposableEmittersListRegex by lazy {
     Regex(
         listOf(
             "Spacer\\d*", // Spacer() + SpacerNUM()

@@ -119,7 +119,33 @@ class ComposeModifierNotUsedAtRootCheckTest {
                         }
                     }
                 }
-
+                @Composable
+                fun Something(
+                  modifier: Modifier = Modifier,
+                  content: @Composable BoxScope.() -> Unit
+                ) {
+                  MaterialTheme(
+                    colorScheme = darkColorScheme()
+                  ) {
+                    Box(
+                      modifier = modifier
+                        .fillMaxSize()
+                        .background(
+                          color = MaterialTheme.colorScheme.background
+                        )
+                    ) {
+                      Card(
+                        modifier = Modifier.fillMaxSize()
+                      ) {
+                        Box(
+                          modifier = Modifier.padding(16.dp)
+                        ) {
+                          content()
+                        }
+                      }
+                    }
+                  }
+                }
             """.trimIndent()
         modifierRuleAssertThat(code)
             .withEditorConfigOverride(
