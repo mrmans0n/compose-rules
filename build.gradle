@@ -26,7 +26,9 @@ subprojects {
     spotless {
         kotlin {
             target "**/*.kt"
-            ktlint(libs.versions.ktlint.get())
+            // ktlint(libs.versions.ktlint.get())
+            ktlint("0.50.0")
+
             licenseHeaderFile rootProject.file('spotless/copyright.txt')
         }
         groovyGradle {
