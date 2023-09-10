@@ -73,7 +73,13 @@ class ComposeViewModelInjection : ComposeKtVisitor {
 
         when {
             // If there are no parameters, we will insert the code directly
-            lastParameters.isEmpty() -> parameterList.addParameter(newParam)
+            lastParameters.isEmpty() -> {
+                // Ideally this should be:
+                //  parameterList.addParameter(newParam)
+                // but since Kotlin 1.9 we can't use these methods without crashing.
+                (parameterList.node.lastChildLeafOrSelf() as LeafPsiElement)
+                    .rawReplaceWithText("${newParam.text})")
+            }
             // If the last element is a function, we need to preserve the trailing lambda, so we will insert
             // the code before that last param
             lastParameters.last().typeReference?.typeElement is KtFunctionType -> {
@@ -92,9 +98,19 @@ class ComposeViewModelInjection : ComposeKtVisitor {
                     lastToken.rawReplaceWithText("${lastToken.text} $newCode,")
                 }
             }
-
+            // Add as the last parameter
             else -> {
-                parameterList.addParameter(newParam)
+                // Ideally this should just be:
+                //  parameterList.addParameter(newParam)
+                // but since Kotlin 1.9 we can't use these methods without crashing.
+
+                val hasTrailingComma = composable.valueParameters.last().node.nextCodeSibling()?.text == ","
+                // If it has a trailing comma, no need to add a new one
+                val preCommaIfNeeded = if (hasTrailingComma) "" else ","
+                // And if it has a trailing comma, we'll need to preserve that in the style
+                val trailingCommaIfNeeded = if (hasTrailingComma) "," else ""
+                (parameterList.node.lastChildLeafOrSelf() as LeafPsiElement)
+                    .rawReplaceWithText("$preCommaIfNeeded${newParam.text}$trailingCommaIfNeeded)")
             }
         }
 
