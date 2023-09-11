@@ -4,6 +4,15 @@
 
 > **Note**
 > This repository is a fork of the [Twitter Jetpack Compose Rules](https://github.com/twitter/compose-rules) by its original maintainer. As none of the admins/maintainers continue working at the company, its development will continue here from now on.
+> 
+> Migration Guide:
+> 1) change coordinates (`com.twitter.compose.rules:detekt:$version` becomes `io.nlopez.compose.rules:detekt:$version`)
+> 2) update $version to the latest, see: https://github.com/mrmans0n/compose-rules/releases
+> 3) Update the config file (`detekt.yml`) so that the rule set name (`TwitterCompose` becomes `Compose`)
+> 4) Done!
+
+
+## Overview
 
 It can be challenging for big teams to start adopting Compose, particularly because not everyone will start at same time or with the same patterns. We tried to ease the pain by creating a set of Compose static checks.
 
