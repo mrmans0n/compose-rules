@@ -76,23 +76,25 @@ class ComposeViewModelForwardingCheckTest {
                 AnotherComposable(vm = viewModel)
             }
             """.trimIndent()
-        forwardingRuleAssertThat(code).hasLintViolationsWithoutAutoCorrect(
-            LintViolation(
-                line = 3,
-                col = 5,
-                detail = ComposeViewModelForwarding.AvoidViewModelForwarding,
-            ),
-            LintViolation(
-                line = 8,
-                col = 9,
-                detail = ComposeViewModelForwarding.AvoidViewModelForwarding,
-            ),
-            LintViolation(
-                line = 13,
-                col = 5,
-                detail = ComposeViewModelForwarding.AvoidViewModelForwarding,
-            ),
-        )
+        forwardingRuleAssertThat(code)
+            .withEditorConfigOverride(allowedStateHolderNames to ".*Component,.*ViewModel")
+            .hasLintViolationsWithoutAutoCorrect(
+                LintViolation(
+                    line = 3,
+                    col = 5,
+                    detail = ComposeViewModelForwarding.AvoidViewModelForwarding,
+                ),
+                LintViolation(
+                    line = 8,
+                    col = 9,
+                    detail = ComposeViewModelForwarding.AvoidViewModelForwarding,
+                ),
+                LintViolation(
+                    line = 13,
+                    col = 5,
+                    detail = ComposeViewModelForwarding.AvoidViewModelForwarding,
+                ),
+            )
     }
 
     @Test

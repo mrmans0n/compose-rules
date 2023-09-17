@@ -75,6 +75,15 @@ The `naming-check` rule requires all composables that return a value to be lower
 compose_allowed_composable_function_names = .*Presenter,.*SomethingElse
 ```
 
+### Allowing custom state holder names
+
+The `vm-forwarding-check` rule will, by default, design as a state holder any class ending on "ViewModel" or "Presenter". You can, however, add new types of names to the mix via a comma-separated list of matching regexes in your `.editorconfig` file:
+
+```editorconfig
+[*.{kt,kts}]
+compose_allowed_state_holder_names = .*ViewModel,.*Presenter,.*Component,.*SomethingElse
+```
+
 ### Configure the visibility of the composables where to check for missing modifiers
 
 The `modifier-missing-check` rule will, by default, only look for missing modifiers for public composables. If you want to lower the visibility threshold to check also internal compoosables, or all composables, you can configure it in your `.editorconfig` file:

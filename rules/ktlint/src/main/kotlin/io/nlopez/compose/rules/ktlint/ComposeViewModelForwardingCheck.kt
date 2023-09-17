@@ -7,5 +7,8 @@ import io.nlopez.rules.core.ComposeKtVisitor
 import io.nlopez.rules.core.ktlint.KtlintRule
 
 class ComposeViewModelForwardingCheck :
-    KtlintRule("compose:vm-forwarding-check"),
+    KtlintRule(
+        id = "compose:vm-forwarding-check",
+        editorConfigProperties = setOf(allowedStateHolderNames),
+    ),
     ComposeKtVisitor by ComposeViewModelForwarding()

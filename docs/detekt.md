@@ -69,6 +69,8 @@ Compose:
     active: true
   ViewModelForwarding:
     active: true
+      # You can optionally use this rule on things other than types ending in "ViewModel" or "Presenter" (which are the defaults). You can add your own via a regex here:
+      # allowedStateHolderNames: .*ViewModel,.*Presenter
   ViewModelInjection:
     active: true
     # You can optionally add your own ViewModel factories here

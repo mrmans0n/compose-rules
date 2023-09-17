@@ -4,6 +4,7 @@ package io.nlopez.compose.rules.detekt
 
 import io.gitlab.arturbosch.detekt.api.Config
 import io.gitlab.arturbosch.detekt.api.SourceLocation
+import io.gitlab.arturbosch.detekt.test.TestConfig
 import io.gitlab.arturbosch.detekt.test.assertThat
 import io.gitlab.arturbosch.detekt.test.lint
 import io.nlopez.compose.rules.ComposeViewModelForwarding
@@ -12,6 +13,9 @@ import org.junit.jupiter.api.Test
 
 class ComposeViewModelForwardingCheckTest {
 
+    private val testConfig = TestConfig(
+        "stateHolder" to listOf("bananaViewModel", "potatoViewModel"),
+    )
     private val rule = ComposeViewModelForwardingCheck(Config.empty)
 
     @Test

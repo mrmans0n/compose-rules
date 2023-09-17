@@ -95,3 +95,21 @@ val viewModelFactories: EditorConfigProperty<String> =
             }
         },
     )
+
+val allowedStateHolderNames: EditorConfigProperty<String> =
+    EditorConfigProperty(
+        type = PropertyType.LowerCasingPropertyType(
+            "compose_allowed_state_holder_names",
+            "A comma separated list of regexes of valid state holders / ViewModel / Presenter names",
+            PropertyType.PropertyValueParser.IDENTITY_VALUE_PARSER,
+            emptySet(),
+        ),
+        defaultValue = "",
+        propertyMapper = { property, _ ->
+            when {
+                property?.isUnset == true -> ""
+                property?.getValueAs<String>() != null -> property.getValueAs<String>()
+                else -> property?.getValueAs()
+            }
+        },
+    )

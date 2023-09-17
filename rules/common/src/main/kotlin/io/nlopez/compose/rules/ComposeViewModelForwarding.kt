@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package io.nlopez.compose.rules
 
+import io.nlopez.rules.core.ComposeKtConfig.Companion.config
 import io.nlopez.rules.core.ComposeKtVisitor
 import io.nlopez.rules.core.Emitter
 import io.nlopez.rules.core.util.definedInInterface
@@ -21,10 +22,23 @@ class ComposeViewModelForwarding : ComposeKtVisitor {
 
         // We get here a list of variable names that tentatively contain ViewModels
         val parameters = function.valueParameterList?.parameters ?: emptyList()
+        // Exit early to avoid hitting non-param composables
+        if (parameters.isEmpty()) return
+
+        val stateHolderValidNames = Regex(
+            function.config()
+                .getList("allowedStateHolderNames", defaultStateHolderNames)
+                .ifEmpty { defaultStateHolderNames }
+                .joinToString(
+                    separator = "|",
+                    prefix = "(",
+                    postfix = ")",
+                ),
+        )
+
         val viewModelParameterNames = parameters.filter { parameter ->
-            // We can't do much better than this. We could look for viewModel() / weaverViewModel() but that
-            // would give us way less (and less useful) hits.
-            parameter.typeReference?.text?.endsWith("ViewModel") ?: false
+            // We can't do much better than looking at the types at face value
+            parameter.typeReference?.text?.matches(stateHolderValidNames) == true
         }
             .mapNotNull { it.name }
             .toSet()
@@ -49,8 +63,9 @@ class ComposeViewModelForwarding : ComposeKtVisitor {
     }
 
     companion object {
+        private val defaultStateHolderNames = listOf(".*ViewModel", ".*Presenter")
         val AvoidViewModelForwarding = """
-            Forwarding a ViewModel through multiple @Composable functions should be avoided. Consider using state hoisting.
+            Forwarding a ViewModel/Presenter through multiple @Composable functions should be avoided. Consider using state hoisting.
 
             See https://mrmans0n.github.io/compose-rules/rules/#hoist-all-the-things for more information.
         """.trimIndent()
