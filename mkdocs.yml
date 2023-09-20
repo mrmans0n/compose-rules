@@ -43,3 +43,4 @@ markdown_extensions:
     - pymdownx.superfences
     - pymdownx.tabbed
     - pymdownx.details
+    - mdx_truly_sane_lists
