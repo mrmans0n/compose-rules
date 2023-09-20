@@ -279,6 +279,12 @@ class ComposeModifierMissingCheckTest {
                     Row {
                     }
                 }
+                @PreviewScreenSizes
+                @Composable
+                fun Something() {
+                    Row {
+                    }
+                }
                 @Preview
                 @Composable
                 fun Something() {

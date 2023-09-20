@@ -9,11 +9,4 @@ val KtAnnotated.isPreview: Boolean
     get() = annotationEntries.any { it.isPreviewAnnotation }
 
 val KtAnnotationEntry.isPreviewAnnotation: Boolean
-    get() = calleeExpression?.text?.let { PreviewNameRegex.matches(it) } == true
-
-val KtAnnotated.isPreviewParameter: Boolean
-    get() = annotationEntries.any { it.calleeExpression?.text == "PreviewParameter" }
-
-val PreviewNameRegex by lazy {
-    Regex(".*Preview[s]*$")
-}
+    get() = calleeExpression?.text?.run { contains("Preview") } == true
