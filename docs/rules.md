@@ -137,12 +137,11 @@ Related rule: [compose:multiple-emitters-check](https://github.com/mrmans0n/comp
 
 ### Naming multipreview annotations properly
 
-Multipreview annotations should be named by using `Previews` as suffix (or `Preview` if just one). These annotations have to be explicitly named to make sure that they are clearly identifiable as a `@Preview` alternative on its usages.
+Multipreview annotations should be named by using `Previews` as a prefix. These annotations have to be explicitly named to make sure that they are clearly identifiable as a `@Preview` alternative on its usages.
 
-More information: [Multipreview annotations](https://developer.android.com/jetpack/compose/tooling#preview-multipreview)
+More information: [Multipreview annotations](https://developer.android.com/jetpack/compose/tooling#preview-multipreview) and [Google's own predefined annotations](https://cs.android.com/androidx/platform/frameworks/support/+/androidx-main:compose/ui/ui-tooling-preview/src/androidMain/kotlin/androidx/compose/ui/tooling/preview/MultiPreviews.kt?q=MultiPreviews.kt)
 
-Related rule: [compose:preview-naming](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ComposePreviewNaming.kt)
-
+Related rule: [compose:preview-annotation-naming](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ComposePreviewAnnotationNaming.kt)
 
 ### Naming @Composable functions properly
 

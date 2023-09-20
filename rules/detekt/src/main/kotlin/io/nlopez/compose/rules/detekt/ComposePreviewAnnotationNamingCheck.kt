@@ -6,18 +6,18 @@ import io.gitlab.arturbosch.detekt.api.Config
 import io.gitlab.arturbosch.detekt.api.Debt
 import io.gitlab.arturbosch.detekt.api.Issue
 import io.gitlab.arturbosch.detekt.api.Severity
-import io.nlopez.compose.rules.ComposePreviewNaming
+import io.nlopez.compose.rules.ComposePreviewAnnotationNaming
 import io.nlopez.rules.core.ComposeKtVisitor
 import io.nlopez.rules.core.detekt.DetektRule
 
-class ComposePreviewNamingCheck(config: Config) :
+class ComposePreviewAnnotationNamingCheck(config: Config) :
     DetektRule(config),
-    ComposeKtVisitor by ComposePreviewNaming() {
+    ComposeKtVisitor by ComposePreviewAnnotationNaming() {
 
     override val issue: Issue = Issue(
-        id = "PreviewNaming",
+        id = "PreviewAnnotationNaming",
         severity = Severity.CodeSmell,
-        description = "Multipreview annotations should end with the `Previews` suffix",
+        description = "Multipreview annotations should begin with the `Preview` suffix",
         debt = Debt.FIVE_MINS,
     )
 }

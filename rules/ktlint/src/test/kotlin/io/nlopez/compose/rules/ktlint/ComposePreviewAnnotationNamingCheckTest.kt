@@ -4,13 +4,13 @@ package io.nlopez.compose.rules.ktlint
 
 import com.pinterest.ktlint.test.KtLintAssertThat.Companion.assertThatRule
 import com.pinterest.ktlint.test.LintViolation
-import io.nlopez.compose.rules.ComposePreviewNaming
+import io.nlopez.compose.rules.ComposePreviewAnnotationNaming
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
 
-class ComposePreviewNamingCheckTest {
+class ComposePreviewAnnotationNamingCheckTest {
 
-    private val ruleAssertThat = assertThatRule { ComposePreviewNamingCheck() }
+    private val ruleAssertThat = assertThatRule { ComposePreviewAnnotationNamingCheck() }
 
     @Test
     fun `passes for non-preview annotations`() {
@@ -28,18 +28,18 @@ class ComposePreviewNamingCheckTest {
         val code =
             """
             @Preview
-            annotation class BananaPreview
-            @BananaPreview
-            annotation class DoubleBananaPreview
+            annotation class PreviewBanana
+            @PreviewBanana
+            annotation class PreviewDoubleBanana
             @Preview
             @Preview
-            annotation class ApplePreviews
+            annotation class PreviewApple
             @Preview
-            @ApplePreviews
-            annotation class CombinedApplePreviews
-            @BananaPreview
-            @ApplePreviews
-            annotation class FruitBasketPreviews
+            @PreviewApple
+            annotation class PreviewCombinedApple
+            @PreviewBanana
+            @PreviewApple
+            annotation class PreviewFruitBasket
             """.trimIndent()
         ruleAssertThat(code).hasNoLintViolations()
     }
@@ -60,17 +60,17 @@ class ComposePreviewNamingCheckTest {
             LintViolation(
                 line = 2,
                 col = 18,
-                detail = ComposePreviewNaming.createMessage(1, "Preview"),
+                detail = ComposePreviewAnnotationNaming.PreviewAnnotationDoesNotStartWithPreview,
             ),
             LintViolation(
                 line = 4,
                 col = 18,
-                detail = ComposePreviewNaming.createMessage(1, "Preview"),
+                detail = ComposePreviewAnnotationNaming.PreviewAnnotationDoesNotStartWithPreview,
             ),
             LintViolation(
                 line = 6,
                 col = 18,
-                detail = ComposePreviewNaming.createMessage(1, "Preview"),
+                detail = ComposePreviewAnnotationNaming.PreviewAnnotationDoesNotStartWithPreview,
             ),
         )
     }
@@ -91,12 +91,12 @@ class ComposePreviewNamingCheckTest {
             LintViolation(
                 line = 3,
                 col = 18,
-                detail = ComposePreviewNaming.createMessage(2, "Previews"),
+                detail = ComposePreviewAnnotationNaming.PreviewAnnotationDoesNotStartWithPreview,
             ),
             LintViolation(
                 line = 6,
                 col = 18,
-                detail = ComposePreviewNaming.createMessage(2, "Previews"),
+                detail = ComposePreviewAnnotationNaming.PreviewAnnotationDoesNotStartWithPreview,
             ),
         )
     }

@@ -6,13 +6,13 @@ import io.gitlab.arturbosch.detekt.api.Config
 import io.gitlab.arturbosch.detekt.api.SourceLocation
 import io.gitlab.arturbosch.detekt.test.assertThat
 import io.gitlab.arturbosch.detekt.test.lint
-import io.nlopez.compose.rules.ComposePreviewNaming
+import io.nlopez.compose.rules.ComposePreviewAnnotationNaming
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
 
-class ComposePreviewNamingCheckTest {
+class ComposePreviewAnnotationNamingCheckTest {
 
-    private val rule = ComposePreviewNamingCheck(Config.empty)
+    private val rule = ComposePreviewAnnotationNamingCheck(Config.empty)
 
     @Test
     fun `passes for non-preview annotations`() {
@@ -31,18 +31,18 @@ class ComposePreviewNamingCheckTest {
         val code =
             """
             @Preview
-            annotation class BananaPreview
-            @BananaPreview
-            annotation class DoubleBananaPreview
+            annotation class PreviewBanana
+            @PreviewBanana
+            annotation class PreviewDoubleBanana
             @Preview
             @Preview
-            annotation class ApplePreviews
+            annotation class PreviewApple
             @Preview
-            @ApplePreviews
-            annotation class CombinedApplePreviews
-            @BananaPreview
-            @ApplePreviews
-            annotation class FruitBasketPreviews
+            @PreviewApple
+            annotation class PreviewCombinedApple
+            @PreviewBanana
+            @PreviewApple
+            annotation class PreviewFruitBasket
             """.trimIndent()
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
@@ -67,7 +67,8 @@ class ComposePreviewNamingCheckTest {
             SourceLocation(6, 18),
         )
         for (error in errors) {
-            assertThat(error).hasMessage(ComposePreviewNaming.createMessage(1, "Preview"))
+            assertThat(error)
+                .hasMessage(ComposePreviewAnnotationNaming.PreviewAnnotationDoesNotStartWithPreview)
         }
     }
 
@@ -89,7 +90,8 @@ class ComposePreviewNamingCheckTest {
             SourceLocation(6, 18),
         )
         for (error in errors) {
-            assertThat(error).hasMessage(ComposePreviewNaming.createMessage(2, "Previews"))
+            assertThat(error)
+                .hasMessage(ComposePreviewAnnotationNaming.PreviewAnnotationDoesNotStartWithPreview)
         }
     }
 }

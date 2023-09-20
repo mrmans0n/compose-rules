@@ -25,7 +25,7 @@ class ComposeRuleSetProvider : RuleSetProvider {
             ComposeMutableParametersCheck(config),
             ComposeNamingCheck(config),
             ComposeParameterOrderCheck(config),
-            ComposePreviewNamingCheck(config),
+            ComposePreviewAnnotationNamingCheck(config),
             ComposePreviewPublicCheck(config),
             ComposeRememberMissingCheck(config),
             ComposeUnstableCollectionsCheck(config),
