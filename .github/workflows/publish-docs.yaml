@@ -26,6 +26,7 @@ jobs:
           python3 -m pip install --upgrade pip
           python3 -m pip install mkdocs
           python3 -m pip install mkdocs-material
+          python3 -m pip install mdx_truly_sane_lists
 
       - name: Build site
         run: mkdocs build
