@@ -30,6 +30,8 @@ Compose:
     # contentEmitters: MyComposable,MyOtherComposable
   DefaultsVisibility:
     active: true
+  ModifierClickableOrder:
+    active: true
   ModifierComposable:
     active: true
   ModifierMissing:
