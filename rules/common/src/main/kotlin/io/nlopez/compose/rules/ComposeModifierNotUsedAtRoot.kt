@@ -5,9 +5,9 @@ package io.nlopez.compose.rules
 import io.nlopez.rules.core.ComposeKtVisitor
 import io.nlopez.rules.core.Emitter
 import io.nlopez.rules.core.report
+import io.nlopez.rules.core.util.argumentsUsingModifiers
 import io.nlopez.rules.core.util.emitsContent
 import io.nlopez.rules.core.util.findChildrenByClass
-import io.nlopez.rules.core.util.argumentsUsingModifiers
 import io.nlopez.rules.core.util.modifierParameter
 import io.nlopez.rules.core.util.obtainAllModifierNames
 import org.jetbrains.kotlin.com.intellij.psi.PsiElement

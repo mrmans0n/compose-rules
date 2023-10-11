@@ -13,7 +13,6 @@ import org.jetbrains.kotlin.psi.KtReferenceExpression
 import org.jetbrains.kotlin.psi.KtValueArgument
 import org.jetbrains.kotlin.psi.KtValueArgumentName
 
-// Try to get all possible names by iterating on possible name reassignments until it's stable
 /**
  *  Try to get all possible names by iterating on possible name reassignments until it's stable
  */
