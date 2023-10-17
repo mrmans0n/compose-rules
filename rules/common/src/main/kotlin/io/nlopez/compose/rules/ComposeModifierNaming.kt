@@ -19,8 +19,13 @@ class ComposeModifierNaming : ComposeKtVisitor {
 
         val count = modifiers.size
 
-        for (modifier in modifiers) {
-            val valid = modifier.name?.lowercase()?.endsWith("modifier") ?: false
+        modifiers.forEachIndexed { index, modifier ->
+            val isCorrectSingleModifier = modifier.name?.equals("modifier") ?: false
+            val valid = if (index == 0) {
+                isCorrectSingleModifier
+            } else {
+                !isCorrectSingleModifier && modifier.name?.lowercase()?.endsWith("modifier") ?: false
+            }
             when {
                 !valid && count == 1 -> emitter.report(modifier, ModifiersAreSupposedToBeCalledModifierWhenAlone)
                 !valid -> emitter.report(modifier, ModifiersAreSupposedToEndInModifierWhenMultiple)
