@@ -227,6 +227,51 @@ More info: [Always provide a Modifier parameter](https://chris.banes.dev/posts/a
 
 Related rule: [compose:modifier-missing-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ComposeModifierMissing.kt)
 
+### Modifier order matters
+
+The order of modifier functions is very important. Each function makes changes to the Modifierreturned by the previous function, the sequence affects the final result. Let's see an example of this:
+
+```kotlin
+@Composable
+fun MyCard(modifier: Modifier = Modifier) {
+    Column(
+        modifier
+            // Tapping on it does a ripple, the ripple is bound incorrectly to the composable
+            .clickable { /* TODO */ }
+            // Create rounded corners
+            .clip(shape = RoundedCornerShape(8.dp))
+            // Background with rounded corners
+            .background(color = backgroundColor, shape = RoundedCornerShape(8.dp))
+    ) {
+        // rest of the implementation
+    }
+}
+```
+The entire area, including the clipped area and the clipped background, responds to clicks. This means that the ripple will fill it all, even the areas that we wanted to trim from the shape.
+
+We can address this by simply reordering the modifiers.
+
+```kotlin
+@Composable
+fun MyCard(modifier: Modifier = Modifier) {
+    Column(
+        modifier
+            // Create rounded corners
+            .clip(shape = RoundedCornerShape(8.dp))
+            // Background with rounded corners
+            .background(color = backgroundColor, shape = RoundedCornerShape(8.dp))
+            // Tapping on it does a ripple, the ripple is bound incorrectly to the composable
+            .clickable { /* TODO */ }
+    ) {
+        // rest of the implementation
+    }
+}
+```
+
+More info: [Modifier documentation](https://developer.android.com/jetpack/compose/modifiers#order-modifier-matters)
+
+Related rule: [compose:modifier-clickable-order](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ComposeModifierClickableOrder.kt)
+
 ### Modifiers should be used at the top-most layout of the component
 
 Modifiers should be applied once as a first modifier in the chain to the root-most layout in the component implementation.

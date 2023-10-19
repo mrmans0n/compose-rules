@@ -134,7 +134,7 @@ class ComposeModifierClickableOrder : ComposeKtVisitor {
         val ModifierChainWithSuspiciousOrder = """
             This order of modifiers is likely to cause visual issues. You should have your clickable modifiers after modifiers that use shapes, so that the clickable selected area takes into account the change in shape as well.
 
-            See https://mrmans0n.github.io/compose-rules/rules/#TODO for more information.
+            See https://mrmans0n.github.io/compose-rules/rules/#modifier-order-matters for more information.
         """.trimIndent()
     }
 }
