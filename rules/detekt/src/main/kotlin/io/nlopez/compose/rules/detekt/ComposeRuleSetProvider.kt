@@ -5,7 +5,6 @@ package io.nlopez.compose.rules.detekt
 import io.gitlab.arturbosch.detekt.api.Config
 import io.gitlab.arturbosch.detekt.api.RuleSet
 import io.gitlab.arturbosch.detekt.api.RuleSetProvider
-import io.nlopez.compose.rules.ComposeModifierClickableOrder
 
 class ComposeRuleSetProvider : RuleSetProvider {
     override val ruleSetId: String = CustomRuleSetId

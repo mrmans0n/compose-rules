@@ -131,7 +131,6 @@ class ComposeModifierClickableOrder : ComposeKtVisitor {
             "combinedClickable",
         )
 
-        // TODO write the actual error
         val ModifierChainWithSuspiciousOrder = """
             This order of modifiers is likely to cause visual issues. You should have your clickable modifiers after modifiers that use shapes, so that the clickable selected area takes into account the change in shape as well.
 
