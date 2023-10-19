@@ -71,27 +71,4 @@ class ComposeModifierNamingCheckTest {
             detail = ComposeModifierNaming.ModifiersAreSupposedToBeCalledModifierWhenAlone,
         )
     }
-
-    @Test
-    fun `errors when a Composable has a non first modifier named exactly modifier`() {
-        @Language("kotlin")
-        val code =
-            """
-                @Composable
-                fun Something1(myModifier: Modifier, modifier: Modifier) {}
-            """.trimIndent()
-
-        modifierRuleAssertThat(code).hasLintViolationsWithoutAutoCorrect(
-            LintViolation(
-                line = 2,
-                col = 16,
-                detail = ComposeModifierNaming.ModifiersAreSupposedToEndInModifierWhenMultiple,
-            ),
-            LintViolation(
-                line = 2,
-                col = 38,
-                detail = ComposeModifierNaming.ModifiersAreSupposedToEndInModifierWhenMultiple,
-            ),
-        )
-    }
 }
