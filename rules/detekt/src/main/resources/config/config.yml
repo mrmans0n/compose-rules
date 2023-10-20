@@ -5,6 +5,8 @@ Compose:
     active: true
   DefaultsVisibility:
     active: true
+  ModifierClickableOrder:
+    active: true
   ModifierComposable:
     active: true
   ModifierMissing:

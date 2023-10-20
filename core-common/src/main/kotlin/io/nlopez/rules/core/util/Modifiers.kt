@@ -10,9 +10,9 @@ import org.jetbrains.kotlin.psi.KtFunction
 import org.jetbrains.kotlin.psi.KtParameter
 import org.jetbrains.kotlin.psi.KtProperty
 import org.jetbrains.kotlin.psi.KtReferenceExpression
+import org.jetbrains.kotlin.psi.KtValueArgument
 import org.jetbrains.kotlin.psi.KtValueArgumentName
 
-// Try to get all possible names by iterating on possible name reassignments until it's stable
 /**
  *  Try to get all possible names by iterating on possible name reassignments until it's stable
  */
@@ -50,7 +50,10 @@ private fun KtBlockExpression.findModifierManipulations(contains: (String) -> Bo
         .mapNotNull { it.nameIdentifier?.text }
 
 fun KtCallExpression.isUsingModifiers(modifierNames: List<String>): Boolean =
-    valueArguments.any { argument ->
+    argumentsUsingModifiers(modifierNames).isNotEmpty()
+
+fun KtCallExpression.argumentsUsingModifiers(modifierNames: List<String>): List<KtValueArgument> =
+    valueArguments.filter { argument ->
         when (val expression = argument.getArgumentExpression()) {
             // if it's MyComposable(modifier) or similar
             is KtReferenceExpression -> {
