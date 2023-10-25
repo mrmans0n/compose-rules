@@ -260,7 +260,7 @@ fun MyCard(modifier: Modifier = Modifier) {
             .clip(shape = RoundedCornerShape(8.dp))
             // Background with rounded corners
             .background(color = backgroundColor, shape = RoundedCornerShape(8.dp))
-            // Tapping on it does a ripple, the ripple is bound incorrectly to the composable
+            // Tapping on it does a ripple, the ripple is bound correctly now to the composable
             .clickable { /* TODO */ }
     ) {
         // rest of the implementation
