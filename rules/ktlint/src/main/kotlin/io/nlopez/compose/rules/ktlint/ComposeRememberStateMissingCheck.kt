@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 package io.nlopez.compose.rules.ktlint
 
-import io.nlopez.compose.rules.ComposeRememberMissing
+import io.nlopez.compose.rules.ComposeRememberStateMissing
 import io.nlopez.rules.core.ComposeKtVisitor
 import io.nlopez.rules.core.ktlint.KtlintRule
 
-class ComposeRememberMissingCheck :
+class ComposeRememberStateMissingCheck :
     KtlintRule("compose:remember-missing-check"),
-    ComposeKtVisitor by ComposeRememberMissing()
+    ComposeKtVisitor by ComposeRememberStateMissing()

@@ -5,11 +5,11 @@ package io.nlopez.compose.rules
 import io.nlopez.rules.core.ComposeKtVisitor
 import io.nlopez.rules.core.Emitter
 import io.nlopez.rules.core.util.findChildrenByClass
-import org.jetbrains.kotlin.com.intellij.psi.PsiElement
+import io.nlopez.rules.core.util.isRemembered
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtFunction
 
-class ComposeRememberMissing : ComposeKtVisitor {
+class ComposeRememberStateMissing : ComposeKtVisitor {
 
     override fun visitComposable(function: KtFunction, autoCorrect: Boolean, emitter: Emitter) {
         // To keep memory consumption in check, we first traverse down until we see one of our known functions
@@ -25,17 +25,6 @@ class ComposeRememberMissing : ComposeKtVisitor {
                     "derivedStateOf" -> emitter.report(callExpression, DerivedStateOfNotRemembered, false)
                 }
             }
-    }
-
-    private fun KtCallExpression.isRemembered(stopAt: PsiElement): Boolean {
-        var current: PsiElement = parent
-        while (current != stopAt) {
-            (current as? KtCallExpression)?.let { callExpression ->
-                if (callExpression.calleeExpression?.text?.startsWith("remember") == true) return true
-            }
-            current = current.parent
-        }
-        return false
     }
 
     companion object {

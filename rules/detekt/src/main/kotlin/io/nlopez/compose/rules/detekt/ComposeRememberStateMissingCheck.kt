@@ -6,13 +6,13 @@ import io.gitlab.arturbosch.detekt.api.Config
 import io.gitlab.arturbosch.detekt.api.Debt
 import io.gitlab.arturbosch.detekt.api.Issue
 import io.gitlab.arturbosch.detekt.api.Severity
-import io.nlopez.compose.rules.ComposeRememberMissing
+import io.nlopez.compose.rules.ComposeRememberStateMissing
 import io.nlopez.rules.core.ComposeKtVisitor
 import io.nlopez.rules.core.detekt.DetektRule
 
-class ComposeRememberMissingCheck(config: Config) :
+class ComposeRememberStateMissingCheck(config: Config) :
     DetektRule(config),
-    ComposeKtVisitor by ComposeRememberMissing() {
+    ComposeKtVisitor by ComposeRememberStateMissing() {
 
     override val issue: Issue = Issue(
         id = "RememberMissing",

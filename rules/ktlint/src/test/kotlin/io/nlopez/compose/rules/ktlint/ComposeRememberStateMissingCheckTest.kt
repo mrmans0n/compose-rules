@@ -1,18 +1,16 @@
 // Copyright 2023 Nacho Lopez
 // SPDX-License-Identifier: Apache-2.0
-package io.nlopez.compose.rules.detekt
+package io.nlopez.compose.rules.ktlint
 
-import io.gitlab.arturbosch.detekt.api.Config
-import io.gitlab.arturbosch.detekt.api.SourceLocation
-import io.gitlab.arturbosch.detekt.test.assertThat
-import io.gitlab.arturbosch.detekt.test.lint
-import io.nlopez.compose.rules.ComposeRememberMissing
+import com.pinterest.ktlint.test.KtLintAssertThat.Companion.assertThatRule
+import com.pinterest.ktlint.test.LintViolation
+import io.nlopez.compose.rules.ComposeRememberStateMissing
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
 
-class ComposeRememberMissingCheckTest {
+class ComposeRememberStateMissingCheckTest {
 
-    private val rule = ComposeRememberMissingCheck(Config.empty)
+    private val rememberRuleAssertThat = assertThatRule { ComposeRememberStateMissingCheck() }
 
     @Test
     fun `passes when a non-remembered mutableStateOf is used outside of a Composable`() {
@@ -21,8 +19,7 @@ class ComposeRememberMissingCheckTest {
             """
                 val msof = mutableStateOf("X")
             """.trimIndent()
-        val errors = rule.lint(code)
-        assertThat(errors).isEmpty()
+        rememberRuleAssertThat(code).hasNoLintViolations()
     }
 
     @Test
@@ -38,15 +35,18 @@ class ComposeRememberMissingCheckTest {
                 fun MyComposable(something: State<String> = mutableStateOf("X")) {
                 }
             """.trimIndent()
-        val errors = rule.lint(code)
-        assertThat(errors).hasSize(2)
-            .hasStartSourceLocations(
-                SourceLocation(3, 21),
-                SourceLocation(6, 45),
-            )
-        for (error in errors) {
-            assertThat(error).hasMessage(ComposeRememberMissing.MutableStateOfNotRemembered)
-        }
+        rememberRuleAssertThat(code).hasLintViolationsWithoutAutoCorrect(
+            LintViolation(
+                line = 3,
+                col = 21,
+                detail = ComposeRememberStateMissing.MutableStateOfNotRemembered,
+            ),
+            LintViolation(
+                line = 6,
+                col = 45,
+                detail = ComposeRememberStateMissing.MutableStateOfNotRemembered,
+            ),
+        )
     }
 
     @Test
@@ -62,8 +62,7 @@ class ComposeRememberMissingCheckTest {
                     val something2 by remember { mutableStateOf("Y") }
                 }
             """.trimIndent()
-        val errors = rule.lint(code)
-        assertThat(errors).isEmpty()
+        rememberRuleAssertThat(code).hasNoLintViolations()
     }
 
     @Test
@@ -79,8 +78,7 @@ class ComposeRememberMissingCheckTest {
                     val something2 by rememberSaveable { mutableStateOf("Y") }
                 }
             """.trimIndent()
-        val errors = rule.lint(code)
-        assertThat(errors).isEmpty()
+        rememberRuleAssertThat(code).hasNoLintViolations()
     }
 
     @Test
@@ -90,8 +88,7 @@ class ComposeRememberMissingCheckTest {
             """
                 val dsof = derivedStateOf("X")
             """.trimIndent()
-        val errors = rule.lint(code)
-        assertThat(errors).isEmpty()
+        rememberRuleAssertThat(code).hasNoLintViolations()
     }
 
     @Test
@@ -107,15 +104,18 @@ class ComposeRememberMissingCheckTest {
                 fun MyComposable(something: State<String> = derivedStateOf { "X" }) {
                 }
             """.trimIndent()
-        val errors = rule.lint(code)
-        assertThat(errors).hasSize(2)
-            .hasStartSourceLocations(
-                SourceLocation(3, 21),
-                SourceLocation(6, 45),
-            )
-        for (error in errors) {
-            assertThat(error).hasMessage(ComposeRememberMissing.DerivedStateOfNotRemembered)
-        }
+        rememberRuleAssertThat(code).hasLintViolationsWithoutAutoCorrect(
+            LintViolation(
+                line = 3,
+                col = 21,
+                detail = ComposeRememberStateMissing.DerivedStateOfNotRemembered,
+            ),
+            LintViolation(
+                line = 6,
+                col = 45,
+                detail = ComposeRememberStateMissing.DerivedStateOfNotRemembered,
+            ),
+        )
     }
 
     @Test
@@ -131,7 +131,6 @@ class ComposeRememberMissingCheckTest {
                     val something2 by remember { derivedStateOf { "Y" } }
                 }
             """.trimIndent()
-        val errors = rule.lint(code)
-        assertThat(errors).isEmpty()
+        rememberRuleAssertThat(code).hasNoLintViolations()
     }
 }

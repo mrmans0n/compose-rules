@@ -19,7 +19,7 @@ Related rule: [compose:vm-forwarding-check](https://github.com/mrmans0n/compose-
 
 Be careful when using `mutableStateOf` (or any of the other state builders) to make sure that you `remember` the instance. If you don't `remember` the state instance, a new state instance will be created when the function is recomposed.
 
-Related rule: [compose:remember-missing-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ComposeRememberMissing.kt)
+Related rule: [compose:remember-missing-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ComposeRememberStateMissing.kt)
 
 ### Use Immutable annotation whenever possible
 
@@ -162,6 +162,15 @@ Modifiers occupy the first optional parameter slot to set a consistent expectati
 More information: [Kotlin default arguments](https://kotlinlang.org/docs/functions.html#default-arguments), [Modifier docs](https://developer.android.com/reference/kotlin/androidx/compose/ui/Modifier) and [Elements accept and respect a Modifier parameter](https://github.com/androidx/androidx/blob/androidx-main/compose/docs/compose-api-guidelines.md#why-8).
 
 Related rule: [compose:param-order-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ComposeParameterOrder.kt)
+
+### Movable content should be remembered
+
+The methods used to create movable composable content (`movableContentOf` and `movableContentWithReceiverOf`) need to be used inside a `remember` function.
+
+To work as intended, they need to persist through compositions - as if they get detached from the composition, they will be immediately recycled.
+
+Related rule: [compose:remember-content-missing-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ComposeRememberContentMissing.kt)
+
 
 ### Make dependencies explicit
 

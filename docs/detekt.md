@@ -67,6 +67,8 @@ Compose:
     active: true
   RememberMissing:
     active: true
+  RememberContentMissing:
+    active: true
   UnstableCollections:
     active: true
   ViewModelForwarding:
