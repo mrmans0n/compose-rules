@@ -2,7 +2,7 @@
 kotlin = "1.9.10"
 ktlint = "1.0.1"
 detekt = "1.23.3"
-junit = "5.10.0"
+junit = "5.10.1"
 
 [libraries]
 ktlint-core = { module = "com.pinterest.ktlint:ktlint-core", version.ref = "ktlint" }
