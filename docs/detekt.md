@@ -20,6 +20,8 @@ For the rules to be picked up, you will need to enable them in your `detekt.yml`
 
 ```yaml
 Compose:
+  ComposableAnnotationNaming:
+    active: true
   CompositionLocalAllowlist:
     active: true
     # You can optionally define a list of CompositionLocals that are allowed here

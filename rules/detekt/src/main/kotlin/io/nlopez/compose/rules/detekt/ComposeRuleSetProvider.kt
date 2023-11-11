@@ -12,6 +12,7 @@ class ComposeRuleSetProvider : RuleSetProvider {
     override fun instance(config: Config): RuleSet = RuleSet(
         CustomRuleSetId,
         listOf(
+            ComposableAnnotationNamingCheck(config),
             CompositionLocalAllowlistCheck(config),
             ContentEmitterReturningValuesCheck(config),
             DefaultsVisibilityCheck(config),

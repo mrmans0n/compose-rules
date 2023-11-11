@@ -11,6 +11,7 @@ class ComposeRuleSetProvider : RuleSetProviderV3(
 ) {
 
     override fun getRuleProviders(): Set<RuleProvider> = setOf(
+        RuleProvider { ComposableAnnotationNamingCheck() },
         RuleProvider { CompositionLocalAllowlistCheck() },
         RuleProvider { ContentEmitterReturningValuesCheck() },
         RuleProvider { DefaultsVisibilityCheck() },

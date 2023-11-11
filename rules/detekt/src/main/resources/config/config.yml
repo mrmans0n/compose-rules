@@ -1,4 +1,6 @@
 Compose:
+  ComposableAnnotationNaming:
+    active: true
   CompositionLocalAllowlist:
     active: true
   ContentEmitterReturningValues:

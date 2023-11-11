@@ -153,6 +153,12 @@ More information: [Naming Unit @Composable functions as entities](https://github
 
 Related rule: [compose:naming-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/Naming.kt)
 
+### Naming Composable annotations properly
+
+Custom Composable annotations (tagged with [`@ComposableTargetMarker`](https://developer.android.com/reference/kotlin/androidx/compose/runtime/ComposableTargetMarker#description())) should have the `Composable` prefix (for example, `@GoogleMapComposable` or `@MosaicComposable`).
+
+Related rule: [compose:composable-annotation-naming-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ComposableAnnotationNaming.kt)
+
 ### Ordering @Composable parameters properly
 
 When writing Kotlin, it's a good practice to write the parameters for your methods by putting the mandatory parameters first, followed by the optional ones (aka the ones with default values). By doing so, [we minimize the number times we will need to write the name for arguments explicitly](https://kotlinlang.org/docs/functions.html#default-arguments).
