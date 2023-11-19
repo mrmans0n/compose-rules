@@ -139,7 +139,7 @@ class ModifierReusedCheckTest {
                 SourceLocation(23, 5),
                 SourceLocation(26, 9),
                 SourceLocation(27, 9),
-                SourceLocation(28, 9)
+                SourceLocation(28, 9),
             )
         for (error in errors) {
             assertThat(error).hasMessage(ModifierReused.ModifierShouldBeUsedOnceOnly)
