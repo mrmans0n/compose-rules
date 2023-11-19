@@ -14,6 +14,7 @@ class ComposeRuleSetProvider : RuleSetProvider {
         listOf(
             ComposableAnnotationNamingCheck(config),
             CompositionLocalAllowlistCheck(config),
+            CompositionLocalNamingCheck(config),
             ContentEmitterReturningValuesCheck(config),
             DefaultsVisibilityCheck(config),
             ModifierClickableOrderCheck(config),

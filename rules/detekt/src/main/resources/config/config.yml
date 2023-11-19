@@ -3,6 +3,8 @@ Compose:
     active: true
   CompositionLocalAllowlist:
     active: true
+  CompositionLocalNaming:
+    active: true
   ContentEmitterReturningValues:
     active: true
   DefaultsVisibility:
