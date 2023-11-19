@@ -60,6 +60,13 @@ class ModifierReusedCheckTest {
                         )
                     }
                 }
+                @Composable
+                fun Something(modifier: Modifier, otherModifier: Modifier): Int {
+                    Column(modifier = modifier) {
+                        SomethingElse(modifier = otherModifier)
+                        SomethingDifferent(modifier = otherModifier)
+                    }
+                }
             """.trimIndent()
 
         val errors = rule.lint(code)
@@ -76,6 +83,8 @@ class ModifierReusedCheckTest {
                 SourceLocation(26, 9),
                 SourceLocation(31, 5),
                 SourceLocation(37, 9),
+                SourceLocation(45, 9),
+                SourceLocation(46, 9),
             )
         for (error in errors) {
             assertThat(error).hasMessage(ModifierReused.ModifierShouldBeUsedOnceOnly)
@@ -107,9 +116,19 @@ class ModifierReusedCheckTest {
                         ChildThatReusesModifier(modifier = newModifier)
                     }
                 }
+                @Composable
+                fun Something(modifier: Modifier, otherModifier: Modifier) {
+                    Column(modifier = modifier) {
+                        val newModifier = modifier.fillMaxWidth()
+                        val newModifier2 = otherModifier.fillMaxWidth()
+                        ChildThatReusesModifier(modifier = newModifier)
+                        ChildThatReusesModifier(modifier = otherModifier)
+                        ChildThatReusesModifier(modifier = newModifier2)
+                    }
+                }
             """.trimIndent()
         val errors = rule.lint(code)
-        assertThat(errors).hasSize(6)
+        assertThat(errors).hasSize(10)
             .hasStartSourceLocations(
                 SourceLocation(3, 5),
                 SourceLocation(4, 9),
@@ -117,6 +136,10 @@ class ModifierReusedCheckTest {
                 SourceLocation(11, 9),
                 SourceLocation(17, 5),
                 SourceLocation(18, 9),
+                SourceLocation(23, 5),
+                SourceLocation(26, 9),
+                SourceLocation(27, 9),
+                SourceLocation(28, 9)
             )
         for (error in errors) {
             assertThat(error).hasMessage(ModifierReused.ModifierShouldBeUsedOnceOnly)

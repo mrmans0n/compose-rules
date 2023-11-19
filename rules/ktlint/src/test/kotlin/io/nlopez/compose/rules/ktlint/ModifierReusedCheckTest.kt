@@ -58,6 +58,13 @@ class ModifierReusedCheckTest {
                         )
                     }
                 }
+                @Composable
+                fun Something(modifier: Modifier, otherModifier: Modifier): Int {
+                    Column(modifier = modifier) {
+                        SomethingElse(modifier = otherModifier)
+                        SomethingDifferent(modifier = otherModifier)
+                    }
+                }
             """.trimIndent()
 
         modifierRuleAssertThat(code).hasLintViolationsWithoutAutoCorrect(
@@ -116,6 +123,16 @@ class ModifierReusedCheckTest {
                 col = 9,
                 detail = ModifierReused.ModifierShouldBeUsedOnceOnly,
             ),
+            LintViolation(
+                line = 45,
+                col = 9,
+                detail = ModifierReused.ModifierShouldBeUsedOnceOnly,
+            ),
+            LintViolation(
+                line = 46,
+                col = 9,
+                detail = ModifierReused.ModifierShouldBeUsedOnceOnly,
+            ),
         )
     }
 
@@ -142,6 +159,16 @@ class ModifierReusedCheckTest {
                     val newModifier = modifier.fillMaxWidth()
                     Column(modifier = modifier) {
                         ChildThatReusesModifier(modifier = newModifier)
+                    }
+                }
+                @Composable
+                fun Something(modifier: Modifier, otherModifier: Modifier) {
+                    Column(modifier = modifier) {
+                        val newModifier = modifier.fillMaxWidth()
+                        val newModifier2 = otherModifier.fillMaxWidth()
+                        ChildThatReusesModifier(modifier = newModifier)
+                        ChildThatReusesModifier(modifier = otherModifier)
+                        ChildThatReusesModifier(modifier = newModifier2)
                     }
                 }
             """.trimIndent()
@@ -173,6 +200,26 @@ class ModifierReusedCheckTest {
             ),
             LintViolation(
                 line = 18,
+                col = 9,
+                detail = ModifierReused.ModifierShouldBeUsedOnceOnly,
+            ),
+            LintViolation(
+                line = 23,
+                col = 5,
+                detail = ModifierReused.ModifierShouldBeUsedOnceOnly,
+            ),
+            LintViolation(
+                line = 26,
+                col = 9,
+                detail = ModifierReused.ModifierShouldBeUsedOnceOnly,
+            ),
+            LintViolation(
+                line = 27,
+                col = 9,
+                detail = ModifierReused.ModifierShouldBeUsedOnceOnly,
+            ),
+            LintViolation(
+                line = 28,
                 col = 9,
                 detail = ModifierReused.ModifierShouldBeUsedOnceOnly,
             ),
