@@ -24,7 +24,7 @@ dependencies {
 
 ## Using with spotless
 
-> **Warning**: If using [Spotless](https://github.com/diffplug/spotless), there is [no current way of enabling a custom ruleset like ours](https://github.com/diffplug/spotless/issues/1220). You would need to use any of the alternatives listed here (like Kotlinter) to just run these rules.
+See [Spotless Ktlint Integration](https://github.com/diffplug/spotless/tree/main/plugin-gradle#ktlint).
 
 ## Using with ktlint CLI or the ktlint (unofficial) IntelliJ plugin
 
