@@ -88,3 +88,6 @@ val KtFunction.modifierParameter: KtParameter?
         val modifiers = valueParameters.filter { it.isModifier }
         return modifiers.firstOrNull { it.name == "modifier" } ?: modifiers.firstOrNull()
     }
+
+val KtFunction.modifierParameters: List<KtParameter>
+    get() = valueParameters.filter { it.isModifier }

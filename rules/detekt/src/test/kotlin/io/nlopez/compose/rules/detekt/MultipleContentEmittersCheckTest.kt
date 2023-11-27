@@ -166,4 +166,33 @@ class MultipleContentEmittersCheckTest {
             .hasStartSourceLocation(2, 5)
         assertThat(errors.first()).hasMessage(MultipleContentEmitters.MultipleContentEmittersDetected)
     }
+
+    @Test
+    fun `for loops are captured`() {
+        @Language("kotlin")
+        val code = """
+            @Composable
+            fun MultipleContent(texts: List<String>, modifier: Modifier = Modifier) {
+                for (text in texts) {
+                    Text(text)
+                }
+            }
+            @Composable
+            fun MultipleContent(otherTexts: List<String>, modifier: Modifier = Modifier) {
+                Text("text 1")
+                for (otherText in otherTexts) {
+                    Text(otherText)
+                }
+            }
+        """.trimIndent()
+        val errors = rule.lint(code)
+        assertThat(errors)
+            .hasStartSourceLocations(
+                SourceLocation(2, 5),
+                SourceLocation(8, 5),
+            )
+        for (error in errors) {
+            assertThat(error).hasMessage(MultipleContentEmitters.MultipleContentEmittersDetected)
+        }
+    }
 }

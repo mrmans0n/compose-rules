@@ -171,4 +171,36 @@ class MultipleContentEmittersCheckTest {
             ),
         )
     }
+
+    @Test
+    fun `for loops are captured`() {
+        @Language("kotlin")
+        val code = """
+            @Composable
+            fun MultipleContent(texts: List<String>, modifier: Modifier = Modifier) {
+                for (text in texts) {
+                    Text(text)
+                }
+            }
+            @Composable
+            fun MultipleContent(otherTexts: List<String>, modifier: Modifier = Modifier) {
+                Text("text 1")
+                for (otherText in otherTexts) {
+                    Text(otherText)
+                }
+            }
+        """.trimIndent()
+        emittersRuleAssertThat(code).hasLintViolationsWithoutAutoCorrect(
+            LintViolation(
+                line = 2,
+                col = 5,
+                detail = MultipleContentEmitters.MultipleContentEmittersDetected,
+            ),
+            LintViolation(
+                line = 8,
+                col = 5,
+                detail = MultipleContentEmitters.MultipleContentEmittersDetected,
+            ),
+        )
+    }
 }
