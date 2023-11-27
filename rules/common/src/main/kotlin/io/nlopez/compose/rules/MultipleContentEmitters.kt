@@ -9,8 +9,10 @@ import io.nlopez.rules.core.util.emitsContent
 import io.nlopez.rules.core.util.findChildrenByClass
 import io.nlopez.rules.core.util.hasReceiverType
 import io.nlopez.rules.core.util.isComposable
+import org.jetbrains.kotlin.psi.KtBlockExpression
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtFile
+import org.jetbrains.kotlin.psi.KtForExpression
 import org.jetbrains.kotlin.psi.KtFunction
 
 class MultipleContentEmitters : ComposeKtVisitor {
@@ -69,10 +71,26 @@ class MultipleContentEmitters : ComposeKtVisitor {
     companion object {
         internal val KtFunction.directUiEmitterCount: Int
             get() = bodyBlockExpression?.let { block ->
-                block.statements
-                    .filterIsInstance<KtCallExpression>()
-                    .count { it.emitsContent }
+                // If there's content emitted in a for loop, we assume there's at
+                // least two iterations and thus count any emitters in them as multiple
+                val forLoopCount = when {
+                    block.forLoopHasUiEmitters -> 2
+                    else -> 0
+                }
+                block.directUiEmitterCount + forLoopCount
             } ?: 0
+
+        internal val KtBlockExpression.forLoopHasUiEmitters: Boolean
+            get() = statements.filterIsInstance<KtForExpression>().any {
+                when (val body = it.body) {
+                    is KtBlockExpression -> body.directUiEmitterCount > 0
+                    is KtCallExpression -> body.emitsContent
+                    else -> false
+                }
+            }
+
+        internal val KtBlockExpression.directUiEmitterCount: Int
+            get() = statements.filterIsInstance<KtCallExpression>().count { it.emitsContent }
 
         internal fun KtFunction.indirectUiEmitterCount(mapping: Map<KtFunction, Int>): Int {
             val bodyBlock = bodyBlockExpression ?: return 0
