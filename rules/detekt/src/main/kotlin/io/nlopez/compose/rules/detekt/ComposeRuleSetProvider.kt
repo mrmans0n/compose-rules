@@ -7,10 +7,10 @@ import io.gitlab.arturbosch.detekt.api.RuleSet
 import io.gitlab.arturbosch.detekt.api.RuleSetProvider
 
 class ComposeRuleSetProvider : RuleSetProvider {
-    override val ruleSetId: String = CustomRuleSetId
+    override val ruleSetId: String = CUSTOM_RULE_SET_ID
 
     override fun instance(config: Config): RuleSet = RuleSet(
-        CustomRuleSetId,
+        CUSTOM_RULE_SET_ID,
         listOf(
             ComposableAnnotationNamingCheck(config),
             CompositionLocalAllowlistCheck(config),
@@ -39,6 +39,6 @@ class ComposeRuleSetProvider : RuleSetProvider {
     )
 
     private companion object {
-        const val CustomRuleSetId = "Compose"
+        const val CUSTOM_RULE_SET_ID = "Compose"
     }
 }

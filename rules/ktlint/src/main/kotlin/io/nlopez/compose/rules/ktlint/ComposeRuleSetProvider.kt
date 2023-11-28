@@ -7,7 +7,7 @@ import com.pinterest.ktlint.rule.engine.core.api.RuleProvider
 import com.pinterest.ktlint.rule.engine.core.api.RuleSetId
 
 class ComposeRuleSetProvider : RuleSetProviderV3(
-    CustomRuleSetId,
+    customRuleSetId,
 ) {
 
     override fun getRuleProviders(): Set<RuleProvider> = setOf(
@@ -37,6 +37,6 @@ class ComposeRuleSetProvider : RuleSetProviderV3(
     )
 
     private companion object {
-        val CustomRuleSetId = RuleSetId("compose")
+        val customRuleSetId = RuleSetId("compose")
     }
 }
