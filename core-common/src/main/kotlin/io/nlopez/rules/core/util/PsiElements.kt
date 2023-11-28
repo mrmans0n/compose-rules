@@ -8,18 +8,17 @@ import org.jetbrains.kotlin.psi.psiUtil.startOffset
 import java.util.Deque
 import java.util.LinkedList
 
-inline fun <reified T : PsiElement> PsiElement.findChildrenByClass(): Sequence<T> =
-    sequence {
-        val queue: Deque<PsiElement> = LinkedList()
-        queue.add(this@findChildrenByClass)
-        while (queue.isNotEmpty()) {
-            val current = queue.pop()
-            if (current is T) {
-                yield(current)
-            }
-            queue.addAll(current.children)
+inline fun <reified T : PsiElement> PsiElement.findChildrenByClass(): Sequence<T> = sequence {
+    val queue: Deque<PsiElement> = LinkedList()
+    queue.add(this@findChildrenByClass)
+    while (queue.isNotEmpty()) {
+        val current = queue.pop()
+        if (current is T) {
+            yield(current)
         }
+        queue.addAll(current.children)
     }
+}
 
 inline fun <reified T : PsiElement> PsiElement.findDirectFirstChildByClass(): T? {
     var current = firstChild
@@ -32,16 +31,15 @@ inline fun <reified T : PsiElement> PsiElement.findDirectFirstChildByClass(): T?
     return null
 }
 
-inline fun <reified T : PsiElement> PsiElement.findDirectChildrenByClass(): Sequence<T> =
-    sequence {
-        var current = firstChild
-        while (current != null) {
-            if (current is T) {
-                yield(current)
-            }
-            current = current.nextSibling
+inline fun <reified T : PsiElement> PsiElement.findDirectChildrenByClass(): Sequence<T> = sequence {
+    var current = firstChild
+    while (current != null) {
+        if (current is T) {
+            yield(current)
         }
+        current = current.nextSibling
     }
+}
 
 val PsiNameIdentifierOwner.startOffsetFromName: Int
     get() = nameIdentifier?.startOffset ?: startOffset

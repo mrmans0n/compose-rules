@@ -39,8 +39,7 @@ fun ASTNode.parent(p: (ASTNode) -> Boolean, strict: Boolean = true): ASTNode? {
     return null
 }
 
-fun ASTNode.isPartOfComment(): Boolean =
-    parent({ it.psi is PsiComment }, strict = false) != null
+fun ASTNode.isPartOfComment(): Boolean = parent({ it.psi is PsiComment }, strict = false) != null
 
 fun ASTNode.nextCodeSibling(): ASTNode? =
     nextSibling { it.elementType != KtTokens.WHITE_SPACE && !it.isPartOfComment() }

@@ -16,20 +16,18 @@ internal class DetektComposeKtConfig(
     private val cache = mutableMapOf<String, Any?>()
 
     @Suppress("UNCHECKED_CAST")
-    private fun <T : Any> valueOrPut(key: String, value: () -> T?): T? =
-        cache.getOrPut(key) { value() } as? T
+    private fun <T : Any> valueOrPut(key: String, value: () -> T?): T? = cache.getOrPut(key) { value() } as? T
 
     override fun getInt(key: String, default: Int): Int =
         valueOrPut(key) { config.valueOrDefault(key, default) } ?: default
 
-    override fun getString(key: String, default: String?): String? =
-        valueOrPut(key) {
-            if (default == null) {
-                config.valueOrNull(key)
-            } else {
-                config.valueOrDefault(key, default)
-            }
+    override fun getString(key: String, default: String?): String? = valueOrPut(key) {
+        if (default == null) {
+            config.valueOrNull(key)
+        } else {
+            config.valueOrDefault(key, default)
         }
+    }
 
     override fun getList(key: String, default: List<String>): List<String> =
         valueOrPut(key) { config.valueOrDefaultCommaSeparated(key, default) } ?: default

@@ -34,20 +34,19 @@ fun KtBlockExpression.obtainAllModifierNames(initialName: String): List<String> 
  * Find references to modifier as a property in case they try to modify or reuse the modifier that way
  * E.g. val modifier2 = if (X) modifier.blah() else modifier.bleh()
  */
-private fun KtBlockExpression.findModifierManipulations(contains: (String) -> Boolean): List<String> =
-    statements
-        .filterIsInstance<KtProperty>()
-        .flatMap { property ->
-            property.findChildrenByClass<KtReferenceExpression>()
-                .filter { referenceExpression ->
-                    val parent = referenceExpression.parent
-                    parent !is KtCallExpression &&
-                        parent !is KtValueArgumentName &&
-                        contains(referenceExpression.text)
-                }
-                .map { property }
-        }
-        .mapNotNull { it.nameIdentifier?.text }
+private fun KtBlockExpression.findModifierManipulations(contains: (String) -> Boolean): List<String> = statements
+    .filterIsInstance<KtProperty>()
+    .flatMap { property ->
+        property.findChildrenByClass<KtReferenceExpression>()
+            .filter { referenceExpression ->
+                val parent = referenceExpression.parent
+                parent !is KtCallExpression &&
+                    parent !is KtValueArgumentName &&
+                    contains(referenceExpression.text)
+            }
+            .map { property }
+    }
+    .mapNotNull { it.nameIdentifier?.text }
 
 fun KtCallExpression.isUsingModifiers(modifierNames: List<String>): Boolean =
     argumentsUsingModifiers(modifierNames).isNotEmpty()

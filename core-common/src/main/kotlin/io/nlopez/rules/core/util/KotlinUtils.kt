@@ -4,8 +4,7 @@ package io.nlopez.rules.core.util
 
 import java.util.Locale
 
-fun <T> T.runIf(value: Boolean, block: T.() -> T): T =
-    if (value) block() else this
+fun <T> T.runIf(value: Boolean, block: T.() -> T): T = if (value) block() else this
 
 fun String?.matchesAnyOf(patterns: Sequence<Regex>): Boolean {
     if (isNullOrEmpty()) return false

@@ -123,21 +123,20 @@ class KtlintComposeKtConfigTest {
             defaultValue = default,
         )
 
-    private fun stringProperty(key: String, default: String = ""): EditorConfigProperty<String> =
-        EditorConfigProperty(
-            type = LowerCasingPropertyType(
-                key,
-                "Internal string value for $key",
-                PropertyType.PropertyValueParser.IDENTITY_VALUE_PARSER,
-                emptySet(),
-            ),
-            defaultValue = default,
-            propertyMapper = { property, _ ->
-                when {
-                    property?.isUnset == true -> ""
-                    property?.getValueAs<String>() != null -> property.getValueAs<String>()
-                    else -> property?.getValueAs()
-                }
-            },
-        )
+    private fun stringProperty(key: String, default: String = ""): EditorConfigProperty<String> = EditorConfigProperty(
+        type = LowerCasingPropertyType(
+            key,
+            "Internal string value for $key",
+            PropertyType.PropertyValueParser.IDENTITY_VALUE_PARSER,
+            emptySet(),
+        ),
+        defaultValue = default,
+        propertyMapper = { property, _ ->
+            when {
+                property?.isUnset == true -> ""
+                property?.getValueAs<String>() != null -> property.getValueAs<String>()
+                else -> property?.getValueAs()
+            }
+        },
+    )
 }
