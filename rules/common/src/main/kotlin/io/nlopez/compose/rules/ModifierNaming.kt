@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package io.nlopez.compose.rules
 
+import io.nlopez.rules.core.ComposeKtConfig
 import io.nlopez.rules.core.ComposeKtVisitor
 import io.nlopez.rules.core.Emitter
 import io.nlopez.rules.core.report
@@ -10,7 +11,12 @@ import org.jetbrains.kotlin.psi.KtFunction
 
 class ModifierNaming : ComposeKtVisitor {
 
-    override fun visitComposable(function: KtFunction, autoCorrect: Boolean, emitter: Emitter) {
+    override fun visitComposable(
+        function: KtFunction,
+        autoCorrect: Boolean,
+        emitter: Emitter,
+        config: ComposeKtConfig,
+    ) {
         // If there is a modifier param, we bail
         val modifiers = function.valueParameters.filter { it.isModifier }
 

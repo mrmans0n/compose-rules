@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package io.nlopez.compose.rules
 
-import io.nlopez.rules.core.ComposeKtConfig.Companion.config
+import io.nlopez.rules.core.ComposeKtConfig
 import io.nlopez.rules.core.ComposeKtVisitor
 import io.nlopez.rules.core.Emitter
 import io.nlopez.rules.core.report
@@ -18,7 +18,12 @@ import org.jetbrains.kotlin.psi.psiUtil.isPublic
 
 class ModifierMissing : ComposeKtVisitor {
 
-    override fun visitComposable(function: KtFunction, autoCorrect: Boolean, emitter: Emitter) {
+    override fun visitComposable(
+        function: KtFunction,
+        autoCorrect: Boolean,
+        emitter: Emitter,
+        config: ComposeKtConfig,
+    ) {
         // We want to find all composable functions that:
         //  - emit content
         //  - are not overridden or part of an interface
@@ -38,7 +43,7 @@ class ModifierMissing : ComposeKtVisitor {
         // - public_and_internal: will check for public and internal composables
         // - all: will check all composables (public, internal, protected, private
         val shouldCheck = when (
-            function.config().getString("checkModifiersForVisibility", "only_public")
+            config.getString("checkModifiersForVisibility", "only_public")
         ) {
             "only_public" -> function.isPublic
             "public_and_internal" -> function.isPublic || function.isInternal
@@ -51,7 +56,7 @@ class ModifierMissing : ComposeKtVisitor {
         if (function.modifierParameter != null) return
 
         // In case we didn't find any `modifier` parameters, we check if it emits content and report the error if so.
-        if (function.emitsContent) {
+        if (with(config) { function.emitsContent }) {
             emitter.report(function, MissingModifierContentComposable)
         }
     }

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package io.nlopez.compose.rules
 
-import io.nlopez.rules.core.ComposeKtConfig.Companion.config
+import io.nlopez.rules.core.ComposeKtConfig
 import io.nlopez.rules.core.ComposeKtVisitor
 import io.nlopez.rules.core.Emitter
 import io.nlopez.rules.core.util.definedInInterface
@@ -16,7 +16,12 @@ import org.jetbrains.kotlin.psi.KtReferenceExpression
 
 class ViewModelForwarding : ComposeKtVisitor {
 
-    override fun visitComposable(function: KtFunction, autoCorrect: Boolean, emitter: Emitter) {
+    override fun visitComposable(
+        function: KtFunction,
+        autoCorrect: Boolean,
+        emitter: Emitter,
+        config: ComposeKtConfig,
+    ) {
         if (function.isOverride || function.definedInInterface || function.isActual) return
         val bodyBlock = function.bodyBlockExpression ?: return
 
@@ -26,7 +31,7 @@ class ViewModelForwarding : ComposeKtVisitor {
         if (parameters.isEmpty()) return
 
         val stateHolderValidNames = Regex(
-            function.config()
+            config
                 .getList("allowedStateHolderNames", defaultStateHolderNames)
                 .ifEmpty { defaultStateHolderNames }
                 .joinToString(

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package io.nlopez.rules.core.util
 
-import io.nlopez.rules.core.ComposeKtConfig.Companion.config
+import io.nlopez.rules.core.ComposeKtConfig
 import org.jetbrains.kotlin.com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
@@ -10,6 +10,7 @@ import org.jetbrains.kotlin.psi.KtFunction
 import org.jetbrains.kotlin.psi.KtProperty
 import org.jetbrains.kotlin.psi.psiUtil.referenceExpression
 
+context(ComposeKtConfig)
 val KtFunction.emitsContent: Boolean
     get() {
         return if (isComposable) {
@@ -42,12 +43,13 @@ val KtFunction.emitsContent: Boolean
 private val KtCallExpression.emitExplicitlyNoContent: Boolean
     get() = calleeExpression?.text in ComposableNonEmittersList
 
+context(ComposeKtConfig)
 val KtCallExpression.emitsContent: Boolean
     get() {
         val methodName = calleeExpression?.text ?: return false
         return methodName in ComposableEmittersList ||
             ComposableEmittersListRegex.matches(methodName) ||
-            methodName in config().getSet("contentEmitters", emptySet()) ||
+            methodName in getSet("contentEmitters", emptySet()) ||
             containsComposablesWithModifiers
     }
 

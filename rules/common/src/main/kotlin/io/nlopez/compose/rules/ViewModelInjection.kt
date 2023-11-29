@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package io.nlopez.compose.rules
 
-import io.nlopez.rules.core.ComposeKtConfig.Companion.config
+import io.nlopez.rules.core.ComposeKtConfig
 import io.nlopez.rules.core.ComposeKtVisitor
 import io.nlopez.rules.core.Emitter
 import io.nlopez.rules.core.util.definedInInterface
@@ -23,13 +23,18 @@ import org.jetbrains.kotlin.psi.KtPsiFactory
 
 class ViewModelInjection : ComposeKtVisitor {
 
-    override fun visitComposable(function: KtFunction, autoCorrect: Boolean, emitter: Emitter) {
+    override fun visitComposable(
+        function: KtFunction,
+        autoCorrect: Boolean,
+        emitter: Emitter,
+        config: ComposeKtConfig,
+    ) {
         if (function.isOverride || function.definedInInterface) return
 
         val bodyBlock = function.bodyBlockExpression ?: return
 
         val knownViewModelFactories = DefaultKnownViewModelFactories +
-            function.config().getSet("viewModelFactories", emptySet())
+            config.getSet("viewModelFactories", emptySet())
 
         bodyBlock.findChildrenByClass<KtProperty>()
             .flatMap { property ->

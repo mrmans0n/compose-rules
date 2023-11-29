@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package io.nlopez.compose.rules
 
+import io.nlopez.rules.core.ComposeKtConfig
 import io.nlopez.rules.core.ComposeKtVisitor
 import io.nlopez.rules.core.Emitter
 import io.nlopez.rules.core.report
@@ -17,7 +18,7 @@ import org.jetbrains.kotlin.psi.KtFunction
 
 class MultipleContentEmitters : ComposeKtVisitor {
 
-    override fun visitFile(file: KtFile, autoCorrect: Boolean, emitter: Emitter) {
+    override fun visitFile(file: KtFile, autoCorrect: Boolean, emitter: Emitter, config: ComposeKtConfig) {
         // CHECK #1 : We want to find the composables first that are at risk of emitting content from multiple sources.
         val composables = file.findChildrenByClass<KtFunction>()
             .filter { it.isComposable }
@@ -31,7 +32,7 @@ class MultipleContentEmitters : ComposeKtVisitor {
             .filterNot { it.hasReceiverType }
 
         // Now we want to get the count of direct emitters in them: the composables we know for a fact that output UI
-        val composableToEmissionCount = composables.associateWith { it.directUiEmitterCount }
+        val composableToEmissionCount = composables.associateWith { with(config) { it.directUiEmitterCount } }
 
         // We can start showing errors, for composables that emit more than once (from the list of known composables)
         val directEmissionsReported = composableToEmissionCount.filterValues { it > 1 }.keys
@@ -50,7 +51,7 @@ class MultipleContentEmitters : ComposeKtVisitor {
         var shouldMakeAnotherPass = true
         while (shouldMakeAnotherPass) {
             val updatedMapping = currentMapping.mapValues { (functionNode, _) ->
-                functionNode.indirectUiEmitterCount(currentMapping)
+                with(config) { functionNode.indirectUiEmitterCount(currentMapping) }
             }
             when {
                 updatedMapping != currentMapping -> currentMapping = updatedMapping
@@ -69,6 +70,8 @@ class MultipleContentEmitters : ComposeKtVisitor {
     }
 
     companion object {
+
+        context(ComposeKtConfig)
         internal val KtFunction.directUiEmitterCount: Int
             get() = bodyBlockExpression?.let { block ->
                 // If there's content emitted in a for loop, we assume there's at
@@ -80,6 +83,7 @@ class MultipleContentEmitters : ComposeKtVisitor {
                 block.directUiEmitterCount + forLoopCount
             } ?: 0
 
+        context(ComposeKtConfig)
         internal val KtBlockExpression.forLoopHasUiEmitters: Boolean
             get() = statements.filterIsInstance<KtForExpression>().any {
                 when (val body = it.body) {
@@ -89,9 +93,11 @@ class MultipleContentEmitters : ComposeKtVisitor {
                 }
             }
 
+        context(ComposeKtConfig)
         internal val KtBlockExpression.directUiEmitterCount: Int
             get() = statements.filterIsInstance<KtCallExpression>().count { it.emitsContent }
 
+        context(ComposeKtConfig)
         internal fun KtFunction.indirectUiEmitterCount(mapping: Map<KtFunction, Int>): Int {
             val bodyBlock = bodyBlockExpression ?: return 0
             return bodyBlock.statements

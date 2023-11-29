@@ -4,6 +4,7 @@ package io.nlopez.compose.rules
 
 import io.nlopez.compose.rules.MultipleContentEmitters.Companion.directUiEmitterCount
 import io.nlopez.compose.rules.MultipleContentEmitters.Companion.indirectUiEmitterCount
+import io.nlopez.rules.core.ComposeKtConfig
 import io.nlopez.rules.core.ComposeKtVisitor
 import io.nlopez.rules.core.Emitter
 import io.nlopez.rules.core.report
@@ -16,7 +17,7 @@ import org.jetbrains.kotlin.psi.KtFunction
 
 class ContentEmitterReturningValues : ComposeKtVisitor {
 
-    override fun visitFile(file: KtFile, autoCorrect: Boolean, emitter: Emitter) {
+    override fun visitFile(file: KtFile, autoCorrect: Boolean, emitter: Emitter, config: ComposeKtConfig) {
         val composableToEmissionCount = file.findChildrenByClass<KtFunction>()
             .filter { it.isComposable }
             // We don't want to analyze composables that are extension functions, as they might be things like
@@ -25,7 +26,7 @@ class ContentEmitterReturningValues : ComposeKtVisitor {
             // We want only methods with a body
             .filterNot { it.hasReceiverType }
             // Now we want to get the count of direct emitters in them: the composables we know for a fact that output UI
-            .associateWith { it.directUiEmitterCount }
+            .associateWith { with(config) { it.directUiEmitterCount } }
 
         // Now we can give some extra passes through the list of composables, and try to get a more accurate count.
         // We want to make sure that if these composables are using other composables in this file that emit UI,
@@ -38,7 +39,7 @@ class ContentEmitterReturningValues : ComposeKtVisitor {
         var shouldMakeAnotherPass = true
         while (shouldMakeAnotherPass) {
             val updatedMapping = current.mapValues { (functionNode, _) ->
-                functionNode.indirectUiEmitterCount(current)
+                with(config) { functionNode.indirectUiEmitterCount(current) }
             }
             when {
                 updatedMapping != current -> current = updatedMapping

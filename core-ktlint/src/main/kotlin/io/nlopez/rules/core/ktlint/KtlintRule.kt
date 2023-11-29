@@ -7,7 +7,6 @@ import com.pinterest.ktlint.rule.engine.core.api.RuleId
 import com.pinterest.ktlint.rule.engine.core.api.editorconfig.EditorConfig
 import com.pinterest.ktlint.rule.engine.core.api.editorconfig.EditorConfigProperty
 import io.nlopez.rules.core.ComposeKtConfig
-import io.nlopez.rules.core.ComposeKtConfig.Companion.attach
 import io.nlopez.rules.core.ComposeKtVisitor
 import io.nlopez.rules.core.Emitter
 import io.nlopez.rules.core.util.isComposable
@@ -51,17 +50,16 @@ abstract class KtlintRule(
         val psi = node.psi
         when (node.elementType) {
             KtStubElementTypes.FILE -> {
-                psi.attach(config)
-                visitFile(psi as KtFile, autoCorrect, emit.toEmitter())
+                visitFile(psi as KtFile, autoCorrect, emit.toEmitter(), config)
             }
 
-            KtStubElementTypes.CLASS -> visitClass(psi as KtClass, autoCorrect, emit.toEmitter())
+            KtStubElementTypes.CLASS -> visitClass(psi as KtClass, autoCorrect, emit.toEmitter(), config)
             KtStubElementTypes.FUNCTION -> {
                 val function = psi as KtFunction
                 val emitter = emit.toEmitter()
-                visitFunction(function, autoCorrect, emitter)
+                visitFunction(function, autoCorrect, emitter, config)
                 if (function.isComposable) {
-                    visitComposable(function, autoCorrect, emitter)
+                    visitComposable(function, autoCorrect, emitter, config)
                 }
             }
         }

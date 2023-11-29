@@ -9,7 +9,6 @@ import io.gitlab.arturbosch.detekt.api.Entity
 import io.gitlab.arturbosch.detekt.api.Location
 import io.gitlab.arturbosch.detekt.api.Rule
 import io.nlopez.rules.core.ComposeKtConfig
-import io.nlopez.rules.core.ComposeKtConfig.Companion.attach
 import io.nlopez.rules.core.ComposeKtVisitor
 import io.nlopez.rules.core.Emitter
 import io.nlopez.rules.core.util.isComposable
@@ -51,25 +50,22 @@ abstract class DetektRule(
 
     override fun visit(root: KtFile) {
         super.visit(root)
-        root.attach(config)
-        visitFile(root, autoCorrect, emitter)
+        visitFile(root, autoCorrect, emitter, config)
     }
 
     override fun visitClass(klass: KtClass) {
         super<Rule>.visitClass(klass)
-        klass.attach(config)
-        visitClass(klass, autoCorrect, emitter)
+        visitClass(klass, autoCorrect, emitter, config)
     }
 
     override fun visitKtElement(element: KtElement) {
         super.visitKtElement(element)
-        element.attach(config)
         when (element.node.elementType) {
             KtStubElementTypes.FUNCTION -> {
                 val function = element as KtFunction
-                visitFunction(function, autoCorrect, emitter)
+                visitFunction(function, autoCorrect, emitter, config)
                 if (function.isComposable) {
-                    visitComposable(function, autoCorrect, emitter)
+                    visitComposable(function, autoCorrect, emitter, config)
                 }
             }
         }

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package io.nlopez.compose.rules
 
+import io.nlopez.rules.core.ComposeKtConfig
 import io.nlopez.rules.core.ComposeKtVisitor
 import io.nlopez.rules.core.Emitter
 import io.nlopez.rules.core.util.definedInInterface
@@ -15,7 +16,12 @@ import org.jetbrains.kotlin.psi.KtFunction
 
 class ModifierWithoutDefault : ComposeKtVisitor {
 
-    override fun visitComposable(function: KtFunction, autoCorrect: Boolean, emitter: Emitter) {
+    override fun visitComposable(
+        function: KtFunction,
+        autoCorrect: Boolean,
+        emitter: Emitter,
+        config: ComposeKtConfig,
+    ) {
         if (function.definedInInterface || function.isActual || function.isOverride || function.isAbstract) return
 
         // Look for modifier params in the composable signature, and if any without a default value is found, error out.

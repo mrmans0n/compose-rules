@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package io.nlopez.compose.rules
 
+import io.nlopez.rules.core.ComposeKtConfig
 import io.nlopez.rules.core.ComposeKtVisitor
 import io.nlopez.rules.core.Emitter
 import io.nlopez.rules.core.report
@@ -16,7 +17,12 @@ import org.jetbrains.kotlin.psi.KtFunction
 
 class ModifierNotUsedAtRoot : ComposeKtVisitor {
 
-    override fun visitComposable(function: KtFunction, autoCorrect: Boolean, emitter: Emitter) {
+    override fun visitComposable(
+        function: KtFunction,
+        autoCorrect: Boolean,
+        emitter: Emitter,
+        config: ComposeKtConfig,
+    ) {
         val modifier = function.modifierParameter ?: return
         if (modifier.name != "modifier") return
         val code = function.bodyBlockExpression ?: return
@@ -32,7 +38,9 @@ class ModifierNotUsedAtRoot : ComposeKtVisitor {
             .filter { (callExpression, _) ->
                 // we'll need to traverse upwards to the composable root and check if there is any parent that
                 // emits content: if this is the case, the main modifier should be used there instead.
-                callExpression.findFirstAncestorEmittingContent(stopAt = code) != null
+                callExpression.findFirstAncestorEmittingContent(stopAt = code) {
+                    with(config) { it.emitsContent }
+                } != null
             }
             .map { (_, valueArgument) -> valueArgument }
 
@@ -41,12 +49,15 @@ class ModifierNotUsedAtRoot : ComposeKtVisitor {
         }
     }
 
-    private fun KtCallExpression.findFirstAncestorEmittingContent(stopAt: PsiElement): KtCallExpression? {
+    private fun KtCallExpression.findFirstAncestorEmittingContent(
+        stopAt: PsiElement,
+        isContentEmitterPredicate: (KtCallExpression) -> Boolean,
+    ): KtCallExpression? {
         val origin = this
         var current: PsiElement = this
         var result: KtCallExpression? = null
         while (current != stopAt) {
-            if (current != origin && current is KtCallExpression && current.emitsContent) {
+            if (current != origin && current is KtCallExpression && isContentEmitterPredicate(current)) {
                 result = current
             }
             current = current.parent

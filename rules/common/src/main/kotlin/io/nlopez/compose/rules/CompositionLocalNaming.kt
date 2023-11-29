@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package io.nlopez.compose.rules
 
+import io.nlopez.rules.core.ComposeKtConfig
 import io.nlopez.rules.core.ComposeKtVisitor
 import io.nlopez.rules.core.Emitter
 import io.nlopez.rules.core.report
@@ -12,7 +13,7 @@ import org.jetbrains.kotlin.psi.KtProperty
 
 class CompositionLocalNaming : ComposeKtVisitor {
 
-    override fun visitFile(file: KtFile, autoCorrect: Boolean, emitter: Emitter) {
+    override fun visitFile(file: KtFile, autoCorrect: Boolean, emitter: Emitter, config: ComposeKtConfig) {
         val compositionLocals = file.findChildrenByClass<KtProperty>()
             .filter { it.declaresCompositionLocal }
 

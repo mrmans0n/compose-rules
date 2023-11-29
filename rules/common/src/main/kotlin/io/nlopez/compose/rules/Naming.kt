@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package io.nlopez.compose.rules
 
-import io.nlopez.rules.core.ComposeKtConfig.Companion.config
+import io.nlopez.rules.core.ComposeKtConfig
 import io.nlopez.rules.core.ComposeKtVisitor
 import io.nlopez.rules.core.Emitter
 import io.nlopez.rules.core.report
@@ -13,7 +13,12 @@ import org.jetbrains.kotlin.psi.KtFunction
 
 class Naming : ComposeKtVisitor {
 
-    override fun visitComposable(function: KtFunction, autoCorrect: Boolean, emitter: Emitter) {
+    override fun visitComposable(
+        function: KtFunction,
+        autoCorrect: Boolean,
+        emitter: Emitter,
+        config: ComposeKtConfig,
+    ) {
         // If it's a block we can't know if there is a return type or not
         if (!function.hasBlockBody()) return
 
@@ -27,7 +32,7 @@ class Naming : ComposeKtVisitor {
             // If it returns value, the composable should start with a lowercase letter
             if (firstLetter.isUpperCase()) {
                 // If it's allowed, we don't report it
-                val isAllowed = function.config().getSet("allowedComposableFunctionNames", emptySet())
+                val isAllowed = config.getSet("allowedComposableFunctionNames", emptySet())
                     .any {
                         it.toRegex().matches(functionName)
                     }
