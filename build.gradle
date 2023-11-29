@@ -20,17 +20,16 @@ allprojects {
         }
     }
 
-    tasks.withType(JavaCompile).configureEach {
-        javaCompiler = javaToolchains.compilerFor {
-            languageVersion = JavaLanguageVersion.of(11)
+    plugins.withType(JavaBasePlugin).configureEach {
+        java {
+            toolchain.languageVersion = JavaLanguageVersion.of(11)
         }
     }
+
     tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach { compile ->
         kotlinOptions {
             // Treat all Kotlin warnings as errors
             allWarningsAsErrors = true
-            // Set JVM target to 17
-            jvmTarget = JavaVersion.VERSION_11
             // Allow use of @OptIn
             freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
             // Enable default methods in interfaces
