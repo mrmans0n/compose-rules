@@ -7,7 +7,7 @@ plugins {
 }
 
 allprojects {
-    apply plugin: "com.diffplug.spotless"
+    pluginManager.apply(libs.plugins.spotless.get().pluginId)
     spotless {
         kotlin {
             target "**/*.kt"
