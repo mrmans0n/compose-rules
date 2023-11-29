@@ -43,7 +43,11 @@ allprojects {
             )
         }
     }
+
     version = VERSION_NAME
+    if (project != rootProject) {
+        pluginManager.apply(libs.plugins.mavenPublish.get().pluginId)
+    }
 }
 
 tasks.register("printVersion") {
