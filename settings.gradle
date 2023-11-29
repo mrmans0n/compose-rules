@@ -1,10 +1,5 @@
-pluginManagement {
-    repositories {
-        mavenCentral()
-        gradlePluginPortal()
-    }
-}
-
+// Copyright 2023 Nacho Lopez
+// SPDX-License-Identifier: Apache-2.0
 plugins {
     id 'com.gradle.enterprise' version '3.15.1'
 }
