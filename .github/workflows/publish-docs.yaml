@@ -9,6 +9,7 @@ on:
 
 jobs:
   deploy_docs:
+    if: github.repository == 'mrmans0n/compose-rules'
     runs-on: ubuntu-latest
     env:
       TERM: dumb

@@ -7,6 +7,7 @@ on:
 
 jobs:
   update_draft_release:
+    if: github.repository == 'mrmans0n/compose-rules'
     runs-on: ubuntu-latest
     steps:
       - uses: release-drafter/release-drafter@v5

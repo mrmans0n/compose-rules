@@ -41,5 +41,5 @@ ij_groovy_for_brace_force = always
 [{*.ant,*.fxml,*.jhm,*.jnlp,*.jrxml,*.rng,*.tld,*.wsdl,*.xml,*.xsd,*.xsl,*.xslt,*.xul}]
 ij_continuation_indent_size = 4
 
-[*.yml]
-ij_continuation_indent_size = 2
+[*.{yml,yaml}]
+indent_size = 2
