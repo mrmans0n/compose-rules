@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     alias(libs.plugins.kotlin.jvm) apply false
     alias(libs.plugins.mavenPublish) apply false
@@ -26,19 +28,19 @@ allprojects {
         }
     }
 
-    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach { compile ->
-        kotlinOptions {
+    tasks.withType(KotlinCompile).configureEach {
+        compilerOptions {
             // Treat all Kotlin warnings as errors
             allWarningsAsErrors = true
-            // Allow use of @OptIn
-            freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
-            // Enable default methods in interfaces
-            freeCompilerArgs += "-Xjvm-default=all"
-            // Enable context receivers
-            freeCompilerArgs += "-Xcontext-receivers"
-            // Enable K2 compiler
-            freeCompilerArgs += "-language-version=2.0"
-            freeCompilerArgs += "-Xsuppress-version-warnings"
+            freeCompilerArgs.addAll(
+                    // Enable default methods in interfaces
+                    "-Xjvm-default=all",
+                    // Enable context receivers
+                    "-Xcontext-receivers",
+                    // Enable K2 compiler
+                    "-language-version=2.0",
+                    "-Xsuppress-version-warnings",
+            )
         }
     }
     version = VERSION_NAME
