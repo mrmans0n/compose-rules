@@ -1,6 +1,7 @@
 # Jetpack Compose Rules - Static checks for Ktlint and Detekt
 
-![build](https://github.com/mrmans0n/compose-rules/actions/workflows/build.yaml/badge.svg) ![Latest version](https://img.shields.io/maven-central/v/io.nlopez.compose.rules/common)
+[![Build & test](https://github.com/mrmans0n/compose-rules/actions/workflows/build.yaml/badge.svg?branch=main)](https://github.com/mrmans0n/compose-rules/actions/workflows/build.yaml?query=branch%3Amain)
+[![Maven Central](https://img.shields.io/maven-central/v/io.nlopez.compose.rules/common)](https://central.sonatype.com/search?q=g%3Aio.nlopez.compose.rules)
 
 > **Note**
 > This repository is a fork of the [Twitter Jetpack Compose Rules](https://github.com/twitter/compose-rules) by its original maintainer. As none of the admins/maintainers continue working at the company, its development will continue here from now on. If you come from that project, check out the [migration guide](https://mrmans0n.github.io/compose-rules/).
