@@ -1,6 +1,10 @@
 Compose:
   ComposableAnnotationNaming:
     active: true
+  ComposableNaming:
+    active: true
+  ComposableParamOrder:
+    active: true
   CompositionLocalAllowlist:
     active: true
   CompositionLocalNaming:
@@ -27,9 +31,7 @@ Compose:
     active: true
   MutableParams:
     active: true
-  ComposableNaming:
-    active: true
-  ComposableParamOrder:
+  MutableStateParam:
     active: true
   PreviewAnnotationNaming:
     active: true

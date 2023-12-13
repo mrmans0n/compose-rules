@@ -25,6 +25,7 @@ class ComposeRuleSetProvider : RuleSetProviderV3(
         RuleProvider { ModifierWithoutDefaultCheck() },
         RuleProvider { MultipleContentEmittersCheck() },
         RuleProvider { MutableParametersCheck() },
+        RuleProvider { MutableStateParameterCheck() },
         RuleProvider { NamingCheck() },
         RuleProvider { ParameterOrderCheck() },
         RuleProvider { PreviewAnnotationNamingCheck() },

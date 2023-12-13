@@ -7,7 +7,8 @@ Compose is built upon the idea of a [unidirectional data flow](https://developer
 In practice, there are a few common things to look out for:
 
 - Do not pass ViewModels (or objects from DI) down.
-- Do not pass `State<Foo>` or `MutableState<Bar>` instances down.
+- Do not pass `MutableState<Bar>` instances down.
+- Do not pass inherently mutable types, that can't be observed types, down.
 
 Instead pass down the relevant data to the function, and optional lambdas for callbacks.
 
@@ -71,9 +72,21 @@ This is an anti-pattern though as it breaks the pattern of state flowing down, a
 
 There are a few reasons for this, but the main one is that it is very easy to use a mutable object which does not trigger recomposition. Without triggering recomposition, your composables will not automatically update to reflect the updated value.
 
-Passing `ArrayList<T>`, `MutableState<T>`, `ViewModel` are common examples of this (but not limited to those types).
+Passing `ArrayList<T>` or `ViewModel` are common examples of this (but not limited to those types).
 
 Related rule: [compose:mutable-params-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/MutableParameters.kt)
+
+### Do not use MutableState as a parameter
+
+This practice also follows on from the 'Hoist all the things' item above. When using `MutableState<T>` in a @Composable function signature as a parameter, this is promoting joint ownership over a state between a component and its user.
+
+Instead, if possible, consider making the component stateless and concede the state change to the caller. If mutation of the parent’s owned property is required in the component, consider creating a ComponentState class with the domain specific meaningful field that is backed by `mutableStateOf(...)`.
+
+When a component accepts MutableState as a parameter, it gains the ability to change it. This results in the split ownership of the state, and the usage side that owns the state now has no control over how and when it will be changed from within the component’s implementation.
+
+More info: [Compose API guidelines](https://android.googlesource.com/platform/frameworks/support/+/androidx-main/compose/docs/compose-component-api-guidelines.md#mutablestate_t_as-a-parameter)
+
+Related rule: [compose:mutable-state-param-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/MutableStateParameter.kt)
 
 ### Do not emit content and return a result
 

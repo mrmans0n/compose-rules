@@ -4,13 +4,13 @@ package io.nlopez.compose.rules.ktlint
 
 import com.pinterest.ktlint.test.KtLintAssertThat.Companion.assertThatRule
 import com.pinterest.ktlint.test.LintViolation
-import io.nlopez.compose.rules.MutableParameters
+import io.nlopez.compose.rules.MutableStateParameter
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
 
-class MutableParametersCheckTest {
+class MutableStateParameterCheckTest {
 
-    private val mutableParamRuleAssertThat = assertThatRule { MutableParametersCheck() }
+    private val mutableParamRuleAssertThat = assertThatRule { MutableStateParameterCheck() }
 
     @Test
     fun `errors when a Composable has a mutable parameter`() {
@@ -18,27 +18,13 @@ class MutableParametersCheckTest {
         val code =
             """
                 @Composable
-                fun Something(a: ArrayList<String>) {}
-                @Composable
-                fun Something(a: HashSet<String>) {}
-                @Composable
-                fun Something(a: MutableMap<String, String>) {}
+                fun Something(a: MutableState<String>) {}
             """.trimIndent()
         mutableParamRuleAssertThat(code).hasLintViolationsWithoutAutoCorrect(
             LintViolation(
                 line = 2,
                 col = 15,
-                detail = MutableParameters.MutableParameterInCompose,
-            ),
-            LintViolation(
-                line = 4,
-                col = 15,
-                detail = MutableParameters.MutableParameterInCompose,
-            ),
-            LintViolation(
-                line = 6,
-                col = 15,
-                detail = MutableParameters.MutableParameterInCompose,
+                detail = MutableStateParameter.MutableStateParameterInCompose,
             ),
         )
     }

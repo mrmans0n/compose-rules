@@ -6,35 +6,29 @@ import io.gitlab.arturbosch.detekt.api.Config
 import io.gitlab.arturbosch.detekt.api.SourceLocation
 import io.gitlab.arturbosch.detekt.test.assertThat
 import io.gitlab.arturbosch.detekt.test.lint
-import io.nlopez.compose.rules.MutableParameters
+import io.nlopez.compose.rules.MutableStateParameter
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
 
-class MutableParametersCheckTest {
+class MutableStateParameterCheckTest {
 
-    private val rule = MutableParametersCheck(Config.empty)
+    private val rule = MutableStateParameterCheck(Config.empty)
 
     @Test
-    fun `errors when a Composable has a mutable parameter`() {
+    fun `errors when a Composable has a MutableState parameter`() {
         @Language("kotlin")
         val code =
             """
                 @Composable
-                fun Something(a: ArrayList<String>) {}
-                @Composable
-                fun Something(a: HashSet<String>) {}
-                @Composable
-                fun Something(a: MutableMap<String, String>) {}
+                fun Something(a: MutableState<String>) {}
             """.trimIndent()
         val errors = rule.lint(code)
         assertThat(errors)
             .hasStartSourceLocations(
                 SourceLocation(2, 15),
-                SourceLocation(4, 15),
-                SourceLocation(6, 15),
             )
         for (error in errors) {
-            assertThat(error).hasMessage(MutableParameters.MutableParameterInCompose)
+            assertThat(error).hasMessage(MutableStateParameter.MutableStateParameterInCompose)
         }
     }
 

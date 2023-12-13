@@ -25,8 +25,6 @@ private val KnownMutableCommonTypesRegex = sequenceOf(
     "MutableMap<.*>\\??",
     "HashMap<.*>\\??",
     "Hashtable<.*>\\??",
-    // Compose
-    "MutableState<.*>\\??",
     // Flow
     "MutableStateFlow<.*>\\??",
     "MutableSharedFlow<.*>\\??",
