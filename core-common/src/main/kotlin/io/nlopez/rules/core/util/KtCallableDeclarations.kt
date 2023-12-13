@@ -7,7 +7,7 @@ import org.jetbrains.kotlin.psi.KtCallableDeclaration
 val KtCallableDeclaration.isTypeMutable: Boolean
     get() = typeReference?.text?.matchesAnyOf(KnownMutableCommonTypesRegex) == true
 
-val KnownMutableCommonTypesRegex = sequenceOf(
+private val KnownMutableCommonTypesRegex = sequenceOf(
     // Set
     "MutableSet<.*>\\??",
     "ArraySet<.*>\\??",

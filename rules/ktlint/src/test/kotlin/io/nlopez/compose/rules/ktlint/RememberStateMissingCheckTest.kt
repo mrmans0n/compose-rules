@@ -39,12 +39,12 @@ class RememberStateMissingCheckTest {
             LintViolation(
                 line = 3,
                 col = 21,
-                detail = RememberStateMissing.MutableStateOfNotRemembered,
+                detail = RememberStateMissing.errorMessage("mutableStateOf"),
             ),
             LintViolation(
                 line = 6,
                 col = 45,
-                detail = RememberStateMissing.MutableStateOfNotRemembered,
+                detail = RememberStateMissing.errorMessage("mutableStateOf"),
             ),
         )
     }
@@ -108,12 +108,12 @@ class RememberStateMissingCheckTest {
             LintViolation(
                 line = 3,
                 col = 21,
-                detail = RememberStateMissing.DerivedStateOfNotRemembered,
+                detail = RememberStateMissing.errorMessage("derivedStateOf"),
             ),
             LintViolation(
                 line = 6,
                 col = 45,
-                detail = RememberStateMissing.DerivedStateOfNotRemembered,
+                detail = RememberStateMissing.errorMessage("derivedStateOf"),
             ),
         )
     }

@@ -45,7 +45,7 @@ class RememberStateMissingCheckTest {
                 SourceLocation(6, 45),
             )
         for (error in errors) {
-            assertThat(error).hasMessage(RememberStateMissing.MutableStateOfNotRemembered)
+            assertThat(error).hasMessage(RememberStateMissing.errorMessage("mutableStateOf"))
         }
     }
 
@@ -114,7 +114,7 @@ class RememberStateMissingCheckTest {
                 SourceLocation(6, 45),
             )
         for (error in errors) {
-            assertThat(error).hasMessage(RememberStateMissing.DerivedStateOfNotRemembered)
+            assertThat(error).hasMessage(RememberStateMissing.errorMessage("derivedStateOf"))
         }
     }
 

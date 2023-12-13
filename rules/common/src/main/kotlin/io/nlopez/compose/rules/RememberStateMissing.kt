@@ -21,15 +21,13 @@ class RememberStateMissing : ComposeKtVisitor {
         // To keep memory consumption in check, we first traverse down until we see one of our known functions
         // that need remembering
         function.findChildrenByClass<KtCallExpression>()
-            .filter { MethodsThatNeedRemembering.contains(it.calleeExpression?.text) }
+            .filter { it.calleeExpression?.text in MethodsThatNeedRemembering }
             // Only for those, we traverse up to [function], to see if it was actually remembered
             .filterNot { it.isRemembered(function) }
             // If it wasn't, we show the error
             .forEach { callExpression ->
-                when (callExpression.calleeExpression!!.text) {
-                    "mutableStateOf" -> emitter.report(callExpression, MutableStateOfNotRemembered, false)
-                    "derivedStateOf" -> emitter.report(callExpression, DerivedStateOfNotRemembered, false)
-                }
+                val errorMessage = MethodsAndErrorsThatNeedRemembering[callExpression.calleeExpression!!.text].orEmpty()
+                emitter.report(callExpression, errorMessage, false)
             }
     }
 
@@ -37,11 +35,14 @@ class RememberStateMissing : ComposeKtVisitor {
         private val MethodsThatNeedRemembering = setOf(
             "derivedStateOf",
             "mutableStateOf",
+            "mutableIntStateOf",
+            "mutableFloatStateOf",
+            "mutableDoubleStateOf",
+            "mutableLongStateOf",
         )
-        val DerivedStateOfNotRemembered = errorMessage("derivedStateOf")
-        val MutableStateOfNotRemembered = errorMessage("mutableStateOf")
+        private val MethodsAndErrorsThatNeedRemembering = MethodsThatNeedRemembering.associateWith { errorMessage(it) }
 
-        private fun errorMessage(name: String): String = """
+        fun errorMessage(name: String): String = """
             Using `$name` in a @Composable function without it being inside of a remember function.
             If you don't remember the state instance, a new state instance will be created when the function is recomposed.
 
