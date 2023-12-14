@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package io.nlopez.rules.core.util
 
+import io.nlopez.rules.core.ComposeKtConfig
 import org.jetbrains.kotlin.psi.KtBlockExpression
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtCallableDeclaration
@@ -76,17 +77,21 @@ val ModifierNames by lazy(LazyThreadSafetyMode.NONE) {
     )
 }
 
+context(ComposeKtConfig)
 val KtCallableDeclaration.isModifier: Boolean
-    get() = typeReference?.text in ModifierNames
+    get() = typeReference?.text in ModifierNames + getSet("customModifiers", emptySet())
 
+context(ComposeKtConfig)
 val KtCallableDeclaration.isModifierReceiver: Boolean
-    get() = receiverTypeReference?.text in ModifierNames
+    get() = receiverTypeReference?.text in ModifierNames + getSet("customModifiers", emptySet())
 
+context(ComposeKtConfig)
 val KtFunction.modifierParameter: KtParameter?
     get() {
         val modifiers = valueParameters.filter { it.isModifier }
         return modifiers.firstOrNull { it.name == "modifier" } ?: modifiers.firstOrNull()
     }
 
+context(ComposeKtConfig)
 val KtFunction.modifierParameters: List<KtParameter>
     get() = valueParameters.filter { it.isModifier }

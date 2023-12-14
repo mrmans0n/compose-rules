@@ -53,7 +53,7 @@ class ModifierMissing : ComposeKtVisitor {
         if (!shouldCheck) return
 
         // If there is a modifier param, we bail
-        if (function.modifierParameter != null) return
+        if (with(config) { function.modifierParameter } != null) return
 
         // In case we didn't find any `modifier` parameters, we check if it emits content and report the error if so.
         if (with(config) { function.emitsContent }) {

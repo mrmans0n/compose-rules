@@ -25,7 +25,7 @@ class ModifierWithoutDefault : ComposeKtVisitor {
         if (function.definedInInterface || function.isActual || function.isOverride || function.isAbstract) return
 
         // Look for modifier params in the composable signature, and if any without a default value is found, error out.
-        function.valueParameters.filter { it.isModifier }
+        function.valueParameters.filter { with(config) { it.isModifier } }
             .filterNot { it.hasDefaultValue() }
             .forEach { modifierParameter ->
                 emitter.report(modifierParameter, MissingModifierDefaultParam, true)

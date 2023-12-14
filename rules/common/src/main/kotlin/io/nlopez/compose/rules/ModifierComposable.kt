@@ -17,7 +17,7 @@ class ModifierComposable : ComposeKtVisitor {
         emitter: Emitter,
         config: ComposeKtConfig,
     ) {
-        if (!function.isModifierReceiver) return
+        if (!with(config) { function.isModifierReceiver }) return
 
         emitter.report(function, ComposableModifier)
     }

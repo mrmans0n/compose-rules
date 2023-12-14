@@ -47,30 +47,44 @@ class ModifierMissingCheckTest {
                         Text("Hi!")
                     }
                 }
+                @Composable
+                fun Something() {
+                    Column(modifier = BananaModifier.fillMaxSize()) {
+                    }
+                }
             """.trimIndent()
 
-        modifierRuleAssertThat(code).hasLintViolationsWithoutAutoCorrect(
-            LintViolation(
-                line = 2,
-                col = 5,
-                detail = ModifierMissing.MissingModifierContentComposable,
-            ),
-            LintViolation(
-                line = 7,
-                col = 5,
-                detail = ModifierMissing.MissingModifierContentComposable,
-            ),
-            LintViolation(
-                line = 12,
-                col = 5,
-                detail = ModifierMissing.MissingModifierContentComposable,
-            ),
-            LintViolation(
-                line = 19,
-                col = 5,
-                detail = ModifierMissing.MissingModifierContentComposable,
-            ),
-        )
+        modifierRuleAssertThat(code)
+            .withEditorConfigOverride(
+                customModifiers to "BananaModifier",
+            )
+            .hasLintViolationsWithoutAutoCorrect(
+                LintViolation(
+                    line = 2,
+                    col = 5,
+                    detail = ModifierMissing.MissingModifierContentComposable,
+                ),
+                LintViolation(
+                    line = 7,
+                    col = 5,
+                    detail = ModifierMissing.MissingModifierContentComposable,
+                ),
+                LintViolation(
+                    line = 12,
+                    col = 5,
+                    detail = ModifierMissing.MissingModifierContentComposable,
+                ),
+                LintViolation(
+                    line = 19,
+                    col = 5,
+                    detail = ModifierMissing.MissingModifierContentComposable,
+                ),
+                LintViolation(
+                    line = 32,
+                    col = 5,
+                    detail = ModifierMissing.MissingModifierContentComposable,
+                ),
+            )
     }
 
     @Test

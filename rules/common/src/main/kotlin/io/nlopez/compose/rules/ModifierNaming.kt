@@ -18,7 +18,7 @@ class ModifierNaming : ComposeKtVisitor {
         config: ComposeKtConfig,
     ) {
         // If there is a modifier param, we bail
-        val modifiers = function.valueParameters.filter { it.isModifier }
+        val modifiers = function.valueParameters.filter { with(config) { it.isModifier } }
 
         // If there are no modifiers, or more than one, we don't care as much about the naming
         if (modifiers.isEmpty()) return

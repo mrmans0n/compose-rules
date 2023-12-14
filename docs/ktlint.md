@@ -98,6 +98,15 @@ Possible values are:
 * `public_and_internal`: Will check for missing modifiers in both public and internal composables.
 * `all`: Will check for missing modifiers in all composables.
 
+### Configure custom Modifier names
+
+Most of the modifier-related rules will look for modifiers based their type: either Modifier or GlanceModifier type. Some libraries might add their own flavor of Modifier to the mix, and it might make sense to enforce the same rules we have for the other default modifiers. To support that, you can configure this in your `.editorconfig` file:
+
+```editorconfig
+[*.{kt,kts}]
+compose_custom_modifiers = BananaModifier,PotatoModifier
+```
+
 ## Disabling a specific rule
 
 To disable a rule you have to follow the [instructions from the ktlint documentation](https://github.com/pinterest/ktlint#how-do-i-suppress-an-errors-for-a-lineblockfile), and use the id of the rule you want to disable with the `compose` tag.

@@ -44,19 +44,29 @@ Compose:
     active: true
   ModifierComposable:
     active: true
+    # You can optionally add your own Modifier types
+    # customModifiers: BananaModifier,PotatoModifier
   ModifierMissing:
     active: true
     # You can optionally control the visibility of which composables to check for here
     # Possible values are: `only_public`, `public_and_internal` and `all` (default is `only_public`)
     # checkModifiersForVisibility: only_public
+    # You can optionally add your own Modifier types
+    # customModifiers: BananaModifier,PotatoModifier
   ModifierNaming:
     active: true
+    # You can optionally add your own Modifier types
+    # customModifiers: BananaModifier,PotatoModifier
   ModifierNotUsedAtRoot:
     active: true
     # You can optionally add your own composables here
     # contentEmitters: MyComposable,MyOtherComposable
+    # You can optionally add your own Modifier types
+    # customModifiers: BananaModifier,PotatoModifier
   ModifierReused:
     active: true
+    # You can optionally add your own Modifier types
+    # customModifiers: BananaModifier,PotatoModifier
   ModifierWithoutDefault:
     active: true
   MultipleEmitters:

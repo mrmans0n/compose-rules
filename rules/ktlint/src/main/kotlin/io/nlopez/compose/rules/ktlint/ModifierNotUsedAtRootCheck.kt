@@ -9,6 +9,6 @@ import io.nlopez.rules.core.ktlint.KtlintRule
 class ModifierNotUsedAtRootCheck :
     KtlintRule(
         id = "compose:modifier-not-used-at-root",
-        editorConfigProperties = setOf(contentEmittersProperty),
+        editorConfigProperties = setOf(contentEmittersProperty, customModifiers),
     ),
     ComposeKtVisitor by ModifierNotUsedAtRoot()

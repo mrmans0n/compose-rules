@@ -47,7 +47,7 @@ val compositionLocalAllowlistProperty: EditorConfigProperty<String> =
         type = PropertyType.LowerCasingPropertyType(
             "compose_allowed_composition_locals",
             "A comma separated list of allowed CompositionLocals",
-            PropertyType.PropertyValueParser.IDENTITY_VALUE_PARSER,
+            PropertyValueParser.IDENTITY_VALUE_PARSER,
             emptySet(),
         ),
         defaultValue = "",
@@ -65,7 +65,7 @@ val allowedComposeNamingNames: EditorConfigProperty<String> =
         type = PropertyType.LowerCasingPropertyType(
             "compose_allowed_composable_function_names",
             "A comma separated list of regexes of allowed composable function names",
-            PropertyType.PropertyValueParser.IDENTITY_VALUE_PARSER,
+            PropertyValueParser.IDENTITY_VALUE_PARSER,
             emptySet(),
         ),
         defaultValue = "",
@@ -83,7 +83,7 @@ val viewModelFactories: EditorConfigProperty<String> =
         type = PropertyType.LowerCasingPropertyType(
             "compose_view_model_factories",
             "A comma separated list of ViewModel factory methods",
-            PropertyType.PropertyValueParser.IDENTITY_VALUE_PARSER,
+            PropertyValueParser.IDENTITY_VALUE_PARSER,
             emptySet(),
         ),
         defaultValue = "",
@@ -101,7 +101,25 @@ val allowedStateHolderNames: EditorConfigProperty<String> =
         type = PropertyType.LowerCasingPropertyType(
             "compose_allowed_state_holder_names",
             "A comma separated list of regexes of valid state holders / ViewModel / Presenter names",
-            PropertyType.PropertyValueParser.IDENTITY_VALUE_PARSER,
+            PropertyValueParser.IDENTITY_VALUE_PARSER,
+            emptySet(),
+        ),
+        defaultValue = "",
+        propertyMapper = { property, _ ->
+            when {
+                property?.isUnset == true -> ""
+                property?.getValueAs<String>() != null -> property.getValueAs<String>()
+                else -> property?.getValueAs()
+            }
+        },
+    )
+
+val customModifiers: EditorConfigProperty<String> =
+    EditorConfigProperty(
+        type = PropertyType.LowerCasingPropertyType(
+            "compose_custom_modifiers",
+            "A comma separated list of custom Modifier implementations",
+            PropertyValueParser.IDENTITY_VALUE_PARSER,
             emptySet(),
         ),
         defaultValue = "",

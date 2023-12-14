@@ -23,7 +23,7 @@ class ModifierNotUsedAtRoot : ComposeKtVisitor {
         emitter: Emitter,
         config: ComposeKtConfig,
     ) {
-        val modifier = function.modifierParameter ?: return
+        val modifier = with(config) { function.modifierParameter } ?: return
         if (modifier.name != "modifier") return
         val code = function.bodyBlockExpression ?: return
 

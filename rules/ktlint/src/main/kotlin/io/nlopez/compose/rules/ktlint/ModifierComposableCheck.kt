@@ -7,5 +7,8 @@ import io.nlopez.rules.core.ComposeKtVisitor
 import io.nlopez.rules.core.ktlint.KtlintRule
 
 class ModifierComposableCheck :
-    KtlintRule("compose:modifier-composable-check"),
+    KtlintRule(
+        id = "compose:modifier-composable-check",
+        editorConfigProperties = setOf(customModifiers),
+    ),
     ComposeKtVisitor by ModifierComposable()

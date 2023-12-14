@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 package io.nlopez.compose.rules.detekt
 
-import io.gitlab.arturbosch.detekt.api.Config
 import io.gitlab.arturbosch.detekt.api.SourceLocation
 import io.gitlab.arturbosch.detekt.test.TestConfig
 import io.gitlab.arturbosch.detekt.test.assertThat
@@ -13,7 +12,10 @@ import org.junit.jupiter.api.Test
 
 class ModifierMissingCheckTest {
 
-    private val rule = ModifierMissingCheck(Config.empty)
+    private val testConfig = TestConfig(
+        "customModifiers" to listOf("BananaModifier"),
+    )
+    private val rule = ModifierMissingCheck(testConfig)
 
     @Test
     fun `errors when a Composable has a layout inside and it doesn't have a modifier`() {
@@ -50,14 +52,18 @@ class ModifierMissingCheckTest {
                         Text("Hi!")
                     }
                 }
+                @Composable
+                fun Something6() {
+                    Column(modifier = BananaModifier.fillMaxSize()) {
+                    }
+                }
             """.trimIndent()
 
         val errors = rule.lint(code)
-        assertThat(errors).hasTextLocations("Something1", "Something2", "Something3", "Something4")
-        assertThat(errors[0]).hasMessage(ModifierMissing.MissingModifierContentComposable)
-        assertThat(errors[1]).hasMessage(ModifierMissing.MissingModifierContentComposable)
-        assertThat(errors[2]).hasMessage(ModifierMissing.MissingModifierContentComposable)
-        assertThat(errors[3]).hasMessage(ModifierMissing.MissingModifierContentComposable)
+        assertThat(errors).hasTextLocations("Something1", "Something2", "Something3", "Something4", "Something6")
+        for (error in errors) {
+            assertThat(error).hasMessage(ModifierMissing.MissingModifierContentComposable)
+        }
     }
 
     @Test

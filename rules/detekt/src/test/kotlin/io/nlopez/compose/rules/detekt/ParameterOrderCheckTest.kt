@@ -30,6 +30,9 @@ class ParameterOrderCheckTest {
 
             @Composable
             fun MyComposable(text1: String, modifier: Modifier = Modifier, m2: Modifier = Modifier, trailing: (() -> Unit)?) { }
+
+            @Composable
+            fun MyComposable(modifier: Modifier, text1: String, m2: Modifier = Modifier, trailing: (() -> Unit)?) { }
         """.trimIndent()
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()

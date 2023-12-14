@@ -26,7 +26,7 @@ class ModifierReused : ComposeKtVisitor {
         with(config) { if (!function.emitsContent) return }
 
         val composableBlockExpression = function.bodyBlockExpression ?: return
-        val initialModifierNames = function.modifierParameters.mapNotNull { it.name }
+        val initialModifierNames = with(config) { function.modifierParameters.mapNotNull { it.name } }
         if (initialModifierNames.isEmpty()) return
 
         initialModifierNames
