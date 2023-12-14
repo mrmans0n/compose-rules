@@ -8,6 +8,7 @@ import io.nlopez.rules.core.Emitter
 import io.nlopez.rules.core.report
 import io.nlopez.rules.core.util.argumentsUsingModifiers
 import io.nlopez.rules.core.util.findChildrenByClass
+import io.nlopez.rules.core.util.modifierParameters
 import io.nlopez.rules.core.util.obtainAllModifierNames
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
@@ -27,7 +28,8 @@ class ModifierClickableOrder : ComposeKtVisitor {
     ) {
         val code = function.bodyBlockExpression ?: return
 
-        val modifiers = code.obtainAllModifierNames("modifier")
+        val initialModifierNames = with(config) { function.modifierParameters.mapNotNull { it.name } }
+        val modifiers = initialModifierNames.flatMap { code.obtainAllModifierNames(it) }
 
         val suspiciousOrderModifiers = code.findChildrenByClass<KtCallExpression>()
             .filter { it.calleeExpression?.text?.first()?.isUpperCase() == true }

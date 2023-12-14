@@ -20,7 +20,7 @@ class ModifierClickableOrderCheckTest {
         val code =
             """
                 @Composable
-                fun Something1(modifier: Modifier = Modifier) {
+                fun Something1(modifier: Modifier = Modifier, bananaModifier: Modifier = Modifier) {
                     Something2(
                         modifier = Modifier.clickable { }.clip(shape = RoundedCornerShape(8.dp))
                     )
@@ -36,6 +36,9 @@ class ModifierClickableOrderCheckTest {
                     Something6(
                         modifier.clickable { }.then(if (x) border(TurdShape) else Modifier)
                     )
+                    Something7(
+                        modifier = bananaModifier.clickable { }.clip(shape = RoundedCornerShape(8.dp))
+                    )
                 }
             """.trimIndent()
 
@@ -47,6 +50,7 @@ class ModifierClickableOrderCheckTest {
                 SourceLocation(10, 18),
                 SourceLocation(13, 47),
                 SourceLocation(16, 18),
+                SourceLocation(19, 35),
             )
 
         assertThat(errors[0]).hasMessage(ModifierClickableOrder.ModifierChainWithSuspiciousOrder)

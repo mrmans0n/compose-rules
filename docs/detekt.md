@@ -24,54 +24,56 @@ Compose:
     active: true
   ComposableNaming:
     active: true
-    # You can optionally disable the checks in this rule for regex matches against the composable name (e.g. molecule presenters)
+    # -- You can optionally disable the checks in this rule for regex matches against the composable name (e.g. molecule presenters)
     # allowedComposableFunctionNames: .*Presenter,.*MoleculePresenter
   ComposableParamOrder:
     active: true
   CompositionLocalAllowlist:
     active: true
-    # You can optionally define a list of CompositionLocals that are allowed here
+    # -- You can optionally define a list of CompositionLocals that are allowed here
     # allowedCompositionLocals: LocalSomething,LocalSomethingElse
   CompositionLocalNaming:
     active: true
   ContentEmitterReturningValues:
     active: true
-    # You can optionally add your own composables here
+    # -- You can optionally add your own composables here
     # contentEmitters: MyComposable,MyOtherComposable
   DefaultsVisibility:
     active: true
   ModifierClickableOrder:
     active: true
+    # -- You can optionally add your own Modifier types
+    # customModifiers: BananaModifier,PotatoModifier
   ModifierComposable:
     active: true
-    # You can optionally add your own Modifier types
+    # -- You can optionally add your own Modifier types
     # customModifiers: BananaModifier,PotatoModifier
   ModifierMissing:
     active: true
-    # You can optionally control the visibility of which composables to check for here
-    # Possible values are: `only_public`, `public_and_internal` and `all` (default is `only_public`)
+    # -- You can optionally control the visibility of which composables to check for here
+    # -- Possible values are: `only_public`, `public_and_internal` and `all` (default is `only_public`)
     # checkModifiersForVisibility: only_public
-    # You can optionally add your own Modifier types
+    # -- You can optionally add your own Modifier types
     # customModifiers: BananaModifier,PotatoModifier
   ModifierNaming:
     active: true
-    # You can optionally add your own Modifier types
+    # -- You can optionally add your own Modifier types
     # customModifiers: BananaModifier,PotatoModifier
   ModifierNotUsedAtRoot:
     active: true
-    # You can optionally add your own composables here
+    # -- You can optionally add your own composables here
     # contentEmitters: MyComposable,MyOtherComposable
-    # You can optionally add your own Modifier types
+    # -- You can optionally add your own Modifier types
     # customModifiers: BananaModifier,PotatoModifier
   ModifierReused:
     active: true
-    # You can optionally add your own Modifier types
+    # -- You can optionally add your own Modifier types
     # customModifiers: BananaModifier,PotatoModifier
   ModifierWithoutDefault:
     active: true
   MultipleEmitters:
     active: true
-    # You can optionally add your own composables here
+    # -- You can optionally add your own composables here
     # contentEmitters: MyComposable,MyOtherComposable
   MutableParams:
     active: true
@@ -89,11 +91,11 @@ Compose:
     active: true
   ViewModelForwarding:
     active: true
-      # You can optionally use this rule on things other than types ending in "ViewModel" or "Presenter" (which are the defaults). You can add your own via a regex here:
-      # allowedStateHolderNames: .*ViewModel,.*Presenter
+    # -- You can optionally use this rule on things other than types ending in "ViewModel" or "Presenter" (which are the defaults). You can add your own via a regex here:
+    # allowedStateHolderNames: .*ViewModel,.*Presenter
   ViewModelInjection:
     active: true
-    # You can optionally add your own ViewModel factories here
+    # -- You can optionally add your own ViewModel factories here
     # viewModelFactories: hiltViewModel,potatoViewModel
 ```
 

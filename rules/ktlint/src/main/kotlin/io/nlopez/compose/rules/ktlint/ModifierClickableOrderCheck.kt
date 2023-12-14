@@ -7,5 +7,8 @@ import io.nlopez.rules.core.ComposeKtVisitor
 import io.nlopez.rules.core.ktlint.KtlintRule
 
 class ModifierClickableOrderCheck :
-    KtlintRule("compose:modifier-clickable-order"),
+    KtlintRule(
+        id = "compose:modifier-clickable-order",
+        editorConfigProperties = setOf(customModifiers),
+    ),
     ComposeKtVisitor by ModifierClickableOrder()

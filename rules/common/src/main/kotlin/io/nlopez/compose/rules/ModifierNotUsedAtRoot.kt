@@ -24,6 +24,8 @@ class ModifierNotUsedAtRoot : ComposeKtVisitor {
         config: ComposeKtConfig,
     ) {
         val modifier = with(config) { function.modifierParameter } ?: return
+
+        // We only care about the main modifier for this rule
         if (modifier.name != "modifier") return
         val code = function.bodyBlockExpression ?: return
 
