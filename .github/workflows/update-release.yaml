@@ -34,7 +34,7 @@ jobs:
             if: success() && !endsWith(env.VERSION, '-SNAPSHOT')
             run: ./gradlew clean :rules:ktlint:shadowJar :rules:detekt:shadowJar -PuberJar --rerun-tasks
 
-          - name: Upload ktlint binaries to release
+          - name: Upload ktlint fat jars binaries to release
             if: success() && !endsWith(env.VERSION, '-SNAPSHOT')
             uses: svenstaro/upload-release-action@v2
             with:
@@ -44,7 +44,7 @@ jobs:
                 asset_name: ktlint-compose-${{ env.VERSION }}-all.jar
                 overwrite: true
 
-          - name: Upload detekt binaries to release
+          - name: Upload detekt fat jars binaries to release
             if: success() && !endsWith(env.VERSION, '-SNAPSHOT')
             uses: svenstaro/upload-release-action@v2
             with:
@@ -52,4 +52,28 @@ jobs:
                 file: rules/detekt/build/libs/detekt-${{ env.VERSION }}-all.jar
                 tag: v${{ env.VERSION }}
                 asset_name: detekt-compose-${{ env.VERSION }}-all.jar
+                overwrite: true
+
+          - name: Build the normal jars
+            if: success() && !endsWith(env.VERSION, '-SNAPSHOT')
+            run: ./gradlew clean :rules:ktlint:build :rules:detekt:build --rerun-tasks
+
+          - name: Upload ktlint binaries to release
+            if: success() && !endsWith(env.VERSION, '-SNAPSHOT')
+            uses: svenstaro/upload-release-action@v2
+            with:
+                repo_token: ${{ secrets.GITHUB_TOKEN }}
+                file: rules/ktlint/build/libs/ktlint-${{ env.VERSION }}.jar
+                tag: v${{ env.VERSION }}
+                asset_name: ktlint-compose-${{ env.VERSION }}.jar
+                overwrite: true
+
+          - name: Upload detekt binaries to release
+            if: success() && !endsWith(env.VERSION, '-SNAPSHOT')
+            uses: svenstaro/upload-release-action@v2
+            with:
+                repo_token: ${{ secrets.GITHUB_TOKEN }}
+                file: rules/detekt/build/libs/detekt-${{ env.VERSION }}.jar
+                tag: v${{ env.VERSION }}
+                asset_name: detekt-compose-${{ env.VERSION }}.jar
                 overwrite: true
