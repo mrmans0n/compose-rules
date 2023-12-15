@@ -4,8 +4,10 @@ package io.nlopez.rules.core.util
 
 import io.nlopez.rules.core.ComposeKtConfig
 import org.jetbrains.kotlin.com.intellij.psi.PsiElement
+import org.jetbrains.kotlin.psi.KtBlockExpression
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
+import org.jetbrains.kotlin.psi.KtForExpression
 import org.jetbrains.kotlin.psi.KtFunction
 import org.jetbrains.kotlin.psi.KtProperty
 import org.jetbrains.kotlin.psi.psiUtil.referenceExpression
@@ -69,6 +71,73 @@ private val KtCallExpression.containsComposablesWithModifiers: Boolean
             .filterIsInstance<KtDotQualifiedExpression>()
             .any { it.rootExpression.text == "Modifier" }
     }
+
+context(ComposeKtConfig)
+private val KtFunction.directUiEmitterCount: Int
+    get() = bodyBlockExpression?.let { block ->
+        // If there's content emitted in a for loop, we assume there's at
+        // least two iterations and thus count any emitters in them as multiple
+        val forLoopCount = when {
+            block.forLoopHasUiEmitters -> 2
+            else -> 0
+        }
+        block.directUiEmitterCount + forLoopCount
+    } ?: 0
+
+context(ComposeKtConfig)
+private val KtBlockExpression.forLoopHasUiEmitters: Boolean
+    get() = statements.filterIsInstance<KtForExpression>().any {
+        when (val body = it.body) {
+            is KtBlockExpression -> body.directUiEmitterCount > 0
+            is KtCallExpression -> body.emitsContent
+            else -> false
+        }
+    }
+
+context(ComposeKtConfig)
+private val KtBlockExpression.directUiEmitterCount: Int
+    get() = statements.filterIsInstance<KtCallExpression>().count { it.emitsContent }
+
+context(ComposeKtConfig)
+private fun KtFunction.indirectUiEmitterCount(mapping: Map<KtFunction, Int>): Int {
+    val bodyBlock = bodyBlockExpression ?: return 0
+    return bodyBlock.statements
+        .filterIsInstance<KtCallExpression>()
+        .count { callExpression ->
+            // If it's a direct hit on our list, it should count directly
+            if (callExpression.emitsContent) return@count true
+
+            val name = callExpression.calleeExpression?.text ?: return@count false
+            // If the hit is in the provided mapping, it means it is using a composable that we know emits UI,
+            // that we inferred from previous passes
+            val value = mapping.mapKeys { entry -> entry.key.name }[name] ?: return@count false
+            value > 0
+        }
+}
+
+context(ComposeKtConfig)
+fun Sequence<KtFunction>.createDirectComposableToEmissionCountMapping(): Map<KtFunction, Int> =
+    associateWith { it.directUiEmitterCount }
+
+context(ComposeKtConfig)
+fun refineComposableToEmissionCountMapping(
+    initialMapping: Map<KtFunction, Int>,
+): Map<KtFunction, Int> {
+    var current = initialMapping
+
+    var shouldMakeAnotherPass = true
+    while (shouldMakeAnotherPass) {
+        val updatedMapping = current.mapValues { (functionNode, _) ->
+            functionNode.indirectUiEmitterCount(current)
+        }
+        when {
+            updatedMapping != current -> current = updatedMapping
+            else -> shouldMakeAnotherPass = false
+        }
+    }
+
+    return current
+}
 
 /**
  * This is a denylist with common composables that emit content in their own window. Feel free to add more elements
