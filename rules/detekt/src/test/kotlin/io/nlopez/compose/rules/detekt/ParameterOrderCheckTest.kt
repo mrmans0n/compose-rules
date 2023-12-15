@@ -9,6 +9,7 @@ import io.gitlab.arturbosch.detekt.test.lint
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
 
+@Suppress("ktlint:standard:max-line-length")
 class ParameterOrderCheckTest {
 
     private val testConfig = TestConfig(
@@ -20,6 +21,11 @@ class ParameterOrderCheckTest {
     fun `no errors when ordering is correct`() {
         @Language("kotlin")
         val code = """
+            typealias TypealiasLambda = () -> Unit
+            fun interface InterfaceLambda {
+                fun whatever()
+            }
+
             fun MyComposable(text1: String, modifier: Modifier = Modifier, other: String = "1", other2: String = "2") { }
 
             @Composable
@@ -42,6 +48,20 @@ class ParameterOrderCheckTest {
 
             @Composable
             fun MyComposable(modifier: Modifier, text1: String, m2: Modifier = Modifier, trailing: (() -> Unit)?) { }
+
+            @Composable
+            fun MyComposable(text1: String, modifier: Modifier = Modifier, m2: Modifier = Modifier, trailing: TypealiasLambda) { }
+
+            @Composable
+            fun MyComposable(text1: String, modifier: Modifier = Modifier, m2: Modifier = Modifier, trailing: TypealiasLambda?) { }
+
+            @Composable
+            fun MyComposable(text1: String, modifier: Modifier = Modifier, m2: Modifier = Modifier, trailing: InterfaceLambda) { }
+
+            @Composable
+            fun MyComposable(text1: String, modifier: Modifier = Modifier, m2: Modifier = Modifier, trailing: InterfaceLambda?) { }
+
+
         """.trimIndent()
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
@@ -65,15 +85,21 @@ class ParameterOrderCheckTest {
 
             @Composable
             fun MyComposable(text1: String, m2: Modifier = Modifier, modifier: Modifier = Modifier, trailing: () -> Unit) { }
+
+            @Composable
+            fun MyComposable(text1: String, m2: Modifier = Modifier, modifier: Modifier = Modifier, trailing: NonFunctionalType) { }
+
+            typealias NonFunctionalType = String
         """.trimIndent()
         val errors = rule.lint(code)
-        assertThat(errors).hasSize(5)
+        assertThat(errors)
             .hasStartSourceLocations(
                 SourceLocation(2, 5),
                 SourceLocation(5, 5),
                 SourceLocation(8, 5),
                 SourceLocation(11, 5),
                 SourceLocation(14, 5),
+                SourceLocation(17, 5),
             )
     }
 }

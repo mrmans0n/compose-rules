@@ -8,6 +8,7 @@ import io.nlopez.compose.rules.ParameterOrder
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
 
+@Suppress("ktlint:standard:max-line-length")
 class ParameterOrderCheckTest {
 
     private val orderingRuleAssertThat = assertThatRule { ParameterOrderCheck() }
@@ -16,6 +17,11 @@ class ParameterOrderCheckTest {
     fun `no errors when ordering is correct`() {
         @Language("kotlin")
         val code = """
+            typealias TypealiasLambda = () -> Unit
+            fun interface InterfaceLambda {
+                fun whatever()
+            }
+
             fun MyComposable(text1: String, modifier: Modifier = Modifier, other: String = "1", other2: String = "2") { }
 
             @Composable
@@ -38,6 +44,18 @@ class ParameterOrderCheckTest {
 
             @Composable
             fun MyComposable(modifier: Modifier, text1: String, m2: Modifier = Modifier, trailing: (() -> Unit)?) { }
+
+            @Composable
+            fun MyComposable(text1: String, modifier: Modifier = Modifier, m2: Modifier = Modifier, trailing: TypealiasLambda) { }
+
+            @Composable
+            fun MyComposable(text1: String, modifier: Modifier = Modifier, m2: Modifier = Modifier, trailing: TypealiasLambda?) { }
+
+            @Composable
+            fun MyComposable(text1: String, modifier: Modifier = Modifier, m2: Modifier = Modifier, trailing: InterfaceLambda) { }
+
+            @Composable
+            fun MyComposable(text1: String, modifier: Modifier = Modifier, m2: Modifier = Modifier, trailing: InterfaceLambda?) { }
         """.trimIndent()
         orderingRuleAssertThat(code)
             .withEditorConfigOverride(treatAsLambda to "LambdaType")
@@ -62,6 +80,11 @@ class ParameterOrderCheckTest {
 
             @Composable
             fun MyComposable(text1: String, m2: Modifier = Modifier, modifier: Modifier = Modifier, trailing: () -> Unit) { }
+
+            @Composable
+            fun MyComposable(text1: String, m2: Modifier = Modifier, modifier: Modifier = Modifier, trailing: NonFunctionalType) { }
+
+            typealias NonFunctionalType = String
         """.trimIndent()
         orderingRuleAssertThat(code).hasLintViolationsWithoutAutoCorrect(
             LintViolation(
@@ -106,6 +129,16 @@ class ParameterOrderCheckTest {
                     "text1: String, m2: Modifier = Modifier, modifier: Modifier = Modifier, trailing: () -> Unit",
                     properOrder =
                     "text1: String, modifier: Modifier = Modifier, m2: Modifier = Modifier, trailing: () -> Unit",
+                ),
+            ),
+            LintViolation(
+                line = 17,
+                col = 5,
+                detail = ParameterOrder.createErrorMessage(
+                    currentOrder =
+                    "text1: String, m2: Modifier = Modifier, modifier: Modifier = Modifier, trailing: NonFunctionalType",
+                    properOrder =
+                    "text1: String, trailing: NonFunctionalType, modifier: Modifier = Modifier, m2: Modifier = Modifier",
                 ),
             ),
         )
