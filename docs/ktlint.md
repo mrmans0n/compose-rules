@@ -126,6 +126,15 @@ Most of the modifier-related rules will look for modifiers based their type: eit
 compose_custom_modifiers = BananaModifier,PotatoModifier
 ```
 
+### Configure types to treat as lambdas in ParamOrder check
+
+The `param-order-check` rule will do its best to identify trailing lambdas. However, in cases where a typedef / functional interface is being used, we might want to have this rule to treat them as if they were lambdas: not reporting them if they are the last in a method signature and they don't have a default value. To give ktlint some hints, you can configure this in your `.editorconfig` file:
+
+```editorconfig
+[*.{kt,kts}]
+compose_treat_as_lambda = MyLambdaType,MyOtherLambdaType
+```
+
 ## Disabling a specific rule
 
 To disable a rule you have to follow the [instructions from the ktlint documentation](https://github.com/pinterest/ktlint#how-do-i-suppress-an-errors-for-a-lineblockfile), and use the id of the rule you want to disable with the `compose` tag.

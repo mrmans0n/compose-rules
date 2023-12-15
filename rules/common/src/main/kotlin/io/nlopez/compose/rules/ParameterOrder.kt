@@ -12,6 +12,8 @@ import org.jetbrains.kotlin.psi.KtFunction
 import org.jetbrains.kotlin.psi.KtFunctionType
 import org.jetbrains.kotlin.psi.KtNullableType
 import org.jetbrains.kotlin.psi.KtParameter
+import org.jetbrains.kotlin.psi.KtTypeElement
+import org.jetbrains.kotlin.psi.KtUserType
 
 class ParameterOrder : ComposeKtVisitor {
 
@@ -31,7 +33,7 @@ class ParameterOrder : ComposeKtVisitor {
         val currentOrder = function.valueParameters
 
         // We look in the original params without defaults and see if the last one is a function.
-        val hasTrailingFunction = function.hasTrailingFunction
+        val hasTrailingFunction = with(config) { function.hasTrailingFunction }
         val trailingLambda = if (hasTrailingFunction) {
             listOf(function.valueParameters.last())
         } else {
@@ -59,13 +61,18 @@ class ParameterOrder : ComposeKtVisitor {
         }
     }
 
+    context(ComposeKtConfig)
     private val KtFunction.hasTrailingFunction: Boolean
-        get() =
-            when (val outerType = valueParameters.lastOrNull()?.typeReference?.typeElement) {
-                is KtFunctionType -> true
-                is KtNullableType -> outerType.innerType is KtFunctionType
-                else -> false
-            }
+        get() = valueParameters.lastOrNull()?.typeReference?.typeElement?.isLambda() == true
+
+    context(ComposeKtConfig)
+    private fun KtTypeElement.isLambda(treatAsLambda: Set<String> = getSet("treatAsLambda", emptySet())): Boolean =
+        when (this) {
+            is KtFunctionType -> true
+            is KtNullableType -> innerType?.isLambda(treatAsLambda) == true
+            is KtUserType -> getReferencedName() in getSet("treatAsLambda", emptySet())
+            else -> false
+        }
 
     companion object {
         fun createErrorMessage(currentOrder: List<KtParameter>, properOrder: List<KtParameter>): String =

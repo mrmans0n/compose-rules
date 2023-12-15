@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 package io.nlopez.compose.rules.detekt
 
-import io.gitlab.arturbosch.detekt.api.Config
 import io.gitlab.arturbosch.detekt.api.SourceLocation
+import io.gitlab.arturbosch.detekt.test.TestConfig
 import io.gitlab.arturbosch.detekt.test.assertThat
 import io.gitlab.arturbosch.detekt.test.lint
 import org.intellij.lang.annotations.Language
@@ -11,7 +11,10 @@ import org.junit.jupiter.api.Test
 
 class ParameterOrderCheckTest {
 
-    private val rule = ParameterOrderCheck(Config.empty)
+    private val testConfig = TestConfig(
+        "treatAsLambda" to listOf("LambdaType"),
+    )
+    private val rule = ParameterOrderCheck(testConfig)
 
     @Test
     fun `no errors when ordering is correct`() {
@@ -27,6 +30,12 @@ class ParameterOrderCheckTest {
 
             @Composable
             fun MyComposable(text1: String, modifier: Modifier = Modifier, m2: Modifier = Modifier, trailing: () -> Unit) { }
+
+            @Composable
+            fun MyComposable(text1: String, modifier: Modifier = Modifier, m2: Modifier = Modifier, trailing: LambdaType) { }
+
+            @Composable
+            fun MyComposable(text1: String, modifier: Modifier = Modifier, m2: Modifier = Modifier, trailing: LambdaType?) { }
 
             @Composable
             fun MyComposable(text1: String, modifier: Modifier = Modifier, m2: Modifier = Modifier, trailing: (() -> Unit)?) { }

@@ -169,3 +169,22 @@ val customModifiers: EditorConfigProperty<String> =
             }
         },
     )
+
+val treatAsLambda: EditorConfigProperty<String> =
+    EditorConfigProperty(
+        type = PropertyType.LowerCasingPropertyType(
+            "compose_treat_as_lambda",
+            "A comma separated list of types that should be treated as lambdas " +
+                "(e.g. typedefs of lambdas, fun interfaces)",
+            PropertyValueParser.IDENTITY_VALUE_PARSER,
+            emptySet(),
+        ),
+        defaultValue = "",
+        propertyMapper = { property, _ ->
+            when {
+                property?.isUnset == true -> ""
+                property?.getValueAs<String>() != null -> property.getValueAs<String>()
+                else -> property?.getValueAs()
+            }
+        },
+    )

@@ -28,12 +28,20 @@ class ParameterOrderCheckTest {
             fun MyComposable(text1: String, modifier: Modifier = Modifier, m2: Modifier = Modifier, trailing: () -> Unit) { }
 
             @Composable
+            fun MyComposable(text1: String, modifier: Modifier = Modifier, m2: Modifier = Modifier, trailing: LambdaType) { }
+
+            @Composable
+            fun MyComposable(text1: String, modifier: Modifier = Modifier, m2: Modifier = Modifier, trailing: LambdaType?) { }
+
+            @Composable
             fun MyComposable(text1: String, modifier: Modifier = Modifier, m2: Modifier = Modifier, trailing: (() -> Unit)?) { }
 
             @Composable
             fun MyComposable(modifier: Modifier, text1: String, m2: Modifier = Modifier, trailing: (() -> Unit)?) { }
         """.trimIndent()
-        orderingRuleAssertThat(code).hasNoLintViolations()
+        orderingRuleAssertThat(code)
+            .withEditorConfigOverride(treatAsLambda to "LambdaType")
+            .hasNoLintViolations()
     }
 
     @Test

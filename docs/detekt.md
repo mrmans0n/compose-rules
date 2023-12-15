@@ -28,6 +28,8 @@ Compose:
     # allowedComposableFunctionNames: .*Presenter,.*MoleculePresenter
   ComposableParamOrder:
     active: true
+    # -- You can optionally have a list of types to be treated as lambdas (e.g. typedefs or fun interfaces not picked up automatically)
+    # treatAsLambda: MyLambdaType
   CompositionLocalAllowlist:
     active: true
     # -- You can optionally define a list of CompositionLocals that are allowed here
