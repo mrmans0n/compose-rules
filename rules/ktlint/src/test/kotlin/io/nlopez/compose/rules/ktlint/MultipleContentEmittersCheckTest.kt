@@ -43,7 +43,7 @@ class MultipleContentEmittersCheckTest {
                 }
                 @Composable
                 fun RowScope.Something() {
-                    Spacer16()
+                    Spacer()
                     Text("Hola")
                 }
             """.trimIndent()
@@ -64,7 +64,7 @@ class MultipleContentEmittersCheckTest {
                 context(RowScope)
                 @Composable
                 fun Something() {
-                    Spacer16()
+                    Spacer()
                     Text("Hola")
                 }
             """.trimIndent()
@@ -83,7 +83,7 @@ class MultipleContentEmittersCheckTest {
                 }
                 @Composable
                 fun Something() {
-                    Spacer16()
+                    Spacer()
                     Text("Hola")
                 }
             """.trimIndent()
@@ -202,5 +202,21 @@ class MultipleContentEmittersCheckTest {
                 detail = MultipleContentEmitters.MultipleContentEmittersDetected,
             ),
         )
+    }
+
+    @Test
+    fun `passes when the composable is in the denylist`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun Something() {
+                    Text("Hi")
+                    Spacer()
+                }
+            """.trimIndent()
+        emittersRuleAssertThat(code)
+            .withEditorConfigOverride(contentEmittersDenylist to "Spacer")
+            .hasNoLintViolations()
     }
 }

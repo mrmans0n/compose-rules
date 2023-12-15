@@ -41,11 +41,20 @@ You can use this same [uber jar from the releases page](https://github.com/mrman
 
 ### Providing custom content emitters
 
-There are some rules (`compose:content-emitter-returning-values-check`, `compose:modifier-not-used-at-root` and `compose:multiple-emitters-check`) that use predefined list of known composables that emit content. But you can add your own too! In your `.editorconfig` file, you'll need to add a `content_emitters` property followed by a list of composable names separated by commas. You would typically want the composables that are part of your custom design system to be in this list.
+There are some rules (`compose:content-emitter-returning-values-check`, `compose:modifier-not-used-at-root` and `compose:multiple-emitters-check`) that use predefined list of known composables that emit content. But you can add your own too! In your `.editorconfig` file, you'll need to add a `compose_content_emitters` property followed by a list of composable names separated by commas. You would typically want the composables that are part of your custom design system to be in this list.
 
 ```editorconfig
 [*.{kt,kts}]
 compose_content_emitters = MyComposable,MyOtherComposable
+```
+
+### Providing exceptions to content emitters
+
+Sometimes we'll want to not count a Composable towards the multiple content emitters (`compose:multiple-emitters-check`) rule. This is useful, for example, if the composable function actually emits content but that content is painted in a different window (like a dialog or a modal). For those cases, we can use a denylist `compose_content_emitters_denyylist` to add those composable names separated by commas.
+
+```editorconfig
+[*.{kt,kts}]
+compose_content_emitters_denylist = MyModalComposable,MyDialogComposable
 ```
 
 ### Providing custom ViewModel factories

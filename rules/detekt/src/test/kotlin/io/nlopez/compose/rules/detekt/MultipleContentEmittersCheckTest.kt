@@ -13,7 +13,8 @@ import org.junit.jupiter.api.Test
 class MultipleContentEmittersCheckTest {
 
     private val testConfig = TestConfig(
-        "contentEmitters" to listOf("Potato", "Banana"),
+        "contentEmitters" to listOf("Potato", "Banana", "Apple"),
+        "contentEmittersDenylist" to listOf("Apple"),
     )
     private val rule = MultipleContentEmittersCheck(testConfig)
 
@@ -49,7 +50,7 @@ class MultipleContentEmittersCheckTest {
                 }
                 @Composable
                 fun RowScope.Something() {
-                    Spacer16()
+                    Spacer()
                     Text("Hola")
                 }
             """.trimIndent()
@@ -71,7 +72,7 @@ class MultipleContentEmittersCheckTest {
                 context(ColumnScope)
                 @Composable
                 fun Something() {
-                    Spacer16()
+                    Spacer()
                     Text("Hola")
                 }
             """.trimIndent()
@@ -91,12 +92,12 @@ class MultipleContentEmittersCheckTest {
                 }
                 @Composable
                 fun Something() {
-                    Spacer16()
+                    Spacer()
                     Text("Hola")
                 }
             """.trimIndent()
         val errors = rule.lint(code)
-        assertThat(errors).hasSize(2)
+        assertThat(errors)
             .hasStartSourceLocations(
                 SourceLocation(2, 5),
                 SourceLocation(7, 5),
@@ -135,7 +136,7 @@ class MultipleContentEmittersCheckTest {
                 }
             """.trimIndent()
         val errors = rule.lint(code)
-        assertThat(errors).hasSize(2)
+        assertThat(errors)
             .hasStartSourceLocations(
                 SourceLocation(6, 5),
                 SourceLocation(19, 5),
@@ -162,7 +163,7 @@ class MultipleContentEmittersCheckTest {
                 }
             """.trimIndent()
         val errors = rule.lint(code)
-        assertThat(errors).hasSize(1)
+        assertThat(errors)
             .hasStartSourceLocation(2, 5)
         assertThat(errors.first()).hasMessage(MultipleContentEmitters.MultipleContentEmittersDetected)
     }
@@ -194,5 +195,20 @@ class MultipleContentEmittersCheckTest {
         for (error in errors) {
             assertThat(error).hasMessage(MultipleContentEmitters.MultipleContentEmittersDetected)
         }
+    }
+
+    @Test
+    fun `passes when the composable is in the denylist`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun Something() {
+                    Text("Hi")
+                    Apple()
+                }
+            """.trimIndent()
+        val errors = rule.lint(code)
+        assertThat(errors).isEmpty()
     }
 }

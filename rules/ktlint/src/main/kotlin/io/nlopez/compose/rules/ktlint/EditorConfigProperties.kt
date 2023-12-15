@@ -11,7 +11,26 @@ val contentEmittersProperty: EditorConfigProperty<String> =
         type = PropertyType.LowerCasingPropertyType(
             "compose_content_emitters",
             "A comma separated list of composable functions that emit content (e.g. UI)",
-            PropertyType.PropertyValueParser.IDENTITY_VALUE_PARSER,
+            PropertyValueParser.IDENTITY_VALUE_PARSER,
+            emptySet(),
+        ),
+        defaultValue = "",
+        propertyMapper = { property, _ ->
+            when {
+                property?.isUnset == true -> ""
+                property?.getValueAs<String>() != null -> property.getValueAs<String>()
+                else -> property?.getValueAs()
+            }
+        },
+    )
+
+val contentEmittersDenylist: EditorConfigProperty<String> =
+    EditorConfigProperty(
+        type = PropertyType.LowerCasingPropertyType(
+            "compose_content_emitters_denylist",
+            "A comma separated list of composable functions that we don't want to take into acccount " +
+                "when assessing if something is a content emitter",
+            PropertyValueParser.IDENTITY_VALUE_PARSER,
             emptySet(),
         ),
         defaultValue = "",

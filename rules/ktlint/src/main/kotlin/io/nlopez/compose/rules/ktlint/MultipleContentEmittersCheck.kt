@@ -9,6 +9,6 @@ import io.nlopez.rules.core.ktlint.KtlintRule
 class MultipleContentEmittersCheck :
     KtlintRule(
         id = "compose:multiple-emitters-check",
-        editorConfigProperties = setOf(contentEmittersProperty),
+        editorConfigProperties = setOf(contentEmittersProperty, contentEmittersDenylist),
     ),
     ComposeKtVisitor by MultipleContentEmitters()

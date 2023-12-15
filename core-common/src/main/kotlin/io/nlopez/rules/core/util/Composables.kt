@@ -47,9 +47,11 @@ context(ComposeKtConfig)
 val KtCallExpression.emitsContent: Boolean
     get() {
         val methodName = calleeExpression?.text ?: return false
-        return methodName in ComposableEmittersList ||
-            ComposableEmittersListRegex.matches(methodName) ||
-            methodName in getSet("contentEmitters", emptySet()) ||
+
+        // If in denylist, we will assume it doesn't emit content (regardless of anything else).
+        if (methodName in getSet("contentEmittersDenylist", emptySet())) return false
+
+        return methodName in ComposableEmittersList + getSet("contentEmitters", emptySet()) ||
             containsComposablesWithModifiers
     }
 
@@ -70,7 +72,8 @@ private val KtCallExpression.containsComposablesWithModifiers: Boolean
 
 /**
  * This is a denylist with common composables that emit content in their own window. Feel free to add more elements
- * if you stumble upon them in code reviews that should have triggered an error from this rule.
+ * if you stumble upon false positives that should not have triggered an error from this rule, and are in foundational
+ * libraries.
  */
 private val ComposableNonEmittersList = setOf(
     "AlertDialog",
@@ -96,6 +99,7 @@ private val ComposableEmittersList by lazy {
         "LazyRow",
         "LazyVerticalGrid",
         "Row",
+        "Spacer",
         "Text",
         // android.compose.material
         "BottomDrawer",
@@ -147,18 +151,6 @@ private val ComposableEmittersList by lazy {
         "VerticalPager",
         "VerticalPagerIndicator",
         "WebView",
-    )
-}
-
-private val ComposableEmittersListRegex by lazy {
-    Regex(
-        listOf(
-            "Spacer\\d*", // Spacer() + SpacerNUM()
-        ).joinToString(
-            separator = "|",
-            prefix = "(",
-            postfix = ")",
-        ),
     )
 }
 

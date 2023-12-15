@@ -73,8 +73,10 @@ Compose:
     active: true
   MultipleEmitters:
     active: true
-    # -- You can optionally add your own composables here
+    # -- You can optionally add your own composables here that will count as content emitters
     # contentEmitters: MyComposable,MyOtherComposable
+    # -- You can add composables here that you don't want to count as content emitters (e.g. custom dialogs or modals)
+    # contentEmittersDenylist: MyNonEmitterComposable
   MutableParams:
     active: true
   MutableStateParam:
