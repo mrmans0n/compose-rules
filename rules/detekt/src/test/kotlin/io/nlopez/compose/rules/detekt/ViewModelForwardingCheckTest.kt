@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 package io.nlopez.compose.rules.detekt
 
-import io.gitlab.arturbosch.detekt.api.Config
 import io.gitlab.arturbosch.detekt.api.SourceLocation
 import io.gitlab.arturbosch.detekt.test.TestConfig
 import io.gitlab.arturbosch.detekt.test.assertThat
@@ -14,9 +13,10 @@ import org.junit.jupiter.api.Test
 class ViewModelForwardingCheckTest {
 
     private val testConfig = TestConfig(
-        "stateHolder" to listOf("bananaViewModel", "potatoViewModel"),
+        "allowedStateHolderNames" to listOf(".*Component", ".*StateHolder"),
+        "allowedForwarding" to listOf(".*Content"),
     )
-    private val rule = ViewModelForwardingCheck(Config.empty)
+    private val rule = ViewModelForwardingCheck(testConfig)
 
     @Test
     fun `allows the forwarding of ViewModels in overridden Composable functions`() {
@@ -107,6 +107,54 @@ class ViewModelForwardingCheckTest {
                 key(viewModel) { }
                 val x = remember(viewModel) { "ABC" }
                 LaunchedEffect(viewModel) { }
+            }
+            """.trimIndent()
+        val errors = rule.lint(code)
+        assertThat(errors).isEmpty()
+    }
+
+    @Test
+    fun `errors when a custom state holder is forwarded`() {
+        @Language("kotlin")
+        val code =
+            """
+            @Composable
+            fun MyComposable(viewModel: MyViewComponent) {
+                AnotherComposable(viewModel)
+            }
+            @Composable
+            fun MyComposable2(viewModel: MyStateHolder) {
+                AnotherComposable(viewModel)
+            }
+            """.trimIndent()
+        val errors = rule.lint(code)
+        assertThat(errors).hasStartSourceLocations(
+            SourceLocation(3, 5),
+            SourceLocation(7, 5),
+        )
+        for (error in errors) {
+            assertThat(error).hasMessage(ViewModelForwarding.AvoidViewModelForwarding)
+        }
+    }
+
+    @Test
+    fun `allows forwarding when a ViewModel is in the allowlist`() {
+        @Language("kotlin")
+        val code =
+            """
+            @Composable
+            fun MyComposable(viewModel: MyViewModel) {
+                AnotherComposableContent(viewModel)
+            }
+            @Composable
+            fun MyComposable2(viewModel: MyViewModel) {
+                Row {
+                    AnotherComposableContent(viewModel)
+                }
+            }
+            @Composable
+            fun MyComposable3(viewModel: MyViewModel) {
+                AnotherComposableContent(vm = viewModel)
             }
             """.trimIndent()
         val errors = rule.lint(code)

@@ -6,6 +6,8 @@ import java.util.Locale
 
 fun <T> T.runIf(value: Boolean, block: T.() -> T): T = if (value) block() else this
 
+fun <T, R> T.runIfNotNull(value: R?, block: T.(R) -> T): T = value?.let { block(it) } ?: this
+
 fun String?.matchesAnyOf(patterns: Sequence<Regex>): Boolean {
     if (isNullOrEmpty()) return false
     for (regex in patterns) {

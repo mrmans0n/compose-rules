@@ -9,6 +9,6 @@ import io.nlopez.rules.core.ktlint.KtlintRule
 class ViewModelForwardingCheck :
     KtlintRule(
         id = "compose:vm-forwarding-check",
-        editorConfigProperties = setOf(allowedStateHolderNames),
+        editorConfigProperties = setOf(allowedStateHolderNames, allowedForwarding),
     ),
     ComposeKtVisitor by ViewModelForwarding()

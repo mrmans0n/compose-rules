@@ -31,15 +31,25 @@ class ViewModelForwarding : ComposeKtVisitor {
         if (parameters.isEmpty()) return
 
         val stateHolderValidNames = Regex(
-            config
-                .getList("allowedStateHolderNames", defaultStateHolderNames)
-                .ifEmpty { defaultStateHolderNames }
+            (config.getList("allowedStateHolderNames", emptyList()) + defaultStateHolderNames)
                 .joinToString(
                     separator = "|",
                     prefix = "(",
                     postfix = ")",
                 ),
         )
+
+        val allowedForwarding = config.getSet("allowedForwarding", emptySet())
+        val allowedForwardingRegex = when {
+            allowedForwarding.isNotEmpty() -> Regex(
+                allowedForwarding.joinToString(
+                    separator = "|",
+                    prefix = "(",
+                    postfix = ")",
+                ),
+            )
+            else -> null
+        }
 
         val viewModelParameterNames = parameters.filter { parameter ->
             // We can't do much better than looking at the types at face value
@@ -54,6 +64,10 @@ class ViewModelForwarding : ComposeKtVisitor {
             .filter { callExpression -> callExpression.calleeExpression?.text?.first()?.isUpperCase() ?: false }
             // Avoid LaunchedEffect/DisposableEffect/etc that can use the VM as a key
             .filterNot { callExpression -> callExpression.isRestartableEffect }
+            // Avoid explicitly allowlisted Composable names
+            .filterNot { callExpression ->
+                allowedForwardingRegex?.let { callExpression.calleeExpression?.text?.matches(it) } == true
+            }
             .flatMap { callExpression ->
                 // Get VALUE_ARGUMENT that has a REFERENCE_EXPRESSION. This would map to `viewModel` in this example:
                 // MyComposable(viewModel, ...)

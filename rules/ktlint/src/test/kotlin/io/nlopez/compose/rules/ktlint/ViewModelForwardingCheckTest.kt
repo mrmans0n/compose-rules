@@ -112,4 +112,63 @@ class ViewModelForwardingCheckTest {
             """.trimIndent()
         forwardingRuleAssertThat(code).hasNoLintViolations()
     }
+
+    @Test
+    fun `errors when a custom state holder is forwarded`() {
+        @Language("kotlin")
+        val code =
+            """
+            @Composable
+            fun MyComposable(viewModel: MyViewComponent) {
+                AnotherComposable(viewModel)
+            }
+            @Composable
+            fun MyComposable2(viewModel: MyStateHolder) {
+                AnotherComposable(viewModel)
+            }
+            """.trimIndent()
+        forwardingRuleAssertThat(code)
+            .withEditorConfigOverride(
+                allowedStateHolderNames to ".*Component,.*StateHolder",
+            )
+            .hasLintViolationsWithoutAutoCorrect(
+                LintViolation(
+                    line = 3,
+                    col = 5,
+                    detail = ViewModelForwarding.AvoidViewModelForwarding,
+                ),
+                LintViolation(
+                    line = 7,
+                    col = 5,
+                    detail = ViewModelForwarding.AvoidViewModelForwarding,
+                ),
+            )
+    }
+
+    @Test
+    fun `allows forwarding when a ViewModel is in the allowlist`() {
+        @Language("kotlin")
+        val code =
+            """
+            @Composable
+            fun MyComposable(viewModel: MyViewModel) {
+                AnotherComposableContent(viewModel)
+            }
+            @Composable
+            fun MyComposable2(viewModel: MyViewModel) {
+                Row {
+                    AnotherComposableContent(viewModel)
+                }
+            }
+            @Composable
+            fun MyComposable3(viewModel: MyViewModel) {
+                AnotherComposableContent(vm = viewModel)
+            }
+            """.trimIndent()
+        forwardingRuleAssertThat(code)
+            .withEditorConfigOverride(
+                allowedForwarding to ".*Content",
+            )
+            .hasNoLintViolations()
+    }
 }

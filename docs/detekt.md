@@ -99,6 +99,8 @@ Compose:
     active: true
     # -- You can optionally add your own ViewModel factories here
     # viewModelFactories: hiltViewModel,potatoViewModel
+    # -- You can optionally add an allowlist for Composable names that won't be affected by this rule
+    # allowedForwarding: .*Content,.*FancyStuff
 ```
 
 ### Disabling a specific rule

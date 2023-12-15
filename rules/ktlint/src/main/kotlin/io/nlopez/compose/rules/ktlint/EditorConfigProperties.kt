@@ -133,6 +133,25 @@ val allowedStateHolderNames: EditorConfigProperty<String> =
         },
     )
 
+val allowedForwarding: EditorConfigProperty<String> =
+    EditorConfigProperty(
+        type = PropertyType.LowerCasingPropertyType(
+            "compose_allowed_forwarding",
+            "A comma separated list of regexes of composable names where forwarding a " +
+                "state holder / ViewModel / Presenter names is alright to do",
+            PropertyValueParser.IDENTITY_VALUE_PARSER,
+            emptySet(),
+        ),
+        defaultValue = "",
+        propertyMapper = { property, _ ->
+            when {
+                property?.isUnset == true -> ""
+                property?.getValueAs<String>() != null -> property.getValueAs<String>()
+                else -> property?.getValueAs()
+            }
+        },
+    )
+
 val customModifiers: EditorConfigProperty<String> =
     EditorConfigProperty(
         type = PropertyType.LowerCasingPropertyType(
