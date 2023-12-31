@@ -18,7 +18,7 @@ kotlin-compiler = { module = "org.jetbrains.kotlin:kotlin-compiler-embeddable", 
 
 junit5 = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
 junit5-params = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "junit" }
-assertj = "org.assertj:assertj-core:3.24.2"
+assertj = "org.assertj:assertj-core:3.25.0"
 reflections = "org.reflections:reflections:0.10.2"
 
 [plugins]
