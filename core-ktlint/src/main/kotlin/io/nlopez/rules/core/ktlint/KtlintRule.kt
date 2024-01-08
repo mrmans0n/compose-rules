@@ -17,7 +17,6 @@ import org.jetbrains.kotlin.psi.KtClass
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtFunction
 import org.jetbrains.kotlin.psi.psiUtil.startOffset
-import org.jetbrains.kotlin.psi.stubs.elements.KtStubElementTypes
 
 abstract class KtlintRule(
     id: String,
@@ -41,25 +40,19 @@ abstract class KtlintRule(
 
     private val config: ComposeKtConfig by lazy { KtlintComposeKtConfig(properties, usesEditorConfigProperties) }
 
-    @Suppress("DEPRECATION")
     final override fun beforeVisitChildNodes(
         node: ASTNode,
         autoCorrect: Boolean,
         emit: (offset: Int, errorMessage: String, canBeAutoCorrected: Boolean) -> Unit,
     ) {
-        val psi = node.psi
-        when (node.elementType) {
-            KtStubElementTypes.FILE -> {
-                visitFile(psi as KtFile, autoCorrect, emit.toEmitter(), config)
-            }
-
-            KtStubElementTypes.CLASS -> visitClass(psi as KtClass, autoCorrect, emit.toEmitter(), config)
-            KtStubElementTypes.FUNCTION -> {
-                val function = psi as KtFunction
+        when (val psi = node.psi) {
+            is KtFile -> visitFile(psi, autoCorrect, emit.toEmitter(), config)
+            is KtClass -> visitClass(psi, autoCorrect, emit.toEmitter(), config)
+            is KtFunction -> {
                 val emitter = emit.toEmitter()
-                visitFunction(function, autoCorrect, emitter, config)
-                if (function.isComposable) {
-                    visitComposable(function, autoCorrect, emitter, config)
+                visitFunction(psi, autoCorrect, emitter, config)
+                if (psi.isComposable) {
+                    visitComposable(psi, autoCorrect, emitter, config)
                 }
             }
         }

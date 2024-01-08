@@ -18,7 +18,6 @@ import org.jetbrains.kotlin.psi.KtClass
 import org.jetbrains.kotlin.psi.KtElement
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtFunction
-import org.jetbrains.kotlin.psi.stubs.elements.KtStubElementTypes
 
 abstract class DetektRule(
     config: Config = Config.empty,
@@ -60,12 +59,11 @@ abstract class DetektRule(
 
     override fun visitKtElement(element: KtElement) {
         super.visitKtElement(element)
-        when (element.node.elementType) {
-            KtStubElementTypes.FUNCTION -> {
-                val function = element as KtFunction
-                visitFunction(function, autoCorrect, emitter, config)
-                if (function.isComposable) {
-                    visitComposable(function, autoCorrect, emitter, config)
+        when (element) {
+            is KtFunction -> {
+                visitFunction(element, autoCorrect, emitter, config)
+                if (element.isComposable) {
+                    visitComposable(element, autoCorrect, emitter, config)
                 }
             }
         }
