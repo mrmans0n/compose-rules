@@ -1,6 +1,6 @@
 [versions]
 kotlin = "1.9.22"
-ktlint = "1.1.0"
+ktlint = "1.1.1"
 detekt = "1.23.4"
 junit = "5.10.1"
 
