@@ -13,7 +13,7 @@ allprojects {
     spotless {
         kotlin {
             target "**/*.kt"
-            ktlint("1.1.1")
+            ktlint("1.1.0")
             // NOTE: When ktlint supports 1.1.0, use this instead:
             // ktlint(libs.versions.ktlint.get())
 
