@@ -8,44 +8,18 @@ import io.nlopez.rules.core.Emitter
 import io.nlopez.rules.core.report
 import io.nlopez.rules.core.util.findChildrenByClass
 import io.nlopez.rules.core.util.isComposable
+import io.nlopez.rules.core.util.isLambda
 import io.nlopez.rules.core.util.isModifier
+import io.nlopez.rules.core.util.lambdaTypes
 import io.nlopez.rules.core.util.runIf
-import org.jetbrains.kotlin.lexer.KtTokens
-import org.jetbrains.kotlin.psi.KtClass
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtFunction
-import org.jetbrains.kotlin.psi.KtFunctionType
-import org.jetbrains.kotlin.psi.KtNullableType
 import org.jetbrains.kotlin.psi.KtParameter
-import org.jetbrains.kotlin.psi.KtTypeAlias
-import org.jetbrains.kotlin.psi.KtTypeElement
-import org.jetbrains.kotlin.psi.KtUserType
 
 class ParameterOrder : ComposeKtVisitor {
 
     override fun visitFile(file: KtFile, autoCorrect: Boolean, emitter: Emitter, config: ComposeKtConfig) {
-        val lambdaTypes = mutableSetOf<String>()
-        // Add types defined in the config
-        lambdaTypes += config.getSet("treatAsLambda", emptySet())
-
-        // Add fun interfaces
-        lambdaTypes += file.findChildrenByClass<KtClass>()
-            .filter { it.isInterface() && it.hasModifier(KtTokens.FUN_KEYWORD) }
-            .mapNotNull { it.name }
-
-        fun KtTypeElement.isLambda(): Boolean = when (this) {
-            is KtFunctionType -> true
-            is KtNullableType -> innerType?.isLambda() == true
-            is KtUserType -> getReferencedName() in lambdaTypes
-            else -> false
-        }
-
-        // Add typealias with functional types
-        // NOTE: it has to be last, so that isLambda picks up fun interfaces / config stuff in lambdaTypes
-        lambdaTypes += file.findChildrenByClass<KtTypeAlias>()
-            .filter { it.getTypeReference()?.typeElement?.isLambda() == true }
-            .mapNotNull { it.name }
-            .toSet()
+        val lambdaTypes = with(config) { file.lambdaTypes }
 
         val composables = file.findChildrenByClass<KtFunction>()
             .filter { it.isComposable }
@@ -63,8 +37,7 @@ class ParameterOrder : ComposeKtVisitor {
             // We look in the original params without defaults and see if the last one is a function.
             val hasTrailingFunction = function.valueParameters.lastOrNull()
                 ?.typeReference
-                ?.typeElement
-                ?.isLambda() == true
+                ?.isLambda(treatAsLambdaTypes = lambdaTypes) == true
 
             val trailingLambda = if (hasTrailingFunction) {
                 listOf(function.valueParameters.last())
