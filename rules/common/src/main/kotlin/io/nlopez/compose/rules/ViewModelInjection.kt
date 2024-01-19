@@ -130,11 +130,16 @@ class ViewModelInjection : ComposeKtVisitor {
 
         private val DefaultKnownViewModelFactories by lazy {
             setOf(
-                "viewModel", // AAC VM
-                "weaverViewModel", // Weaver
-                "hiltViewModel", // Hilt
-                "injectedViewModel", // Whetstone
-                "mavericksViewModel", // Mavericks
+                // AAC VM
+                "viewModel",
+                // Weaver
+                "weaverViewModel",
+                // Hilt
+                "hiltViewModel",
+                // Whetstone
+                "injectedViewModel",
+                // Mavericks
+                "mavericksViewModel",
             )
         }
 
