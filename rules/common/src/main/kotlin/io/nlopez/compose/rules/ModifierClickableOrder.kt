@@ -106,8 +106,9 @@ class ModifierClickableOrder : ComposeKtVisitor {
 
     private val KtCallExpression.isThen: Boolean
         get() = calleeExpression?.text == "then"
+
     private val KtCallExpression.isClipWithShape: Boolean
-        get() = calleeExpression?.text == "clip" && valueArguments.any { it.isNamedShape || it.referencesShape }
+        get() = calleeExpression?.text == "clip" // any clip will reference a shape
 
     private val KtCallExpression.isBackgroundWithShape: Boolean
         get() = calleeExpression?.text == "background" && valueArguments.any { it.isNamedShape || it.referencesShape }
@@ -127,6 +128,10 @@ class ModifierClickableOrder : ComposeKtVisitor {
             // if (x) MyShape else MyOtherShape
             is KtIfExpression -> expression.then?.text?.endsWith("Shape") == true ||
                 expression.`else`?.text?.endsWith("Shape") == true
+            // MaterialTheme.shapes.x or LocalShapes.current.x or AppShapes.x or MyThemeShapes.x
+            is KtDotQualifiedExpression -> expression.text.startsWith("MaterialTheme.shapes") ||
+                expression.text.contains("Shape")
+
             else -> false
         }
 

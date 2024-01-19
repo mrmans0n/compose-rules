@@ -39,6 +39,12 @@ class ModifierClickableOrderCheckTest {
                     Something7(
                         modifier = bananaModifier.clickable { }.clip(shape = RoundedCornerShape(8.dp))
                     )
+                    Something8(
+                        modifier = bananaModifier.clickable { }.clip(Potato)
+                    )
+                    Something9(
+                        modifier = bananaModifier.clickable { }.background(MaterialTheme.shapes.large)
+                    )
                 }
             """.trimIndent()
 
@@ -51,6 +57,8 @@ class ModifierClickableOrderCheckTest {
                 SourceLocation(13, 47),
                 SourceLocation(16, 18),
                 SourceLocation(19, 35),
+                SourceLocation(22, 35),
+                SourceLocation(25, 35),
             )
 
         assertThat(errors[0]).hasMessage(ModifierClickableOrder.ModifierChainWithSuspiciousOrder)

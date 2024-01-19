@@ -37,6 +37,12 @@ class ModifierClickableOrderCheckTest {
                     Something7(
                         modifier = bananaModifier.clickable { }.clip(shape = RoundedCornerShape(8.dp))
                     )
+                    Something8(
+                        modifier = bananaModifier.clickable { }.clip(Potato)
+                    )
+                    Something9(
+                        modifier = bananaModifier.clickable { }.background(MaterialTheme.shapes.large)
+                    )
                 }
             """.trimIndent()
         modifierRuleAssertThat(code).hasLintViolationsWithoutAutoCorrect(
@@ -67,6 +73,16 @@ class ModifierClickableOrderCheckTest {
             ),
             LintViolation(
                 line = 19,
+                col = 35,
+                detail = ModifierClickableOrder.ModifierChainWithSuspiciousOrder,
+            ),
+            LintViolation(
+                line = 22,
+                col = 35,
+                detail = ModifierClickableOrder.ModifierChainWithSuspiciousOrder,
+            ),
+            LintViolation(
+                line = 25,
                 col = 35,
                 detail = ModifierClickableOrder.ModifierChainWithSuspiciousOrder,
             ),
