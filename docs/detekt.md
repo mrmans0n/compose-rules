@@ -42,6 +42,10 @@ Compose:
     # contentEmitters: MyComposable,MyOtherComposable
   DefaultsVisibility:
     active: true
+  LambdaParameterInRestartableEffect:
+    active: true
+    # -- You can optionally have a list of types to be treated as lambdas (e.g. typedefs or fun interfaces not picked up automatically)
+    # treatAsLambda: MyLambdaType
   ModifierClickableOrder:
     active: true
     # -- You can optionally add your own Modifier types

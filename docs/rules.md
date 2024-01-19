@@ -88,6 +88,60 @@ More info: [Compose API guidelines](https://android.googlesource.com/platform/fr
 
 Related rule: [compose:mutable-state-param-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/MutableStateParameter.kt)
 
+### Be mindful of the arguments you use inside of a restarting effect
+
+In Compose, effects like `LaunchedEffect`, `produceState`, or `DisposableEffect` can take multiple keys as arguments to control when the effect restarts. The typical form for these APIs is:
+
+```kotlin
+    EffectName(key1, key2, key3, ...) { block }
+```
+Using the wrong keys to restart the effect can lead to:
+
+- Bugs if the effect restarts less often than needed.
+- Inefficiency if the effect restarts more often than necessary.
+
+To ensure proper behavior:
+
+- Include mutable and immutable variables from the effect block as parameters.
+- Additional parameters can be added for explicit restart control.
+- Use `rememberUpdatedState` to prevent unnecessary restarts.
+  - This is usually useful whenever it wouldn't be a good idea to restart the effect, e.g. it's invoked inside of a flow collector method.
+- If a variable never changes due to remember with no keys, no need to pass it as a key to the effect.
+
+Let's see some sample cases.
+
+```kotlin
+    // ❌ onClick changes, but the effect won't be pointing to the right one!
+    @Composable
+    fun MyComposable(onClick: () -> Unit) {
+        LaunchedEffect(Unit) {
+            onClick()
+        }
+        // ...
+    }
+    // ✅ onClick changes and the LaunchedEffect won't be rebuilt -- but will point at the correct onClick!
+    @Composable
+    fun MyComposable(onClick: () -> Unit) {
+        val latestOnClick by rememberUpdatedState(onClick)
+        LaunchedEffect(Unit) {
+            latestOnClick()
+        }
+        // ...
+    }
+    // ✅ _If we don't care about rebuilding the effect_, we can also use the parameter as key
+    @Composable
+    fun MyComposable(onClick: () -> Unit) {
+        // This effect will be rebuilt every time onClick changes, so it will always point to the latest one.
+        LaunchedEffect(onClick) {
+            onClick()
+        }
+    }
+```
+
+More info: [Restarting effects](https://developer.android.com/jetpack/compose/side-effects#restarting-effects) and [rememberUpdatedState](https://developer.android.com/jetpack/compose/side-effects#rememberupdatedstate)
+
+Related rule: [compose:lambda-param-in-effect](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/LambdaParameterInRestartableEffect.kt)
+
 ### Do not emit content and return a result
 
 Composable functions should either emit layout content, or return a value, but not both.
