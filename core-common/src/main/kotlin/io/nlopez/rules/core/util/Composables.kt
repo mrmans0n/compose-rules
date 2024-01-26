@@ -10,6 +10,7 @@ import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.KtForExpression
 import org.jetbrains.kotlin.psi.KtFunction
 import org.jetbrains.kotlin.psi.KtProperty
+import org.jetbrains.kotlin.psi.KtSafeQualifiedExpression
 import org.jetbrains.kotlin.psi.psiUtil.referenceExpression
 
 context(ComposeKtConfig)
@@ -96,7 +97,21 @@ private val KtBlockExpression.forLoopHasUiEmitters: Boolean
 
 context(ComposeKtConfig)
 private val KtBlockExpression.directUiEmitterCount: Int
-    get() = statements.filterIsInstance<KtCallExpression>().count { it.emitsContent }
+    get() {
+        val sequence = statements.asSequence()
+        val callExpressionCount = sequence.filterIsInstance<KtCallExpression>().count { it.emitsContent }
+        val safeLetCallExpressionCount = sequence.filterIsInstance<KtSafeQualifiedExpression>()
+            .mapNotNull { it.selectorExpression as? KtCallExpression }
+            // ?.let { ... }
+            .filter { it.calleeExpression?.text == "let" }
+            .mapNotNull { it.lambdaArguments.singleOrNull() }
+            // Recursive call to the let code block
+            .mapNotNull { it.getLambdaExpression()?.bodyExpression?.directUiEmitterCount }
+            // Sum all values
+            .fold(0) { acc, next -> acc + next }
+
+        return callExpressionCount + safeLetCallExpressionCount
+    }
 
 context(ComposeKtConfig)
 private fun KtFunction.indirectUiEmitterCount(mapping: Map<KtFunction, Int>): Int {

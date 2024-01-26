@@ -95,12 +95,18 @@ class MultipleContentEmittersCheckTest {
                     Spacer()
                     Text("Hola")
                 }
+                @Composable
+                fun Something(title: String?, subtitle: String?) {
+                    title?.let { Text(title) }
+                    subtitle?.let { Text(subtitle) }
+                }
             """.trimIndent()
         val errors = rule.lint(code)
         assertThat(errors)
             .hasStartSourceLocations(
                 SourceLocation(2, 5),
                 SourceLocation(7, 5),
+                SourceLocation(12, 5),
             )
         for (error in errors) {
             assertThat(error).hasMessage(MultipleContentEmitters.MultipleContentEmittersDetected)

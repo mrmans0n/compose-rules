@@ -86,6 +86,11 @@ class MultipleContentEmittersCheckTest {
                     Spacer()
                     Text("Hola")
                 }
+                @Composable
+                fun Something(title: String?, subtitle: String?) {
+                    title?.let { Text(title) }
+                    subtitle?.let { Text(subtitle) }
+                }
             """.trimIndent()
         emittersRuleAssertThat(code).hasLintViolationsWithoutAutoCorrect(
             LintViolation(
@@ -95,6 +100,11 @@ class MultipleContentEmittersCheckTest {
             ),
             LintViolation(
                 line = 7,
+                col = 5,
+                detail = MultipleContentEmitters.MultipleContentEmittersDetected,
+            ),
+            LintViolation(
+                line = 12,
                 col = 5,
                 detail = MultipleContentEmitters.MultipleContentEmittersDetected,
             ),
