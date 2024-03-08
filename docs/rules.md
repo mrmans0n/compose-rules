@@ -35,7 +35,8 @@ Related rule: TBD
 Collections are defined as interfaces (e.g. `List<T>`, `Map<T>`, `Set<T>`) in Kotlin, which can't guarantee that they are actually immutable. For example, you could write:
 
 ```kotlin
-    val list: List<String> = mutableListOf<String>()
+// ❌ The compiler won't be able to infer that the list is immutable
+val list: List<String> = mutableListOf<String>()
 ```
 
 The variable is constant, its declared type is not mutable but its implementation is still mutable. The Compose compiler cannot be sure of the immutability of this class as it just sees the declared type and as such declares it as unstable.
@@ -45,16 +46,18 @@ To force the compiler to see a collection as truly 'immutable' you have a couple
 You can use [Kotlinx Immutable Collections](https://github.com/Kotlin/kotlinx.collections.immutable):
 
 ```kotlin
-    val list: ImmutableList<String> = persistentListOf<String>()
+// ✅ The compiler knows that this list is immutable
+val list: ImmutableList<String> = persistentListOf<String>()
 ```
 
 Alternatively, you can wrap your collection in an annotated stable class to mark it as immutable for the Compose compiler.
 
 ```kotlin
-    @Immutable
-    data class StringList(val items: List<String>)
-    // ...
-    val list: StringList = StringList(yourList)
+// ✅ The compiler knows that this class is immutable
+@Immutable
+data class StringList(val items: List<String>)
+// ...
+val list: StringList = StringList(yourList)
 ```
 > **Note**: It is preferred to use Kotlinx Immutable Collections for this. As you can see, the wrapped case only includes the immutability promise with the annotation, but the underlying List is still mutable.
 
@@ -93,7 +96,7 @@ Related rule: [compose:mutable-state-param-check](https://github.com/mrmans0n/co
 In Compose, effects like `LaunchedEffect`, `produceState`, or `DisposableEffect` can take multiple keys as arguments to control when the effect restarts. The typical form for these APIs is:
 
 ```kotlin
-    EffectName(key1, key2, key3, ...) { block }
+EffectName(key1, key2, key3, ...) { block }
 ```
 Using the wrong keys to restart the effect can lead to:
 
@@ -111,31 +114,31 @@ To ensure proper behavior:
 Let's see some sample cases.
 
 ```kotlin
-    // ❌ onClick changes, but the effect won't be pointing to the right one!
-    @Composable
-    fun MyComposable(onClick: () -> Unit) {
-        LaunchedEffect(Unit) {
-            onClick()
-        }
-        // ...
+// ❌ onClick changes, but the effect won't be pointing to the right one!
+@Composable
+fun MyComposable(onClick: () -> Unit) {
+    LaunchedEffect(Unit) {
+        onClick()
     }
-    // ✅ onClick changes and the LaunchedEffect won't be rebuilt -- but will point at the correct onClick!
-    @Composable
-    fun MyComposable(onClick: () -> Unit) {
-        val latestOnClick by rememberUpdatedState(onClick)
-        LaunchedEffect(Unit) {
-            latestOnClick()
-        }
-        // ...
+    // ...
+}
+// ✅ onClick changes and the LaunchedEffect won't be rebuilt -- but will point at the correct onClick!
+@Composable
+fun MyComposable(onClick: () -> Unit) {
+    val latestOnClick by rememberUpdatedState(onClick)
+    LaunchedEffect(Unit) {
+        latestOnClick()
     }
-    // ✅ _If we don't care about rebuilding the effect_, we can also use the parameter as key
-    @Composable
-    fun MyComposable(onClick: () -> Unit) {
-        // This effect will be rebuilt every time onClick changes, so it will always point to the latest one.
-        LaunchedEffect(onClick) {
-            onClick()
-        }
+    // ...
+}
+// ✅ _If we don't care about rebuilding the effect_, we can also use the parameter as key
+@Composable
+fun MyComposable(onClick: () -> Unit) {
+    // This effect will be rebuilt every time onClick changes, so it will always point to the latest one.
+    LaunchedEffect(onClick) {
+        onClick()
     }
+}
 ```
 
 More info: [Restarting effects](https://developer.android.com/jetpack/compose/side-effects#restarting-effects) and [rememberUpdatedState](https://developer.android.com/jetpack/compose/side-effects#rememberupdatedstate)
@@ -158,13 +161,18 @@ Related rule: [compose:content-emitter-returning-values-check](https://github.co
 
 A composable function should emit either 0 or 1 pieces of layout, but no more. A composable function should be cohesive, and not rely on what function it is called from.
 
-You can see an example of what not to do below. `InnerContent()` emits a number of layout nodes and assumes that it will be called from a Column:
+You can see an example of what not to do below. `InnerContent()` emits a number of layout nodes and assumes that it will be called from a `Column`:
 
 ```kotlin
+// This will render:
+// <text>
+// <image>
+// <button>
 Column {
     InnerContent()
 }
 
+// ❌ Unclear UI, as we emit multiple pieces of content at the same time
 @Composable
 private fun InnerContent() {
     Text(...)
@@ -173,9 +181,23 @@ private fun InnerContent() {
 }
 ```
 
-However InnerContent could just as easily be called from a Row which would break all assumptions. Instead, InnerContent should be cohesive and emit a single layout node itself:
+However InnerContent could just as easily be called from a `Row` or a `Box` which would break all assumptions. Some other examples of interaction with `InnerContent` could be:
 
 ```kotlin
+// ❌ This will render: <text><image><button>
+Row {
+    InnerContent()
+}
+// ❌ This will render all elements on top of each other.
+Box {
+    InnerContent()
+}
+```
+
+Instead, InnerContent should be cohesive and emit a single layout node itself:
+
+```kotlin
+// ✅
 @Composable
 private fun InnerContent() {
     Column {
@@ -189,6 +211,7 @@ Nesting of layouts has a drastically lower cost vs the view system, so developer
 
 There is a slight exception to this rule, which is when the function is defined as an extension function of an appropriate scope, like so:
 ```kotlin
+// ✅
 @Composable
 private fun ColumnScope.InnerContent() {
     Text(...)
@@ -264,6 +287,7 @@ To solve this problem, you should inject these dependencies as default values in
 Let's see it with an example.
 
 ```kotlin
+// ❌ The VM dependency is implicit here.
 @Composable
 private fun MyComposable() {
     val viewModel = viewModel<MyViewModel>()
@@ -275,6 +299,7 @@ In this composable, the dependencies are implicit. When testing it you would nee
 But, if you change it to pass these instances via the composable function parameters, you could provide the instance you want directly in your tests without any extra effort. It would also have the upside of the function being explicit about its external dependencies in its signature.
 
 ```kotlin
+// ✅ The VM dependency is explicit
 @Composable
 private fun MyComposable(
     viewModel: MyViewModel = viewModel(),
@@ -322,6 +347,7 @@ Related rule: [compose:modifier-missing-check](https://github.com/mrmans0n/compo
 The order of modifier functions is very important. Each function makes changes to the Modifier returned by the previous function, the sequence affects the final result. Let's see an example of this:
 
 ```kotlin
+// ❌ The UI will be off, as the pressed state ripple will extend beyond the intended shape
 @Composable
 fun MyCard(modifier: Modifier = Modifier) {
     Column(
@@ -342,6 +368,7 @@ The entire area, including the clipped area and the clipped background, responds
 We can address this by simply reordering the modifiers.
 
 ```kotlin
+// ✅ The UI will be now correct, as the pressed state ripple will have the same shape as the element
 @Composable
 fun MyCard(modifier: Modifier = Modifier) {
     Column(
@@ -378,6 +405,7 @@ Modifiers which are passed in are designed so that they should be used by a sing
 In the following example we've exposed a public modifier parameter, and then passed it to the root Column, but we've also passed it to each of the descendant calls, with some extra modifiers on top:
 
 ```kotlin
+// ❌ When changing `modifier` at the call site, it will the whole layout in unintended ways
 @Composable
 private fun InnerContent(modifier: Modifier = Modifier) {
     Column(modifier) {
@@ -390,6 +418,7 @@ private fun InnerContent(modifier: Modifier = Modifier) {
 This is not recommended. Instead, the provided modifier should only be used on the Column. The descendant calls should use newly built modifiers, by using the empty Modifier object:
 
 ```kotlin
+// ✅ When changing `modifier` at the call site, it will only affect the external container of the UI
 @Composable
 private fun InnerContent(modifier: Modifier = Modifier) {
     Column(modifier) {
