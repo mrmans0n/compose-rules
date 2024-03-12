@@ -23,6 +23,6 @@ reflections = "org.reflections:reflections:0.10.2"
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
-mavenPublish = "com.vanniktech.maven.publish:0.27.0"
+mavenPublish = "com.vanniktech.maven.publish:0.28.0"
 spotless = { id = "com.diffplug.spotless", version = "6.25.0" }
 shadowJar = { id = "com.github.johnrengelman.shadow", version = "8.1.1" }
