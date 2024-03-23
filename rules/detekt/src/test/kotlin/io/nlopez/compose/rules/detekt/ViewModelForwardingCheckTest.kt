@@ -97,6 +97,191 @@ class ViewModelForwardingCheckTest {
     }
 
     @Test
+    fun `errors when a ViewModel is forwarded to another Composable within a with scope`() {
+        @Language("kotlin")
+        val code =
+            """
+            @Composable
+            fun MyComposable(viewModel: MyViewModel) {
+                with(viewModel) {
+                    AnotherComposable(this)
+                }
+            }
+            @Composable
+            fun MyComposable2(viewModel: MyViewModel) {
+                with(viewModel) {
+                    Row {
+                        AnotherComposable(this)
+                    }
+                }
+            }
+            @Composable
+            fun MyComposable3(viewModel: MyViewModel) {
+                with(viewModel) {
+                    AnotherComposable(vm = this)
+                }
+            }
+            """.trimIndent()
+        val errors = rule.lint(code)
+        assertThat(errors).hasStartSourceLocations(
+            SourceLocation(4, 9),
+            SourceLocation(11, 13),
+            SourceLocation(18, 9),
+        )
+        for (error in errors) {
+            assertThat(error).hasMessage(ViewModelForwarding.AvoidViewModelForwarding)
+        }
+    }
+
+    @Test
+    fun `errors when a ViewModel is forwarded to another Composable within an apply scope`() {
+        @Language("kotlin")
+        val code =
+            """
+            @Composable
+            fun MyComposable(viewModel: MyViewModel) {
+                viewModel.apply {
+                    AnotherComposable(this)
+                }
+            }
+            @Composable
+            fun MyComposable2(viewModel: MyViewModel) {
+                viewModel.apply {
+                    Row {
+                        AnotherComposable(this)
+                    }
+                }
+            }
+            @Composable
+            fun MyComposable3(viewModel: MyViewModel) {
+                viewModel.apply {
+                    AnotherComposable(vm = this)
+                }
+            }
+            """.trimIndent()
+        val errors = rule.lint(code)
+        assertThat(errors).hasStartSourceLocations(
+            SourceLocation(4, 9),
+            SourceLocation(11, 13),
+            SourceLocation(18, 9),
+        )
+        for (error in errors) {
+            assertThat(error).hasMessage(ViewModelForwarding.AvoidViewModelForwarding)
+        }
+    }
+
+    @Test
+    fun `errors when a ViewModel is forwarded to another Composable within a run scope`() {
+        @Language("kotlin")
+        val code =
+            """
+            @Composable
+            fun MyComposable(viewModel: MyViewModel) {
+                viewModel.run {
+                    AnotherComposable(this)
+                }
+            }
+            @Composable
+            fun MyComposable2(viewModel: MyViewModel) {
+                viewModel.run {
+                    Row {
+                        AnotherComposable(this)
+                    }
+                }
+            }
+            @Composable
+            fun MyComposable3(viewModel: MyViewModel) {
+                viewModel.run {
+                    AnotherComposable(vm = this)
+                }
+            }
+            """.trimIndent()
+        val errors = rule.lint(code)
+        assertThat(errors).hasStartSourceLocations(
+            SourceLocation(4, 9),
+            SourceLocation(11, 13),
+            SourceLocation(18, 9),
+        )
+        for (error in errors) {
+            assertThat(error).hasMessage(ViewModelForwarding.AvoidViewModelForwarding)
+        }
+    }
+
+    @Test
+    fun `errors when a ViewModel is forwarded to another Composable within a let scope`() {
+        @Language("kotlin")
+        val code =
+            """
+            @Composable
+            fun MyComposable(viewModel: MyViewModel) {
+                viewModel.let {
+                    AnotherComposable(it)
+                }
+            }
+            @Composable
+            fun MyComposable2(viewModel: MyViewModel) {
+                viewModel.let {
+                    Row {
+                        AnotherComposable(it)
+                    }
+                }
+            }
+            @Composable
+            fun MyComposable3(viewModel: MyViewModel) {
+                viewModel.let {
+                    AnotherComposable(vm = it)
+                }
+            }
+            """.trimIndent()
+        val errors = rule.lint(code)
+        assertThat(errors).hasStartSourceLocations(
+            SourceLocation(4, 9),
+            SourceLocation(11, 13),
+            SourceLocation(18, 9),
+        )
+        for (error in errors) {
+            assertThat(error).hasMessage(ViewModelForwarding.AvoidViewModelForwarding)
+        }
+    }
+
+    @Test
+    fun `errors when a ViewModel is forwarded to another Composable within a also scope`() {
+        @Language("kotlin")
+        val code =
+            """
+            @Composable
+            fun MyComposable(viewModel: MyViewModel) {
+                viewModel.also {
+                    AnotherComposable(it)
+                }
+            }
+            @Composable
+            fun MyComposable2(viewModel: MyViewModel) {
+                viewModel.also {
+                    Row {
+                        AnotherComposable(it)
+                    }
+                }
+            }
+            @Composable
+            fun MyComposable3(viewModel: MyViewModel) {
+                viewModel.also {
+                    AnotherComposable(vm = it)
+                }
+            }
+            """.trimIndent()
+        val errors = rule.lint(code)
+        assertThat(errors).hasStartSourceLocations(
+            SourceLocation(4, 9),
+            SourceLocation(11, 13),
+            SourceLocation(18, 9),
+        )
+        for (error in errors) {
+            assertThat(error).hasMessage(ViewModelForwarding.AvoidViewModelForwarding)
+        }
+    }
+
+    @Test
     fun `allows the forwarding of ViewModels that are used as keys`() {
         @Language("kotlin")
         val code =
