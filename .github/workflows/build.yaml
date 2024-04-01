@@ -77,7 +77,7 @@ jobs:
         run: echo "VERSION=$(./gradlew -q printVersion)" >> $GITHUB_ENV
 
       - name: Publish release
-        run: ./gradlew closeAndReleaseRepository
+        run: ./gradlew releaseRepository
         if: success() && !endsWith(env.VERSION, '-SNAPSHOT')
         env:
             ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
