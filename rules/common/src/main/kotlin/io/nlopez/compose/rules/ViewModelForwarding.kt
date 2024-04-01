@@ -63,15 +63,15 @@ class ViewModelForwarding : ComposeKtVisitor {
             .mapNotNull { it.name }
             .toSet()
 
-        val checkedCallExpressions = HashSet<KtCallExpression>()
+        val checkedCallExpressions = mutableSetOf<KtCallExpression>()
         fun checkCallExpressions(
-            bodyExpression: KtBlockExpression?,
+            bodyExpression: KtBlockExpression,
             scopedParameter: String? = null,
             usesItObjectRef: Boolean = false,
         ) {
-            bodyExpression?.findChildrenByClass<KtCallExpression>()
-                ?.filterNot { it in checkedCallExpressions }
-                ?.forEach { callExpression ->
+            bodyExpression.findChildrenByClass<KtCallExpression>()
+                .filterNot { it in checkedCallExpressions }
+                .forEach { callExpression ->
                     checkedCallExpressions.add(callExpression)
                     // We want now to see if these parameter names are used in any other calls to functions that start with
                     // a capital letter (so, most likely, composables).
@@ -106,11 +106,10 @@ class ViewModelForwarding : ComposeKtVisitor {
                             }
                     }
 
-                    val scopedFunctions = setOf("with", "apply", "run", "also", "let")
                     // Check if the call is a scope function
                     if (callExpression.calleeExpression is KtNameReferenceExpression &&
                         (callExpression.calleeExpression as KtNameReferenceExpression)
-                            .getReferencedName() in scopedFunctions
+                            .getReferencedName() in scopeFunctions
                     ) {
                         callExpression.lambdaArguments
                             .mapNotNull { it.getLambdaExpression()?.bodyExpression }
@@ -131,7 +130,7 @@ class ViewModelForwarding : ComposeKtVisitor {
         get() = (calleeExpression as? KtNameReferenceExpression)?.getReferencedName() == "with"
 
     private val KtCallExpression.hasItObjectReference: Boolean
-        get() = (calleeExpression as? KtNameReferenceExpression)?.getReferencedName() in setOf("let", "also")
+        get() = (calleeExpression as? KtNameReferenceExpression)?.getReferencedName() in itObjectScopeFunctions
 
     private fun KtCallExpression.getScopedParameterValue(default: String?): String? {
         return when {
@@ -143,6 +142,8 @@ class ViewModelForwarding : ComposeKtVisitor {
 
     companion object {
         private val defaultStateHolderNames = listOf(".*ViewModel", ".*Presenter")
+        private val scopeFunctions = setOf("with", "apply", "run", "also", "let")
+        private val itObjectScopeFunctions = setOf("let", "also")
         val AvoidViewModelForwarding = """
             Forwarding a ViewModel/Presenter through multiple @Composable functions should be avoided. Consider using state hoisting.
 
