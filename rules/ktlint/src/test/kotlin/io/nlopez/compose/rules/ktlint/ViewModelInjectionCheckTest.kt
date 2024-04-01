@@ -49,7 +49,7 @@ class ViewModelInjectionCheckTest {
 
     @ParameterizedTest
     @ValueSource(strings = ["viewModel", "weaverViewModel", "hiltViewModel", "bananaViewModel", "potatoViewModel"])
-    fun `errors when a weaverViewModel is used at the beginning of a Composable`(viewModel: String) {
+    fun `errors when a viewModel is used at the beginning of a Composable`(viewModel: String) {
         @Language("kotlin")
         val code =
             """
@@ -89,7 +89,27 @@ class ViewModelInjectionCheckTest {
 
     @ParameterizedTest
     @ValueSource(strings = ["viewModel", "weaverViewModel", "hiltViewModel", "bananaViewModel", "potatoViewModel"])
-    fun `errors when a weaverViewModel is used in different branches`(viewModel: String) {
+    fun `passes when a viewModel is used inside the navigation DSL`(viewModel: String) {
+        @Language("kotlin")
+        val code =
+            """
+            @Composable
+            fun MyComposable(modifier: Modifier) {
+                NavHost() {
+                    composable("bleh") {
+                        val viewModel = $viewModel<MyVM>()
+                    }
+                }
+            }
+            """.trimIndent()
+        injectionRuleAssertThat(code)
+            .withEditorConfigOverride(viewModelFactories to "bananaViewModel,potatoViewModel")
+            .hasNoLintViolations()
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = ["viewModel", "weaverViewModel", "hiltViewModel", "bananaViewModel", "potatoViewModel"])
+    fun `errors when a viewModel is used in different branches`(viewModel: String) {
         @Language("kotlin")
         val code =
             """
@@ -127,19 +147,12 @@ class ViewModelInjectionCheckTest {
             fun MyComposableNoParams() {
                 val viewModel: MyVM = $viewModel()
             }
-            @Composable
-            fun MyComposableNoParams() {
-                val viewModel: MyVM = $viewModel(named = "meh")
-            }
         """.trimIndent()
 
         @Language("kotlin")
         val expectedCode = """
             @Composable
             fun MyComposableNoParams(viewModel: MyVM = $viewModel()) {
-            }
-            @Composable
-            fun MyComposableNoParams(viewModel: MyVM = $viewModel(named = "meh")) {
             }
         """.trimIndent()
 

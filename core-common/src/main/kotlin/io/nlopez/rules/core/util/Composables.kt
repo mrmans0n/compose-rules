@@ -11,6 +11,7 @@ import org.jetbrains.kotlin.psi.KtForExpression
 import org.jetbrains.kotlin.psi.KtFunction
 import org.jetbrains.kotlin.psi.KtProperty
 import org.jetbrains.kotlin.psi.KtSafeQualifiedExpression
+import org.jetbrains.kotlin.psi.psiUtil.parents
 import org.jetbrains.kotlin.psi.psiUtil.referenceExpression
 
 context(ComposeKtConfig)
@@ -263,13 +264,7 @@ private val RestartableEffects by lazy(LazyThreadSafetyMode.NONE) {
     )
 }
 
-fun KtCallExpression.isRemembered(stopAt: PsiElement): Boolean {
-    var current: PsiElement = parent
-    while (current != stopAt) {
-        (current as? KtCallExpression)?.let { callExpression ->
-            if (callExpression.calleeExpression?.text?.startsWith("remember") == true) return true
-        }
-        current = current.parent
-    }
-    return false
-}
+fun KtCallExpression.isRemembered(stopAt: PsiElement): Boolean = parents
+    .takeWhile { it != stopAt }
+    .filterIsInstance<KtCallExpression>()
+    .any { it.calleeExpression?.text?.startsWith("remember") == true }

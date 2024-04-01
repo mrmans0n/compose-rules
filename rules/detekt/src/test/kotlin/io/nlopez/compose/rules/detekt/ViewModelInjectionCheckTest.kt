@@ -51,7 +51,7 @@ class ViewModelInjectionCheckTest {
 
     @ParameterizedTest
     @ValueSource(strings = ["viewModel", "weaverViewModel", "hiltViewModel", "bananaViewModel", "potatoViewModel"])
-    fun `errors when a weaverViewModel is used at the beginning of a Composable`(viewModel: String) {
+    fun `errors when a viewModel is used at the beginning of a Composable`(viewModel: String) {
         @Language("kotlin")
         val code =
             """
@@ -82,7 +82,26 @@ class ViewModelInjectionCheckTest {
 
     @ParameterizedTest
     @ValueSource(strings = ["viewModel", "weaverViewModel", "hiltViewModel", "bananaViewModel", "potatoViewModel"])
-    fun `errors when a weaverViewModel is used in different branches`(viewModel: String) {
+    fun `passes when a viewModel is used inside the navigation DSL`(viewModel: String) {
+        @Language("kotlin")
+        val code =
+            """
+            @Composable
+            fun MyComposable(modifier: Modifier) {
+                NavHost() {
+                    composable("bleh") {
+                        val viewModel = $viewModel<MyVM>()
+                    }
+                }
+            }
+            """.trimIndent()
+        val errors = rule.lint(code)
+        assertThat(errors).isEmpty()
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = ["viewModel", "weaverViewModel", "hiltViewModel", "bananaViewModel", "potatoViewModel"])
+    fun `errors when a viewModel is used in different branches`(viewModel: String) {
         @Language("kotlin")
         val code =
             """

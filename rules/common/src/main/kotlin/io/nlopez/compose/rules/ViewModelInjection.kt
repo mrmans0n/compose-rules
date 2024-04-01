@@ -13,6 +13,7 @@ import io.nlopez.rules.core.util.firstChildLeafOrSelf
 import io.nlopez.rules.core.util.isOverride
 import io.nlopez.rules.core.util.lastChildLeafOrSelf
 import io.nlopez.rules.core.util.nextCodeSibling
+import org.jetbrains.kotlin.com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.com.intellij.psi.impl.source.tree.ElementType
 import org.jetbrains.kotlin.com.intellij.psi.impl.source.tree.LeafPsiElement
 import org.jetbrains.kotlin.psi.KtCallExpression
@@ -20,6 +21,7 @@ import org.jetbrains.kotlin.psi.KtFunction
 import org.jetbrains.kotlin.psi.KtFunctionType
 import org.jetbrains.kotlin.psi.KtProperty
 import org.jetbrains.kotlin.psi.KtPsiFactory
+import org.jetbrains.kotlin.psi.psiUtil.parents
 
 class ViewModelInjection : ComposeKtVisitor {
 
@@ -40,6 +42,7 @@ class ViewModelInjection : ComposeKtVisitor {
             .flatMap { property ->
                 property.findDirectChildrenByClass<KtCallExpression>()
                     .filter { it.calleeExpression?.text in knownViewModelFactories }
+                    .filterNot { it.isNavigation(bodyBlock) }
                     .map { property to it.calleeExpression!!.text }
             }
             .forEach { (property, viewModelFactoryName) ->
@@ -55,6 +58,10 @@ class ViewModelInjection : ComposeKtVisitor {
         val variableName = property.name
         val callExpression = property.findDirectFirstChildByClass<KtCallExpression>() ?: return
         val argumentList = callExpression.valueArgumentList ?: return
+
+        // With factories with params, we can't know for sure if they'll continue working (they might have not be accessible
+        // from the composable params). Let's filter them out.
+        if (callExpression.valueArguments.isNotEmpty()) return
 
         // We also want the ViewModel type, with two possibilities to support:
         // val viewModel : VM = viewModel(...)
@@ -126,7 +133,19 @@ class ViewModelInjection : ComposeKtVisitor {
         property.delete()
     }
 
+    private fun KtCallExpression.isNavigation(stopAt: PsiElement): Boolean = parents
+        .takeWhile { it != stopAt }
+        .filterIsInstance<KtCallExpression>()
+        .any { it.calleeExpression?.text in KnownNavigationCallExpressions }
+
     companion object {
+        private val KnownNavigationCallExpressions by lazy {
+            setOf(
+                // androidx navigation
+                "composable",
+                "NavHost",
+            )
+        }
 
         private val DefaultKnownViewModelFactories by lazy {
             setOf(
