@@ -54,6 +54,10 @@ Compose:
     active: true
     # -- You can optionally add your own Modifier types
     # customModifiers: BananaModifier,PotatoModifier
+  ModifierComposed:
+    active: true
+    # -- You can optionally add your own Modifier types
+    # customModifiers: BananaModifier,PotatoModifier
   ModifierMissing:
     active: true
     # -- You can optionally control the visibility of which composables to check for here

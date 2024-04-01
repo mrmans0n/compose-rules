@@ -451,11 +451,13 @@ Related rule: [compose:modifier-naming](https://github.com/mrmans0n/compose-rule
 
 ### Avoid Modifier extension factory functions
 
-Using `@Composable` builder functions for modifiers is not recommended, as they cause unnecessary recompositions. To avoid this, you should use [Modifier.Node](https://developer.android.com/reference/kotlin/androidx/compose/ui/Modifier.Node) instead. It will allow you to accomplish the same things while being very performant, and not using a `@Composable` unnecessarily. In instances where `Modifier.Node` is not fit for the job, you can still rely on the [composed](https://developer.android.com/reference/kotlin/androidx/compose/ui/package-summary#(androidx.compose.ui.Modifier).composed(kotlin.Function1,kotlin.Function1)) modifier.
+Using `@Composable` builder functions for modifiers is not recommended, as they cause unnecessary recompositions. To avoid this, you should use [Modifier.Node](https://developer.android.com/reference/kotlin/androidx/compose/ui/Modifier.Node) instead. It will allow you to accomplish the same things while being very performant.
+
+There is another API for creating custom modifiers, `composed {}`. This API is no longer recommended due to the performance issues it created, and like with the extension factory functions case, Modifier.Node is recommended instead.
 
 More info: [Modifier.Node](https://developer.android.com/reference/kotlin/androidx/compose/ui/Modifier.Node), [Compose Modifier.Node and where to find it, by Merab Tato Kutalia](https://proandroiddev.com/compose-modifier-node-and-where-to-find-it-merab-tato-kutalia-66f891c0e8), [Compose modifiers deep dive, with Leland Richardson](https://www.youtube.com/watch?v=BjGX2RftXsU) and [Composed modifier docs](https://developer.android.com/reference/kotlin/androidx/compose/ui/package-summary#(androidx.compose.ui.Modifier).composed(kotlin.Function1,kotlin.Function1)).
 
-Related rule: [compose:modifier-composable-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierComposable.kt)
+Related rules: [compose:modifier-composable-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierComposable.kt) and [compose:modifier-composed-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierComposed.kt)
 
 ## ComponentDefaults
 

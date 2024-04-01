@@ -19,6 +19,8 @@ Compose:
     active: true
   ModifierComposable:
     active: true
+  ModifierComposed:
+    active: true
   ModifierMissing:
     active: true
   ModifierNaming:

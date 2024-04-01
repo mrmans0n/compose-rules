@@ -19,6 +19,7 @@ class ComposeRuleSetProvider : RuleSetProviderV3(
         RuleProvider { LambdaParameterInRestartableEffectCheck() },
         RuleProvider { ModifierClickableOrderCheck() },
         RuleProvider { ModifierComposableCheck() },
+        RuleProvider { ModifierComposedCheck() },
         RuleProvider { ModifierMissingCheck() },
         RuleProvider { ModifierNamingCheck() },
         RuleProvider { ModifierNotUsedAtRootCheck() },
