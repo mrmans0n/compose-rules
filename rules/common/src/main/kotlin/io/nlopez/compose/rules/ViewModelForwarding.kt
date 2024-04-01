@@ -10,7 +10,6 @@ import io.nlopez.rules.core.util.findChildrenByClass
 import io.nlopez.rules.core.util.isActual
 import io.nlopez.rules.core.util.isOverride
 import io.nlopez.rules.core.util.isRestartableEffect
-import org.jetbrains.kotlin.psi.KtBlockExpression
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.KtFunction
