@@ -108,14 +108,6 @@ class ViewModelForwardingCheckTest {
                 }
             }
             @Composable
-            fun MyComposable2(viewModel: MyViewModel) {
-                with(viewModel) {
-                    Row {
-                        AnotherComposable(this)
-                    }
-                }
-            }
-            @Composable
             fun MyComposable3(viewModel: MyViewModel) {
                 with(viewModel) {
                     AnotherComposable(vm = this)
@@ -125,8 +117,7 @@ class ViewModelForwardingCheckTest {
         val errors = rule.lint(code)
         assertThat(errors).hasStartSourceLocations(
             SourceLocation(4, 9),
-            SourceLocation(11, 13),
-            SourceLocation(18, 9),
+            SourceLocation(10, 9),
         )
         for (error in errors) {
             assertThat(error).hasMessage(ViewModelForwarding.AvoidViewModelForwarding)
@@ -145,14 +136,6 @@ class ViewModelForwardingCheckTest {
                 }
             }
             @Composable
-            fun MyComposable2(viewModel: MyViewModel) {
-                viewModel.apply {
-                    Row {
-                        AnotherComposable(this)
-                    }
-                }
-            }
-            @Composable
             fun MyComposable3(viewModel: MyViewModel) {
                 viewModel.apply {
                     AnotherComposable(vm = this)
@@ -162,8 +145,7 @@ class ViewModelForwardingCheckTest {
         val errors = rule.lint(code)
         assertThat(errors).hasStartSourceLocations(
             SourceLocation(4, 9),
-            SourceLocation(11, 13),
-            SourceLocation(18, 9),
+            SourceLocation(10, 9),
         )
         for (error in errors) {
             assertThat(error).hasMessage(ViewModelForwarding.AvoidViewModelForwarding)
@@ -182,14 +164,6 @@ class ViewModelForwardingCheckTest {
                 }
             }
             @Composable
-            fun MyComposable2(viewModel: MyViewModel) {
-                viewModel.run {
-                    Row {
-                        AnotherComposable(this)
-                    }
-                }
-            }
-            @Composable
             fun MyComposable3(viewModel: MyViewModel) {
                 viewModel.run {
                     AnotherComposable(vm = this)
@@ -199,8 +173,7 @@ class ViewModelForwardingCheckTest {
         val errors = rule.lint(code)
         assertThat(errors).hasStartSourceLocations(
             SourceLocation(4, 9),
-            SourceLocation(11, 13),
-            SourceLocation(18, 9),
+            SourceLocation(10, 9),
         )
         for (error in errors) {
             assertThat(error).hasMessage(ViewModelForwarding.AvoidViewModelForwarding)
@@ -219,14 +192,6 @@ class ViewModelForwardingCheckTest {
                 }
             }
             @Composable
-            fun MyComposable2(viewModel: MyViewModel) {
-                viewModel.let {
-                    Row {
-                        AnotherComposable(it)
-                    }
-                }
-            }
-            @Composable
             fun MyComposable3(viewModel: MyViewModel) {
                 viewModel.let {
                     AnotherComposable(vm = it)
@@ -236,8 +201,7 @@ class ViewModelForwardingCheckTest {
         val errors = rule.lint(code)
         assertThat(errors).hasStartSourceLocations(
             SourceLocation(4, 9),
-            SourceLocation(11, 13),
-            SourceLocation(18, 9),
+            SourceLocation(10, 9),
         )
         for (error in errors) {
             assertThat(error).hasMessage(ViewModelForwarding.AvoidViewModelForwarding)
@@ -256,14 +220,6 @@ class ViewModelForwardingCheckTest {
                 }
             }
             @Composable
-            fun MyComposable2(viewModel: MyViewModel) {
-                viewModel.also {
-                    Row {
-                        AnotherComposable(it)
-                    }
-                }
-            }
-            @Composable
             fun MyComposable3(viewModel: MyViewModel) {
                 viewModel.also {
                     AnotherComposable(vm = it)
@@ -273,12 +229,61 @@ class ViewModelForwardingCheckTest {
         val errors = rule.lint(code)
         assertThat(errors).hasStartSourceLocations(
             SourceLocation(4, 9),
-            SourceLocation(11, 13),
-            SourceLocation(18, 9),
+            SourceLocation(10, 9),
         )
         for (error in errors) {
             assertThat(error).hasMessage(ViewModelForwarding.AvoidViewModelForwarding)
         }
+    }
+
+    @Test
+    fun `allows non first level scope functions`() {
+        @Language("kotlin")
+        val code =
+            """
+            @Composable
+            fun MyComposable(viewModel: MyViewModel) {
+                viewModel.also {
+                    Row {
+                        AnotherComposable(it)
+                    }
+                }
+            }
+            @Composable
+            fun MyComposable2(viewModel: MyViewModel) {
+                viewModel.let {
+                    SomeComposable {
+                        AnotherComposable(it)
+                    }
+                }
+            }
+            @Composable
+            fun MyComposable3(viewModel: MyViewModel) {
+                viewModel.run {
+                    Row {
+                        AnotherComposable(this)
+                    }
+                }
+            }
+            @Composable
+            fun MyComposable4(viewModel: MyViewModel) {
+                viewModel.apply {
+                    Row {
+                        AnotherComposable(this)
+                    }
+                }
+            }
+            @Composable
+            fun MyComposable5(viewModel: MyViewModel) {
+                with(viewModel) {
+                    SomeComposable {
+                        AnotherComposable(this)
+                    }
+                }
+            }
+            """.trimIndent()
+        val errors = rule.lint(code)
+        assertThat(errors).isEmpty()
     }
 
     @Test
