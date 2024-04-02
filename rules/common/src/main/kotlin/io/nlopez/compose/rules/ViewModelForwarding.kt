@@ -82,12 +82,11 @@ class ViewModelForwarding : ComposeKtVisitor {
                             lambdaBodyExpression.children
                                 .filterIsInstance<KtCallExpression>()
                                 .filterNot { it in checkedCallExpressions }
-                                .forEach { scopedCallExpression ->
-                                    // Recursively check the call expressions within the scope function
+                                .also { expressions ->
                                     checkCallExpressions(
                                         scopedParameter = callExpression.getScopedParameterValue(scopedParameter),
                                         usesItObjectRef = callExpression.hasItObjectReference,
-                                        callExpressions = sequenceOf(scopedCallExpression)
+                                        callExpressions = expressions.asSequence(),
                                     )
                                 }
                         }
@@ -128,7 +127,6 @@ class ViewModelForwarding : ComposeKtVisitor {
                 .forEach { callExpression ->
                     emitter.report(callExpression, AvoidViewModelForwarding, false)
                 }
-
         }
         val callExpressions = bodyBlock
             .findChildrenByClass<KtCallExpression>()
