@@ -98,6 +98,225 @@ class ViewModelForwardingCheckTest {
     }
 
     @Test
+    fun `errors when a ViewModel is forwarded to another Composable within a with scope`() {
+        @Language("kotlin")
+        val code =
+            """
+            @Composable
+            fun MyComposable(viewModel: MyViewModel) {
+                with(viewModel) {
+                    AnotherComposable(this)
+                }
+            }
+            @Composable
+            fun MyComposable3(viewModel: MyViewModel) {
+                with(viewModel) {
+                    AnotherComposable(vm = this)
+                }
+            }
+            """.trimIndent()
+        forwardingRuleAssertThat(code)
+            .withEditorConfigOverride(allowedStateHolderNames to ".*Component,.*ViewModel")
+            .hasLintViolationsWithoutAutoCorrect(
+                LintViolation(
+                    line = 4,
+                    col = 9,
+                    detail = ViewModelForwarding.AvoidViewModelForwarding,
+                ),
+                LintViolation(
+                    line = 10,
+                    col = 9,
+                    detail = ViewModelForwarding.AvoidViewModelForwarding,
+                ),
+            )
+    }
+
+    @Test
+    fun `errors when a ViewModel is forwarded to another Composable within an apply scope`() {
+        @Language("kotlin")
+        val code =
+            """
+            @Composable
+            fun MyComposable(viewModel: MyViewModel) {
+                viewModel.apply {
+                    AnotherComposable(this)
+                }
+            }
+            @Composable
+            fun MyComposable3(viewModel: MyViewModel) {
+                viewModel.apply {
+                    AnotherComposable(vm = this)
+                }
+            }
+            """.trimIndent()
+        forwardingRuleAssertThat(code)
+            .withEditorConfigOverride(allowedStateHolderNames to ".*Component,.*ViewModel")
+            .hasLintViolationsWithoutAutoCorrect(
+                LintViolation(
+                    line = 4,
+                    col = 9,
+                    detail = ViewModelForwarding.AvoidViewModelForwarding,
+                ),
+                LintViolation(
+                    line = 10,
+                    col = 9,
+                    detail = ViewModelForwarding.AvoidViewModelForwarding,
+                ),
+            )
+    }
+
+    @Test
+    fun `errors when a ViewModel is forwarded to another Composable within a run scope`() {
+        @Language("kotlin")
+        val code =
+            """
+            @Composable
+            fun MyComposable(viewModel: MyViewModel) {
+                viewModel.run {
+                    AnotherComposable(this)
+                }
+            }
+            @Composable
+            fun MyComposable3(viewModel: MyViewModel) {
+                viewModel.run {
+                    AnotherComposable(vm = this)
+                }
+            }
+            """.trimIndent()
+        forwardingRuleAssertThat(code)
+            .withEditorConfigOverride(allowedStateHolderNames to ".*Component,.*ViewModel")
+            .hasLintViolationsWithoutAutoCorrect(
+                LintViolation(
+                    line = 4,
+                    col = 9,
+                    detail = ViewModelForwarding.AvoidViewModelForwarding,
+                ),
+                LintViolation(
+                    line = 10,
+                    col = 9,
+                    detail = ViewModelForwarding.AvoidViewModelForwarding,
+                ),
+            )
+    }
+
+    @Test
+    fun `errors when a ViewModel is forwarded to another Composable within a let scope`() {
+        @Language("kotlin")
+        val code =
+            """
+            @Composable
+            fun MyComposable(viewModel: MyViewModel) {
+                viewModel.let {
+                    AnotherComposable(it)
+                }
+            }
+            @Composable
+            fun MyComposable3(viewModel: MyViewModel) {
+                viewModel.let {
+                    AnotherComposable(vm = it)
+                }
+            }
+            """.trimIndent()
+        forwardingRuleAssertThat(code)
+            .withEditorConfigOverride(allowedStateHolderNames to ".*Component,.*ViewModel")
+            .hasLintViolationsWithoutAutoCorrect(
+                LintViolation(
+                    line = 4,
+                    col = 9,
+                    detail = ViewModelForwarding.AvoidViewModelForwarding,
+                ),
+                LintViolation(
+                    line = 10,
+                    col = 9,
+                    detail = ViewModelForwarding.AvoidViewModelForwarding,
+                ),
+            )
+    }
+
+    @Test
+    fun `errors when a ViewModel is forwarded to another Composable within an also scope`() {
+        @Language("kotlin")
+        val code =
+            """
+            @Composable
+            fun MyComposable(viewModel: MyViewModel) {
+                viewModel.also {
+                    AnotherComposable(it)
+                }
+            }
+            @Composable
+            fun MyComposable3(viewModel: MyViewModel) {
+                viewModel.also {
+                    AnotherComposable(vm = it)
+                }
+            }
+            """.trimIndent()
+        forwardingRuleAssertThat(code)
+            .withEditorConfigOverride(allowedStateHolderNames to ".*Component,.*ViewModel")
+            .hasLintViolationsWithoutAutoCorrect(
+                LintViolation(
+                    line = 4,
+                    col = 9,
+                    detail = ViewModelForwarding.AvoidViewModelForwarding,
+                ),
+                LintViolation(
+                    line = 10,
+                    col = 9,
+                    detail = ViewModelForwarding.AvoidViewModelForwarding,
+                ),
+            )
+    }
+
+    @Test
+    fun `allows non first level scope functions`() {
+        @Language("kotlin")
+        val code =
+            """
+            @Composable
+            fun MyComposable(viewModel: MyViewModel) {
+                viewModel.also {
+                    Row {
+                        AnotherComposable(it)
+                    }
+                }
+            }
+            @Composable
+            fun MyComposable2(viewModel: MyViewModel) {
+                viewModel.let {
+                    SomeComposable {
+                        AnotherComposable(it)
+                    }
+                }
+            }
+            @Composable
+            fun MyComposable3(viewModel: MyViewModel) {
+                viewModel.run {
+                    Row {
+                        AnotherComposable(this)
+                    }
+                }
+            }
+            @Composable
+            fun MyComposable4(viewModel: MyViewModel) {
+                viewModel.apply {
+                    Row {
+                        AnotherComposable(this)
+                    }
+                }
+            }
+            @Composable
+            fun MyComposable5(viewModel: MyViewModel) {
+                with(viewModel) {
+                    SomeComposable {
+                        AnotherComposable(this)
+                    }
+                }
+            }
+            """.trimIndent()
+        forwardingRuleAssertThat(code).hasNoLintViolations()
+    }
+
+    @Test
     fun `allows the forwarding of ViewModels that are used as keys`() {
         @Language("kotlin")
         val code =
