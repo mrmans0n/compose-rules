@@ -7,6 +7,7 @@ import io.nlopez.rules.core.ComposeKtVisitor
 import io.nlopez.rules.core.Emitter
 import io.nlopez.rules.core.util.definedInInterface
 import io.nlopez.rules.core.util.findChildrenByClass
+import io.nlopez.rules.core.util.findDirectChildrenByClass
 import io.nlopez.rules.core.util.isActual
 import io.nlopez.rules.core.util.isOverride
 import io.nlopez.rules.core.util.isRestartableEffect
@@ -83,7 +84,7 @@ class ViewModelForwarding : ComposeKtVisitor {
                                 .filterNot { it in checkedCallExpressions }
                                 .also { expressions ->
                                     checkCallExpressions(
-                                        scopedParameter = callExpression.getScopedParameterValue(scopedParameter),
+                                        scopedParameter = callExpression.getScopedParameterValue(),
                                         usesItObjectRef = callExpression.hasItObjectReference,
                                         callExpressions = expressions.asSequence(),
                                     )
@@ -111,15 +112,13 @@ class ViewModelForwarding : ComposeKtVisitor {
                             }
                         }
                         .filter { argumentExpression ->
-                            reference.text in viewModelParameterNames ||
-                                (
-                                    reference.text == "it" &&
-                                        scopedParameter in viewModelParameterNames && usesItObjectRef
-                                    ) ||
-                                (
-                                    reference.text == "this" &&
-                                        scopedParameter in viewModelParameterNames && !usesItObjectRef
-                                    )
+                            val isItRefAndScopedInVMParams = usesItObjectRef
+                                && argumentExpression.text == "it" && scopedParameter in viewModelParameterNames
+                            val isThisRefAndScopedInVMParams = !usesItObjectRef
+                                && argumentExpression.text == "this" && scopedParameter in viewModelParameterNames
+
+                            argumentExpression.text in viewModelParameterNames || isItRefAndScopedInVMParams
+                                || isThisRefAndScopedInVMParams
                         }
                         .map { callExpression }
                 }
@@ -142,11 +141,12 @@ class ViewModelForwarding : ComposeKtVisitor {
     private val KtCallExpression.hasItObjectReference: Boolean
         get() = (calleeExpression as? KtNameReferenceExpression)?.getReferencedName() in itObjectScopeFunctions
 
-    private fun KtCallExpression.getScopedParameterValue(default: String?): String? {
-        return when {
-            isWithScope -> valueArguments.firstOrNull()?.getArgumentExpression()?.text
-            !isWithScope -> (parent as? KtDotQualifiedExpression)?.receiverExpression?.text
-            else -> default
+    private fun KtCallExpression.getScopedParameterValue(): String? {
+        return if (isWithScope) {
+            valueArguments.firstOrNull()?.getArgumentExpression()?.text
+        }
+        else {
+            (parent as? KtDotQualifiedExpression)?.receiverExpression?.text
         }
     }
 
