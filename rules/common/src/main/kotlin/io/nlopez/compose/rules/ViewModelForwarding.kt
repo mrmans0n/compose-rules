@@ -79,8 +79,7 @@ class ViewModelForwarding : ComposeKtVisitor {
                             // For each lambda body expression, get the call expressions
                             // ensures that only the immediate children of the bodyExpression that are instances of
                             // KtCallExpression are checked, effectively limiting the scope to the first level of nesting.
-                            lambdaBodyExpression.children
-                                .filterIsInstance<KtCallExpression>()
+                            lambdaBodyExpression.findDirectChildrenByClass<KtCallExpression>()
                                 .filterNot { it in checkedCallExpressions }
                                 .also { expressions ->
                                     checkCallExpressions(
@@ -111,7 +110,7 @@ class ViewModelForwarding : ComposeKtVisitor {
                                 else -> null
                             }
                         }
-                        .filter { reference ->
+                        .filter { argumentExpression ->
                             reference.text in viewModelParameterNames ||
                                 (
                                     reference.text == "it" &&
