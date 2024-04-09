@@ -1,7 +1,7 @@
 // Copyright 2023 Nacho Lopez
 // SPDX-License-Identifier: Apache-2.0
 plugins {
-    id 'com.gradle.enterprise' version '3.17'
+    id 'com.gradle.enterprise' version '3.17.1'
 }
 
 dependencyResolutionManagement {
