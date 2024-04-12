@@ -13,8 +13,10 @@ Compose:
     active: true
   DefaultsVisibility:
     active: true
-  LambdaParameterInRestartableEffectCheck:
+  LambdaParameterInRestartableEffect:
     active: true
+  Material2:
+    active: false
   ModifierClickableOrder:
     active: true
   ModifierComposable:

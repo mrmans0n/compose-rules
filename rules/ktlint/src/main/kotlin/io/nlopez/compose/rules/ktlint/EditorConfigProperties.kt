@@ -188,3 +188,32 @@ val treatAsLambda: EditorConfigProperty<String> =
             }
         },
     )
+
+val allowedFromM2: EditorConfigProperty<String> =
+    EditorConfigProperty(
+        type = PropertyType.LowerCasingPropertyType(
+            "compose_allowed_from_m2",
+            "A comma separated list of Material 2 APIs that are allowed",
+            PropertyValueParser.IDENTITY_VALUE_PARSER,
+            emptySet(),
+        ),
+        defaultValue = "",
+        propertyMapper = { property, _ ->
+            when {
+                property?.isUnset == true -> ""
+                property?.getValueAs<String>() != null -> property.getValueAs<String>()
+                else -> property?.getValueAs()
+            }
+        },
+    )
+
+val disallowMaterial2: EditorConfigProperty<Boolean> =
+    EditorConfigProperty(
+        type = PropertyType.LowerCasingPropertyType(
+            "compose_disallow_material2",
+            "When enabled, Compose Material 2 (M2) usages will be disallowed.",
+            PropertyValueParser.BOOLEAN_VALUE_PARSER,
+            setOf(true.toString(), false.toString()),
+        ),
+        defaultValue = false,
+    )

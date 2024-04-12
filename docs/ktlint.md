@@ -135,6 +135,25 @@ The `param-order-check` rule will do its best to identify trailing lambdas. Howe
 compose_treat_as_lambda = MyLambdaType,MyOtherLambdaType
 ```
 
+### Enabling the Material 2 detector
+
+The `material-two` rule will flag any usage of a Material 2 API. This rule is disabled by default, so you'll need to explicitly enable it in your `.editorconfig` file:
+
+```editorconfig
+[*.{kt,kts}]
+compose_disallow_material2 = true
+```
+
+You might also want to disallow Material 2, but allow a specific set / subset of APIs. The rule allows this too.
+
+For example, let's say you want to allow all filled icons (whose fully qualified names are androidx.compose.material.icons.filled.*) and the `Button` composable (androidx.compose.material.Button). This is how you'd allow those:
+
+```editorconfig
+[*.{kt,kts}]
+compose_disallow_material2 = true
+compose_allowed_from_m2 = icons.filled,Button
+```
+
 ## Disabling a specific rule
 
 To disable a rule you have to follow the [instructions from the ktlint documentation](https://github.com/pinterest/ktlint#how-do-i-suppress-an-errors-for-a-lineblockfile), and use the id of the rule you want to disable with the `compose` tag.

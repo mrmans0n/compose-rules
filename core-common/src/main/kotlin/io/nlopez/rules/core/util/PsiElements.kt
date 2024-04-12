@@ -4,6 +4,7 @@ package io.nlopez.rules.core.util
 
 import org.jetbrains.kotlin.com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.com.intellij.psi.PsiNameIdentifierOwner
+import org.jetbrains.kotlin.psi.psiUtil.endOffset
 import org.jetbrains.kotlin.psi.psiUtil.startOffset
 import java.util.Deque
 import java.util.LinkedList
@@ -43,3 +44,6 @@ inline fun <reified T : PsiElement> PsiElement.findDirectChildrenByClass(): Sequ
 
 val PsiNameIdentifierOwner.startOffsetFromName: Int
     get() = nameIdentifier?.startOffset ?: startOffset
+
+val PsiElement.range: IntRange
+    get() = IntRange(startOffset, endOffset)

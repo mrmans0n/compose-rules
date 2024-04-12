@@ -46,6 +46,10 @@ Compose:
     active: true
     # -- You can optionally have a list of types to be treated as lambdas (e.g. typedefs or fun interfaces not picked up automatically)
     # treatAsLambda: MyLambdaType
+  Material2:
+    active: false # Opt-in, disabled by default. Turn on if you want to disallow Material 2 usages.
+    # -- You can optionally allow parts of it, if you are in the middle of a migration.
+    # allowedFromM2: icons.Icons,TopAppBar
   ModifierClickableOrder:
     active: true
     # -- You can optionally add your own Modifier types

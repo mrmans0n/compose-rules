@@ -468,3 +468,17 @@ If your composable has an associated `Defaults` object to contain its default va
 More info: [Compose Component API Guidelines](https://github.com/androidx/androidx/blob/androidx-main/compose/docs/compose-component-api-guidelines.md#default-expressions)
 
 Related rule: [compose:defaults-visibility](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/DefaultsVisibility.kt)
+
+## Opt-in rules
+
+> **Note**: These rules are disabled by default, you'll need to explicitly enable them individually in detekt/ktlint if you.
+
+### Don't use Material 2
+
+Material Design 3 is the next evolution of Material Design. It includes updated theming, components, and Material You personalization features like dynamic color. It supersedes Material 2, and using Material 3 usage is recommended instead of Material 2.
+
+Enabling: [ktlint](https://mrmans0n.github.io/compose-rules/ktlint/#enabling-the-material-2-detector), [detekt](https://mrmans0n.github.io/compose-rules/detekt/#enabling-rules)
+
+More info: [Migration to Material 3](https://developer.android.com/develop/ui/compose/designsystems/material2-material3)
+
+Related rule: [compose:material-two](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/Material2.kt)

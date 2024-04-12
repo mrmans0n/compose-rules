@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package io.nlopez.rules.core.util
 
+import org.jetbrains.kotlin.name.FqName
 import java.util.*
 
 fun <T> T.runIf(value: Boolean, block: T.() -> T): T = if (value) block() else this
@@ -10,6 +11,8 @@ fun <T, R> T.runIfNotNull(value: R?, block: T.(R) -> T): T = value?.let { block(
 
 fun <T, R> Sequence<T>.mapIf(condition: (T) -> Boolean, transform: (T) -> R): Sequence<R> =
     mapNotNull { if (condition(it)) transform(it) else null }
+
+operator fun FqName.plus(other: String): FqName = FqName(asString() + "." + other)
 
 fun String?.matchesAnyOf(patterns: Sequence<Regex>): Boolean {
     if (isNullOrEmpty()) return false
