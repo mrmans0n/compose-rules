@@ -37,6 +37,8 @@ Compose:
     active: true
   MutableParams:
     active: true
+  MutableStateAutoboxing:
+    active: true
   MutableStateParam:
     active: true
   PreviewAnnotationNaming:

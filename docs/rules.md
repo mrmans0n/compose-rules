@@ -65,6 +65,14 @@ More info: [Jetpack Compose Stability Explained](https://medium.com/androiddevel
 
 Related rule: [compose:unstable-collections](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/UnstableCollections.kt)
 
+### Use mutableStateOf type-specific variants when possible
+
+`mutableIntStateOf`, `mutableLongStateOf`, `mutableDoubleStateOf`, `mutableFloatStateOf` are essentially counterparts to `mutableStateOf`, but with the added advantage of circumventing autoboxing on JVM platforms. This distinction renders them more memory efficient, making them the preferable choice when dealing with primitive types such as double, float, int, and long.
+
+Functionally are the same, but they are preferred when dealing with these specific types.
+
+Related rule: [compose:mutable-state-autoboxing](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/MutableStateAutoboxing.kt)
+
 ## Composables
 
 ### Do not use inherently mutable types as parameters

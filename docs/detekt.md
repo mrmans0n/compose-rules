@@ -93,6 +93,8 @@ Compose:
     # contentEmittersDenylist: MyNonEmitterComposable
   MutableParams:
     active: true
+  MutableStateAutoboxing:
+    active: true
   MutableStateParam:
     active: true
   PreviewAnnotationNaming:

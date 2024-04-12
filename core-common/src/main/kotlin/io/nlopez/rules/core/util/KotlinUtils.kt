@@ -12,6 +12,9 @@ fun <T, R> T.runIfNotNull(value: R?, block: T.(R) -> T): T = value?.let { block(
 fun <T, R> Sequence<T>.mapIf(condition: (T) -> Boolean, transform: (T) -> R): Sequence<R> =
     mapNotNull { if (condition(it)) transform(it) else null }
 
+fun <F, S, T : Pair<F, S>> Sequence<T>.mapFirst() = map { it.first }
+fun <F, S, T : Pair<F, S>> Sequence<T>.mapSecond() = map { it.second }
+
 operator fun FqName.plus(other: String): FqName = FqName(asString() + "." + other)
 
 fun String?.matchesAnyOf(patterns: Sequence<Regex>): Boolean {
