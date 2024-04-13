@@ -23,7 +23,7 @@ class Material2 : ComposeKtVisitor {
         // Allowed elements/apis from material2, in the format of whatever comes after androidx.compose.material
         // For instance, if we want to allow icons, we'll put just `Icons`, or if we only allowed the filled icons,
         // we'll put `icons.filled` (regardless of the specifics that could come after)
-        val allowedFqNames = config.getSet("allowedFromM2", emptySet()).map { M2FqName + it }
+        val allowedFqNames = config.getSet("allowedFromM2", emptySet()).map { M2FqName + it } + NotInM2
 
         // Find in import list
         val imports = file.importList?.imports.orEmpty()
@@ -78,6 +78,9 @@ class Material2 : ComposeKtVisitor {
 
     companion object {
         private val M2FqName = FqName.fromSegments(listOf("androidx", "compose", "material"))
+        private val NotInM2 = setOf(
+            M2FqName + "icons",
+        )
         val DisallowedUsageOfMaterial2 = """
             Compose Material 2 is disallowed by your configuration.
 

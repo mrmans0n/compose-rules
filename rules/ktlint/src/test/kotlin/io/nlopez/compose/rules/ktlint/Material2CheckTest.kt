@@ -67,7 +67,7 @@ class Material2CheckTest {
         ruleAssertThat(code)
             .withEditorConfigOverride(
                 disallowMaterial2 to true,
-                allowedFromM2 to "icons.Icons,TopAppBar",
+                allowedFromM2 to "TopAppBar",
             )
             .hasNoLintViolations()
     }
@@ -80,7 +80,7 @@ class Material2CheckTest {
                 @Composable
                 fun Something() {
                     androidx.compose.material.Text("hi")
-                    Icon(imageVector = androidx.compose.material.icons.Icons.ArrowBack, contentDescription = null)
+                    Icon(imageVector = androidx.compose.material.potato.Banana, contentDescription = null)
                 }
             """.trimIndent()
 
@@ -115,7 +115,7 @@ class Material2CheckTest {
         ruleAssertThat(code)
             .withEditorConfigOverride(
                 disallowMaterial2 to true,
-                allowedFromM2 to "icons.Icons,TopAppBar",
+                allowedFromM2 to "TopAppBar",
             )
             .hasNoLintViolations()
     }

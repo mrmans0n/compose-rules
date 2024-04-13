@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test
 class Material2CheckTest {
 
     private val testConfig = TestConfig(
-        "allowedFromM2" to listOf("icons.Icons", "TopAppBar"),
+        "allowedFromM2" to listOf("TopAppBar"),
     )
     private val rule = Material2Check(testConfig)
 
@@ -61,7 +61,7 @@ class Material2CheckTest {
                 @Composable
                 fun Something() {
                     androidx.compose.material.Text("hi")
-                    Icon(imageVector = androidx.compose.material.icons.filled.ArrowBack, contentDescription = null)
+                    Icon(imageVector = androidx.compose.material.potato.Banana, contentDescription = null)
                 }
             """.trimIndent()
 
