@@ -88,6 +88,18 @@ class NamingCheckTest {
     }
 
     @Test
+    fun `passes when a composable returns a value and is capitalized but it's suppressed`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Suppress("ComposableNaming")
+                @Composable
+                fun MyComposable(): Something { }
+            """.trimIndent()
+        namingRuleAssertThat(code).hasNoLintViolations()
+    }
+
+    @Test
     fun `errors when a composable returns nothing or Unit and is lowercase`() {
         @Language("kotlin")
         val code =
@@ -110,6 +122,22 @@ class NamingCheckTest {
                 detail = Naming.ComposablesThatDoNotReturnResultsShouldBeCapitalized,
             ),
         )
+    }
+
+    @Test
+    fun `passes when a composable returns nothing or Unit and is lowercase but it's suppressed`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Suppress("ComposableNaming")
+                @Composable
+                fun myComposable() { }
+
+                @Suppress("ComposableNaming")
+                @Composable
+                fun myComposable(): Unit { }
+            """.trimIndent()
+        namingRuleAssertThat(code).hasNoLintViolations()
     }
 
     @Test

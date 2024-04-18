@@ -8,6 +8,7 @@ import io.nlopez.rules.core.Emitter
 import io.nlopez.rules.core.report
 import io.nlopez.rules.core.util.hasReceiverType
 import io.nlopez.rules.core.util.isOperator
+import io.nlopez.rules.core.util.isSuppressed
 import io.nlopez.rules.core.util.returnsValue
 import org.jetbrains.kotlin.psi.KtFunction
 
@@ -24,6 +25,9 @@ class Naming : ComposeKtVisitor {
 
         // Operators have fixed names that we can't modify, so this rule is useless in that case
         if (function.isOperator) return
+
+        // If it's suppressed by the official lints, we will honor that too
+        if (function.isSuppressed("ComposableNaming")) return
 
         val functionName = function.name?.takeUnless(String::isEmpty) ?: return
         val firstLetter = functionName.first()
