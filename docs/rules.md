@@ -26,7 +26,7 @@ Related rule: [compose:remember-missing-check](https://github.com/mrmans0n/compo
 
 The Compose Compiler tries to infer immutability and stability on value classes, but sometimes it gets it wrong, which then means that your UI will be doing more work than it needs. To force the compiler to see a class as 'immutable' you can apply the `@Immutable` annotation to the class.
 
-More info: [Immutable docs](https://developer.android.com/reference/kotlin/androidx/compose/runtime/Immutable) and [Composable metrics blog post](https://chris.banes.dev/composable-metrics/)
+More info: [Immutable docs](https://developer.android.com/reference/kotlin/androidx/compose/runtime/Immutable) and [Composable metrics blog post](https://chris.banes.me/composable-metrics/)
 
 Related rule: TBD
 
