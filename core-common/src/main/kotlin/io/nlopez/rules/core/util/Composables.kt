@@ -162,7 +162,9 @@ fun refineComposableToEmissionCountMapping(
  */
 private val ComposableNonEmittersList = setOf(
     "AlertDialog",
+    "DatePickerDialog",
     "ModalBottomSheetLayout",
+    "ModalBottomSheet",
 )
 
 /**
@@ -221,6 +223,15 @@ private val ComposableEmittersList by lazy {
         "TabRow",
         "TextButton",
         "TopAppBar",
+        // androidx.compose.material3 (there are some dupes with M2 names so only adding the new ones)
+        "DatePickerDialog",
+        "DockedSearchBar",
+        "ExposedDropdownMenuBox",
+        "InputField",
+        "ModalBottomSheet",
+        "PlainTooltip",
+        "RichTooltip",
+        "SearchBar",
         // Accompanist
         "BottomNavigation",
         "BottomNavigationContent",
