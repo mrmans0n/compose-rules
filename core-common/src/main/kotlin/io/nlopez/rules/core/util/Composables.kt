@@ -14,38 +14,28 @@ import org.jetbrains.kotlin.psi.KtSafeQualifiedExpression
 import org.jetbrains.kotlin.psi.psiUtil.parents
 import org.jetbrains.kotlin.psi.psiUtil.referenceExpression
 
+private tailrec suspend fun SequenceScope<KtCallExpression>.scan(elements: List<PsiElement>) {
+    if (elements.isEmpty()) return
+    return scan(
+        elements
+            .mapNotNull { current ->
+                if (current is KtCallExpression) {
+                    if (current.calleeExpression?.text in ComposableNonEmittersList) {
+                        null
+                    } else {
+                        current.also { yield(it) }
+                    }
+                } else {
+                    current
+                }
+            }
+            .flatMap { it.children.toList() },
+    )
+}
+
 context(ComposeKtConfig)
 val KtFunction.emitsContent: Boolean
-    get() {
-        return if (isComposable) {
-            sequence {
-                tailrec suspend fun SequenceScope<KtCallExpression>.scan(elements: List<PsiElement>) {
-                    if (elements.isEmpty()) return
-                    val toProcess = elements
-                        .mapNotNull { current ->
-                            if (current is KtCallExpression) {
-                                if (current.emitExplicitlyNoContent) {
-                                    null
-                                } else {
-                                    yield(current)
-                                    current
-                                }
-                            } else {
-                                current
-                            }
-                        }
-                        .flatMap { it.children.toList() }
-                    return scan(toProcess)
-                }
-                scan(listOf(this@emitsContent))
-            }.any { it.emitsContent }
-        } else {
-            false
-        }
-    }
-
-private val KtCallExpression.emitExplicitlyNoContent: Boolean
-    get() = calleeExpression?.text in ComposableNonEmittersList
+    get() = if (isComposable) sequence { scan(listOf(this@emitsContent)) }.any { it.emitsContent } else false
 
 context(ComposeKtConfig)
 val KtCallExpression.emitsContent: Boolean
