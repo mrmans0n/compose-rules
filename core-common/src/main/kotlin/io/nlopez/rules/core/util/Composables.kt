@@ -153,8 +153,10 @@ fun refineComposableToEmissionCountMapping(
 private val ComposableNonEmittersList = setOf(
     "AlertDialog",
     "DatePickerDialog",
+    "Dialog",
     "ModalBottomSheetLayout",
     "ModalBottomSheet",
+    "Popup",
 )
 
 /**
