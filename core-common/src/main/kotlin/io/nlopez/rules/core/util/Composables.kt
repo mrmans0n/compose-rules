@@ -42,6 +42,9 @@ val KtCallExpression.emitsContent: Boolean
     get() {
         val methodName = calleeExpression?.text ?: return false
 
+        // If in non emitters list, we assume it doesn't emit content
+        if (methodName in ComposableNonEmittersList) return false
+
         // If in denylist, we will assume it doesn't emit content (regardless of anything else).
         if (methodName in getSet("contentEmittersDenylist", emptySet())) return false
 
