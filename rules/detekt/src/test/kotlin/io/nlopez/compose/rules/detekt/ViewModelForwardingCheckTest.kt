@@ -15,6 +15,7 @@ class ViewModelForwardingCheckTest {
     private val testConfig = TestConfig(
         "allowedStateHolderNames" to listOf(".*Component", ".*StateHolder"),
         "allowedForwarding" to listOf(".*Content"),
+        "allowedForwardingOfTypes" to listOf("PotatoViewModel"),
     )
     private val rule = ViewModelForwardingCheck(testConfig)
 
@@ -328,7 +329,7 @@ class ViewModelForwardingCheckTest {
     }
 
     @Test
-    fun `allows forwarding when a ViewModel is in the allowlist`() {
+    fun `allows forwarding when a composable is in the allowlist`() {
         @Language("kotlin")
         val code =
             """
@@ -345,6 +346,34 @@ class ViewModelForwardingCheckTest {
             @Composable
             fun MyComposable3(viewModel: MyViewModel) {
                 AnotherComposableContent(vm = viewModel)
+            }
+            """.trimIndent()
+        val errors = rule.lint(code)
+        assertThat(errors).isEmpty()
+    }
+
+    @Test
+    fun `allows forwarding when a ViewModel is in the allowlist`() {
+        @Language("kotlin")
+        val code =
+            """
+            @Composable
+            fun MyComposable(viewModel: PotatoViewModel) {
+                AnotherComposable(viewModel)
+            }
+            @Composable
+            fun MyComposable2(viewModel: PotatoViewModel) {
+                Row {
+                    AnotherComposable(viewModel)
+                }
+            }
+            @Composable
+            fun MyComposable3(viewModel: PotatoViewModel) {
+                AnotherComposable(vm = viewModel)
+            }
+            @Composable
+            fun MyComposable4(viewModel: PotatoViewModel) {
+                with(viewModel) { AnotherComposable(vm = this) }
             }
             """.trimIndent()
         val errors = rule.lint(code)

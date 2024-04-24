@@ -26,6 +26,16 @@ fun String?.matchesAnyOf(patterns: Sequence<Regex>): Boolean {
     return false
 }
 
+fun Set<String>.joinToRegexOrNull(): Regex? = if (isEmpty()) null else joinToRegex()
+
+fun Set<String>.joinToRegex(): Regex = Regex(
+    joinToString(
+        separator = "|",
+        prefix = "(",
+        postfix = ")",
+    ),
+)
+
 fun String.toCamelCase() = split('_').joinToString(
     separator = "",
     transform = { original ->

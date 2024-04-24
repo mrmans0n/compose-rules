@@ -113,6 +113,8 @@ Compose:
     # allowedStateHolderNames: .*ViewModel,.*Presenter
     # -- You can optionally add an allowlist for Composable names that won't be affected by this rule
     # allowedForwarding: .*Content,.*FancyStuff
+    # -- You can optionally add an allowlist for ViewModel/StateHolder names that won't be affected by this rule
+    # allowedForwardingOfTypes: PotatoViewModel,(Apple|Banana)ViewModel,.*FancyViewModel
   ViewModelInjection:
     active: true
     # -- You can optionally add your own ViewModel factories here
