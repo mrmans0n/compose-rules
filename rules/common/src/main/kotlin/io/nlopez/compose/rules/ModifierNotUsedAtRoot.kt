@@ -29,7 +29,7 @@ class ModifierNotUsedAtRoot : ComposeKtVisitor {
         if (modifier.name != "modifier") return
         val code = function.bodyBlockExpression ?: return
 
-        val modifiers = code.obtainAllModifierNames("modifier")
+        val modifiers = code.obtainAllModifierNames("modifier").toSet()
 
         val errors = code.findChildrenByClass<KtCallExpression>()
             .filter { it.calleeExpression?.text?.first()?.isUpperCase() == true }

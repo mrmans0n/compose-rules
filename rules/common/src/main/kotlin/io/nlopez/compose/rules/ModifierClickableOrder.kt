@@ -29,7 +29,7 @@ class ModifierClickableOrder : ComposeKtVisitor {
         val code = function.bodyBlockExpression ?: return
 
         val initialModifierNames = with(config) { function.modifierParameters.mapNotNull { it.name } }
-        val modifiers = initialModifierNames.flatMap { code.obtainAllModifierNames(it) }
+        val modifiers = initialModifierNames.flatMap { code.obtainAllModifierNames(it) }.toSet()
 
         val suspiciousOrderModifiers = code.findChildrenByClass<KtCallExpression>()
             .filter { it.calleeExpression?.text?.first()?.isUpperCase() == true }

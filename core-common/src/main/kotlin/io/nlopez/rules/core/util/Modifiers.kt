@@ -49,26 +49,41 @@ private fun KtBlockExpression.findModifierManipulations(contains: (String) -> Bo
     }
     .mapNotNull { it.nameIdentifier?.text }
 
-fun KtCallExpression.isUsingModifiers(modifierNames: List<String>): Boolean =
+fun KtCallExpression.isUsingModifiers(modifierNames: Set<String>): Boolean =
     argumentsUsingModifiers(modifierNames).isNotEmpty()
 
-fun KtCallExpression.argumentsUsingModifiers(modifierNames: List<String>): List<KtValueArgument> =
+fun KtCallExpression.argumentsUsingModifiers(modifierNames: Set<String>): List<KtValueArgument> =
     valueArguments.filter { argument ->
         when (val expression = argument.getArgumentExpression()) {
             // if it's MyComposable(modifier) or similar
             is KtReferenceExpression -> {
-                modifierNames.contains(expression.text)
+                expression.text in modifierNames
             }
             // if it's MyComposable(modifier.fillMaxWidth()) or similar
             is KtDotQualifiedExpression -> {
                 // On cases of multiple nested KtDotQualifiedExpressions (e.g. multiple chained methods)
                 // we need to iterate until we find the start of the chain
-                modifierNames.contains(expression.rootExpression.text)
+                expression.rootExpression.text in modifierNames
             }
 
             else -> false
         }
     }
+
+fun KtCallExpression.modifiersBeingUsedFrom(modifierNames: Set<String>): Set<String> =
+    valueArguments.mapNotNull { argument ->
+        when (val expression = argument.getArgumentExpression()) {
+            // if it's MyComposable(modifier) or similar
+            is KtReferenceExpression -> expression.text
+
+            // if it's MyComposable(modifier.fillMaxWidth()) or similar
+            is KtDotQualifiedExpression -> expression.rootExpression.text
+
+            else -> null
+        }
+    }
+        .filter { it in modifierNames }
+        .toSet()
 
 val ModifierNames by lazy(LazyThreadSafetyMode.NONE) {
     setOf(

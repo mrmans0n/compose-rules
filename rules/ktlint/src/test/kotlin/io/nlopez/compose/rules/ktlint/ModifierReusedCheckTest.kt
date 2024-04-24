@@ -391,4 +391,36 @@ class ModifierReusedCheckTest {
             """.trimIndent()
         modifierRuleAssertThat(code).hasNoLintViolations()
     }
+
+    @Test
+    fun `passes when the modifier parameter of a Composable is shadowed`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun Something(modifier: Modifier) {
+                    Row(modifier) {
+                        val x = @Composable { modifier: Modifier ->
+                            SomethingElse(modifier)
+                        }
+                    }
+                }
+                @Composable
+                fun Something(modifier: Modifier) {
+                    Row(modifier) {
+                        val x = @Composable { (modifier, _) ->
+                            SomethingElse(modifier)
+                        }
+                    }
+                }
+                @Composable
+                fun Something(modifier: Modifier) {
+                    Column(modifier) {
+                        Bleh { modifier -> Potato(modifier) }
+                    }
+                }
+            """.trimIndent()
+
+        modifierRuleAssertThat(code).hasNoLintViolations()
+    }
 }

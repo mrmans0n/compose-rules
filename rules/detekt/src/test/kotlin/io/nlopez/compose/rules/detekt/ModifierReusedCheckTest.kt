@@ -128,7 +128,7 @@ class ModifierReusedCheckTest {
                 }
             """.trimIndent()
         val errors = rule.lint(code)
-        assertThat(errors).hasSize(10)
+        assertThat(errors)
             .hasStartSourceLocations(
                 SourceLocation(3, 5),
                 SourceLocation(4, 9),
@@ -176,7 +176,7 @@ class ModifierReusedCheckTest {
                 }
             """.trimIndent()
         val errors = rule.lint(code)
-        assertThat(errors).hasSize(7)
+        assertThat(errors)
             .hasStartSourceLocations(
                 SourceLocation(6, 5),
                 SourceLocation(8, 9),
@@ -288,6 +288,39 @@ class ModifierReusedCheckTest {
                     }
                 }
             """.trimIndent()
+        val errors = rule.lint(code)
+        assertThat(errors).isEmpty()
+    }
+
+    @Test
+    fun `passes when the modifier parameter of a Composable is shadowed`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun Something(modifier: Modifier) {
+                    Row(modifier) {
+                        val x = @Composable { modifier: Modifier ->
+                            SomethingElse(modifier)
+                        }
+                    }
+                }
+                @Composable
+                fun Something(modifier: Modifier) {
+                    Row(modifier) {
+                        val x = @Composable { (modifier, _) ->
+                            SomethingElse(modifier)
+                        }
+                    }
+                }
+                @Composable
+                fun Something(modifier: Modifier) {
+                    Column(modifier) {
+                        Bleh { modifier -> Potato(modifier) }
+                    }
+                }
+            """.trimIndent()
+
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }

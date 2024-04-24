@@ -5,9 +5,10 @@ package io.nlopez.rules.core.util
 import org.jetbrains.kotlin.com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.com.intellij.psi.PsiNameIdentifierOwner
 import org.jetbrains.kotlin.psi.psiUtil.endOffset
+import org.jetbrains.kotlin.psi.psiUtil.parentsWithSelf
+import org.jetbrains.kotlin.psi.psiUtil.siblings
 import org.jetbrains.kotlin.psi.psiUtil.startOffset
-import java.util.Deque
-import java.util.LinkedList
+import java.util.*
 
 inline fun <reified T : PsiElement> PsiElement.findChildrenByClass(): Sequence<T> = sequence {
     val queue: Deque<PsiElement> = LinkedList()
@@ -41,6 +42,10 @@ inline fun <reified T : PsiElement> PsiElement.findDirectChildrenByClass(): Sequ
         current = current.nextSibling
     }
 }
+
+fun PsiElement.walkBackwards(stopAtParent: PsiElement? = null): Sequence<PsiElement> = parentsWithSelf
+    .flatMap { it.siblings(forward = false, withItself = true) }
+    .takeWhile { it != stopAtParent }
 
 val PsiNameIdentifierOwner.startOffsetFromName: Int
     get() = nameIdentifier?.startOffset ?: startOffset
