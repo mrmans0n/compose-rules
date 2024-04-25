@@ -31,7 +31,7 @@ class UnstableCollections : ComposeKtVisitor {
     }
 
     companion object {
-        private val DiamondRegex by lazy(LazyThreadSafetyMode.NONE) { Regex("<.*>\\??") }
+        private val DiamondRegex by lazy { Regex("<.*>\\??") }
         private val String.capitalized: String
             get() = replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
 

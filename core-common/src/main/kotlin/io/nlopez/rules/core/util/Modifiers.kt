@@ -85,7 +85,7 @@ fun KtCallExpression.modifiersBeingUsedFrom(modifierNames: Set<String>): Set<Str
         .filter { it in modifierNames }
         .toSet()
 
-val ModifierNames by lazy(LazyThreadSafetyMode.NONE) {
+private val ModifierNames by lazy {
     setOf(
         "Modifier",
         "GlanceModifier",

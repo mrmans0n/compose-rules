@@ -251,7 +251,7 @@ val KtProperty.declaresCompositionLocal: Boolean
         initializer is KtCallExpression &&
         (initializer as KtCallExpression).referenceExpression()?.text in CompositionLocalReferenceExpressions
 
-private val CompositionLocalReferenceExpressions by lazy(LazyThreadSafetyMode.NONE) {
+private val CompositionLocalReferenceExpressions by lazy {
     setOf(
         "staticCompositionLocalOf",
         "compositionLocalOf",
@@ -262,7 +262,7 @@ val KtCallExpression.isRestartableEffect: Boolean
     get() = calleeExpression?.text in RestartableEffects
 
 // From https://developer.android.com/jetpack/compose/side-effects#restarting-effects
-private val RestartableEffects by lazy(LazyThreadSafetyMode.NONE) {
+private val RestartableEffects by lazy {
     setOf(
         "LaunchedEffect",
         "produceState",

@@ -45,4 +45,4 @@ fun String.toCamelCase() = split('_').joinToString(
 
 fun String.toSnakeCase() = replace(humps, "_").lowercase(Locale.getDefault())
 
-private val humps by lazy(LazyThreadSafetyMode.NONE) { "(?<=.)(?=\\p{Upper})".toRegex() }
+private val humps by lazy { "(?<=.)(?=\\p{Upper})".toRegex() }
