@@ -11,6 +11,9 @@ import io.nlopez.rules.core.util.findDirectChildrenByClass
 import io.nlopez.rules.core.util.isActual
 import io.nlopez.rules.core.util.isOverride
 import io.nlopez.rules.core.util.isRestartableEffect
+import io.nlopez.rules.core.util.joinToRegex
+import io.nlopez.rules.core.util.joinToRegexOrNull
+import io.nlopez.rules.core.util.runIfNotNull
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.KtFunction
@@ -34,32 +37,24 @@ class ViewModelForwarding : ComposeKtVisitor {
         // Exit early to avoid hitting non-param composables
         if (parameters.isEmpty()) return
 
-        val stateHolderValidNames = Regex(
-            (config.getList("allowedStateHolderNames", emptyList()) + defaultStateHolderNames)
-                .joinToString(
-                    separator = "|",
-                    prefix = "(",
-                    postfix = ")",
-                ),
-        )
+        val stateHolderValidNames = (config.getSet("allowedStateHolderNames", emptySet()) + defaultStateHolderNames)
+            .joinToRegex()
 
-        val allowedForwarding = config.getSet("allowedForwarding", emptySet())
-        val allowedForwardingRegex = when {
-            allowedForwarding.isNotEmpty() -> Regex(
-                allowedForwarding.joinToString(
-                    separator = "|",
-                    prefix = "(",
-                    postfix = ")",
-                ),
-            )
+        val allowedForwardingTargetNames = config.getSet("allowedForwarding", emptySet()).joinToRegexOrNull()
+        val allowedForwardingOfTypes = config.getSet("allowedForwardingOfTypes", emptySet()).joinToRegexOrNull()
 
-            else -> null
-        }
-
-        val viewModelParameterNames = parameters.filter { parameter ->
-            // We can't do much better than looking at the types at face value
-            parameter.typeReference?.text?.matches(stateHolderValidNames) == true
-        }
+        // Grab all the types we are going to watch if they are forwarded
+        val viewModelParameterNames = parameters
+            .filter { parameter ->
+                // We can't do much better than looking at the types at face value
+                parameter.typeReference?.text?.matches(stateHolderValidNames) == true
+            }
+            // Filter out the ones we are cool with forwarding
+            .runIfNotNull(allowedForwardingOfTypes) { regex ->
+                filterNot { parameter ->
+                    parameter.typeReference?.text?.matches(regex) == true
+                }
+            }
             .mapNotNull { it.name }
             .toSet()
 
@@ -86,7 +81,7 @@ class ViewModelForwarding : ComposeKtVisitor {
                                     checkCallExpressions(
                                         scopedParameter = callExpression.getScopedParameterValue(),
                                         usesItObjectRef = callExpression.hasItObjectReference,
-                                        callExpressions = expressions.asSequence(),
+                                        callExpressions = expressions,
                                     )
                                 }
                         }
@@ -97,8 +92,10 @@ class ViewModelForwarding : ComposeKtVisitor {
                 // Avoid LaunchedEffect/DisposableEffect/etc that can use the VM as a key
                 .filterNot { callExpression -> callExpression.isRestartableEffect }
                 // Avoid explicitly allowlisted Composable names
-                .filterNot { callExpression ->
-                    allowedForwardingRegex?.let { callExpression.calleeExpression?.text?.matches(it) } == true
+                .runIfNotNull(allowedForwardingTargetNames) { regex ->
+                    filterNot { callExpression ->
+                        callExpression.calleeExpression?.text?.matches(regex) == true
+                    }
                 }
                 .flatMap { callExpression ->
                     checkedCallExpressions.add(callExpression)
@@ -126,6 +123,7 @@ class ViewModelForwarding : ComposeKtVisitor {
                     emitter.report(callExpression, AvoidViewModelForwarding, false)
                 }
         }
+
         val callExpressions = bodyBlock
             .findChildrenByClass<KtCallExpression>()
             .filterNot { it in checkedCallExpressions }

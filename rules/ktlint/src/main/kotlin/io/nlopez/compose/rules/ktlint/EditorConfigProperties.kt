@@ -152,6 +152,25 @@ val allowedForwarding: EditorConfigProperty<String> =
         },
     )
 
+val allowedForwardingOfTypes: EditorConfigProperty<String> =
+    EditorConfigProperty(
+        type = PropertyType.LowerCasingPropertyType(
+            "compose_allowed_forwarding_of_types",
+            "A comma separated list of regexes of state holder/ViewModel names which are exempt from " +
+                "the forwarding rule",
+            PropertyValueParser.IDENTITY_VALUE_PARSER,
+            emptySet(),
+        ),
+        defaultValue = "",
+        propertyMapper = { property, _ ->
+            when {
+                property?.isUnset == true -> ""
+                property?.getValueAs<String>() != null -> property.getValueAs<String>()
+                else -> property?.getValueAs()
+            }
+        },
+    )
+
 val customModifiers: EditorConfigProperty<String> =
     EditorConfigProperty(
         type = PropertyType.LowerCasingPropertyType(

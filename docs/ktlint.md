@@ -93,14 +93,22 @@ The `vm-forwarding-check` rule will, by default, design as a state holder any cl
 compose_allowed_state_holder_names = .*ViewModel,.*Presenter,.*Component,.*SomethingElse
 ```
 
-
 ### Allowlist for composable names that aren't affected by the ViewModelForwarding rule
 
-The `vm-forwarding-check` will catch VMs/state holder classes that are relayed to other composables. However, in some situations this can be a valid use-case. The rule can be configured so that all the names that matches a list of regexes are exempt to this rule. You can configure this in your `.editorconfig` file:
+The `vm-forwarding-check` will catch VMs/state holder classes that are relayed to other composables. However, in some situations this can be a valid use-case. The rule can be configured so that all the names of composables that match a list of regexes are exempt to this rule. You can configure this in your `.editorconfig` file:
 
 ```editorconfig
 [*.{kt,kts}]
 compose_allowed_forwarding = .*Content,.*SomethingElse
+```
+
+### Allowlist for ViewModel/state holder names that aren't affected by the ViewModelForwarding rule
+
+The `vm-forwarding-check` will catch VMs/state holder classes that are relayed to other composables. However, in some situations this can be a valid use-case. The rule can be configured so that all the names of ViewModels that match a list of regexes are exempt to this rule. You can configure this in your `.editorconfig` file:
+
+```editorconfig
+[*.{kt,kts}]
+compose_allowed_forwarding_of_types = .*MyViewModel,PotatoViewModel
 ```
 
 ### Configure the visibility of the composables where to check for missing modifiers
