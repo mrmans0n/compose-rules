@@ -9,11 +9,14 @@ import io.nlopez.rules.core.report
 import io.nlopez.rules.core.util.argumentsUsingModifiers
 import io.nlopez.rules.core.util.emitsContent
 import io.nlopez.rules.core.util.findChildrenByClass
+import io.nlopez.rules.core.util.isInContentEmittersDenylist
+import io.nlopez.rules.core.util.mapSecond
 import io.nlopez.rules.core.util.modifierParameter
 import io.nlopez.rules.core.util.obtainAllModifierNames
 import org.jetbrains.kotlin.com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtFunction
+import org.jetbrains.kotlin.psi.psiUtil.parents
 
 class ModifierNotUsedAtRoot : ComposeKtVisitor {
 
@@ -22,8 +25,8 @@ class ModifierNotUsedAtRoot : ComposeKtVisitor {
         autoCorrect: Boolean,
         emitter: Emitter,
         config: ComposeKtConfig,
-    ) {
-        val modifier = with(config) { function.modifierParameter } ?: return
+    ) = with(config) {
+        val modifier = function.modifierParameter ?: return
 
         // We only care about the main modifier for this rule
         if (modifier.name != "modifier") return
@@ -37,14 +40,16 @@ class ModifierNotUsedAtRoot : ComposeKtVisitor {
                 val usage = callExpression.argumentsUsingModifiers(modifiers).firstOrNull() ?: return@mapNotNull null
                 callExpression to usage
             }
+            .filterNot { (callExpression, _) ->
+                // If there is a parent that's a non-content emitter or deny-listed, we don't want to continue
+                callExpression.parents.filterIsInstance<KtCallExpression>().any { it.isInContentEmittersDenylist }
+            }
             .filter { (callExpression, _) ->
                 // we'll need to traverse upwards to the composable root and check if there is any parent that
                 // emits content: if this is the case, the main modifier should be used there instead.
-                callExpression.findFirstAncestorEmittingContent(stopAt = code) {
-                    with(config) { it.emitsContent }
-                } != null
+                callExpression.findFirstAncestorEmittingContent(stopAt = code) { it.emitsContent } != null
             }
-            .map { (_, valueArgument) -> valueArgument }
+            .mapSecond()
 
         for (valueArgument in errors) {
             emitter.report(valueArgument, ComposableModifierShouldBeUsedAtTheTopMostPossiblePlace)

@@ -10,6 +10,8 @@ import org.jetbrains.kotlin.psi.psiUtil.siblings
 import org.jetbrains.kotlin.psi.psiUtil.startOffset
 import java.util.*
 
+private val neverIgnore = { false }
+
 inline fun <reified T : PsiElement> PsiElement.findChildrenByClass(): Sequence<T> = sequence {
     val queue: Deque<PsiElement> = LinkedList()
     queue.add(this@findChildrenByClass)

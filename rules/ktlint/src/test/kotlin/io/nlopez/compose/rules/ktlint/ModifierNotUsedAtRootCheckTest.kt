@@ -84,6 +84,29 @@ class ModifierNotUsedAtRootCheckTest {
     }
 
     @Test
+    fun `passes out when modifier is used in too deep in the hierarchy but has a non-emitter parent`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun Something(modifier: Modifier = Modifier) {
+                    Dialog {
+                        Text("Hi", modifier = modifier)
+                    }
+                }
+                @Composable
+                fun Something(modifier: Modifier = Modifier) {
+                    Potato {
+                        Text("Hi", modifier = modifier)
+                    }
+                }
+            """.trimIndent()
+        modifierRuleAssertThat(code)
+            .withEditorConfigOverride(contentEmittersDenylist to "Potato")
+            .hasNoLintViolations()
+    }
+
+    @Test
     fun `passes when modifier is used in the top-most place that emits content`() {
         @Language("kotlin")
         val code =

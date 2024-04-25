@@ -43,13 +43,23 @@ val KtCallExpression.emitsContent: Boolean
         val methodName = calleeExpression?.text ?: return false
 
         // If in non emitters list, we assume it doesn't emit content
-        if (methodName in ComposableNonEmittersList) return false
-
-        // If in denylist, we will assume it doesn't emit content (regardless of anything else).
-        if (methodName in getSet("contentEmittersDenylist", emptySet())) return false
+        if (isInContentEmittersDenylist) return false
 
         return methodName in ComposableEmittersList + getSet("contentEmitters", emptySet()) ||
             containsComposablesWithModifiers
+    }
+
+context(ComposeKtConfig)
+val KtCallExpression.isInContentEmittersDenylist: Boolean
+    get() {
+        val methodName = calleeExpression?.text ?: return false
+
+        // If in non emitters list, we assume it doesn't emit content
+        if (methodName in ComposableNonEmittersList) return true
+
+        // If in denylist, we will assume it doesn't emit content (regardless of anything else).
+        if (methodName in getSet("contentEmittersDenylist", emptySet())) return true
+        return false
     }
 
 private val KtCallExpression.containsComposablesWithModifiers: Boolean
@@ -153,14 +163,16 @@ fun refineComposableToEmissionCountMapping(
  * if you stumble upon false positives that should not have triggered an error from this rule, and are in foundational
  * libraries.
  */
-private val ComposableNonEmittersList = setOf(
-    "AlertDialog",
-    "DatePickerDialog",
-    "Dialog",
-    "ModalBottomSheetLayout",
-    "ModalBottomSheet",
-    "Popup",
-)
+private val ComposableNonEmittersList by lazy {
+    setOf(
+        "AlertDialog",
+        "DatePickerDialog",
+        "Dialog",
+        "ModalBottomSheetLayout",
+        "ModalBottomSheet",
+        "Popup",
+    )
+}
 
 /**
  * This is an allowlist with common composables that emit content. Feel free to add more elements if you stumble

@@ -14,6 +14,7 @@ class ModifierNotUsedAtRootCheckTest {
 
     private val testConfig = TestConfig(
         "contentEmitters" to listOf("Potato", "Banana"),
+        "contentEmittersDenylist" to listOf("Apple"),
     )
     private val rule = ModifierNotUsedAtRootCheck(testConfig)
 
@@ -67,6 +68,28 @@ class ModifierNotUsedAtRootCheckTest {
         for (error in errors) {
             assertThat(error).hasMessage(ComposableModifierShouldBeUsedAtTheTopMostPossiblePlace)
         }
+    }
+
+    @Test
+    fun `passes out when modifier is used in too deep in the hierarchy but has a non-emitter parent`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun Something(modifier: Modifier = Modifier) {
+                    Dialog {
+                        Text("Hi", modifier = modifier)
+                    }
+                }
+                @Composable
+                fun Something(modifier: Modifier = Modifier) {
+                    Apple {
+                        Text("Hi", modifier = modifier)
+                    }
+                }
+            """.trimIndent()
+        val errors = rule.lint(code)
+        assertThat(errors).isEmpty()
     }
 
     @Test
