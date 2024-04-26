@@ -70,21 +70,6 @@ fun KtCallExpression.argumentsUsingModifiers(modifierNames: Set<String>): List<K
         }
     }
 
-fun KtCallExpression.modifiersBeingUsedFrom(modifierNames: Set<String>): Set<String> =
-    valueArguments.mapNotNull { argument ->
-        when (val expression = argument.getArgumentExpression()) {
-            // if it's MyComposable(modifier) or similar
-            is KtReferenceExpression -> expression.text
-
-            // if it's MyComposable(modifier.fillMaxWidth()) or similar
-            is KtDotQualifiedExpression -> expression.rootExpression.text
-
-            else -> null
-        }
-    }
-        .filter { it in modifierNames }
-        .toSet()
-
 private val ModifierNames by lazy {
     setOf(
         "Modifier",
