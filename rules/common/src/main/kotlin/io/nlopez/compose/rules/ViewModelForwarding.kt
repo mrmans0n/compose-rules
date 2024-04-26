@@ -58,8 +58,8 @@ class ViewModelForwarding : ComposeKtVisitor {
             .mapNotNull { it.name }
             .toSet()
 
-        val checkedCallExpressions = mutableSetOf<KtCallExpression>()
-        fun checkCallExpressions(
+        val alreadyProcessedCallExpressions = mutableSetOf<KtCallExpression>()
+        fun scanCallExpressions(
             callExpressions: Sequence<KtCallExpression>,
             scopedParameter: String? = null,
             usesItObjectRef: Boolean = false,
@@ -76,9 +76,9 @@ class ViewModelForwarding : ComposeKtVisitor {
                             // ensures that only the immediate children of the bodyExpression that are instances of
                             // KtCallExpression are checked, effectively limiting the scope to the first level of nesting.
                             lambdaBodyExpression.findDirectChildrenByClass<KtCallExpression>()
-                                .filterNot { it in checkedCallExpressions }
+                                .filterNot { it in alreadyProcessedCallExpressions }
                                 .also { expressions ->
-                                    checkCallExpressions(
+                                    scanCallExpressions(
                                         scopedParameter = callExpression.getScopedParameterValue(),
                                         usesItObjectRef = callExpression.hasItObjectReference,
                                         callExpressions = expressions,
@@ -98,7 +98,7 @@ class ViewModelForwarding : ComposeKtVisitor {
                     }
                 }
                 .flatMap { callExpression ->
-                    checkedCallExpressions.add(callExpression)
+                    alreadyProcessedCallExpressions.add(callExpression)
                     // Get VALUE_ARGUMENT that has a REFERENCE_EXPRESSION. This would map to `viewModel` in this example:
                     // MyComposable(viewModel, ...)
                     callExpression.valueArguments
@@ -126,8 +126,8 @@ class ViewModelForwarding : ComposeKtVisitor {
 
         val callExpressions = bodyBlock
             .findChildrenByClass<KtCallExpression>()
-            .filterNot { it in checkedCallExpressions }
-        checkCallExpressions(callExpressions = callExpressions)
+            .filterNot { it in alreadyProcessedCallExpressions }
+        scanCallExpressions(callExpressions = callExpressions)
     }
 
     private val KtCallExpression.isScopeFunction: Boolean
