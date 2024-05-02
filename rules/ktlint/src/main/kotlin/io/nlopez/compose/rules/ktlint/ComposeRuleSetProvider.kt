@@ -15,6 +15,7 @@ class ComposeRuleSetProvider : RuleSetProviderV3(
         RuleProvider { CompositionLocalAllowlistCheck() },
         RuleProvider { CompositionLocalNamingCheck() },
         RuleProvider { ContentEmitterReturningValuesCheck() },
+        RuleProvider { ContentTrailingLambdaCheck() },
         RuleProvider { DefaultsVisibilityCheck() },
         RuleProvider { LambdaParameterInRestartableEffectCheck() },
         RuleProvider { Material2Check() },

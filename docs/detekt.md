@@ -40,6 +40,10 @@ Compose:
     active: true
     # -- You can optionally add your own composables here
     # contentEmitters: MyComposable,MyOtherComposable
+  ContentTrailingLambda:
+    active: true
+    # -- You can optionally have a list of types to be treated as composable lambdas (e.g. typedefs or fun interfaces not picked up automatically)
+    # treatAsComposableLambda: MyComposableLambdaType
   DefaultsVisibility:
     active: true
   LambdaParameterInRestartableEffect:

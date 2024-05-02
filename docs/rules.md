@@ -236,6 +236,31 @@ Related rule: [compose:multiple-emitters-check](https://github.com/mrmans0n/comp
 
 > **Note**: To add your custom composables so they are used in this rule (things like your design system composables), you can add `composeEmitters` to this rule config in Detekt, or `compose_emitters` to your .editorconfig in ktlint.
 
+### Slots for main content should be the trailing lambda
+
+The slots used to display the main content for a composable, which are typically in the form of `content: @Composable () -> Unit` (or their nullable counterpart) should always be placed as the last parameter of a composable function, so they can be written as the trailing lambda. This makes following the flow of the main pieces of UI / content more natural and easy to reason about.
+
+```kotlin
+// ❌
+@Composable
+fun Avatar(content: @Composable () -> Unit, subtitle: String, modifier: Modifier = Modifier) { ... }
+
+// ✅ The usage of the main content as a trailing lambda is more natural
+@Composable
+fun Avatar(subtitle: String, modifier: Modifier = Modifier, content: @Composable () -> Unit) { ... }
+
+@Composable
+fun Profile(user: User, modifier: Modifier = Modifier) {
+    Column(modifier) {
+        Avatar(subtitle = user.name) {
+            AsyncImage(url = user.avatarUrl)
+        }
+    }
+}
+```
+
+Related rule: [compose:content-trailing-lambda](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ContentTrailingLambda.kt)
+
 ### Naming CompositionLocals properly
 
 `CompositionLocal`s should be named by using the adjective `Local` as prefix, followed by a descriptive noun that describes the value they hold. This makes it easier to know when a value comes from a `CompositionLocal`. Given that these are implicit dependencies, we should make them obvious.

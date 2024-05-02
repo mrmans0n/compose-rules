@@ -208,6 +208,25 @@ val treatAsLambda: EditorConfigProperty<String> =
         },
     )
 
+val treatAsComposableLambda: EditorConfigProperty<String> =
+    EditorConfigProperty(
+        type = PropertyType.LowerCasingPropertyType(
+            "compose_treat_as_composable_lambda",
+            "A comma separated list of types that should be treated as @Composable lambdas " +
+                "(e.g. typedefs of lambdas, fun interfaces)",
+            PropertyValueParser.IDENTITY_VALUE_PARSER,
+            emptySet(),
+        ),
+        defaultValue = "",
+        propertyMapper = { property, _ ->
+            when {
+                property?.isUnset == true -> ""
+                property?.getValueAs<String>() != null -> property.getValueAs<String>()
+                else -> property?.getValueAs()
+            }
+        },
+    )
+
 val allowedFromM2: EditorConfigProperty<String> =
     EditorConfigProperty(
         type = PropertyType.LowerCasingPropertyType(
