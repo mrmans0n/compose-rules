@@ -36,6 +36,9 @@ val KtFunction.isExpect: Boolean
 val KtFunction.isAbstract: Boolean
     get() = hasModifier(KtTokens.ABSTRACT_KEYWORD)
 
+val KtFunction.isOpen: Boolean
+    get() = hasModifier(KtTokens.OPEN_KEYWORD)
+
 val KtFunction.isOperator: Boolean
     get() = hasModifier(KtTokens.OPERATOR_KEYWORD)
 

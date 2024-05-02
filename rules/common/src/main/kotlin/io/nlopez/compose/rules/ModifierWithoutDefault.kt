@@ -9,6 +9,7 @@ import io.nlopez.rules.core.util.definedInInterface
 import io.nlopez.rules.core.util.isAbstract
 import io.nlopez.rules.core.util.isActual
 import io.nlopez.rules.core.util.isModifier
+import io.nlopez.rules.core.util.isOpen
 import io.nlopez.rules.core.util.isOverride
 import io.nlopez.rules.core.util.lastChildLeafOrSelf
 import org.jetbrains.kotlin.com.intellij.psi.impl.source.tree.LeafPsiElement
@@ -22,21 +23,31 @@ class ModifierWithoutDefault : ComposeKtVisitor {
         emitter: Emitter,
         config: ComposeKtConfig,
     ) {
-        if (function.definedInInterface || function.isActual || function.isOverride || function.isAbstract) return
+        if (
+            function.definedInInterface ||
+            function.isActual ||
+            function.isOverride ||
+            function.isAbstract ||
+            function.isOpen
+        ) {
+            return
+        }
 
-        // Look for modifier params in the composable signature, and if any without a default value is found, error out.
-        function.valueParameters.filter { with(config) { it.isModifier } }
-            .filterNot { it.hasDefaultValue() }
-            .forEach { modifierParameter ->
-                emitter.report(modifierParameter, MissingModifierDefaultParam, true)
+        with(config) {
+            // Look for modifier params in the composable signature, and if any without a default value is found, error out.
+            function.valueParameters.filter { it.isModifier }
+                .filterNot { it.hasDefaultValue() }
+                .forEach { modifierParameter ->
+                    emitter.report(modifierParameter, MissingModifierDefaultParam, true)
 
-                // This error is easily auto fixable, we just inject ` = Modifier` to the param
-                if (autoCorrect) {
-                    val lastToken = modifierParameter.node.lastChildLeafOrSelf() as LeafPsiElement
-                    val currentText = lastToken.text
-                    lastToken.rawReplaceWithText("$currentText = Modifier")
+                    // This error is easily auto fixable, we just inject ` = Modifier` to the param
+                    if (autoCorrect) {
+                        val lastToken = modifierParameter.node.lastChildLeafOrSelf() as LeafPsiElement
+                        val currentText = lastToken.text
+                        lastToken.rawReplaceWithText("$currentText = Modifier")
+                    }
                 }
-            }
+        }
     }
 
     companion object {
