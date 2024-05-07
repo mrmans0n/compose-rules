@@ -39,15 +39,26 @@ class LambdaParameterInRestartableEffect : ComposeKtVisitor {
 
             if (lambdaParameterNames.isEmpty()) continue
 
-            // Then, we just want the lambda parameters that are actually used inside in any of the found effects'
+            // Then, we just want the lambda parameters that are actually used inside any of the found effects'
             // trailing lambda code
-            val usedLambdaParameterNames = effects.mapNotNull { it.lambdaArguments.lastOrNull() }
-                .mapNotNull { it.getLambdaExpression()?.bodyExpression }
-                .flatMap { body ->
+            val usedLambdaParameterNames = effects
+                .flatMap { effect ->
+                    val body = effect.lambdaArguments.lastOrNull()?.getLambdaExpression()?.bodyExpression
+                        ?: return@flatMap emptySequence()
+
                     val callExpressions = body.findChildrenByClass<KtCallExpression>()
+                    val isDisposableEffect = effect.calleeExpression?.text == "DisposableEffect"
 
                     // Lambdas used directly: myLambda()
-                    val invoked = callExpressions.mapNotNull { it.calleeExpression?.text }
+                    val invoked = callExpressions
+                        .let { expressions ->
+                            if (isDisposableEffect) {
+                                expressions.filter { it.calleeExpression?.text != "onDispose" }
+                            } else {
+                                expressions
+                            }
+                        }
+                        .mapNotNull { it.calleeExpression?.text }
                         .filter { it in lambdaParameterNames }
 
                     // Lambdas being tossed around to other methods

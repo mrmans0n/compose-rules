@@ -86,4 +86,68 @@ class LambdaParameterInRestartableEffectCheckTest {
             )
             .hasNoLintViolations()
     }
+
+    @Test
+    fun `error out when detecting a lambda named onDispose used in a non-DisposableEffect`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun Something(onDispose: () -> Unit) {
+                    LaunchedEffect(Unit) {
+                        onDispose()
+                    }
+                }
+                @Composable
+                fun Something(onDispose: () -> Unit) {
+                    DisposableEffect(Unit) {
+                        onDispose(onDispose)
+                    }
+                }
+
+                // TODO ideally these would also be caught, but may require type resolution
+                @Composable
+                fun Something(onDispose: () -> Unit) {
+                    DisposableEffect(Unit) {
+                        onDispose { onDispose() }
+                    }
+                }
+                @Composable
+                fun Something(onDispose: (Int) -> Unit) {
+                    DisposableEffect(Unit) {
+                        onDispose(0)
+                        onDispose {}
+                    }
+                }
+            """.trimIndent()
+        ruleAssertThat(code)
+            .hasLintViolationsWithoutAutoCorrect(
+                LintViolation(
+                    line = 2,
+                    col = 15,
+                    detail = LambdaParameterInRestartableEffect.LambdaUsedInRestartableEffect,
+                ),
+                LintViolation(
+                    line = 8,
+                    col = 15,
+                    detail = LambdaParameterInRestartableEffect.LambdaUsedInRestartableEffect,
+                ),
+            )
+    }
+
+    @Test
+    fun `passes when a lambda named onDispose is present but unused in DisposableEffect`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun Something(onDispose: () -> Unit) {
+                    val latestOnDispose by rememberUpdatedState(onDispose)
+                    DisposableEffect(Unit) {
+                        onDispose(latestOnDispose)
+                    }
+                }
+            """.trimIndent()
+        ruleAssertThat(code).hasNoLintViolations()
+    }
 }

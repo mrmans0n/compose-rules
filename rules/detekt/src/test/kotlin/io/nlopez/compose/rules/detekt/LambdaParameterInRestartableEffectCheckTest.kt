@@ -78,4 +78,65 @@ class LambdaParameterInRestartableEffectCheckTest {
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }
+
+    @Test
+    fun `error out when detecting a lambda named onDispose used in a non-DisposableEffect`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun Something(onDispose: () -> Unit) {
+                    LaunchedEffect(Unit) {
+                        onDispose()
+                    }
+                }
+                @Composable
+                fun Something(onDispose: () -> Unit) {
+                    DisposableEffect(Unit) {
+                        onDispose(onDispose)
+                    }
+                }
+
+                // TODO ideally these would also be caught, but may require type resolution
+                @Composable
+                fun Something(onDispose: () -> Unit) {
+                    DisposableEffect(Unit) {
+                        onDispose { onDispose() }
+                    }
+                }
+                @Composable
+                fun Something(onDispose: (Int) -> Unit) {
+                    DisposableEffect(Unit) {
+                        onDispose(0)
+                        onDispose {}
+                    }
+                }
+            """.trimIndent()
+        val errors = rule.lint(code)
+        assertThat(errors)
+            .hasStartSourceLocations(
+                SourceLocation(2, 15),
+                SourceLocation(8, 15),
+            )
+        for (error in errors) {
+            assertThat(error).hasMessage(LambdaParameterInRestartableEffect.LambdaUsedInRestartableEffect)
+        }
+    }
+
+    @Test
+    fun `passes when a lambda named onDispose is present but unused in DisposableEffect`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun Something(onDispose: () -> Unit) {
+                    val latestOnDispose by rememberUpdatedState(onDispose)
+                    DisposableEffect(Unit) {
+                        onDispose(latestOnDispose)
+                    }
+                }
+            """.trimIndent()
+        val errors = rule.lint(code)
+        assertThat(errors).isEmpty()
+    }
 }
