@@ -171,6 +171,15 @@ compose_disallow_material2 = true
 compose_allowed_from_m2 = icons.filled,Button
 ```
 
+### Enabling the unstable collections detector
+
+The `unstable-collections` rule will flag any usage of any unstable collection (e.g. List/Set/Map). This rule is disabled by default, so you'll need to explicitly enable it in your `.editorconfig` file:
+
+```editorconfig
+[*.{kt,kts}]
+compose_disallow_unstable_collections = true
+```
+
 ## Disabling a specific rule
 
 To disable a rule you have to follow the [instructions from the ktlint documentation](https://pinterest.github.io/ktlint/0.49.1/faq/#how-do-i-suppress-errors-for-a-lineblockfile), and use the id of the rule you want to disable with the `compose` tag.
@@ -179,5 +188,5 @@ For example, to disable the `naming-check` rule, the tag you'll need to disable 
 
 ```kotlin
     @Suppress("ktlint:compose:naming-check")
-    ... your code here
+    fun YourComposableHere() { ... }
 ```
