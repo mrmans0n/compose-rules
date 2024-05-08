@@ -151,7 +151,7 @@ class ViewModelInjection : ComposeKtVisitor {
             setOf(
                 // AAC VM
                 "viewModel",
-                // Weaver
+                // Weaver (Twitter in-house)
                 "weaverViewModel",
                 // Hilt
                 "hiltViewModel",
@@ -159,6 +159,8 @@ class ViewModelInjection : ComposeKtVisitor {
                 "injectedViewModel",
                 // Mavericks
                 "mavericksViewModel",
+                // Tangle (Anvil extensions)
+                "tangleViewModel",
             )
         }
 
