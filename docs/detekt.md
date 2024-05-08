@@ -110,7 +110,7 @@ Compose:
   RememberContentMissing:
     active: true
   UnstableCollections:
-    active: true
+    active: false # Opt-in, disabled by default. Turn on if you want to enforce this (e.g. you have strong skipping disabled)
   ViewModelForwarding:
     active: true
     # -- You can optionally use this rule on things other than types ending in "ViewModel" or "Presenter" (which are the defaults). You can add your own via a regex here:

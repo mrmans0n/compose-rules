@@ -24,23 +24,40 @@ class UnstableCollectionsCheckTest {
                 @Composable
                 fun Something(a: Map<String, Int>) {}
             """.trimIndent()
-        ruleAssertThat(code).hasLintViolationsWithoutAutoCorrect(
-            LintViolation(
-                line = 2,
-                col = 18,
-                detail = createErrorMessage("List<String>", "List", "a"),
-            ),
-            LintViolation(
-                line = 4,
-                col = 18,
-                detail = createErrorMessage("Set<String>", "Set", "a"),
-            ),
-            LintViolation(
-                line = 6,
-                col = 18,
-                detail = createErrorMessage("Map<String, Int>", "Map", "a"),
-            ),
-        )
+        ruleAssertThat(code)
+            .withEditorConfigOverride(disallowUnstableCollections to true)
+            .hasLintViolationsWithoutAutoCorrect(
+                LintViolation(
+                    line = 2,
+                    col = 18,
+                    detail = createErrorMessage("List<String>", "List", "a"),
+                ),
+                LintViolation(
+                    line = 4,
+                    col = 18,
+                    detail = createErrorMessage("Set<String>", "Set", "a"),
+                ),
+                LintViolation(
+                    line = 6,
+                    col = 18,
+                    detail = createErrorMessage("Map<String, Int>", "Map", "a"),
+                ),
+            )
+    }
+
+    @Test
+    fun `passes even if there are errors if disallowUnstableCollections is false`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun Something(a: List<String>) {}
+                @Composable
+                fun Something(a: Set<String>) {}
+                @Composable
+                fun Something(a: Map<String, Int>) {}
+            """.trimIndent()
+        ruleAssertThat(code).hasNoLintViolations()
     }
 
     @Test
@@ -53,6 +70,8 @@ class UnstableCollectionsCheckTest {
                 @Composable
                 fun Something(a: StringList, b: StringSet, c: StringToIntMap) {}
             """.trimIndent()
-        ruleAssertThat(code).hasNoLintViolations()
+        ruleAssertThat(code)
+            .withEditorConfigOverride(disallowUnstableCollections to true)
+            .hasNoLintViolations()
     }
 }

@@ -255,3 +255,14 @@ val disallowMaterial2: EditorConfigProperty<Boolean> =
         ),
         defaultValue = false,
     )
+
+val disallowUnstableCollections: EditorConfigProperty<Boolean> =
+    EditorConfigProperty(
+        type = PropertyType.LowerCasingPropertyType(
+            "compose_disallow_unstable_collections",
+            "When enabled, unstable collections (e.g. List/Set/Map) will be disallowed.",
+            PropertyValueParser.BOOLEAN_VALUE_PARSER,
+            setOf(true.toString(), false.toString()),
+        ),
+        defaultValue = false,
+    )
