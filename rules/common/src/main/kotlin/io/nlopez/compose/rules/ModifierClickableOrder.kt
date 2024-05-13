@@ -2,14 +2,14 @@
 // SPDX-License-Identifier: Apache-2.0
 package io.nlopez.compose.rules
 
-import io.nlopez.rules.core.ComposeKtConfig
-import io.nlopez.rules.core.ComposeKtVisitor
-import io.nlopez.rules.core.Emitter
-import io.nlopez.rules.core.report
-import io.nlopez.rules.core.util.argumentsUsingModifiers
-import io.nlopez.rules.core.util.findChildrenByClass
-import io.nlopez.rules.core.util.modifierParameters
-import io.nlopez.rules.core.util.obtainAllModifierNames
+import io.nlopez.compose.core.ComposeKtConfig
+import io.nlopez.compose.core.ComposeKtVisitor
+import io.nlopez.compose.core.Emitter
+import io.nlopez.compose.core.report
+import io.nlopez.compose.core.util.argumentsUsingModifiers
+import io.nlopez.compose.core.util.findChildrenByClass
+import io.nlopez.compose.core.util.modifierParameters
+import io.nlopez.compose.core.util.obtainAllModifierNames
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.KtExpression

@@ -2,11 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 package io.nlopez.compose.rules.ktlint
 
+import io.nlopez.compose.core.ComposeKtConfig
+import io.nlopez.compose.core.ComposeKtVisitor
+import io.nlopez.compose.core.Emitter
+import io.nlopez.compose.rules.KtlintRule
 import io.nlopez.compose.rules.Material2
-import io.nlopez.rules.core.ComposeKtConfig
-import io.nlopez.rules.core.ComposeKtVisitor
-import io.nlopez.rules.core.Emitter
-import io.nlopez.rules.core.ktlint.KtlintRule
 import org.jetbrains.kotlin.psi.KtFile
 
 class Material2Check :

@@ -2,11 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 package io.nlopez.compose.rules
 
-import io.nlopez.rules.core.ComposeKtConfig
-import io.nlopez.rules.core.ComposeKtVisitor
-import io.nlopez.rules.core.Emitter
-import io.nlopez.rules.core.report
-import io.nlopez.rules.core.util.isPreview
+import io.nlopez.compose.core.ComposeKtConfig
+import io.nlopez.compose.core.ComposeKtVisitor
+import io.nlopez.compose.core.Emitter
+import io.nlopez.compose.core.report
+import io.nlopez.compose.core.util.isPreview
 import org.jetbrains.kotlin.psi.KtClass
 
 class PreviewAnnotationNaming : ComposeKtVisitor {

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package io.nlopez.compose.rules.ktlint
 
-import io.nlopez.rules.core.ktlint.KtlintRule
+import io.nlopez.compose.rules.KtlintRule
 import org.assertj.core.api.AssertionsForInterfaceTypes.assertThat
 import org.junit.jupiter.api.Test
 import org.reflections.Reflections

@@ -2,18 +2,18 @@
 // SPDX-License-Identifier: Apache-2.0
 package io.nlopez.compose.rules
 
-import io.nlopez.rules.core.ComposeKtConfig
-import io.nlopez.rules.core.ComposeKtVisitor
-import io.nlopez.rules.core.Emitter
-import io.nlopez.rules.core.util.definedInInterface
-import io.nlopez.rules.core.util.findChildrenByClass
-import io.nlopez.rules.core.util.findDirectChildrenByClass
-import io.nlopez.rules.core.util.isActual
-import io.nlopez.rules.core.util.isOverride
-import io.nlopez.rules.core.util.isRestartableEffect
-import io.nlopez.rules.core.util.joinToRegex
-import io.nlopez.rules.core.util.joinToRegexOrNull
-import io.nlopez.rules.core.util.runIfNotNull
+import io.nlopez.compose.core.ComposeKtConfig
+import io.nlopez.compose.core.ComposeKtVisitor
+import io.nlopez.compose.core.Emitter
+import io.nlopez.compose.core.util.definedInInterface
+import io.nlopez.compose.core.util.findChildrenByClass
+import io.nlopez.compose.core.util.findDirectChildrenByClass
+import io.nlopez.compose.core.util.isActual
+import io.nlopez.compose.core.util.isOverride
+import io.nlopez.compose.core.util.isRestartableEffect
+import io.nlopez.compose.core.util.joinToRegex
+import io.nlopez.compose.core.util.joinToRegexOrNull
+import io.nlopez.compose.core.util.runIfNotNull
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.KtFunction

@@ -2,16 +2,16 @@
 // SPDX-License-Identifier: Apache-2.0
 package io.nlopez.compose.rules
 
-import io.nlopez.rules.core.ComposeKtConfig
-import io.nlopez.rules.core.ComposeKtVisitor
-import io.nlopez.rules.core.Emitter
-import io.nlopez.rules.core.util.definedInInterface
-import io.nlopez.rules.core.util.isAbstract
-import io.nlopez.rules.core.util.isActual
-import io.nlopez.rules.core.util.isModifier
-import io.nlopez.rules.core.util.isOpen
-import io.nlopez.rules.core.util.isOverride
-import io.nlopez.rules.core.util.lastChildLeafOrSelf
+import io.nlopez.compose.core.ComposeKtConfig
+import io.nlopez.compose.core.ComposeKtVisitor
+import io.nlopez.compose.core.Emitter
+import io.nlopez.compose.core.util.definedInInterface
+import io.nlopez.compose.core.util.isAbstract
+import io.nlopez.compose.core.util.isActual
+import io.nlopez.compose.core.util.isModifier
+import io.nlopez.compose.core.util.isOpen
+import io.nlopez.compose.core.util.isOverride
+import io.nlopez.compose.core.util.lastChildLeafOrSelf
 import org.jetbrains.kotlin.com.intellij.psi.impl.source.tree.LeafPsiElement
 import org.jetbrains.kotlin.psi.KtFunction
 

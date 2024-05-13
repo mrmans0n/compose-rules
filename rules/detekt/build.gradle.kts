@@ -25,9 +25,6 @@ tasks.shadowJar {
 dependencies {
     api(libs.detekt.core)
     api(projects.rules.common)
-    api(projects.coreDetekt)
-
-    implementation(projects.coreCommon)
 
     testImplementation(libs.detekt.test)
     testImplementation(libs.junit5)

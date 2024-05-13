@@ -2,15 +2,15 @@
 // SPDX-License-Identifier: Apache-2.0
 package io.nlopez.compose.rules
 
-import io.nlopez.rules.core.ComposeKtConfig
-import io.nlopez.rules.core.ComposeKtVisitor
-import io.nlopez.rules.core.Emitter
-import io.nlopez.rules.core.report
-import io.nlopez.rules.core.util.findChildrenByClass
-import io.nlopez.rules.core.util.isComposable
-import io.nlopez.rules.core.util.isInternal
-import io.nlopez.rules.core.util.isPrivate
-import io.nlopez.rules.core.util.isProtected
+import io.nlopez.compose.core.ComposeKtConfig
+import io.nlopez.compose.core.ComposeKtVisitor
+import io.nlopez.compose.core.Emitter
+import io.nlopez.compose.core.report
+import io.nlopez.compose.core.util.findChildrenByClass
+import io.nlopez.compose.core.util.isComposable
+import io.nlopez.compose.core.util.isInternal
+import io.nlopez.compose.core.util.isPrivate
+import io.nlopez.compose.core.util.isProtected
 import org.jetbrains.kotlin.psi.KtClassOrObject
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtFunction

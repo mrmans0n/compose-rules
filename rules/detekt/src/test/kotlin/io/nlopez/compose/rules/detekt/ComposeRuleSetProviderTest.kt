@@ -3,7 +3,7 @@
 package io.nlopez.compose.rules.detekt
 
 import io.gitlab.arturbosch.detekt.api.Config
-import io.nlopez.rules.core.detekt.DetektRule
+import io.nlopez.compose.rules.DetektRule
 import org.assertj.core.api.AssertionsForInterfaceTypes.assertThat
 import org.junit.jupiter.api.Test
 import org.reflections.Reflections

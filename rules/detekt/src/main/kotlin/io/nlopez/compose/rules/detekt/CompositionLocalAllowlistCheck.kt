@@ -6,9 +6,9 @@ import io.gitlab.arturbosch.detekt.api.Config
 import io.gitlab.arturbosch.detekt.api.Debt
 import io.gitlab.arturbosch.detekt.api.Issue
 import io.gitlab.arturbosch.detekt.api.Severity
+import io.nlopez.compose.core.ComposeKtVisitor
 import io.nlopez.compose.rules.CompositionLocalAllowlist
-import io.nlopez.rules.core.ComposeKtVisitor
-import io.nlopez.rules.core.detekt.DetektRule
+import io.nlopez.compose.rules.DetektRule
 
 class CompositionLocalAllowlistCheck(config: Config) :
     DetektRule(config),

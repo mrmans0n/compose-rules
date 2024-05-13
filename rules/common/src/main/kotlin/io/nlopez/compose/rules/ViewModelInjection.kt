@@ -2,17 +2,17 @@
 // SPDX-License-Identifier: Apache-2.0
 package io.nlopez.compose.rules
 
-import io.nlopez.rules.core.ComposeKtConfig
-import io.nlopez.rules.core.ComposeKtVisitor
-import io.nlopez.rules.core.Emitter
-import io.nlopez.rules.core.util.definedInInterface
-import io.nlopez.rules.core.util.findChildrenByClass
-import io.nlopez.rules.core.util.findDirectChildrenByClass
-import io.nlopez.rules.core.util.findDirectFirstChildByClass
-import io.nlopez.rules.core.util.firstChildLeafOrSelf
-import io.nlopez.rules.core.util.isOverride
-import io.nlopez.rules.core.util.lastChildLeafOrSelf
-import io.nlopez.rules.core.util.nextCodeSibling
+import io.nlopez.compose.core.ComposeKtConfig
+import io.nlopez.compose.core.ComposeKtVisitor
+import io.nlopez.compose.core.Emitter
+import io.nlopez.compose.core.util.definedInInterface
+import io.nlopez.compose.core.util.findChildrenByClass
+import io.nlopez.compose.core.util.findDirectChildrenByClass
+import io.nlopez.compose.core.util.findDirectFirstChildByClass
+import io.nlopez.compose.core.util.firstChildLeafOrSelf
+import io.nlopez.compose.core.util.isOverride
+import io.nlopez.compose.core.util.lastChildLeafOrSelf
+import io.nlopez.compose.core.util.nextCodeSibling
 import org.jetbrains.kotlin.com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.com.intellij.psi.impl.source.tree.ElementType
 import org.jetbrains.kotlin.com.intellij.psi.impl.source.tree.LeafPsiElement

@@ -13,7 +13,6 @@ if (!project.hasProperty("uberJar")) {
     }
 }
 
-
 tasks.shadowJar {
     // Relocate packages that may conflict with the ones IntelliJ IDEA provides as well.
     // See https://github.com/nbadal/ktlint-intellij-plugin/blob/main/lib/build.gradle.kts
@@ -27,9 +26,6 @@ dependencies {
     api(libs.ktlint.rule.engine)
     api(libs.ktlint.cli.ruleset.core)
     api(projects.rules.common)
-    api(projects.coreKtlint)
-
-    implementation(projects.coreCommon)
 
     testImplementation(libs.ktlint.test)
     testImplementation(libs.junit5)
