@@ -1,23 +1,20 @@
-// Copyright 2023 Nacho Lopez
+// Copyright 2024 Nacho Lopez
 // SPDX-License-Identifier: Apache-2.0
 plugins {
-    alias libs.plugins.kotlin.jvm
+    alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.shadowJar)
-}
-
-test {
-    useJUnitPlatform()
 }
 
 // if publishing and it's not the uber jar, we want to remove the shadowRuntimeElements variant
 if (!project.hasProperty("uberJar")) {
-    AdhocComponentWithVariants javaComponent = (AdhocComponentWithVariants) project.components.findByName("java")
+    val javaComponent = components["java"] as AdhocComponentWithVariants
     javaComponent.withVariantsFromConfiguration(configurations["shadowRuntimeElements"]) {
         skip()
     }
 }
 
-shadowJar {
+
+tasks.shadowJar {
     // Relocate packages that may conflict with the ones IntelliJ IDEA provides as well.
     // See https://github.com/nbadal/ktlint-intellij-plugin/blob/main/lib/build.gradle.kts
     relocate("org.jetbrains.concurrency", "shadow.org.jetbrains.concurrency")
@@ -27,16 +24,16 @@ shadowJar {
 }
 
 dependencies {
-    api libs.ktlint.rule.engine
-    api libs.ktlint.cli.ruleset.core
-    api project(':rules:common')
-    api project(':core-ktlint')
+    api(libs.ktlint.rule.engine)
+    api(libs.ktlint.cli.ruleset.core)
+    api(projects.rules.common)
+    api(projects.coreKtlint)
 
-    implementation project(':core-common')
+    implementation(projects.coreCommon)
 
-    testImplementation libs.ktlint.test
-    testImplementation libs.junit5
-    testImplementation libs.junit5.params
-    testImplementation libs.assertj
-    testImplementation libs.reflections
+    testImplementation(libs.ktlint.test)
+    testImplementation(libs.junit5)
+    testImplementation(libs.junit5.params)
+    testImplementation(libs.assertj)
+    testImplementation(libs.reflections)
 }
