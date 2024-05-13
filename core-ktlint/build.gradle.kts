@@ -1,18 +1,14 @@
-// Copyright 2023 Nacho Lopez
+// Copyright 2024 Nacho Lopez
 // SPDX-License-Identifier: Apache-2.0
 plugins {
-    alias libs.plugins.kotlin.jvm
-}
-
-test {
-    useJUnitPlatform()
+    alias(libs.plugins.kotlin.jvm)
 }
 
 dependencies {
-    api libs.ktlint.rule.engine
-    implementation project(':core-common')
+    api(libs.ktlint.rule.engine)
+    implementation(projects.coreCommon)
 
-    testImplementation libs.ktlint.test
-    testImplementation libs.junit5
-    testImplementation libs.assertj
+    testImplementation(libs.ktlint.test)
+    testImplementation(libs.junit5)
+    testImplementation(libs.assertj)
 }
