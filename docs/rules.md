@@ -264,6 +264,31 @@ When writing Kotlin, it's a good practice to write the parameters for your metho
 
 Modifiers occupy the first optional parameter slot to set a consistent expectation for developers that they can always provide a modifier as the final positional parameter to an element call for any given element's common case.
 
+Additionally, if there is a `content` lambda, it should be used as a trailing lambda.
+
+```mermaid
+  flowchart TD
+    A[Required params] --> B[Modifier]
+    B --> C[Optional parameters]
+    C --> D[Optionally a trailing lambda, like a content slot]
+```
+
+An example of the above diagram could be this:
+
+```kotlin
+// ✅
+@Composable
+fun Avatar(
+    imageUrl: String, // Required parameters go first
+    name: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier, // Optional parameters, start with modifier
+    loadingContent: @Composable (() -> Unit)? = null, // Other optional parameters
+    errorContent: @Composable (() -> Unit)? = null,
+    content: @Composable () -> Unit, // A trailing mandatory lambda _can_ be last. Recommended placement for `content` slots.
+) { ... }
+```
+
 More information: [Kotlin default arguments](https://kotlinlang.org/docs/functions.html#default-arguments), [Modifier docs](https://developer.android.com/reference/kotlin/androidx/compose/ui/Modifier) and [Elements accept and respect a Modifier parameter](https://github.com/androidx/androidx/blob/androidx-main/compose/docs/compose-api-guidelines.md#why-8).
 
 Related rule: [compose:param-order-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ParameterOrder.kt)
