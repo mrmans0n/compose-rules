@@ -43,6 +43,8 @@ Compose:
     active: true
   MutableStateParam:
     active: true
+  ParameterNaming:
+    active: true
   PreviewAnnotationNaming:
     active: true
   PreviewPublic:

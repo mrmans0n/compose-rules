@@ -268,6 +268,23 @@ More information: [Kotlin default arguments](https://kotlinlang.org/docs/functio
 
 Related rule: [compose:param-order-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ParameterOrder.kt)
 
+### Naming parameters properly
+
+The parameters in composable functions that send events are typically named `on` + verb in the present tense, like in the very common examples in Compose foundation code: `onClick` or `onTextChange`.
+It a common mistake to use the past tense in some of these events, so for consistency’s sake, we'll want to adjust the tense of the verbs to present.
+
+```kotlin
+// ❌
+@Composable
+fun Avatar(onShown: () -> Unit, onChanged: () -> Unit) { ... }
+
+// ✅
+@Composable
+fun Avatar(onShow: () -> Unit, onChange: () -> Unit) { ... }
+```
+
+Related rule: [compose:parameter-naming](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ParameterNaming.kt)
+
 ### Movable content should be remembered
 
 The methods used to create movable composable content (`movableContentOf` and `movableContentWithReceiverOf`) need to be used inside a `remember` function.

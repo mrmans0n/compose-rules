@@ -32,6 +32,7 @@ class ComposeRuleSetProvider : RuleSetProviderV3(
         RuleProvider { MutableStateAutoboxingCheck() },
         RuleProvider { MutableStateParameterCheck() },
         RuleProvider { NamingCheck() },
+        RuleProvider { ParameterNamingCheck() },
         RuleProvider { ParameterOrderCheck() },
         RuleProvider { PreviewAnnotationNamingCheck() },
         RuleProvider { PreviewPublicCheck() },

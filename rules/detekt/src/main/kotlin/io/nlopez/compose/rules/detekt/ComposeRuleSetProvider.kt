@@ -33,6 +33,7 @@ class ComposeRuleSetProvider : RuleSetProvider {
             MutableStateAutoboxingCheck(config),
             MutableStateParameterCheck(config),
             NamingCheck(config),
+            ParameterNamingCheck(config),
             ParameterOrderCheck(config),
             PreviewAnnotationNamingCheck(config),
             PreviewPublicCheck(config),

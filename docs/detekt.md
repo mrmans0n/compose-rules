@@ -101,6 +101,10 @@ Compose:
     active: true
   MutableStateParam:
     active: true
+  ParameterNaming:
+    active: true
+    # -- You can optionally have a list of types to be treated as composable lambdas (e.g. typedefs or fun interfaces not picked up automatically)
+    # treatAsComposableLambda: MyComposableLambdaType
   PreviewAnnotationNaming:
     active: true
   PreviewPublic:
