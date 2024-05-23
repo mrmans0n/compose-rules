@@ -73,7 +73,7 @@ class ParameterOrder : ComposeKtVisitor {
 
         fun createErrorMessage(currentOrder: String, properOrder: String): String = """
             Parameters in a composable function should be ordered following this pattern: params without defaults, modifiers, params with defaults and optionally, a trailing function that might not have a default param.
-            Current params are: [$currentOrder] but should be [$properOrder].
+            Current params are: [$currentOrder] but could be [$properOrder].
 
             See https://mrmans0n.github.io/compose-rules/rules/#ordering-composable-parameters-properly for more information.
         """.trimIndent()
