@@ -279,6 +279,7 @@ private val RestartableEffects by lazy {
         "LaunchedEffect",
         "produceState",
         "DisposableEffect",
+        "produceRetainedState", // Circuit
     )
 }
 
