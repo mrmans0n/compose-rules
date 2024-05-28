@@ -38,7 +38,8 @@ class ParameterNaming : ComposeKtVisitor {
     }
 
     private val String.isPastTense: Boolean
-        get() = endsWith("ed") || IrregularVerbsInPastTense.any { endsWith(it) }
+        get() = VerbsPresentTenseEndingInEd.none { endsWith(it) } &&
+            (endsWith("ed") || IrregularVerbsInPastTense.any { endsWith(it) })
 
     companion object {
         // A list of common irregular verbs in english, excluding those where present tense == past tense,
@@ -200,6 +201,28 @@ class ParameterNaming : ComposeKtVisitor {
                 "Wound",
                 "Written",
                 "Wrote",
+            )
+        }
+
+        // A list of verbs whose present tenses ends in -ed
+        private val VerbsPresentTenseEndingInEd by lazy {
+            setOf(
+                "Bed",
+                "Bleed",
+                "Embed",
+                "Exceed",
+                "Feed",
+                "Heed",
+                "Need",
+                "Proceed",
+                "Seed",
+                "Shed",
+                "Shred",
+                "Sled",
+                "Speed",
+                "Succeed",
+                "Wed",
+                "Weed",
             )
         }
 

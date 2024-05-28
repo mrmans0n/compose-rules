@@ -61,7 +61,13 @@ class ParameterNamingCheckTest {
         val code =
             """
                 @Composable
-                fun A(onClick: () -> Unit, onValueChange: (Int) -> Unit, onWrite: () -> Unit, onPotato: Potato) {}
+                fun A(
+                    onClick: () -> Unit,
+                    onValueChange: (Int) -> Unit,
+                    onWrite: () -> Unit,
+                    onPotato: Potato,
+                    onEmbed: () -> Unit,
+                ) {}
             """.trimIndent()
 
         val errors = rule.lint(code)
