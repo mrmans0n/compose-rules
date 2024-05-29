@@ -23,7 +23,9 @@ tasks.shadowJar {
 }
 
 dependencies {
-    api(libs.detekt.core)
+    api(libs.detekt.api)
+    api(libs.detekt.rules.libraries)
+    api(libs.detekt.rules.ruleauthors)
     api(projects.rules.common)
 
     testImplementation(libs.detekt.test)
