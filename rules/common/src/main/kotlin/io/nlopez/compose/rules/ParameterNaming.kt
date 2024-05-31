@@ -30,6 +30,7 @@ class ParameterNaming : ComposeKtVisitor {
                 // lazy initialization purposes -- and also don't want to be overly annoying.
                 it.name?.startsWith("on") == true
             }
+            .filterNot { it.name in ExceptionsInCompose }
             .filter { it.name?.isPastTense == true }
 
         for (error in errors) {
@@ -223,6 +224,13 @@ class ParameterNaming : ComposeKtVisitor {
                 "Succeed",
                 "Wed",
                 "Weed",
+            )
+        }
+
+        // Usages of past found in official Compose code T_T
+        private val ExceptionsInCompose by lazy {
+            setOf(
+                "onFocusChanged",
             )
         }
 
