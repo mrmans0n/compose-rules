@@ -11,19 +11,22 @@ import org.reflections.Reflections
 class ComposeRuleSetProviderTest {
 
     private val ruleSetProvider = ComposeRuleSetProvider()
-    private val ruleSet = ruleSetProvider.instance(Config.empty)
+    private val ruleSet = ruleSetProvider.instance()
 
     @Test
     fun `ensure all rules in the package are represented in the ruleset`() {
         val reflections = Reflections(ruleSetProvider.javaClass.packageName)
         val ruleClassesInPackage = reflections.getSubTypesOf(DetektRule::class.java)
-        val ruleClassesInRuleSet = ruleSet.rules.filterIsInstance<DetektRule>().map { it::class.java }.toSet()
+        val ruleClassesInRuleSet = ruleSet.rules.values.map {
+            it(Config.empty)
+        }.filterIsInstance<DetektRule>().map { it::class.java }.toSet()
         assertThat(ruleClassesInRuleSet).containsExactlyInAnyOrderElementsOf(ruleClassesInPackage)
     }
 
     @Test
     fun `ensure all rules in the package are listed in alphabetical order`() {
         val isOrdered = ruleSet.rules
+            .values.map { it(Config.empty) }
             .filterIsInstance<DetektRule>()
             .asSequence()
             .map { it::class.java.simpleName }
