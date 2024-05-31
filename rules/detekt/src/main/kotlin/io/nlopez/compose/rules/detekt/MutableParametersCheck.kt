@@ -3,20 +3,13 @@
 package io.nlopez.compose.rules.detekt
 
 import io.gitlab.arturbosch.detekt.api.Config
-import io.gitlab.arturbosch.detekt.api.Debt
-import io.gitlab.arturbosch.detekt.api.Issue
-import io.gitlab.arturbosch.detekt.api.Severity
 import io.nlopez.compose.core.ComposeKtVisitor
 import io.nlopez.compose.rules.DetektRule
 import io.nlopez.compose.rules.MutableParameters
 
 class MutableParametersCheck(config: Config) :
-    DetektRule(config),
+    DetektRule(config, MutableParameters.MutableParameterInCompose),
     ComposeKtVisitor by MutableParameters() {
-    override val issue: Issue = Issue(
-        id = "MutableParams",
-        severity = Severity.Defect,
-        description = MutableParameters.MutableParameterInCompose,
-        debt = Debt.TWENTY_MINS,
-    )
+
+    override val ruleId = Id("MutableParams")
 }

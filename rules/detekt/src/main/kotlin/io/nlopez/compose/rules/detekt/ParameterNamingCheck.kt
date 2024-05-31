@@ -3,24 +3,21 @@
 package io.nlopez.compose.rules.detekt
 
 import io.gitlab.arturbosch.detekt.api.Config
-import io.gitlab.arturbosch.detekt.api.Debt
-import io.gitlab.arturbosch.detekt.api.Issue
-import io.gitlab.arturbosch.detekt.api.Severity
 import io.nlopez.compose.core.ComposeKtVisitor
 import io.nlopez.compose.rules.DetektRule
 import io.nlopez.compose.rules.ParameterNaming
 
 class ParameterNamingCheck(config: Config) :
-    DetektRule(config),
+    DetektRule(config, description),
     ComposeKtVisitor by ParameterNaming() {
-    override val issue: Issue = Issue(
-        id = "ParameterNaming",
-        severity = Severity.CodeSmell,
-        description = """
+
+    override val ruleId = Id("ParameterNaming")
+
+    private companion object {
+        private val description = """
         Lambda parameters in a composable function should be in present tense, not past tense.
 
         Examples: `onClick` and not `onClicked`, `onTextChange` and not `onTextChanged`, etc.
-        """.trimIndent(),
-        debt = Debt.FIVE_MINS,
-    )
+        """.trimIndent()
+    }
 }

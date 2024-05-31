@@ -3,22 +3,19 @@
 package io.nlopez.compose.rules.detekt
 
 import io.gitlab.arturbosch.detekt.api.Config
-import io.gitlab.arturbosch.detekt.api.Debt
-import io.gitlab.arturbosch.detekt.api.Issue
-import io.gitlab.arturbosch.detekt.api.Severity
 import io.nlopez.compose.core.ComposeKtVisitor
 import io.nlopez.compose.rules.DetektRule
 import io.nlopez.compose.rules.ParameterOrder
 
 class ParameterOrderCheck(config: Config) :
-    DetektRule(config),
+    DetektRule(config, DESCRIPTION),
     ComposeKtVisitor by ParameterOrder() {
-    override val issue: Issue = Issue(
-        id = "ComposableParamOrder",
-        severity = Severity.CodeSmell,
-        description = "Parameters in a composable function should be ordered following this pattern: " +
-            "params without defaults, modifiers, params with defaults and optionally, " +
-            "a trailing function that might not have a default param.",
-        debt = Debt.TEN_MINS,
-    )
+
+    override val ruleId = Id("ComposableParamOrder")
+
+    private companion object {
+        private const val DESCRIPTION = "Parameters in a composable function should be ordered following this " +
+            "pattern: params without defaults, modifiers, params with defaults and optionally, " +
+            "a trailing function that might not have a default param."
+    }
 }

@@ -3,20 +3,13 @@
 package io.nlopez.compose.rules.detekt
 
 import io.gitlab.arturbosch.detekt.api.Config
-import io.gitlab.arturbosch.detekt.api.Debt
-import io.gitlab.arturbosch.detekt.api.Issue
-import io.gitlab.arturbosch.detekt.api.Severity
 import io.nlopez.compose.core.ComposeKtVisitor
 import io.nlopez.compose.rules.DetektRule
 import io.nlopez.compose.rules.ModifierComposable
 
 class ModifierComposableCheck(config: Config) :
-    DetektRule(config),
+    DetektRule(config, ModifierComposable.ComposableModifier),
     ComposeKtVisitor by ModifierComposable() {
-    override val issue: Issue = Issue(
-        id = "ModifierComposable",
-        severity = Severity.Performance,
-        description = ModifierComposable.ComposableModifier,
-        debt = Debt.TEN_MINS,
-    )
+
+    override val ruleId = Id("ModifierComposable")
 }

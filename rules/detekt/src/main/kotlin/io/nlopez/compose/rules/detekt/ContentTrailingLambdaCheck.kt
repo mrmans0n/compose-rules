@@ -3,20 +3,13 @@
 package io.nlopez.compose.rules.detekt
 
 import io.gitlab.arturbosch.detekt.api.Config
-import io.gitlab.arturbosch.detekt.api.Debt
-import io.gitlab.arturbosch.detekt.api.Issue
-import io.gitlab.arturbosch.detekt.api.Severity
 import io.nlopez.compose.core.ComposeKtVisitor
 import io.nlopez.compose.rules.ContentTrailingLambda
 import io.nlopez.compose.rules.DetektRule
 
 class ContentTrailingLambdaCheck(config: Config) :
-    DetektRule(config),
+    DetektRule(config, ContentTrailingLambda.ContentShouldBeTrailingLambda),
     ComposeKtVisitor by ContentTrailingLambda() {
-    override val issue: Issue = Issue(
-        id = "ContentTrailingLambda",
-        severity = Severity.CodeSmell,
-        description = ContentTrailingLambda.ContentShouldBeTrailingLambda,
-        debt = Debt.TEN_MINS,
-    )
+
+    override val ruleId = Id("ContentTrailingLambda")
 }

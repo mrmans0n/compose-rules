@@ -3,23 +3,19 @@
 package io.nlopez.compose.rules.detekt
 
 import io.gitlab.arturbosch.detekt.api.Config
-import io.gitlab.arturbosch.detekt.api.Debt
-import io.gitlab.arturbosch.detekt.api.Issue
-import io.gitlab.arturbosch.detekt.api.Severity
 import io.nlopez.compose.core.ComposeKtVisitor
 import io.nlopez.compose.rules.DetektRule
 import io.nlopez.compose.rules.RememberContentMissing
 
 class RememberContentMissingCheck(config: Config) :
-    DetektRule(config),
+    DetektRule(config, DESCRIPTION),
     ComposeKtVisitor by RememberContentMissing() {
 
-    override val issue: Issue = Issue(
-        id = "RememberContentMissing",
-        severity = Severity.Defect,
-        description = """
-            Using movableContentOf/movableContentWithReceiverOf in a @Composable function without it being remembered can cause visual problems, as the content would be recycled when detached from the composition.
-        """.trimIndent(),
-        debt = Debt.FIVE_MINS,
-    )
+    override val ruleId = Id("RememberContentMissing")
+
+    private companion object {
+        private const val DESCRIPTION = "Using movableContentOf/movableContentWithReceiverOf in a @Composable " +
+            "function without it being remembered can cause visual problems, as the content would be recycled " +
+            "when detached from the composition."
+    }
 }

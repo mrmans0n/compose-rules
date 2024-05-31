@@ -3,20 +3,13 @@
 package io.nlopez.compose.rules.detekt
 
 import io.gitlab.arturbosch.detekt.api.Config
-import io.gitlab.arturbosch.detekt.api.Debt
-import io.gitlab.arturbosch.detekt.api.Issue
-import io.gitlab.arturbosch.detekt.api.Severity
 import io.nlopez.compose.core.ComposeKtVisitor
 import io.nlopez.compose.rules.DetektRule
 import io.nlopez.compose.rules.ModifierNotUsedAtRoot
 
 class ModifierNotUsedAtRootCheck(config: Config) :
-    DetektRule(config),
+    DetektRule(config, ModifierNotUsedAtRoot.ComposableModifierShouldBeUsedAtTheTopMostPossiblePlace),
     ComposeKtVisitor by ModifierNotUsedAtRoot() {
-    override val issue: Issue = Issue(
-        id = "ModifierNotUsedAtRoot",
-        severity = Severity.Defect,
-        description = ModifierNotUsedAtRoot.ComposableModifierShouldBeUsedAtTheTopMostPossiblePlace,
-        debt = Debt.FIVE_MINS,
-    )
+
+    override val ruleId = Id("ModifierNotUsedAtRoot")
 }

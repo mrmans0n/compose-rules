@@ -3,21 +3,18 @@
 package io.nlopez.compose.rules.detekt
 
 import io.gitlab.arturbosch.detekt.api.Config
-import io.gitlab.arturbosch.detekt.api.Debt
-import io.gitlab.arturbosch.detekt.api.Issue
-import io.gitlab.arturbosch.detekt.api.Severity
 import io.nlopez.compose.core.ComposeKtVisitor
 import io.nlopez.compose.rules.DetektRule
 import io.nlopez.compose.rules.MutableStateAutoboxing
 
 class MutableStateAutoboxingCheck(config: Config) :
-    DetektRule(config),
+    DetektRule(config, DESCRIPTION),
     ComposeKtVisitor by MutableStateAutoboxing() {
-    override val issue: Issue = Issue(
-        id = "MutableStateAutoboxing",
-        severity = Severity.Performance,
-        description = "Using mutableInt/Long/Double/FloatStateOf is recommended over mutableStateOf<X> for " +
-            "Int/Long/Double/Float, as it uses the primitives directly which is more performant.",
-        debt = Debt.FIVE_MINS,
-    )
+
+    override val ruleId = Id("MutableStateAutoboxing")
+
+    private companion object {
+        private const val DESCRIPTION = "Using mutableInt/Long/Double/FloatStateOf is recommended over " +
+            "mutableStateOf<X> for Int/Long/Double/Float, as it uses the primitives directly which is more performant."
+    }
 }

@@ -3,21 +3,13 @@
 package io.nlopez.compose.rules.detekt
 
 import io.gitlab.arturbosch.detekt.api.Config
-import io.gitlab.arturbosch.detekt.api.Debt
-import io.gitlab.arturbosch.detekt.api.Issue
-import io.gitlab.arturbosch.detekt.api.Severity
 import io.nlopez.compose.core.ComposeKtVisitor
 import io.nlopez.compose.rules.DetektRule
 import io.nlopez.compose.rules.LambdaParameterInRestartableEffect
 
 class LambdaParameterInRestartableEffectCheck(config: Config) :
-    DetektRule(config),
+    DetektRule(config, LambdaParameterInRestartableEffect.LambdaUsedInRestartableEffect),
     ComposeKtVisitor by LambdaParameterInRestartableEffect() {
 
-    override val issue: Issue = Issue(
-        id = "LambdaParameterInRestartableEffect",
-        severity = Severity.Defect,
-        description = LambdaParameterInRestartableEffect.LambdaUsedInRestartableEffect,
-        debt = Debt.TWENTY_MINS,
-    )
+    override val ruleId = Id("LambdaParameterInRestartableEffect")
 }
