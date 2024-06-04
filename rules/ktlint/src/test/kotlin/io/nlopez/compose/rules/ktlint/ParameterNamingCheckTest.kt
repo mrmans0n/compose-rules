@@ -76,6 +76,7 @@ class ParameterNamingCheckTest {
                     onPotato: Potato,
                     onEmbed: () -> Unit,
                     onFocusChanged: () -> Unit,
+                    onValueChangeFinished: () -> Unit,
                 ) {}
             """.trimIndent()
 

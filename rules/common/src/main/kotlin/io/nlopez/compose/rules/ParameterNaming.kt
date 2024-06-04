@@ -231,6 +231,7 @@ class ParameterNaming : ComposeKtVisitor {
         private val ExceptionsInCompose by lazy {
             setOf(
                 "onFocusChanged",
+                "onValueChangeFinished", // androidx.compose.material3.RangeSlider
             )
         }
 
