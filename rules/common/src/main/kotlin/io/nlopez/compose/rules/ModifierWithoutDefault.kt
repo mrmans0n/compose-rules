@@ -5,6 +5,7 @@ package io.nlopez.compose.rules
 import io.nlopez.compose.core.ComposeKtConfig
 import io.nlopez.compose.core.ComposeKtVisitor
 import io.nlopez.compose.core.Emitter
+import io.nlopez.compose.core.ifFix
 import io.nlopez.compose.core.util.definedInInterface
 import io.nlopez.compose.core.util.isAbstract
 import io.nlopez.compose.core.util.isActual
@@ -17,12 +18,7 @@ import org.jetbrains.kotlin.psi.KtFunction
 
 class ModifierWithoutDefault : ComposeKtVisitor {
 
-    override fun visitComposable(
-        function: KtFunction,
-        autoCorrect: Boolean,
-        emitter: Emitter,
-        config: ComposeKtConfig,
-    ) {
+    override fun visitComposable(function: KtFunction, emitter: Emitter, config: ComposeKtConfig) {
         if (
             function.definedInInterface ||
             function.isActual ||
@@ -38,10 +34,8 @@ class ModifierWithoutDefault : ComposeKtVisitor {
             function.valueParameters.filter { it.isModifier }
                 .filterNot { it.hasDefaultValue() }
                 .forEach { modifierParameter ->
-                    emitter.report(modifierParameter, MissingModifierDefaultParam, true)
-
-                    // This error is easily auto fixable, we just inject ` = Modifier` to the param
-                    if (autoCorrect) {
+                    emitter.report(modifierParameter, MissingModifierDefaultParam, true).ifFix {
+                        // This error is easily auto fixable, we just inject ` = Modifier` to the param
                         val lastToken = modifierParameter.node.lastChildLeafOrSelf() as LeafPsiElement
                         val currentText = lastToken.text
                         lastToken.rawReplaceWithText("$currentText = Modifier")

@@ -18,12 +18,7 @@ import org.jetbrains.kotlin.psi.psiUtil.isPublic
 
 class ModifierMissing : ComposeKtVisitor {
 
-    override fun visitComposable(
-        function: KtFunction,
-        autoCorrect: Boolean,
-        emitter: Emitter,
-        config: ComposeKtConfig,
-    ) {
+    override fun visitComposable(function: KtFunction, emitter: Emitter, config: ComposeKtConfig) {
         // We want to find all composable functions that:
         //  - emit content
         //  - are not overridden or part of an interface

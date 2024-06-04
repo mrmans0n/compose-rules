@@ -18,15 +18,10 @@ class UnstableCollectionsCheck :
 
     private val visitor = UnstableCollections()
 
-    override fun visitComposable(
-        function: KtFunction,
-        autoCorrect: Boolean,
-        emitter: Emitter,
-        config: ComposeKtConfig,
-    ) {
+    override fun visitComposable(function: KtFunction, emitter: Emitter, config: ComposeKtConfig) {
         // ktlint allows all rules by default, so we'll add an extra param to make sure it's disabled by default
         if (config.getBoolean("disallowUnstableCollections", false)) {
-            visitor.visitComposable(function, autoCorrect, emitter, config)
+            visitor.visitComposable(function, emitter, config)
         }
     }
 }

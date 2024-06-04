@@ -11,12 +11,7 @@ import org.jetbrains.kotlin.psi.KtFunction
 
 class MutableParameters : ComposeKtVisitor {
 
-    override fun visitComposable(
-        function: KtFunction,
-        autoCorrect: Boolean,
-        emitter: Emitter,
-        config: ComposeKtConfig,
-    ) {
+    override fun visitComposable(function: KtFunction, emitter: Emitter, config: ComposeKtConfig) {
         function.valueParameters
             .filter { it.isTypeMutable }
             .forEach { emitter.report(it, MutableParameterInCompose) }

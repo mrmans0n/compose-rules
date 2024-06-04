@@ -22,7 +22,7 @@ import org.jetbrains.kotlin.psi.KtReferenceExpression
 
 class MutableStateAutoboxing : ComposeKtVisitor {
 
-    override fun visitFile(file: KtFile, autoCorrect: Boolean, emitter: Emitter, config: ComposeKtConfig) {
+    override fun visitFile(file: KtFile, emitter: Emitter, config: ComposeKtConfig) {
         // Things we can realistically support without type resolution without going bananas
         // - numeric constants
         // - explicit types
@@ -71,7 +71,7 @@ class MutableStateAutoboxing : ComposeKtVisitor {
         crossinline predicate: (KtConstantExpression) -> Boolean,
     ): Sequence<KtCallExpression> = filter { (_, constantExpression) -> predicate(constantExpression) }.mapFirst()
 
-    override fun visitFunction(function: KtFunction, autoCorrect: Boolean, emitter: Emitter, config: ComposeKtConfig) {
+    override fun visitFunction(function: KtFunction, emitter: Emitter, config: ComposeKtConfig) {
         // Find the relevant parameter names associated with the types we want (Int, Long, Double, Float)
         val parameterNamesAndTypes = function.valueParameters
             .filter { it.typeReference?.text in SupportedTypes }

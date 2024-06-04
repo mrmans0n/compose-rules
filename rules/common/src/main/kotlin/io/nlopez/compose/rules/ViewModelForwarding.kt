@@ -23,12 +23,7 @@ import org.jetbrains.kotlin.psi.KtThisExpression
 
 class ViewModelForwarding : ComposeKtVisitor {
 
-    override fun visitComposable(
-        function: KtFunction,
-        autoCorrect: Boolean,
-        emitter: Emitter,
-        config: ComposeKtConfig,
-    ) {
+    override fun visitComposable(function: KtFunction, emitter: Emitter, config: ComposeKtConfig) {
         if (function.isOverride || function.definedInInterface || function.isActual) return
         val bodyBlock = function.bodyBlockExpression ?: return
 
@@ -110,11 +105,14 @@ class ViewModelForwarding : ComposeKtVisitor {
                         }
                         .filter { argumentExpression ->
                             val isItRefAndScopedInVMParams = usesItObjectRef &&
-                                argumentExpression.text == "it" && scopedParameter in viewModelParameterNames
+                                argumentExpression.text == "it" &&
+                                scopedParameter in viewModelParameterNames
                             val isThisRefAndScopedInVMParams = !usesItObjectRef &&
-                                argumentExpression.text == "this" && scopedParameter in viewModelParameterNames
+                                argumentExpression.text == "this" &&
+                                scopedParameter in viewModelParameterNames
 
-                            argumentExpression.text in viewModelParameterNames || isItRefAndScopedInVMParams ||
+                            argumentExpression.text in viewModelParameterNames ||
+                                isItRefAndScopedInVMParams ||
                                 isThisRefAndScopedInVMParams
                         }
                         .map { callExpression }
@@ -139,12 +137,10 @@ class ViewModelForwarding : ComposeKtVisitor {
     private val KtCallExpression.hasItObjectReference: Boolean
         get() = (calleeExpression as? KtNameReferenceExpression)?.getReferencedName() in itObjectScopeFunctions
 
-    private fun KtCallExpression.getScopedParameterValue(): String? {
-        return if (isWithScope) {
-            valueArguments.firstOrNull()?.getArgumentExpression()?.text
-        } else {
-            (parent as? KtDotQualifiedExpression)?.receiverExpression?.text
-        }
+    private fun KtCallExpression.getScopedParameterValue(): String? = if (isWithScope) {
+        valueArguments.firstOrNull()?.getArgumentExpression()?.text
+    } else {
+        (parent as? KtDotQualifiedExpression)?.receiverExpression?.text
     }
 
     companion object {

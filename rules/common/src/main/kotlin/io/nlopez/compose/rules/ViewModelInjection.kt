@@ -5,6 +5,7 @@ package io.nlopez.compose.rules
 import io.nlopez.compose.core.ComposeKtConfig
 import io.nlopez.compose.core.ComposeKtVisitor
 import io.nlopez.compose.core.Emitter
+import io.nlopez.compose.core.ifFix
 import io.nlopez.compose.core.util.definedInInterface
 import io.nlopez.compose.core.util.findChildrenByClass
 import io.nlopez.compose.core.util.findDirectChildrenByClass
@@ -25,12 +26,7 @@ import org.jetbrains.kotlin.psi.psiUtil.parents
 
 class ViewModelInjection : ComposeKtVisitor {
 
-    override fun visitComposable(
-        function: KtFunction,
-        autoCorrect: Boolean,
-        emitter: Emitter,
-        config: ComposeKtConfig,
-    ) {
+    override fun visitComposable(function: KtFunction, emitter: Emitter, config: ComposeKtConfig) {
         if (function.isOverride || function.definedInInterface) return
 
         val bodyBlock = function.bodyBlockExpression ?: return
@@ -47,9 +43,7 @@ class ViewModelInjection : ComposeKtVisitor {
             }
             .forEach { (property, viewModelFactoryName) ->
                 emitter.report(property, errorMessage(viewModelFactoryName), true)
-                if (autoCorrect) {
-                    fix(function, property, viewModelFactoryName)
-                }
+                    .ifFix { fix(function, property, viewModelFactoryName) }
             }
     }
 

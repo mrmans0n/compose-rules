@@ -12,12 +12,7 @@ import org.jetbrains.kotlin.psi.KtFunction
 
 class ContentTrailingLambda : ComposeKtVisitor {
 
-    override fun visitComposable(
-        function: KtFunction,
-        autoCorrect: Boolean,
-        emitter: Emitter,
-        config: ComposeKtConfig,
-    ) = with(config) {
+    override fun visitComposable(function: KtFunction, emitter: Emitter, config: ComposeKtConfig) = with(config) {
         val lambdaTypes = function.containingKtFile.composableLambdaTypes
 
         val candidate = function.valueParameters

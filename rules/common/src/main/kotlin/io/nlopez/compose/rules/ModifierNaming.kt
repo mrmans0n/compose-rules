@@ -11,12 +11,7 @@ import org.jetbrains.kotlin.psi.KtFunction
 
 class ModifierNaming : ComposeKtVisitor {
 
-    override fun visitComposable(
-        function: KtFunction,
-        autoCorrect: Boolean,
-        emitter: Emitter,
-        config: ComposeKtConfig,
-    ) {
+    override fun visitComposable(function: KtFunction, emitter: Emitter, config: ComposeKtConfig) {
         // If there is a modifier param, we bail
         val modifiers = function.valueParameters.filter { with(config) { it.isModifier } }
 

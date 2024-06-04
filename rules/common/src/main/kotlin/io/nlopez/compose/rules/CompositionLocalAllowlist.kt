@@ -13,7 +13,7 @@ import org.jetbrains.kotlin.psi.KtProperty
 
 class CompositionLocalAllowlist : ComposeKtVisitor {
 
-    override fun visitFile(file: KtFile, autoCorrect: Boolean, emitter: Emitter, config: ComposeKtConfig) {
+    override fun visitFile(file: KtFile, emitter: Emitter, config: ComposeKtConfig) {
         val compositionLocals = file.findChildrenByClass<KtProperty>()
             .filter { it.declaresCompositionLocal }
 

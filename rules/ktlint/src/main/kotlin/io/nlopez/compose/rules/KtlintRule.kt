@@ -2,12 +2,15 @@
 // SPDX-License-Identifier: Apache-2.0
 package io.nlopez.compose.rules
 
+import com.pinterest.ktlint.rule.engine.core.api.AutocorrectDecision
 import com.pinterest.ktlint.rule.engine.core.api.Rule
+import com.pinterest.ktlint.rule.engine.core.api.RuleAutocorrectApproveHandler
 import com.pinterest.ktlint.rule.engine.core.api.RuleId
 import com.pinterest.ktlint.rule.engine.core.api.editorconfig.EditorConfig
 import com.pinterest.ktlint.rule.engine.core.api.editorconfig.EditorConfigProperty
 import io.nlopez.compose.core.ComposeKtConfig
 import io.nlopez.compose.core.ComposeKtVisitor
+import io.nlopez.compose.core.Decision
 import io.nlopez.compose.core.Emitter
 import io.nlopez.compose.core.util.isComposable
 import io.nlopez.compose.core.util.startOffsetFromName
@@ -18,19 +21,18 @@ import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtFunction
 import org.jetbrains.kotlin.psi.psiUtil.startOffset
 
-abstract class KtlintRule(
-    id: String,
-    editorConfigProperties: Set<EditorConfigProperty<*>> = emptySet(),
-) : Rule(
-    ruleId = RuleId(id),
-    about = About(
-        maintainer = "Compose Rules",
-        repositoryUrl = "https://github.com/mrmans0n/compose-rules",
-        issueTrackerUrl = "https://github.com/mrmans0n/compose-rules/issues",
+abstract class KtlintRule(id: String, editorConfigProperties: Set<EditorConfigProperty<*>> = emptySet()) :
+    Rule(
+        ruleId = RuleId(id),
+        about = About(
+            maintainer = "Compose Rules",
+            repositoryUrl = "https://github.com/mrmans0n/compose-rules",
+            issueTrackerUrl = "https://github.com/mrmans0n/compose-rules/issues",
+        ),
+        usesEditorConfigProperties = editorConfigProperties,
     ),
-    usesEditorConfigProperties = editorConfigProperties,
-),
-    ComposeKtVisitor {
+    ComposeKtVisitor,
+    RuleAutocorrectApproveHandler {
 
     private lateinit var properties: EditorConfig
 
@@ -40,30 +42,33 @@ abstract class KtlintRule(
 
     private val config: ComposeKtConfig by lazy { KtlintComposeKtConfig(properties, usesEditorConfigProperties) }
 
-    final override fun beforeVisitChildNodes(
+    override fun beforeVisitChildNodes(
         node: ASTNode,
-        autoCorrect: Boolean,
-        emit: (offset: Int, errorMessage: String, canBeAutoCorrected: Boolean) -> Unit,
+        emit: (offset: Int, errorMessage: String, canBeAutoCorrected: Boolean) -> AutocorrectDecision,
     ) {
         when (val psi = node.psi) {
-            is KtFile -> visitFile(psi, autoCorrect, emit.toEmitter(), config)
-            is KtClass -> visitClass(psi, autoCorrect, emit.toEmitter(), config)
+            is KtFile -> visitFile(psi, emit.toEmitter(), config)
+            is KtClass -> visitClass(psi, emit.toEmitter(), config)
             is KtFunction -> {
                 val emitter = emit.toEmitter()
-                visitFunction(psi, autoCorrect, emitter, config)
+                visitFunction(psi, emitter, config)
                 if (psi.isComposable) {
-                    visitComposable(psi, autoCorrect, emitter, config)
+                    visitComposable(psi, emitter, config)
                 }
             }
         }
     }
 
-    private fun ((Int, String, Boolean) -> Unit).toEmitter() = Emitter { element, errorMessage, canBeAutoCorrected ->
-        val offset = if (element is PsiNameIdentifierOwner) {
-            element.startOffsetFromName
-        } else {
-            element.startOffset
+    private fun ((Int, String, Boolean) -> AutocorrectDecision).toEmitter() =
+        Emitter { element, errorMessage, canBeAutoCorrected ->
+            val offset = if (element is PsiNameIdentifierOwner) {
+                element.startOffsetFromName
+            } else {
+                element.startOffset
+            }
+            when (invoke(offset, errorMessage, canBeAutoCorrected)) {
+                AutocorrectDecision.ALLOW_AUTOCORRECT -> Decision.Fix
+                AutocorrectDecision.NO_AUTOCORRECT -> Decision.Ignore
+            }
         }
-        invoke(offset, errorMessage, canBeAutoCorrected)
-    }
 }

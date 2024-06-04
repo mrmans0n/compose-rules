@@ -10,7 +10,7 @@ import io.nlopez.compose.core.util.isPreview
 import org.jetbrains.kotlin.psi.KtClass
 
 class PreviewAnnotationNaming : ComposeKtVisitor {
-    override fun visitClass(clazz: KtClass, autoCorrect: Boolean, emitter: Emitter, config: ComposeKtConfig) {
+    override fun visitClass(clazz: KtClass, emitter: Emitter, config: ComposeKtConfig) {
         if (!clazz.isAnnotation()) return
         if (!clazz.isPreview) return
 

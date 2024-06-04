@@ -17,7 +17,7 @@ import org.jetbrains.kotlin.psi.KtFunction
 
 class ContentEmitterReturningValues : ComposeKtVisitor {
 
-    override fun visitFile(file: KtFile, autoCorrect: Boolean, emitter: Emitter, config: ComposeKtConfig) {
+    override fun visitFile(file: KtFile, emitter: Emitter, config: ComposeKtConfig) {
         val composables = file.findChildrenByClass<KtFunction>()
             .filter { it.isComposable }
             // We don't want to analyze composables that are extension functions, as they might be things like

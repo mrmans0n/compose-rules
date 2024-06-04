@@ -18,12 +18,7 @@ import org.jetbrains.kotlin.psi.psiUtil.siblings
 
 class ModifierReused : ComposeKtVisitor {
 
-    override fun visitComposable(
-        function: KtFunction,
-        autoCorrect: Boolean,
-        emitter: Emitter,
-        config: ComposeKtConfig,
-    ) {
+    override fun visitComposable(function: KtFunction, emitter: Emitter, config: ComposeKtConfig) {
         with(config) { if (!function.emitsContent) return }
 
         val composableBlockExpression = function.bodyBlockExpression ?: return

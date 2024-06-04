@@ -18,7 +18,7 @@ import org.jetbrains.kotlin.psi.KtParameter
 
 class ParameterOrder : ComposeKtVisitor {
 
-    override fun visitFile(file: KtFile, autoCorrect: Boolean, emitter: Emitter, config: ComposeKtConfig) {
+    override fun visitFile(file: KtFile, emitter: Emitter, config: ComposeKtConfig) {
         val lambdaTypes = with(config) { file.lambdaTypes }
 
         val composables = file.findChildrenByClass<KtFunction>()

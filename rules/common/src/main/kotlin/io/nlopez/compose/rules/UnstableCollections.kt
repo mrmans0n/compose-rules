@@ -12,12 +12,7 @@ import java.util.*
 
 class UnstableCollections : ComposeKtVisitor {
 
-    override fun visitComposable(
-        function: KtFunction,
-        autoCorrect: Boolean,
-        emitter: Emitter,
-        config: ComposeKtConfig,
-    ) {
+    override fun visitComposable(function: KtFunction, emitter: Emitter, config: ComposeKtConfig) {
         for (param in function.valueParameters.filter { it.isTypeUnstableCollection }) {
             val variableName = param.nameAsSafeName.asString()
             val type = param.typeReference?.text ?: "List/Set/Map"

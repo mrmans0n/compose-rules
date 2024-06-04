@@ -10,9 +10,7 @@ import io.nlopez.compose.core.ComposeKtConfig
  * Manages the configuration for detekt rules. Results will be memoized, as config shouldn't be changing
  * during the lifetime of a rule.
  */
-internal class DetektComposeKtConfig(
-    private val config: Config,
-) : ComposeKtConfig {
+internal class DetektComposeKtConfig(private val config: Config) : ComposeKtConfig {
     private val cache = mutableMapOf<String, Any?>()
 
     @Suppress("UNCHECKED_CAST")

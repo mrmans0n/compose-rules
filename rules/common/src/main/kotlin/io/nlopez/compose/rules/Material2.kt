@@ -19,7 +19,7 @@ import org.jetbrains.kotlin.psi.KtReferenceExpression
 import org.jetbrains.kotlin.psi.psiUtil.startOffset
 
 class Material2 : ComposeKtVisitor {
-    override fun visitFile(file: KtFile, autoCorrect: Boolean, emitter: Emitter, config: ComposeKtConfig) {
+    override fun visitFile(file: KtFile, emitter: Emitter, config: ComposeKtConfig) {
         // Allowed elements/apis from material2, in the format of whatever comes after androidx.compose.material
         // For instance, if we want to allow icons, we'll put just `Icons`, or if we only allowed the filled icons,
         // we'll put `icons.filled` (regardless of the specifics that could come after)

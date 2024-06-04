@@ -16,7 +16,7 @@ import org.jetbrains.kotlin.psi.KtFunction
 
 class MultipleContentEmitters : ComposeKtVisitor {
 
-    override fun visitFile(file: KtFile, autoCorrect: Boolean, emitter: Emitter, config: ComposeKtConfig) {
+    override fun visitFile(file: KtFile, emitter: Emitter, config: ComposeKtConfig) {
         // CHECK #1 : We want to find the composables first that are at risk of emitting content from multiple sources.
         val composables = file.findChildrenByClass<KtFunction>()
             .filter { it.isComposable }

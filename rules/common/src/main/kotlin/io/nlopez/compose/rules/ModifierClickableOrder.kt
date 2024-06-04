@@ -20,12 +20,7 @@ import org.jetbrains.kotlin.psi.KtValueArgument
 
 class ModifierClickableOrder : ComposeKtVisitor {
 
-    override fun visitComposable(
-        function: KtFunction,
-        autoCorrect: Boolean,
-        emitter: Emitter,
-        config: ComposeKtConfig,
-    ) {
+    override fun visitComposable(function: KtFunction, emitter: Emitter, config: ComposeKtConfig) {
         val code = function.bodyBlockExpression ?: return
 
         val initialModifierNames = with(config) { function.modifierParameters.mapNotNull { it.name } }

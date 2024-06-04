@@ -6,9 +6,10 @@ import com.pinterest.ktlint.cli.ruleset.core.api.RuleSetProviderV3
 import com.pinterest.ktlint.rule.engine.core.api.RuleProvider
 import com.pinterest.ktlint.rule.engine.core.api.RuleSetId
 
-class ComposeRuleSetProvider : RuleSetProviderV3(
-    customRuleSetId,
-) {
+class ComposeRuleSetProvider :
+    RuleSetProviderV3(
+        customRuleSetId,
+    ) {
 
     override fun getRuleProviders(): Set<RuleProvider> = setOf(
         RuleProvider { ComposableAnnotationNamingCheck() },

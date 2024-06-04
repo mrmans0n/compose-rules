@@ -12,12 +12,7 @@ import org.jetbrains.kotlin.psi.KtFunction
 
 class RememberStateMissing : ComposeKtVisitor {
 
-    override fun visitComposable(
-        function: KtFunction,
-        autoCorrect: Boolean,
-        emitter: Emitter,
-        config: ComposeKtConfig,
-    ) {
+    override fun visitComposable(function: KtFunction, emitter: Emitter, config: ComposeKtConfig) {
         // To keep memory consumption in check, we first traverse down until we see one of our known functions
         // that need remembering
         function.findChildrenByClass<KtCallExpression>()

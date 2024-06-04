@@ -10,12 +10,7 @@ import org.jetbrains.kotlin.psi.KtFunction
 
 class MutableStateParameter : ComposeKtVisitor {
 
-    override fun visitComposable(
-        function: KtFunction,
-        autoCorrect: Boolean,
-        emitter: Emitter,
-        config: ComposeKtConfig,
-    ) {
+    override fun visitComposable(function: KtFunction, emitter: Emitter, config: ComposeKtConfig) {
         function.valueParameters
             .filter { it.typeReference?.text?.matches(MutableStateRegex) == true }
             .forEach { emitter.report(it, MutableStateParameterInCompose) }

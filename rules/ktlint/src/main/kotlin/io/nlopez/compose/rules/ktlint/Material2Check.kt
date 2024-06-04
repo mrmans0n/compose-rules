@@ -17,10 +17,10 @@ class Material2Check :
     ComposeKtVisitor {
     private val visitor = Material2()
 
-    override fun visitFile(file: KtFile, autoCorrect: Boolean, emitter: Emitter, config: ComposeKtConfig) {
+    override fun visitFile(file: KtFile, emitter: Emitter, config: ComposeKtConfig) {
         // ktlint allows all rules by default, so we'll add an extra param to make sure it's disabled by default
         if (config.getBoolean("disallowMaterial2", false)) {
-            visitor.visitFile(file, autoCorrect, emitter, config)
+            visitor.visitFile(file, emitter, config)
         }
     }
 }

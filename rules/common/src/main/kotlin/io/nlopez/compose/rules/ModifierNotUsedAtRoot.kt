@@ -20,12 +20,7 @@ import org.jetbrains.kotlin.psi.psiUtil.parents
 
 class ModifierNotUsedAtRoot : ComposeKtVisitor {
 
-    override fun visitComposable(
-        function: KtFunction,
-        autoCorrect: Boolean,
-        emitter: Emitter,
-        config: ComposeKtConfig,
-    ) = with(config) {
+    override fun visitComposable(function: KtFunction, emitter: Emitter, config: ComposeKtConfig) = with(config) {
         val modifier = function.modifierParameter ?: return
 
         // We only care about the main modifier for this rule

@@ -10,7 +10,7 @@ import org.jetbrains.kotlin.psi.KtAnnotated
 import org.jetbrains.kotlin.psi.KtClass
 
 class ComposableAnnotationNaming : ComposeKtVisitor {
-    override fun visitClass(clazz: KtClass, autoCorrect: Boolean, emitter: Emitter, config: ComposeKtConfig) {
+    override fun visitClass(clazz: KtClass, emitter: Emitter, config: ComposeKtConfig) {
         if (!clazz.isAnnotation()) return
         if (!clazz.isComposableTargetMarkerAnnotation) return
 

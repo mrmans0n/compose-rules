@@ -10,6 +10,7 @@ import io.gitlab.arturbosch.detekt.api.Location
 import io.gitlab.arturbosch.detekt.api.Rule
 import io.nlopez.compose.core.ComposeKtConfig
 import io.nlopez.compose.core.ComposeKtVisitor
+import io.nlopez.compose.core.Decision
 import io.nlopez.compose.core.Emitter
 import io.nlopez.compose.core.util.isComposable
 import io.nlopez.compose.core.util.runIf
@@ -19,9 +20,9 @@ import org.jetbrains.kotlin.psi.KtElement
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtFunction
 
-abstract class DetektRule(
-    config: Config = Config.empty,
-) : Rule(config), ComposeKtVisitor {
+abstract class DetektRule(config: Config = Config.empty) :
+    Rule(config),
+    ComposeKtVisitor {
 
     private val config: ComposeKtConfig by lazy { DetektComposeKtConfig(this) }
 
@@ -45,25 +46,30 @@ abstract class DetektRule(
             )
         }
         report(finding)
+
+        when {
+            this@DetektRule.autoCorrect && canBeAutoCorrected -> Decision.Fix
+            else -> Decision.Ignore
+        }
     }
 
     override fun visit(root: KtFile) {
         super.visit(root)
-        visitFile(root, autoCorrect, emitter, config)
+        visitFile(root, emitter, config)
     }
 
     override fun visitClass(klass: KtClass) {
         super<Rule>.visitClass(klass)
-        visitClass(klass, autoCorrect, emitter, config)
+        visitClass(klass, emitter, config)
     }
 
     override fun visitKtElement(element: KtElement) {
         super.visitKtElement(element)
         when (element) {
             is KtFunction -> {
-                visitFunction(element, autoCorrect, emitter, config)
+                visitFunction(element, emitter, config)
                 if (element.isComposable) {
-                    visitComposable(element, autoCorrect, emitter, config)
+                    visitComposable(element, emitter, config)
                 }
             }
         }

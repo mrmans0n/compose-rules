@@ -14,12 +14,7 @@ import org.jetbrains.kotlin.psi.KtFunction
 
 class Naming : ComposeKtVisitor {
 
-    override fun visitComposable(
-        function: KtFunction,
-        autoCorrect: Boolean,
-        emitter: Emitter,
-        config: ComposeKtConfig,
-    ) {
+    override fun visitComposable(function: KtFunction, emitter: Emitter, config: ComposeKtConfig) {
         // If it's a block we can't know if there is a return type or not
         if (!function.hasBlockBody()) return
 

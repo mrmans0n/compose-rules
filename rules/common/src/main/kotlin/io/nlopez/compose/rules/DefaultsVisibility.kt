@@ -20,7 +20,7 @@ import org.jetbrains.kotlin.psi.psiUtil.isPublic
 
 class DefaultsVisibility : ComposeKtVisitor {
 
-    override fun visitFile(file: KtFile, autoCorrect: Boolean, emitter: Emitter, config: ComposeKtConfig) {
+    override fun visitFile(file: KtFile, emitter: Emitter, config: ComposeKtConfig) {
         val composables = file.findChildrenByClass<KtFunction>()
             .filter { it.isComposable }
 

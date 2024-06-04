@@ -8,11 +8,11 @@ import org.jetbrains.kotlin.psi.KtFunction
 
 interface ComposeKtVisitor {
 
-    fun visitFunction(function: KtFunction, autoCorrect: Boolean, emitter: Emitter, config: ComposeKtConfig) {}
+    fun visitFunction(function: KtFunction, emitter: Emitter, config: ComposeKtConfig) {}
 
-    fun visitComposable(function: KtFunction, autoCorrect: Boolean, emitter: Emitter, config: ComposeKtConfig) {}
+    fun visitComposable(function: KtFunction, emitter: Emitter, config: ComposeKtConfig) {}
 
-    fun visitClass(clazz: KtClass, autoCorrect: Boolean, emitter: Emitter, config: ComposeKtConfig) {}
+    fun visitClass(clazz: KtClass, emitter: Emitter, config: ComposeKtConfig) {}
 
-    fun visitFile(file: KtFile, autoCorrect: Boolean, emitter: Emitter, config: ComposeKtConfig) {}
+    fun visitFile(file: KtFile, emitter: Emitter, config: ComposeKtConfig) {}
 }
