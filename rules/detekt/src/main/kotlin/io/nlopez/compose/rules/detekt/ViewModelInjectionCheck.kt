@@ -8,16 +8,8 @@ import io.nlopez.compose.rules.DetektRule
 import io.nlopez.compose.rules.ViewModelInjection
 
 class ViewModelInjectionCheck(config: Config) :
-    DetektRule(config, description),
+    DetektRule(config, "Implicit dependencies of composables should be made explicit."),
     ComposeKtVisitor by ViewModelInjection() {
 
     override val ruleId = Id("ViewModelInjection")
-
-    private companion object {
-        private val description = """
-            Implicit dependencies of composables should be made explicit.
-
-            Acquiring a ViewModel should be done in composable default parameters, so that it is more testable and flexible.
-        """.trimIndent()
-    }
 }

@@ -8,14 +8,8 @@ import io.nlopez.compose.rules.DetektRule
 import io.nlopez.compose.rules.RememberContentMissing
 
 class RememberContentMissingCheck(config: Config) :
-    DetektRule(config, DESCRIPTION),
+    DetektRule(config, "movableContentOf/movableContentWithReceiverOf need to be remembered"),
     ComposeKtVisitor by RememberContentMissing() {
 
     override val ruleId = Id("RememberContentMissing")
-
-    private companion object {
-        private const val DESCRIPTION = "Using movableContentOf/movableContentWithReceiverOf in a @Composable " +
-            "function without it being remembered can cause visual problems, as the content would be recycled " +
-            "when detached from the composition."
-    }
 }

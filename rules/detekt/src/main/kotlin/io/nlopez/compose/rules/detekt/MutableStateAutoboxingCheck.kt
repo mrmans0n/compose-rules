@@ -8,13 +8,8 @@ import io.nlopez.compose.rules.DetektRule
 import io.nlopez.compose.rules.MutableStateAutoboxing
 
 class MutableStateAutoboxingCheck(config: Config) :
-    DetektRule(config, DESCRIPTION),
+    DetektRule(config, "Using mutableInt/Long/Double/FloatStateOf is recommended over mutableStateOf<X> for Int/Long/Double/Float"),
     ComposeKtVisitor by MutableStateAutoboxing() {
 
     override val ruleId = Id("MutableStateAutoboxing")
-
-    private companion object {
-        private const val DESCRIPTION = "Using mutableInt/Long/Double/FloatStateOf is recommended over " +
-            "mutableStateOf<X> for Int/Long/Double/Float, as it uses the primitives directly which is more performant."
-    }
 }
