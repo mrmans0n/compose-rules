@@ -180,6 +180,15 @@ The `unstable-collections` rule will flag any usage of any unstable collection (
 compose_disallow_unstable_collections = true
 ```
 
+### Disable `standard:function-naming` rule for Composable
+
+The function name for a Composable starts with an uppercase. This causes the ktlint rule `standard:function-naming` to report a violation. This rule can be configured to ignore Composable functions in your `.editorconfig` file:
+
+```editorconfig
+[*.{kt,kts}]
+ktlint_function_naming_ignore_when_annotated_with = Composable
+```
+
 ## Disabling a specific rule
 
 To disable a rule you have to follow the [instructions from the ktlint documentation](https://pinterest.github.io/ktlint/0.49.1/faq/#how-do-i-suppress-errors-for-a-lineblockfile), and use the id of the rule you want to disable with the `compose` tag.
