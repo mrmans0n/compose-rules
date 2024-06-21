@@ -3,21 +3,13 @@
 package io.nlopez.compose.rules.detekt
 
 import io.gitlab.arturbosch.detekt.api.Config
-import io.gitlab.arturbosch.detekt.api.Debt
-import io.gitlab.arturbosch.detekt.api.Issue
-import io.gitlab.arturbosch.detekt.api.Severity
 import io.nlopez.compose.core.ComposeKtVisitor
 import io.nlopez.compose.rules.DetektRule
 import io.nlopez.compose.rules.PreviewPublic
 
 class PreviewPublicCheck(config: Config) :
-    DetektRule(config),
+    DetektRule(config, PreviewPublic.ComposablesPreviewShouldNotBePublic),
     ComposeKtVisitor by PreviewPublic() {
 
-    override val issue: Issue = Issue(
-        id = "PreviewPublic",
-        severity = Severity.CodeSmell,
-        description = PreviewPublic.ComposablesPreviewShouldNotBePublic,
-        debt = Debt.FIVE_MINS,
-    )
+    override val ruleId = Id("PreviewPublic")
 }

@@ -3,7 +3,6 @@
 package io.nlopez.compose.rules
 
 import io.gitlab.arturbosch.detekt.api.Config
-import io.gitlab.arturbosch.detekt.api.internal.valueOrDefaultCommaSeparated
 import io.nlopez.compose.core.ComposeKtConfig
 
 /**
@@ -30,7 +29,7 @@ internal class DetektComposeKtConfig(
     }
 
     override fun getList(key: String, default: List<String>): List<String> =
-        valueOrPut(key) { config.valueOrDefaultCommaSeparated(key, default) } ?: default
+        valueOrPut(key) { config.valueOrDefault(key, default) } ?: default
 
     override fun getSet(key: String, default: Set<String>): Set<String> =
         valueOrPut(key) { getList(key, default.toList()).toSet() } ?: default

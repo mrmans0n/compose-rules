@@ -21,9 +21,10 @@ import org.jetbrains.kotlin.psi.KtFunction
 
 abstract class DetektRule(
     config: Config = Config.empty,
-) : Rule(config), ComposeKtVisitor {
+    description: String,
+) : Rule(config, description), ComposeKtVisitor {
 
-    private val config: ComposeKtConfig by lazy { DetektComposeKtConfig(this) }
+    private val composeKtConfig: ComposeKtConfig by lazy { DetektComposeKtConfig(config) }
 
     private val emitter: Emitter = Emitter { element, message, canBeAutoCorrected ->
         // Grab the named element if there were any, otherwise fall back to the whole PsiElement
@@ -32,14 +33,12 @@ abstract class DetektRule(
         }
         val finding = when {
             canBeAutoCorrected -> CorrectableCodeSmell(
-                issue = issue,
                 entity = Entity.from(finalElement, Location.from(finalElement)),
                 message = message,
                 autoCorrectEnabled = autoCorrect,
             )
 
             else -> CodeSmell(
-                issue = issue,
                 entity = Entity.from(finalElement, Location.from(finalElement)),
                 message = message,
             )
@@ -49,21 +48,21 @@ abstract class DetektRule(
 
     override fun visit(root: KtFile) {
         super.visit(root)
-        visitFile(root, autoCorrect, emitter, config)
+        visitFile(root, autoCorrect, emitter, composeKtConfig)
     }
 
     override fun visitClass(klass: KtClass) {
         super<Rule>.visitClass(klass)
-        visitClass(klass, autoCorrect, emitter, config)
+        visitClass(klass, autoCorrect, emitter, composeKtConfig)
     }
 
     override fun visitKtElement(element: KtElement) {
         super.visitKtElement(element)
         when (element) {
             is KtFunction -> {
-                visitFunction(element, autoCorrect, emitter, config)
+                visitFunction(element, autoCorrect, emitter, composeKtConfig)
                 if (element.isComposable) {
-                    visitComposable(element, autoCorrect, emitter, config)
+                    visitComposable(element, autoCorrect, emitter, composeKtConfig)
                 }
             }
         }

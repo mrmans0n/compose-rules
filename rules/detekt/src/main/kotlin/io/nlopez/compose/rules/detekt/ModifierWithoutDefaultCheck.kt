@@ -3,21 +3,13 @@
 package io.nlopez.compose.rules.detekt
 
 import io.gitlab.arturbosch.detekt.api.Config
-import io.gitlab.arturbosch.detekt.api.Debt
-import io.gitlab.arturbosch.detekt.api.Issue
-import io.gitlab.arturbosch.detekt.api.Severity
 import io.nlopez.compose.core.ComposeKtVisitor
 import io.nlopez.compose.rules.DetektRule
 import io.nlopez.compose.rules.ModifierWithoutDefault
 
 class ModifierWithoutDefaultCheck(config: Config) :
-    DetektRule(config),
+    DetektRule(config, ModifierWithoutDefault.MissingModifierDefaultParam),
     ComposeKtVisitor by ModifierWithoutDefault() {
 
-    override val issue: Issue = Issue(
-        id = "ModifierWithoutDefault",
-        severity = Severity.CodeSmell,
-        description = ModifierWithoutDefault.MissingModifierDefaultParam,
-        debt = Debt.FIVE_MINS,
-    )
+    override val ruleId = Id("ModifierWithoutDefault")
 }

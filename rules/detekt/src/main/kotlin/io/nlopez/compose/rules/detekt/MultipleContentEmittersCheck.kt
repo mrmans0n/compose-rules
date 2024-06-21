@@ -3,21 +3,13 @@
 package io.nlopez.compose.rules.detekt
 
 import io.gitlab.arturbosch.detekt.api.Config
-import io.gitlab.arturbosch.detekt.api.Debt
-import io.gitlab.arturbosch.detekt.api.Issue
-import io.gitlab.arturbosch.detekt.api.Severity
 import io.nlopez.compose.core.ComposeKtVisitor
 import io.nlopez.compose.rules.DetektRule
 import io.nlopez.compose.rules.MultipleContentEmitters
 
 class MultipleContentEmittersCheck(config: Config) :
-    DetektRule(config),
+    DetektRule(config, MultipleContentEmitters.MultipleContentEmittersDetected),
     ComposeKtVisitor by MultipleContentEmitters() {
 
-    override val issue: Issue = Issue(
-        id = "MultipleEmitters",
-        severity = Severity.Defect,
-        description = MultipleContentEmitters.MultipleContentEmittersDetected,
-        debt = Debt.TWENTY_MINS,
-    )
+    override val ruleId = Id("MultipleEmitters")
 }
