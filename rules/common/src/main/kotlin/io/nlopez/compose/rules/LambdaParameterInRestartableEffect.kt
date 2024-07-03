@@ -7,6 +7,7 @@ import io.nlopez.compose.core.ComposeKtVisitor
 import io.nlopez.compose.core.Emitter
 import io.nlopez.compose.core.report
 import io.nlopez.compose.core.util.findChildrenByClass
+import io.nlopez.compose.core.util.findShadowingRedeclarations
 import io.nlopez.compose.core.util.isComposable
 import io.nlopez.compose.core.util.isLambda
 import io.nlopez.compose.core.util.isRestartableEffect
@@ -96,7 +97,12 @@ class LambdaParameterInRestartableEffect : ComposeKtVisitor {
                 .filter { it in usedLambdaParameterNames }
                 .toSet()
 
-            for (parameterName in usedLambdaParameterNames - keyedLambdaParameterNames) {
+            val shadowedParameters = effects.flatMap { effect ->
+                usedLambdaParameterNames.filter {
+                    effect.findShadowingRedeclarations(parameterName = it, stopAt = composable).any()
+                }
+            }.toSet()
+            for (parameterName in usedLambdaParameterNames - keyedLambdaParameterNames - shadowedParameters) {
                 val parameter = lambdaParameters[parameterName]!!
                 emitter.report(parameter, LambdaUsedInRestartableEffect)
             }

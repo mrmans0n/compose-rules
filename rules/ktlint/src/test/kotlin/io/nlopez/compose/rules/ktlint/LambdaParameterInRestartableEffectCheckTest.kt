@@ -88,6 +88,29 @@ class LambdaParameterInRestartableEffectCheckTest {
     }
 
     @Test
+    fun `passes when the lambda parameter is shadowed before using it in an effect`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun Something(onClick: () -> Unit) {
+                    val onClick by rememberUpdatedState(onClick)
+                    LaunchedEffect(Unit) {
+                        onClick()
+                    }
+                }
+                @Composable
+                fun Something(onClick: () -> Unit) {
+                    val (onClick, bleh) = something()
+                    LaunchedEffect(Unit) {
+                        onClick()
+                    }
+                }
+            """.trimIndent()
+        ruleAssertThat(code).hasNoLintViolations()
+    }
+
+    @Test
     fun `error out when detecting a lambda named onDispose used in a non-DisposableEffect`() {
         @Language("kotlin")
         val code =

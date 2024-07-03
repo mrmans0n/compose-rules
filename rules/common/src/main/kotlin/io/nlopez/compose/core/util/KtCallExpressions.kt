@@ -5,6 +5,8 @@ package io.nlopez.compose.core.util
 import org.jetbrains.kotlin.com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtCallableDeclaration
+import org.jetbrains.kotlin.psi.KtDeclarationWithInitializer
+import org.jetbrains.kotlin.psi.KtDestructuringDeclaration
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.KtReferenceExpression
 import org.jetbrains.kotlin.psi.psiUtil.parents
@@ -41,14 +43,22 @@ private fun KtCallExpression.ancestorsParameterNamesSequence(stopAt: PsiElement)
         }
     }
 
-fun KtCallExpression.isShadowed(parameterName: String, origin: PsiElement): Boolean {
-    // If the parameter is not used at all, it's not shadowed
-    if (parametersBeingUsedFrom(setOf(parameterName)).isEmpty()) return false
+private fun KtCallExpression.walkbackDeclarationsUntil(stopAt: PsiElement) = walkBackwards(stopAtParent = stopAt)
+    .filterIsInstance<KtDeclarationWithInitializer>()
+    .flatMap { declaration ->
+        when {
+            declaration.name != null -> listOfNotNull(declaration.name)
+            declaration is KtDestructuringDeclaration -> declaration.entries.mapNotNull { it.name }
+            else -> emptyList()
+        }.map { it to declaration }
+    }
 
-    // For that parameter, we look at the parents and see if any of them is a function that has a param with
-    //  the same name.
-    return ancestorsParameterNamesSequence(stopAt = origin).any { it == parameterName }
-}
+fun KtCallExpression.findShadowingRedeclarations(
+    parameterName: String,
+    stopAt: PsiElement,
+): Sequence<KtDeclarationWithInitializer> = walkbackDeclarationsUntil(stopAt = stopAt)
+    .filter { (name, _) -> name == parameterName }
+    .mapSecond()
 
 fun KtCallExpression.isAnyShadowed(parameterNames: Set<String>, origin: PsiElement): Boolean {
     val currentNames = parametersBeingUsedFrom(parameterNames)
