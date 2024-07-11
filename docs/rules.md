@@ -369,7 +369,7 @@ Although uncommon, there are [legit usecases](https://developer.android.com/jetp
 
 Related rule: [compose:compositionlocal-allowlist](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/CompositionLocalAllowlist.kt)
 
-> **Note**: To add your custom `CompositionLocal` to your allowlist, you can add `allowedCompositionLocals` to this rule config in Detekt, or `allowed_composition_locals` to your .editorconfig in ktlint.
+> **Note**: To add your custom `CompositionLocal` to your allowlist, you can add `allowedCompositionLocals` to this rule config in Detekt, or `compose_allowed_composition_locals` to your .editorconfig in ktlint.
 
 ### Preview composables should not be public
 
