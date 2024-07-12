@@ -1361,7 +1361,7 @@ In this composable, the dependencies are implicit. When testing it you would nee
 <p>Although uncommon, there are <a href="https://developer.android.com/jetpack/compose/compositionlocal#deciding">legit usecases</a> for them, so this rule provides an allowlist so that you can add your <code>CompositionLocal</code> names to it so that they are not flagged by the rule.</p>
 <p>Related rule: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/CompositionLocalAllowlist.kt">compose:compositionlocal-allowlist</a></p>
 <blockquote>
-<p><strong>Note</strong>: To add your custom <code>CompositionLocal</code> to your allowlist, you can add <code>allowedCompositionLocals</code> to this rule config in Detekt, or <code>allowed_composition_locals</code> to your .editorconfig in ktlint.</p>
+<p><strong>Note</strong>: To add your custom <code>CompositionLocal</code> to your allowlist, you can add <code>allowedCompositionLocals</code> to this rule config in Detekt, or <code>compose_allowed_composition_locals</code> to your .editorconfig in ktlint.</p>
 </blockquote>
 <h3 id="preview-composables-should-not-be-public">Preview composables should not be public<a class="headerlink" href="#preview-composables-should-not-be-public" title="Permanent link">&para;</a></h3>
 <p>When a composable function exists solely because it's a <code>@Preview</code>, it doesn't need to have public visibility because it won't be used in actual UI. To prevent folks from using it unknowingly, we should restrict its visibility to <code>private</code>.</p>
