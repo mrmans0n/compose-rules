@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test
 class ParameterNamingCheckTest {
 
     private val testConfig = TestConfig(
-        "treatAsComposableLambda" to listOf("Potato"),
+        "treatAsLambda" to listOf("Potato"),
     )
     private val rule = ParameterNamingCheck(testConfig)
 

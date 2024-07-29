@@ -6,8 +6,8 @@ import io.nlopez.compose.core.ComposeKtConfig
 import io.nlopez.compose.core.ComposeKtVisitor
 import io.nlopez.compose.core.Emitter
 import io.nlopez.compose.core.report
-import io.nlopez.compose.core.util.composableLambdaTypes
 import io.nlopez.compose.core.util.isLambda
+import io.nlopez.compose.core.util.lambdaTypes
 import org.jetbrains.kotlin.psi.KtFunction
 
 class ParameterNaming : ComposeKtVisitor {
@@ -16,7 +16,7 @@ class ParameterNaming : ComposeKtVisitor {
         // For lambda parameters only: if it starts with `on`, we want it to not be in past tense, to be all consistent.
         // E.g. onClick, onTextChange, onValueChange, and a myriad of other examples in the compose foundation code.
 
-        val lambdaTypes = function.containingKtFile.composableLambdaTypes
+        val lambdaTypes = function.containingKtFile.lambdaTypes
 
         val errors = function.valueParameters
             .filter { it.typeReference?.isLambda(lambdaTypes) == true }

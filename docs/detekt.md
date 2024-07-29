@@ -103,8 +103,8 @@ Compose:
     active: true
   ParameterNaming:
     active: true
-    # -- You can optionally have a list of types to be treated as composable lambdas (e.g. typedefs or fun interfaces not picked up automatically)
-    # treatAsComposableLambda: MyComposableLambdaType
+    # -- You can optionally have a list of types to be treated as lambdas (e.g. typedefs or fun interfaces not picked up automatically)
+    # treatAsLambda: MyLambdaType
   PreviewAnnotationNaming:
     active: true
   PreviewPublic:
