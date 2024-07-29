@@ -6,13 +6,17 @@ import io.nlopez.compose.core.ComposeKtConfig
 import org.jetbrains.kotlin.com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.psi.KtBlockExpression
 import org.jetbrains.kotlin.psi.KtCallExpression
+import org.jetbrains.kotlin.psi.KtDeclarationWithBody
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
+import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtForExpression
 import org.jetbrains.kotlin.psi.KtFunction
+import org.jetbrains.kotlin.psi.KtIfExpression
 import org.jetbrains.kotlin.psi.KtProperty
 import org.jetbrains.kotlin.psi.KtSafeQualifiedExpression
 import org.jetbrains.kotlin.psi.psiUtil.parents
 import org.jetbrains.kotlin.psi.psiUtil.referenceExpression
+import kotlin.math.max
 
 private tailrec suspend fun SequenceScope<KtCallExpression>.scan(elements: List<PsiElement>) {
     if (elements.isEmpty()) return
@@ -78,44 +82,44 @@ private val KtCallExpression.containsComposablesWithModifiers: Boolean
     }
 
 context(ComposeKtConfig)
-private val KtFunction.directUiEmitterCount: Int
-    get() = bodyBlockExpression?.let { block ->
-        // If there's content emitted in a for loop, we assume there's at
-        // least two iterations and thus count any emitters in them as multiple
-        val forLoopCount = when {
-            block.forLoopHasUiEmitters -> 2
-            else -> 0
-        }
-        block.directUiEmitterCount + forLoopCount
-    } ?: 0
+private fun KtExpression.uiEmitterCount(): Int = when (val current = this) {
+    // Something like a function body or a var declaration. E.g. @Composable fun A() { Text("bleh") }
+    is KtDeclarationWithBody -> current.bodyBlockExpression?.uiEmitterCount() ?: 0
 
-context(ComposeKtConfig)
-private val KtBlockExpression.forLoopHasUiEmitters: Boolean
-    get() = statements.filterIsInstance<KtForExpression>().any {
-        when (val body = it.body) {
-            is KtBlockExpression -> body.directUiEmitterCount > 0
-            is KtCallExpression -> body.emitsContent
-            else -> false
-        }
+    // A whole code block. E.g. { Text("bleh") Text("meh") }
+    is KtBlockExpression -> {
+        current.statements.fold(0) { acc, next -> acc + next.uiEmitterCount() }
     }
 
-context(ComposeKtConfig)
-private val KtBlockExpression.directUiEmitterCount: Int
-    get() {
-        val sequence = statements.asSequence()
-        val callExpressionCount = sequence.filterIsInstance<KtCallExpression>().count { it.emitsContent }
-        val safeLetCallExpressionCount = sequence.filterIsInstance<KtSafeQualifiedExpression>()
-            .mapNotNull { it.selectorExpression as? KtCallExpression }
-            // ?.let { ... }
-            .filter { it.calleeExpression?.text == "let" }
-            .mapNotNull { it.lambdaArguments.singleOrNull() }
-            // Recursive call to the let code block
-            .mapNotNull { it.getLambdaExpression()?.bodyExpression?.directUiEmitterCount }
-            // Sum all values
-            .fold(0) { acc, next -> acc + next }
+    // Direct statements. E.g. Text("bleh")
+    is KtCallExpression -> if (current.emitsContent) 1 else 0
 
-        return callExpressionCount + safeLetCallExpressionCount
+    // for loops. E.g. for (item in list) { Text(item) }
+    is KtForExpression -> {
+        // Assume at least 2 iterations if any, as we can't know how many there will be.
+        current.body?.uiEmitterCount()?.takeIf { it > 0 }?.let { it + 1 } ?: 0
     }
+
+    // Scoped function statements. E.g. text?.let { Text(it) }
+    is KtSafeQualifiedExpression -> {
+        (current.selectorExpression as? KtCallExpression)
+            ?.takeIf { it.calleeExpression?.text == "let" || it.calleeExpression?.text == "also" }
+            ?.lambdaArguments
+            ?.singleOrNull()
+            ?.getLambdaExpression()
+            ?.bodyExpression
+            ?.uiEmitterCount()
+            ?: 0
+    }
+
+    is KtIfExpression -> {
+        val ifCount = current.then?.uiEmitterCount() ?: 0
+        val elseCount = current.`else`?.uiEmitterCount() ?: 0
+        max(ifCount, elseCount)
+    }
+
+    else -> 0
+}
 
 context(ComposeKtConfig)
 private fun KtFunction.indirectUiEmitterCount(mapping: Map<KtFunction, Int>): Int {
@@ -136,7 +140,7 @@ private fun KtFunction.indirectUiEmitterCount(mapping: Map<KtFunction, Int>): In
 
 context(ComposeKtConfig)
 fun Sequence<KtFunction>.createDirectComposableToEmissionCountMapping(): Map<KtFunction, Int> =
-    associateWith { it.directUiEmitterCount }
+    associateWith { it.uiEmitterCount() }
 
 context(ComposeKtConfig)
 fun refineComposableToEmissionCountMapping(

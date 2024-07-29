@@ -153,6 +153,60 @@ class MultipleContentEmittersCheckTest {
     }
 
     @Test
+    fun `errors when a Composable function emits multiple content with conditionals`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun A() {
+                    if (something) {
+                        Text("1")
+                        Text("2")
+                    } else {
+                        Text("1")
+                        Text("2")
+                    }
+                }
+                @Composable
+                fun B() {
+                    if (something) {
+                        Text("1")
+                        Text("2")
+                    } else {
+                        Text("1")
+                    }
+                }
+                @Composable
+                fun C() {
+                    if (something) {
+                        Text("1")
+                    } else {
+                        Text("1")
+                        Text("2")
+                    }
+                }
+                @Composable
+                fun D() {
+                    if (something) {
+                        Text("1")
+                    }
+                    Text("2")
+                }
+            """.trimIndent()
+        val errors = rule.lint(code)
+        assertThat(errors)
+            .hasStartSourceLocations(
+                SourceLocation(2, 5),
+                SourceLocation(12, 5),
+                SourceLocation(21, 5),
+                SourceLocation(30, 5),
+            )
+        for (error in errors) {
+            assertThat(error).hasMessage(MultipleContentEmitters.MultipleContentEmittersDetected)
+        }
+    }
+
+    @Test
     fun `make sure to not report twice the same composable`() {
         @Language("kotlin")
         val code =
