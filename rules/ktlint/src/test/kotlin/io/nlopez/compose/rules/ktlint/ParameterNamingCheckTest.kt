@@ -26,7 +26,7 @@ class ParameterNamingCheckTest {
             """.trimIndent()
         ruleAssertThat(code)
             .withEditorConfigOverride(
-                treatAsComposableLambda to "Potato",
+                treatAsLambda to "Potato",
             )
             .hasLintViolationsWithoutAutoCorrect(
                 LintViolation(
