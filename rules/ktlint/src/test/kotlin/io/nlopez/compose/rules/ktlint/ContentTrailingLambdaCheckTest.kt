@@ -78,6 +78,8 @@ class ContentTrailingLambdaCheckTest {
                 @Composable
                 fun A(text: String, content: @Composable () -> Unit) {}
                 @Composable
+                fun A(content: @Composable Plum) {}
+                @Composable
                 fun A(text: String, content: Potato) {}
                 @Composable
                 fun A(text: String, content: Banana) {}
@@ -92,7 +94,7 @@ class ContentTrailingLambdaCheckTest {
             """.trimIndent()
 
         ruleAssertThat(code)
-            .withEditorConfigOverride(treatAsComposableLambda to "Potato")
+            .withEditorConfigOverride(treatAsComposableLambda to "Potato", treatAsLambda to "Plum")
             .hasNoLintViolations()
     }
 }

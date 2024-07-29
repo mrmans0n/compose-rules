@@ -14,6 +14,7 @@ class ContentTrailingLambdaCheckTest {
 
     private val testConfig = TestConfig(
         "treatAsComposableLambda" to listOf("Potato"),
+        "treatAsLambda" to listOf("Plum"),
     )
     private val rule = ContentTrailingLambdaCheck(testConfig)
 
@@ -74,6 +75,8 @@ class ContentTrailingLambdaCheckTest {
             """
                 @Composable
                 fun A(text: String, content: @Composable () -> Unit) {}
+                @Composable
+                fun A(content: @Composable Plum) {}
                 @Composable
                 fun A(text: String, content: Potato) {}
                 @Composable
