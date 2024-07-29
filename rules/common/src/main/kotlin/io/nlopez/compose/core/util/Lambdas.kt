@@ -23,6 +23,21 @@ fun KtTypeElement.isLambda(treatAsLambdaTypes: Set<String>): Boolean = when (thi
 fun KtTypeReference.isLambda(treatAsLambdaTypes: Set<String>): Boolean =
     typeElement?.isLambda(treatAsLambdaTypes) == true
 
+fun KtTypeReference.isComposableLambda(
+    treatAsLambdaTypes: Set<String>,
+    treatAsComposableLambdaTypes: Set<String>,
+): Boolean = when (val element = typeElement) {
+    null -> false
+    is KtFunctionType -> isComposable
+    is KtNullableType -> (isComposable && element.isLambda(treatAsLambdaTypes)) ||
+        element.innerType?.isLambda(treatAsComposableLambdaTypes) == true
+
+    is KtUserType -> (isComposable && element.referencedName in treatAsLambdaTypes) ||
+        element.referencedName in treatAsComposableLambdaTypes
+
+    else -> false
+}
+
 context(ComposeKtConfig)
 val KtFile.lambdaTypes: Set<String>
     get() = buildSet {

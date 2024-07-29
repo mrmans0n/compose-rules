@@ -42,7 +42,10 @@ Compose:
     # contentEmitters: MyComposable,MyOtherComposable
   ContentTrailingLambda:
     active: true
-    # -- You can optionally have a list of types to be treated as composable lambdas (e.g. typedefs or fun interfaces not picked up automatically)
+    # -- You can optionally have a list of types to be treated as lambdas (e.g. typedefs or fun interfaces not picked up automatically)
+    # treatAsLambda: MyLambdaType
+    # -- You can optionally have a list of types to be treated as composable lambdas (e.g. typedefs or fun interfaces not picked up automatically).
+    # -- The difference with treatAsLambda is that those need `@Composable` MyLambdaType in the definition, while these won't.
     # treatAsComposableLambda: MyComposableLambdaType
   DefaultsVisibility:
     active: true

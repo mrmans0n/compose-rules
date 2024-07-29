@@ -7,17 +7,21 @@ import io.nlopez.compose.core.ComposeKtVisitor
 import io.nlopez.compose.core.Emitter
 import io.nlopez.compose.core.report
 import io.nlopez.compose.core.util.composableLambdaTypes
-import io.nlopez.compose.core.util.isLambda
+import io.nlopez.compose.core.util.isComposableLambda
+import io.nlopez.compose.core.util.lambdaTypes
 import org.jetbrains.kotlin.psi.KtFunction
 
 class ContentTrailingLambda : ComposeKtVisitor {
 
     override fun visitComposable(function: KtFunction, emitter: Emitter, config: ComposeKtConfig) = with(config) {
-        val lambdaTypes = function.containingKtFile.composableLambdaTypes
+        val lambdaTypes = function.containingKtFile.lambdaTypes
+        val composableLambdaTypes = function.containingKtFile.composableLambdaTypes
 
         val candidate = function.valueParameters
             .filter { it.name == "content" }
-            .singleOrNull { it.typeReference?.isLambda(lambdaTypes) == true }
+            .singleOrNull { parameter ->
+                parameter.typeReference?.isComposableLambda(lambdaTypes, composableLambdaTypes) == true
+            }
 
         if (candidate != null && candidate != function.valueParameters.last()) {
             emitter.report(candidate, ContentShouldBeTrailingLambda)

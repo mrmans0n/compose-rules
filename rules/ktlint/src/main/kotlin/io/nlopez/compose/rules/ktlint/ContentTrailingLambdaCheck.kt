@@ -9,6 +9,6 @@ import io.nlopez.compose.rules.KtlintRule
 class ContentTrailingLambdaCheck :
     KtlintRule(
         id = "compose:content-trailing-lambda",
-        editorConfigProperties = setOf(treatAsComposableLambda),
+        editorConfigProperties = setOf(treatAsLambda, treatAsComposableLambda),
     ),
     ComposeKtVisitor by ContentTrailingLambda()
