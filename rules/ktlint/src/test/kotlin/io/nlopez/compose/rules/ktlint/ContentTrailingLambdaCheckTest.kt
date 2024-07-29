@@ -97,4 +97,16 @@ class ContentTrailingLambdaCheckTest {
             .withEditorConfigOverride(treatAsComposableLambda to "Potato", treatAsLambda to "Plum")
             .hasNoLintViolations()
     }
+
+    @Test
+    fun `passes when content is not composable`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun A(content: () -> Unit, text: String) {}
+            """.trimIndent()
+
+        ruleAssertThat(code).hasNoLintViolations()
+    }
 }

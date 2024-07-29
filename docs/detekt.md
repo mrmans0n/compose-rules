@@ -49,6 +49,11 @@ Compose:
     # -- You can optionally have a list of types to be treated as composable lambdas (e.g. typedefs or fun interfaces not picked up automatically).
     # -- The difference with treatAsLambda is that those need `@Composable` MyLambdaType in the definition, while these won't.
     # treatAsComposableLambda: MyComposableLambdaType
+  ContentSlotReused:
+      active: true
+      # -- You can optionally have a list of types to be treated as composable lambdas (e.g. typedefs or fun interfaces not picked up automatically).
+      # -- The difference with treatAsLambda is that those need `@Composable` MyLambdaType in the definition, while these won't.
+      # treatAsComposableLambda: MyComposableLambdaType
   DefaultsVisibility:
     active: true
   LambdaParameterEventTrailing:

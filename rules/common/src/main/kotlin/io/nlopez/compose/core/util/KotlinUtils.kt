@@ -3,7 +3,8 @@
 package io.nlopez.compose.core.util
 
 import org.jetbrains.kotlin.name.FqName
-import java.util.*
+import org.jetbrains.kotlin.psi.KtElement
+import java.util.Locale
 
 fun <T> T.runIf(value: Boolean, block: T.() -> T): T = if (value) block() else this
 
@@ -49,3 +50,12 @@ private val humps by lazy { "(?<=.)(?=\\p{Upper})".toRegex() }
 
 val KotlinScopeFunctions = setOf("with", "apply", "run", "also", "let")
 val KotlinItObjectScopeFunctions = setOf("let", "also")
+
+fun <T : KtElement> Sequence<T>.uniquePairs(): Sequence<Pair<T, T>> = sequence {
+    val list = toList()
+    for (i in list.indices) {
+        for (j in i + 1 until list.size) {
+            yield(Pair(list[i], list[j]))
+        }
+    }
+}
