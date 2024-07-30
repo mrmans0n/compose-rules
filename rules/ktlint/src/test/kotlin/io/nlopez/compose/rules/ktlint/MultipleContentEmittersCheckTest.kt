@@ -91,6 +91,11 @@ class MultipleContentEmittersCheckTest {
                     title?.let { Text(title) }
                     subtitle?.let { Text(subtitle) }
                 }
+                @Composable
+                fun Something(title: String?, subtitle: String?) {
+                    with(title) { Text(this) }
+                    with(subtitle) { Text(this) }
+                }
             """.trimIndent()
         emittersRuleAssertThat(code).hasLintViolationsWithoutAutoCorrect(
             LintViolation(
@@ -105,6 +110,11 @@ class MultipleContentEmittersCheckTest {
             ),
             LintViolation(
                 line = 12,
+                col = 5,
+                detail = MultipleContentEmitters.MultipleContentEmittersDetected,
+            ),
+            LintViolation(
+                line = 17,
                 col = 5,
                 detail = MultipleContentEmitters.MultipleContentEmittersDetected,
             ),
@@ -217,6 +227,68 @@ class MultipleContentEmittersCheckTest {
                 ),
                 LintViolation(
                     line = 30,
+                    col = 5,
+                    detail = MultipleContentEmitters.MultipleContentEmittersDetected,
+                ),
+            )
+    }
+
+    @Test
+    fun `errors when a Composable function emits multiple content with elvis operators`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun A() {
+                    text?.let {
+                        Text("1")
+                        Text("2")
+                    } ?: run {
+                        Text("1")
+                        Text("2")
+                    }
+                }
+                @Composable
+                fun B() {
+                    text?.let {
+                        Text("1")
+                        Text("2")
+                    } ?: Text("1")
+                }
+                @Composable
+                fun C() {
+                    text?.let {
+                        Text("1")
+                    } ?: run {
+                        Text("1")
+                        Text("2")
+                    }
+                }
+                @Composable
+                fun D() {
+                    text?.let { Text("1") }
+                    Text("2")
+                }
+            """.trimIndent()
+        emittersRuleAssertThat(code)
+            .hasLintViolationsWithoutAutoCorrect(
+                LintViolation(
+                    line = 2,
+                    col = 5,
+                    detail = MultipleContentEmitters.MultipleContentEmittersDetected,
+                ),
+                LintViolation(
+                    line = 12,
+                    col = 5,
+                    detail = MultipleContentEmitters.MultipleContentEmittersDetected,
+                ),
+                LintViolation(
+                    line = 19,
+                    col = 5,
+                    detail = MultipleContentEmitters.MultipleContentEmittersDetected,
+                ),
+                LintViolation(
+                    line = 28,
                     col = 5,
                     detail = MultipleContentEmitters.MultipleContentEmittersDetected,
                 ),

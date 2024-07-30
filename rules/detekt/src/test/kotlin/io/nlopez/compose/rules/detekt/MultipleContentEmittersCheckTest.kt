@@ -100,6 +100,11 @@ class MultipleContentEmittersCheckTest {
                     title?.let { Text(title) }
                     subtitle?.let { Text(subtitle) }
                 }
+                @Composable
+                fun Something(title: String?, subtitle: String?) {
+                    with(title) { Text(this) }
+                    with(subtitle) { Text(this) }
+                }
             """.trimIndent()
         val errors = rule.lint(code)
         assertThat(errors)
@@ -107,6 +112,7 @@ class MultipleContentEmittersCheckTest {
                 SourceLocation(2, 5),
                 SourceLocation(7, 5),
                 SourceLocation(12, 5),
+                SourceLocation(17, 5),
             )
         for (error in errors) {
             assertThat(error).hasMessage(MultipleContentEmitters.MultipleContentEmittersDetected)
@@ -200,6 +206,56 @@ class MultipleContentEmittersCheckTest {
                 SourceLocation(12, 5),
                 SourceLocation(21, 5),
                 SourceLocation(30, 5),
+            )
+        for (error in errors) {
+            assertThat(error).hasMessage(MultipleContentEmitters.MultipleContentEmittersDetected)
+        }
+    }
+
+    @Test
+    fun `errors when a Composable function emits multiple content with elvis operators`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun A() {
+                    text?.let {
+                        Text("1")
+                        Text("2")
+                    } ?: run {
+                        Text("1")
+                        Text("2")
+                    }
+                }
+                @Composable
+                fun B() {
+                    text?.let {
+                        Text("1")
+                        Text("2")
+                    } ?: Text("1")
+                }
+                @Composable
+                fun C() {
+                    text?.let {
+                        Text("1")
+                    } ?: run {
+                        Text("1")
+                        Text("2")
+                    }
+                }
+                @Composable
+                fun D() {
+                    text?.let { Text("1") }
+                    Text("2")
+                }
+            """.trimIndent()
+        val errors = rule.lint(code)
+        assertThat(errors)
+            .hasStartSourceLocations(
+                SourceLocation(2, 5),
+                SourceLocation(12, 5),
+                SourceLocation(19, 5),
+                SourceLocation(28, 5),
             )
         for (error in errors) {
             assertThat(error).hasMessage(MultipleContentEmitters.MultipleContentEmittersDetected)

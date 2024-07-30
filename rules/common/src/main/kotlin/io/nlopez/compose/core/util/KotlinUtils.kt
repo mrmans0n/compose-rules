@@ -46,3 +46,6 @@ fun String.toCamelCase() = split('_').joinToString(
 fun String.toSnakeCase() = replace(humps, "_").lowercase(Locale.getDefault())
 
 private val humps by lazy { "(?<=.)(?=\\p{Upper})".toRegex() }
+
+val KotlinScopeFunctions = setOf("with", "apply", "run", "also", "let")
+val KotlinItObjectScopeFunctions = setOf("let", "also")
