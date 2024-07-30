@@ -4,6 +4,7 @@ package io.nlopez.compose.core.util
 
 import io.nlopez.compose.core.ComposeKtConfig
 import org.jetbrains.kotlin.com.intellij.psi.PsiElement
+import org.jetbrains.kotlin.psi.KtBinaryExpression
 import org.jetbrains.kotlin.psi.KtBlockExpression
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDeclarationWithBody
@@ -91,8 +92,14 @@ private fun KtExpression.uiEmitterCount(): Int = when (val current = this) {
         current.statements.fold(0) { acc, next -> acc + next.uiEmitterCount() }
     }
 
-    // Direct statements. E.g. Text("bleh")
-    is KtCallExpression -> if (current.emitsContent) 1 else 0
+    is KtCallExpression -> when {
+        // Direct statements. E.g. Text("bleh")
+        current.emitsContent -> 1
+        // Scoped functions like run, with, etc.
+        current.calleeExpression?.text in KotlinScopeFunctions ->
+            current.lambdaArguments.singleOrNull()?.getLambdaExpression()?.bodyExpression?.uiEmitterCount() ?: 0
+        else -> 0
+    }
 
     // for loops. E.g. for (item in list) { Text(item) }
     is KtForExpression -> {
@@ -103,13 +110,20 @@ private fun KtExpression.uiEmitterCount(): Int = when (val current = this) {
     // Scoped function statements. E.g. text?.let { Text(it) }
     is KtSafeQualifiedExpression -> {
         (current.selectorExpression as? KtCallExpression)
-            ?.takeIf { it.calleeExpression?.text == "let" || it.calleeExpression?.text == "also" }
+            ?.takeIf { it.calleeExpression?.text in KotlinScopeFunctions }
             ?.lambdaArguments
             ?.singleOrNull()
             ?.getLambdaExpression()
             ?.bodyExpression
             ?.uiEmitterCount()
             ?: 0
+    }
+
+    // Elvis operators. E.g. text?.let { Text(it) } ?: Text("default")
+    is KtBinaryExpression -> {
+        val leftCount = current.left?.uiEmitterCount() ?: 0
+        val rightCount = current.right?.uiEmitterCount() ?: 0
+        max(leftCount, rightCount)
     }
 
     is KtIfExpression -> {

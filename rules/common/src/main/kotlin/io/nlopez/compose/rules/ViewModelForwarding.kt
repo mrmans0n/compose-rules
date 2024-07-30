@@ -5,6 +5,8 @@ package io.nlopez.compose.rules
 import io.nlopez.compose.core.ComposeKtConfig
 import io.nlopez.compose.core.ComposeKtVisitor
 import io.nlopez.compose.core.Emitter
+import io.nlopez.compose.core.util.KotlinItObjectScopeFunctions
+import io.nlopez.compose.core.util.KotlinScopeFunctions
 import io.nlopez.compose.core.util.definedInInterface
 import io.nlopez.compose.core.util.findChildrenByClass
 import io.nlopez.compose.core.util.findDirectChildrenByClass
@@ -129,13 +131,13 @@ class ViewModelForwarding : ComposeKtVisitor {
     }
 
     private val KtCallExpression.isScopeFunction: Boolean
-        get() = (calleeExpression as? KtNameReferenceExpression)?.getReferencedName() in scopeFunctions
+        get() = (calleeExpression as? KtNameReferenceExpression)?.getReferencedName() in KotlinScopeFunctions
 
     private val KtCallExpression.isWithScope: Boolean
         get() = (calleeExpression as? KtNameReferenceExpression)?.getReferencedName() == "with"
 
     private val KtCallExpression.hasItObjectReference: Boolean
-        get() = (calleeExpression as? KtNameReferenceExpression)?.getReferencedName() in itObjectScopeFunctions
+        get() = (calleeExpression as? KtNameReferenceExpression)?.getReferencedName() in KotlinItObjectScopeFunctions
 
     private fun KtCallExpression.getScopedParameterValue(): String? = if (isWithScope) {
         valueArguments.firstOrNull()?.getArgumentExpression()?.text
@@ -145,8 +147,6 @@ class ViewModelForwarding : ComposeKtVisitor {
 
     companion object {
         private val defaultStateHolderNames = listOf(".*ViewModel", ".*Presenter")
-        private val scopeFunctions = setOf("with", "apply", "run", "also", "let")
-        private val itObjectScopeFunctions = setOf("let", "also")
         val AvoidViewModelForwarding = """
             Forwarding a ViewModel/Presenter through multiple @Composable functions should be avoided. Consider using state hoisting.
 
