@@ -8,6 +8,7 @@ import io.nlopez.compose.core.Emitter
 import io.nlopez.compose.core.report
 import io.nlopez.compose.core.util.hasReceiverType
 import io.nlopez.compose.core.util.isOperator
+import io.nlopez.compose.core.util.isOverride
 import io.nlopez.compose.core.util.isSuppressed
 import io.nlopez.compose.core.util.returnsValue
 import org.jetbrains.kotlin.psi.KtFunction
@@ -20,6 +21,9 @@ class Naming : ComposeKtVisitor {
 
         // Operators have fixed names that we can't modify, so this rule is useless in that case
         if (function.isOperator) return
+
+        // Overrides have names that we might not be able to modify (3p libraries), so the rule is useless there too
+        if (function.isOverride) return
 
         // If it's suppressed by the official lints, we will honor that too
         if (function.isSuppressed("ComposableNaming")) return

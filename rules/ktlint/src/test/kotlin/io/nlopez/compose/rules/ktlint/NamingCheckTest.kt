@@ -166,4 +166,18 @@ class NamingCheckTest {
 
         namingRuleAssertThat(code).hasNoLintViolations()
     }
+
+    @Test
+    fun `passes when a composable is an override even if the naming should be wrong`() {
+        @Language("kotlin")
+        val code =
+            """
+                interface Bleh {
+                    @Composable
+                    override fun component() { }
+                }
+            """.trimIndent()
+
+        namingRuleAssertThat(code).hasNoLintViolations()
+    }
 }
