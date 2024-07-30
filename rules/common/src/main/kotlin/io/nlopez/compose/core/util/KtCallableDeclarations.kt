@@ -3,6 +3,7 @@
 package io.nlopez.compose.core.util
 
 import org.jetbrains.kotlin.psi.KtCallableDeclaration
+import org.jetbrains.kotlin.psi.KtParameter
 
 val KtCallableDeclaration.isTypeMutable: Boolean
     get() = typeReference?.text?.matchesAnyOf(KnownMutableCommonTypesRegex) == true
@@ -45,3 +46,10 @@ val KnownUnstableCollectionTypesRegex = sequenceOf(
     "List<.*>\\??",
     "Map<.*>\\??",
 ).map { Regex(it) }
+
+fun KtCallableDeclaration.contentSlots(
+    treatAsLambdaTypes: Set<String>,
+    treatAsComposableLambdaTypes: Set<String>,
+): List<KtParameter> = valueParameters.filter { parameter ->
+    parameter.typeReference?.isComposableLambda(treatAsLambdaTypes, treatAsComposableLambdaTypes) == true
+}
