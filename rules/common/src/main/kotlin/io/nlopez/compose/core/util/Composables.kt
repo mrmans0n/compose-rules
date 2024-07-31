@@ -4,6 +4,7 @@ package io.nlopez.compose.core.util
 
 import io.nlopez.compose.core.ComposeKtConfig
 import org.jetbrains.kotlin.com.intellij.psi.PsiElement
+import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.KtBinaryExpression
 import org.jetbrains.kotlin.psi.KtBlockExpression
 import org.jetbrains.kotlin.psi.KtCallExpression
@@ -98,6 +99,7 @@ private fun KtExpression.uiEmitterCount(): Int = when (val current = this) {
         // Scoped functions like run, with, etc.
         current.calleeExpression?.text in KotlinScopeFunctions ->
             current.lambdaArguments.singleOrNull()?.getLambdaExpression()?.bodyExpression?.uiEmitterCount() ?: 0
+
         else -> 0
     }
 
@@ -121,9 +123,13 @@ private fun KtExpression.uiEmitterCount(): Int = when (val current = this) {
 
     // Elvis operators. E.g. text?.let { Text(it) } ?: Text("default")
     is KtBinaryExpression -> {
-        val leftCount = current.left?.uiEmitterCount() ?: 0
-        val rightCount = current.right?.uiEmitterCount() ?: 0
-        max(leftCount, rightCount)
+        if (current.operationToken == KtTokens.ELVIS) {
+            val leftCount = current.left?.uiEmitterCount() ?: 0
+            val rightCount = current.right?.uiEmitterCount() ?: 0
+            max(leftCount, rightCount)
+        } else {
+            0
+        }
     }
 
     is KtIfExpression -> {
