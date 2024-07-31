@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#using-with-detekt-cli" class="md-skip">
+        <a href="#using-with-detekt-cli-detekt-ide-plugin" class="md-skip">
           Skip to content
         </a>
       
@@ -311,9 +311,9 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#using-with-detekt-cli" class="md-nav__link">
+  <a href="#using-with-detekt-cli-detekt-ide-plugin" class="md-nav__link">
     <span class="md-ellipsis">
-      Using with detekt CLI
+      Using with detekt CLI / detekt IDE plugin
     </span>
   </a>
   
@@ -390,9 +390,9 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#using-with-detekt-cli" class="md-nav__link">
+  <a href="#using-with-detekt-cli-detekt-ide-plugin" class="md-nav__link">
     <span class="md-ellipsis">
-      Using with detekt CLI
+      Using with detekt CLI / detekt IDE plugin
     </span>
   </a>
   
@@ -441,10 +441,11 @@
 <span class="w">    </span><span class="n">detektPlugins</span><span class="w"> </span><span class="s2">&quot;io.nlopez.compose.rules:detekt:&lt;VERSION&gt;&quot;</span>
 <span class="o">}</span>
 </code></pre></div>
-<h3 id="using-with-detekt-cli">Using with detekt CLI<a class="headerlink" href="#using-with-detekt-cli" title="Permanent link">&para;</a></h3>
+<h3 id="using-with-detekt-cli-detekt-ide-plugin">Using with detekt CLI / detekt IDE plugin<a class="headerlink" href="#using-with-detekt-cli-detekt-ide-plugin" title="Permanent link">&para;</a></h3>
 <p>The <a href="https://github.com/mrmans0n/compose-rules/releases">releases</a> page contains an <a href="https://stackoverflow.com/questions/11947037/what-is-an-uber-jar">uber jar</a> for each version release that can be used to run with the <a href="https://detekt.dev/docs/gettingstarted/cli">CLI version of detekt</a>.</p>
 <div class="highlight"><pre><span></span><code>detekt<span class="w"> </span>-p<span class="w"> </span>detekt-compose-&lt;VERSION&gt;-all.jar<span class="w"> </span>-c<span class="w"> </span>your/config/detekt.yml
 </code></pre></div>
+<p>For the IDE plugin, you'll need to add the uber jar to the list of custom plugins in its configuration, and don't forget to also enable the rules in the yml config provided to the plugin for it to work.</p>
 <h3 id="enabling-rules">Enabling rules<a class="headerlink" href="#enabling-rules" title="Permanent link">&para;</a></h3>
 <p>For the rules to be picked up, you will need to enable them in your <code>detekt.yml</code> configuration file.</p>
 <div class="highlight"><pre><span></span><code><span class="nt">Compose</span><span class="p">:</span>
