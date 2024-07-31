@@ -6,13 +6,15 @@ dependencies {
 }
 ```
 
-### Using with detekt CLI
+### Using with detekt CLI / detekt IDE plugin
 
 The [releases](https://github.com/mrmans0n/compose-rules/releases) page contains an [uber jar](https://stackoverflow.com/questions/11947037/what-is-an-uber-jar) for each version release that can be used to run with the [CLI version of detekt](https://detekt.dev/docs/gettingstarted/cli).
 
 ```shell
 detekt -p detekt-compose-<VERSION>-all.jar -c your/config/detekt.yml
 ```
+
+For the IDE plugin, you'll need to add the uber jar to the list of custom plugins in its configuration, and don't forget to also enable the rules in the yml config provided to the plugin for it to work.
 
 ### Enabling rules
 
