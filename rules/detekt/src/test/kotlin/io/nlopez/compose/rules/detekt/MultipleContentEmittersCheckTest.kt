@@ -263,6 +263,71 @@ class MultipleContentEmittersCheckTest {
     }
 
     @Test
+    fun `errors when a Composable function emits multiple content with a when`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun A() {
+                    when {
+                        isPotato -> {
+                            Text("1")
+                            Text("2")
+                        }
+                        else -> {
+                            Text("1")
+                            Text("2")
+                        }
+                    }
+                }
+                @Composable
+                fun B() {
+                    when {
+                        isPotato -> {
+                            Text("1")
+                        }
+                        else -> {
+                            Text("1")
+                            Text("2")
+                        }
+                    }
+                }
+                @Composable
+                fun C() {
+                    when {
+                        isPotato -> {
+                            Text("1")
+                            Text("2")
+                        }
+                        else -> {
+                            Text("1")
+                        }
+                    }
+                }
+                @Composable
+                fun D() {
+                    Text("1")
+                    when {
+                        isPotato -> Text("2")
+                        else -> {}
+                    }
+                }
+            """.trimIndent()
+
+        val errors = rule.lint(code)
+        assertThat(errors)
+            .hasStartSourceLocations(
+                SourceLocation(2, 5),
+                SourceLocation(15, 5),
+                SourceLocation(27, 5),
+                SourceLocation(39, 5),
+            )
+        for (error in errors) {
+            assertThat(error).hasMessage(MultipleContentEmitters.MultipleContentEmittersDetected)
+        }
+    }
+
+    @Test
     fun `make sure to not report twice the same composable`() {
         @Language("kotlin")
         val code =
