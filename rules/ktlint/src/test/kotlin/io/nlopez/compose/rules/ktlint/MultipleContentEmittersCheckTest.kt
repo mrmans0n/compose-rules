@@ -443,4 +443,57 @@ class MultipleContentEmittersCheckTest {
             .withEditorConfigOverride(contentEmittersDenylist to "Spacer")
             .hasNoLintViolations()
     }
+
+    @Test
+    fun `passes for early returns`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun Something() {
+                    if (x) {
+                        Text("1")
+                        return
+                    }
+                    Text("2")
+                }
+            """.trimIndent()
+        emittersRuleAssertThat(code).hasNoLintViolations()
+    }
+
+    @Test
+    fun `multiple emitters are caught despite early returns`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun Something() {
+                    Text("1")
+                    if (x) {
+                        Text("2")
+                        return
+                    }
+                }
+                @Composable
+                fun Something() {
+                    if (x) {
+                        Text("1")
+                        Text("2")
+                        return
+                    }
+                }
+            """.trimIndent()
+        emittersRuleAssertThat(code).hasLintViolationsWithoutAutoCorrect(
+            LintViolation(
+                line = 2,
+                col = 5,
+                detail = MultipleContentEmitters.MultipleContentEmittersDetected,
+            ),
+            LintViolation(
+                line = 10,
+                col = 5,
+                detail = MultipleContentEmitters.MultipleContentEmittersDetected,
+            ),
+        )
+    }
 }
