@@ -296,6 +296,82 @@ class MultipleContentEmittersCheckTest {
     }
 
     @Test
+    fun `errors when a Composable function emits multiple content with a when`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun A() {
+                    when {
+                        isPotato -> {
+                            Text("1")
+                            Text("2")
+                        }
+                        else -> {
+                            Text("1")
+                            Text("2")
+                        }
+                    }
+                }
+                @Composable
+                fun B() {
+                    when {
+                        isPotato -> {
+                            Text("1")
+                        }
+                        else -> {
+                            Text("1")
+                            Text("2")
+                        }
+                    }
+                }
+                @Composable
+                fun C() {
+                    when {
+                        isPotato -> {
+                            Text("1")
+                            Text("2")
+                        }
+                        else -> {
+                            Text("1")
+                        }
+                    }
+                }
+                @Composable
+                fun D() {
+                    Text("1")
+                    when {
+                        isPotato -> Text("2")
+                        else -> {}
+                    }
+                }
+            """.trimIndent()
+        emittersRuleAssertThat(code)
+            .hasLintViolationsWithoutAutoCorrect(
+                LintViolation(
+                    line = 2,
+                    col = 5,
+                    detail = MultipleContentEmitters.MultipleContentEmittersDetected,
+                ),
+                LintViolation(
+                    line = 15,
+                    col = 5,
+                    detail = MultipleContentEmitters.MultipleContentEmittersDetected,
+                ),
+                LintViolation(
+                    line = 27,
+                    col = 5,
+                    detail = MultipleContentEmitters.MultipleContentEmittersDetected,
+                ),
+                LintViolation(
+                    line = 39,
+                    col = 5,
+                    detail = MultipleContentEmitters.MultipleContentEmittersDetected,
+                ),
+            )
+    }
+
+    @Test
     fun `make sure to not report twice the same composable`() {
         @Language("kotlin")
         val code =

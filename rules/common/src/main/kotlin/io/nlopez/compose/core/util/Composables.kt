@@ -11,11 +11,12 @@ import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDeclarationWithBody
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.KtExpression
-import org.jetbrains.kotlin.psi.KtForExpression
 import org.jetbrains.kotlin.psi.KtFunction
 import org.jetbrains.kotlin.psi.KtIfExpression
+import org.jetbrains.kotlin.psi.KtLoopExpression
 import org.jetbrains.kotlin.psi.KtProperty
 import org.jetbrains.kotlin.psi.KtSafeQualifiedExpression
+import org.jetbrains.kotlin.psi.KtWhenExpression
 import org.jetbrains.kotlin.psi.psiUtil.parents
 import org.jetbrains.kotlin.psi.psiUtil.referenceExpression
 import kotlin.math.max
@@ -103,8 +104,8 @@ private fun KtExpression.uiEmitterCount(): Int = when (val current = this) {
         else -> 0
     }
 
-    // for loops. E.g. for (item in list) { Text(item) }
-    is KtForExpression -> {
+    // for loops, while loops, do while loops, etc. E.g. for (item in list) { Text(item) }
+    is KtLoopExpression -> {
         // Assume at least 2 iterations if any, as we can't know how many there will be.
         current.body?.uiEmitterCount()?.takeIf { it > 0 }?.let { it + 1 } ?: 0
     }
@@ -136,6 +137,10 @@ private fun KtExpression.uiEmitterCount(): Int = when (val current = this) {
         val ifCount = current.then?.uiEmitterCount() ?: 0
         val elseCount = current.`else`?.uiEmitterCount() ?: 0
         max(ifCount, elseCount)
+    }
+
+    is KtWhenExpression -> {
+        current.entries.maxOfOrNull { it.expression?.uiEmitterCount() ?: 0 } ?: 0
     }
 
     else -> 0
