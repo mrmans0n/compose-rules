@@ -15,6 +15,7 @@ import org.jetbrains.kotlin.psi.KtFunction
 import org.jetbrains.kotlin.psi.KtIfExpression
 import org.jetbrains.kotlin.psi.KtLoopExpression
 import org.jetbrains.kotlin.psi.KtProperty
+import org.jetbrains.kotlin.psi.KtReturnExpression
 import org.jetbrains.kotlin.psi.KtSafeQualifiedExpression
 import org.jetbrains.kotlin.psi.KtWhenExpression
 import org.jetbrains.kotlin.psi.psiUtil.parents
@@ -85,65 +86,112 @@ private val KtCallExpression.containsComposablesWithModifiers: Boolean
     }
 
 context(ComposeKtConfig)
-private fun KtExpression.uiEmitterCount(): Int = when (val current = this) {
-    // Something like a function body or a var declaration. E.g. @Composable fun A() { Text("bleh") }
-    is KtDeclarationWithBody -> current.bodyBlockExpression?.uiEmitterCount() ?: 0
+private fun KtExpression.uiEmitterCount(): Int {
+    // For early return false positives detection we need to know where we are at. But yea, yikes.
+    var totalEmittersFound = 0
+    var currentBlockStartedAt = 0
 
-    // A whole code block. E.g. { Text("bleh") Text("meh") }
-    is KtBlockExpression -> {
-        current.statements.fold(0) { acc, next -> acc + next.uiEmitterCount() }
-    }
+    // Function for actually counting. As we can't know how big the code would be, let's be careful wrt recursion.
+    val emitterCount = DeepRecursiveFunction<KtExpression?, Int> { current ->
+        when (current) {
+            null -> 0
 
-    is KtCallExpression -> when {
-        // Direct statements. E.g. Text("bleh")
-        current.emitsContent -> 1
-        // Scoped functions like run, with, etc.
-        current.calleeExpression?.text in KotlinScopeFunctions ->
-            current.lambdaArguments.singleOrNull()?.getLambdaExpression()?.bodyExpression?.uiEmitterCount() ?: 0
+            // Something like a function body or a var declaration. E.g. @Composable fun A() { Text("bleh") }
+            is KtDeclarationWithBody -> callRecursive(current.bodyBlockExpression)
 
-        else -> 0
-    }
+            // A whole code block. E.g. { Text("bleh") Text("meh") }
+            is KtBlockExpression -> {
+                currentBlockStartedAt = totalEmittersFound
+                current.statements.fold(0) { acc, next -> acc + callRecursive(next) }
+            }
 
-    // for loops, while loops, do while loops, etc. E.g. for (item in list) { Text(item) }
-    is KtLoopExpression -> {
-        // Assume at least 2 iterations if any, as we can't know how many there will be.
-        current.body?.uiEmitterCount()?.takeIf { it > 0 }?.let { it + 1 } ?: 0
-    }
+            is KtCallExpression -> when {
+                // Direct statements. E.g. Text("bleh")
+                current.emitsContent -> {
+                    totalEmittersFound++
+                    1
+                }
+                // Scoped functions like run, with, etc.
+                current.calleeExpression?.text in KotlinScopeFunctions ->
+                    callRecursive(current.lambdaArguments.singleOrNull()?.getLambdaExpression()?.bodyExpression)
 
-    // Scoped function statements. E.g. text?.let { Text(it) }
-    is KtSafeQualifiedExpression -> {
-        (current.selectorExpression as? KtCallExpression)
-            ?.takeIf { it.calleeExpression?.text in KotlinScopeFunctions }
-            ?.lambdaArguments
-            ?.singleOrNull()
-            ?.getLambdaExpression()
-            ?.bodyExpression
-            ?.uiEmitterCount()
-            ?: 0
-    }
+                else -> 0
+            }
 
-    // Elvis operators. E.g. text?.let { Text(it) } ?: Text("default")
-    is KtBinaryExpression -> {
-        if (current.operationToken == KtTokens.ELVIS) {
-            val leftCount = current.left?.uiEmitterCount() ?: 0
-            val rightCount = current.right?.uiEmitterCount() ?: 0
-            max(leftCount, rightCount)
-        } else {
-            0
+            // for loops, while loops, do while loops, etc. E.g. for (item in list) { Text(item) }
+            is KtLoopExpression -> {
+                // Assume at the very least 2 iterations (found 1..n, and then +1, so it'll be 2..n),
+                // as we can't know how many there will be.
+                callRecursive(current.body).takeIf { it > 0 }?.let { emitters ->
+                    // Need to do this to take the +1 into account.
+                    totalEmittersFound++
+                    emitters + 1
+                } ?: 0
+            }
+
+            // Scoped function statements. E.g. text?.let { Text(it) }
+            is KtSafeQualifiedExpression -> {
+                callRecursive(
+                    (current.selectorExpression as? KtCallExpression)
+                        ?.takeIf { it.calleeExpression?.text in KotlinScopeFunctions }
+                        ?.lambdaArguments
+                        ?.singleOrNull()
+                        ?.getLambdaExpression()
+                        ?.bodyExpression,
+                )
+            }
+
+            // Elvis operators. E.g. text?.let { Text(it) } ?: Text("default")
+            is KtBinaryExpression -> {
+                if (current.operationToken == KtTokens.ELVIS) {
+                    val leftCount = callRecursive(current.left)
+                    val rightCount = callRecursive(current.right)
+                    max(leftCount, rightCount)
+                } else {
+                    0
+                }
+            }
+
+            // Conditionals. E.g. if (something) { Text("bleh") } else { Test("meh") }
+            is KtIfExpression -> {
+                val ifCount = callRecursive(current.then)
+                val elseCount = callRecursive(current.`else`)
+                max(ifCount, elseCount)
+            }
+
+            // When expressions.
+            is KtWhenExpression -> {
+                current.entries.maxOfOrNull { callRecursive(it.expression) } ?: 0
+            }
+
+            is KtReturnExpression -> {
+                // Ignore labeled expressions (E.g. return@bleh)
+                val functionReturn = current.labeledExpression == null
+                if (functionReturn) {
+                    // This is nasty, but it's simple. We want to exclude early returns from the count,
+                    // we'll need to subtract 1 in the case where the code block with the return started without
+                    // any emitter, and only 1 was found before the return, so we return -1 to cancel it out.
+                    //
+                    // For example, to avoid false positives in a code like this:
+                    //   @Composable fun A() {
+                    //      if (x) {
+                    //          Text("1")
+                    //          return
+                    //      }
+                    //      Text("2")
+                    //   }
+                    val currentBlock = totalEmittersFound - currentBlockStartedAt
+                    if (currentBlock == 1 && currentBlockStartedAt == 0) -1 else 0
+                } else {
+                    0
+                }
+            }
+
+            else -> 0
         }
     }
 
-    is KtIfExpression -> {
-        val ifCount = current.then?.uiEmitterCount() ?: 0
-        val elseCount = current.`else`?.uiEmitterCount() ?: 0
-        max(ifCount, elseCount)
-    }
-
-    is KtWhenExpression -> {
-        current.entries.maxOfOrNull { it.expression?.uiEmitterCount() ?: 0 } ?: 0
-    }
-
-    else -> 0
+    return max(emitterCount(this), 0)
 }
 
 context(ComposeKtConfig)

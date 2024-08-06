@@ -392,4 +392,55 @@ class MultipleContentEmittersCheckTest {
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }
+
+    @Test
+    fun `passes for early returns`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun Something() {
+                    if (x) {
+                        Text("1")
+                        return
+                    }
+                    Text("2")
+                }
+            """.trimIndent()
+        val errors = rule.lint(code)
+        assertThat(errors).isEmpty()
+    }
+
+    @Test
+    fun `multiple emitters are caught despite early returns`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun Something() {
+                    Text("1")
+                    if (x) {
+                        Text("2")
+                        return
+                    }
+                }
+                @Composable
+                fun Something() {
+                    if (x) {
+                        Text("1")
+                        Text("2")
+                        return
+                    }
+                }
+            """.trimIndent()
+        val errors = rule.lint(code)
+        assertThat(errors)
+            .hasStartSourceLocations(
+                SourceLocation(2, 5),
+                SourceLocation(10, 5),
+            )
+        for (error in errors) {
+            assertThat(error).hasMessage(MultipleContentEmitters.MultipleContentEmittersDetected)
+        }
+    }
 }
