@@ -8,9 +8,14 @@ import org.jetbrains.kotlin.psi.psiUtil.endOffset
 import org.jetbrains.kotlin.psi.psiUtil.parentsWithSelf
 import org.jetbrains.kotlin.psi.psiUtil.siblings
 import org.jetbrains.kotlin.psi.psiUtil.startOffset
-import java.util.*
+import java.util.Deque
+import java.util.LinkedList
 
-inline fun <reified T : PsiElement> PsiElement.findChildrenByClass(): Sequence<T> = sequence {
+val PsiElementAlwaysTruePredicate: (PsiElement) -> Boolean = { true }
+
+inline fun <reified T : PsiElement> PsiElement.findChildrenByClass(
+    noinline shouldVisitChildren: (PsiElement) -> Boolean = PsiElementAlwaysTruePredicate,
+): Sequence<T> = sequence {
     val queue: Deque<PsiElement> = LinkedList()
     queue.add(this@findChildrenByClass)
     while (queue.isNotEmpty()) {
@@ -18,7 +23,9 @@ inline fun <reified T : PsiElement> PsiElement.findChildrenByClass(): Sequence<T
         if (current is T) {
             yield(current)
         }
-        queue.addAll(current.children)
+        if (shouldVisitChildren(current)) {
+            queue.addAll(current.children)
+        }
     }
 }
 

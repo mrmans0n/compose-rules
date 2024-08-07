@@ -22,28 +22,14 @@ import org.jetbrains.kotlin.psi.psiUtil.parents
 import org.jetbrains.kotlin.psi.psiUtil.referenceExpression
 import kotlin.math.max
 
-private tailrec suspend fun SequenceScope<KtCallExpression>.scan(elements: List<PsiElement>) {
-    if (elements.isEmpty()) return
-    return scan(
-        elements
-            .mapNotNull { current ->
-                if (current is KtCallExpression) {
-                    if (current.calleeExpression?.text in ComposableNonEmittersList) {
-                        null
-                    } else {
-                        current.also { yield(it) }
-                    }
-                } else {
-                    current
-                }
-            }
-            .flatMap { it.children.toList() },
-    )
-}
-
 context(ComposeKtConfig)
 val KtFunction.emitsContent: Boolean
-    get() = if (isComposable) sequence { scan(listOf(this@emitsContent)) }.any { it.emitsContent } else false
+    get() = when {
+        isComposable -> findChildrenByClass<KtCallExpression> { current ->
+            current !is KtCallExpression || !current.isInContentEmittersDenylist
+        }.any { it.emitsContent }
+        else -> false
+    }
 
 context(ComposeKtConfig)
 val KtCallExpression.emitsContent: Boolean
