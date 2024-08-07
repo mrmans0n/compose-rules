@@ -352,15 +352,22 @@ class ModifierMissingCheckTest {
             """
                 @Composable
                 fun MyDialog() {
-                  AlertDialog(
-                    onDismissRequest = { /*TODO*/ },
-                    buttons = { Text(text = "Button") },
-                    text = { Text(text = "Body") },
-                  )
+                    AlertDialog(
+                        onDismissRequest = { /*TODO*/ },
+                        buttons = { Text(text = "Button") },
+                        text = { Text(text = "Body") },
+                    )
+                    PotatoDialog(
+                        onDismissRequest = { /*TODO*/ },
+                        buttons = { Text(text = "Button") },
+                        text = { Text(text = "Body") },
+                    )
                 }
             """.trimIndent()
 
-        modifierRuleAssertThat(code).hasNoLintViolations()
+        modifierRuleAssertThat(code)
+            .withEditorConfigOverride(contentEmittersDenylist to "PotatoDialog")
+            .hasNoLintViolations()
     }
 
     @Test
@@ -370,13 +377,13 @@ class ModifierMissingCheckTest {
             """
                 @Composable
                 fun MyDialog() {
-                  Text(text = "Unicorn")
+                    Text(text = "Unicorn")
 
-                  AlertDialog(
-                    onDismissRequest = { /*TODO*/ },
-                    buttons = { Text(text = "Button") },
-                    text = { Text(text = "Body") },
-                  )
+                    AlertDialog(
+                        onDismissRequest = { /*TODO*/ },
+                        buttons = { Text(text = "Button") },
+                        text = { Text(text = "Body") },
+                    )
                 }
             """.trimIndent()
 

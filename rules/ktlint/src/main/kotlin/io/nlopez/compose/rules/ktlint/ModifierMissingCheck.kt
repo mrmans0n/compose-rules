@@ -9,6 +9,11 @@ import io.nlopez.compose.rules.ModifierMissing
 class ModifierMissingCheck :
     KtlintRule(
         id = "compose:modifier-missing-check",
-        editorConfigProperties = setOf(checkModifiersForVisibility, contentEmittersProperty, customModifiers),
+        editorConfigProperties = setOf(
+            checkModifiersForVisibility,
+            contentEmittersProperty,
+            customModifiers,
+            contentEmittersDenylist,
+        ),
     ),
     ComposeKtVisitor by ModifierMissing()

@@ -14,6 +14,7 @@ class ModifierMissingCheckTest {
 
     private val testConfig = TestConfig(
         "customModifiers" to listOf("BananaModifier"),
+        "contentEmittersDenylist" to listOf("PotatoDialog"),
     )
     private val rule = ModifierMissingCheck(testConfig)
 
@@ -316,13 +317,17 @@ class ModifierMissingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
                 fun MyDialog() {
-                  AlertDialog(
-                    onDismissRequest = { /*TODO*/ },
-                    buttons = { Text(text = "Button") },
-                    text = { Text(text = "Body") },
-                  )
+                    AlertDialog(
+                        onDismissRequest = { /*TODO*/ },
+                        buttons = { Text(text = "Button") },
+                        text = { Text(text = "Body") },
+                    )
+                    PotatoDialog(
+                        onDismissRequest = { /*TODO*/ },
+                        buttons = { Text(text = "Button") },
+                        text = { Text(text = "Body") },
+                    )
                 }
             """.trimIndent()
 
@@ -337,13 +342,13 @@ class ModifierMissingCheckTest {
             """
                 @Composable
                 fun MyDialog() {
-                  Text(text = "Unicorn")
+                    Text(text = "Unicorn")
 
-                  AlertDialog(
-                    onDismissRequest = { /*TODO*/ },
-                    buttons = { Text(text = "Button") },
-                    text = { Text(text = "Body") },
-                  )
+                    AlertDialog(
+                        onDismissRequest = { /*TODO*/ },
+                        buttons = { Text(text = "Button") },
+                        text = { Text(text = "Body") },
+                    )
                 }
             """.trimIndent()
 

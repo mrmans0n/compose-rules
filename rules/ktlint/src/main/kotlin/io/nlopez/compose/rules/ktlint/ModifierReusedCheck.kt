@@ -9,6 +9,6 @@ import io.nlopez.compose.rules.ModifierReused
 class ModifierReusedCheck :
     KtlintRule(
         id = "compose:modifier-reused-check",
-        editorConfigProperties = setOf(contentEmittersProperty, customModifiers),
+        editorConfigProperties = setOf(contentEmittersProperty, customModifiers, contentEmittersDenylist),
     ),
     ComposeKtVisitor by ModifierReused()
