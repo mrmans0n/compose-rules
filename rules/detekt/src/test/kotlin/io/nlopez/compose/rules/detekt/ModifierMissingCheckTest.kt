@@ -356,4 +356,20 @@ class ModifierMissingCheckTest {
         assertThat(errors).hasTextLocations("MyDialog")
         assertThat(errors[0]).hasMessage(ModifierMissing.MissingModifierContentComposable)
     }
+
+    @Test
+    fun `Modifier factory functions are ignored`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun Modifier.Something() {
+                    Row {
+                    }
+                }
+            """.trimIndent()
+
+        val errors = rule.lint(code)
+        assertThat(errors).isEmpty()
+    }
 }

@@ -10,6 +10,7 @@ import io.nlopez.compose.core.util.definedInInterface
 import io.nlopez.compose.core.util.isAbstract
 import io.nlopez.compose.core.util.isActual
 import io.nlopez.compose.core.util.isModifier
+import io.nlopez.compose.core.util.isModifierReceiver
 import io.nlopez.compose.core.util.isOpen
 import io.nlopez.compose.core.util.isOverride
 import io.nlopez.compose.core.util.lastChildLeafOrSelf
@@ -18,30 +19,29 @@ import org.jetbrains.kotlin.psi.KtFunction
 
 class ModifierWithoutDefault : ComposeKtVisitor {
 
-    override fun visitComposable(function: KtFunction, emitter: Emitter, config: ComposeKtConfig) {
+    override fun visitComposable(function: KtFunction, emitter: Emitter, config: ComposeKtConfig) = with(config) {
         if (
             function.definedInInterface ||
             function.isActual ||
             function.isOverride ||
             function.isAbstract ||
-            function.isOpen
+            function.isOpen ||
+            function.isModifierReceiver
         ) {
             return
         }
 
-        with(config) {
-            // Look for modifier params in the composable signature, and if any without a default value is found, error out.
-            function.valueParameters.filter { it.isModifier }
-                .filterNot { it.hasDefaultValue() }
-                .forEach { modifierParameter ->
-                    emitter.report(modifierParameter, MissingModifierDefaultParam, true).ifFix {
-                        // This error is easily auto fixable, we just inject ` = Modifier` to the param
-                        val lastToken = modifierParameter.node.lastChildLeafOrSelf() as LeafPsiElement
-                        val currentText = lastToken.text
-                        lastToken.rawReplaceWithText("$currentText = Modifier")
-                    }
+        // Look for modifier params in the composable signature, and if any without a default value is found, error out.
+        function.valueParameters.filter { it.isModifier }
+            .filterNot { it.hasDefaultValue() }
+            .forEach { modifierParameter ->
+                emitter.report(modifierParameter, MissingModifierDefaultParam, true).ifFix {
+                    // This error is easily auto fixable, we just inject ` = Modifier` to the param
+                    val lastToken = modifierParameter.node.lastChildLeafOrSelf() as LeafPsiElement
+                    val currentText = lastToken.text
+                    lastToken.rawReplaceWithText("$currentText = Modifier")
                 }
-        }
+            }
     }
 
     companion object {
