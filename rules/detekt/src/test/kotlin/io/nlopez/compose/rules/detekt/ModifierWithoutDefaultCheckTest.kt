@@ -94,4 +94,19 @@ class ModifierWithoutDefaultCheckTest {
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }
+
+    @Test
+    fun `passes for Modifier factory functions`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun Modifier.something(modifier: Modifier) {
+                    Row(modifier = modifier) {
+                    }
+                }
+            """.trimIndent()
+        val errors = rule.lint(code)
+        assertThat(errors).isEmpty()
+    }
 }

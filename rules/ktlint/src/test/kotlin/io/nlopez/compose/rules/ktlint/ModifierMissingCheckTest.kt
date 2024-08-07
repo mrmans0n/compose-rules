@@ -395,4 +395,19 @@ class ModifierMissingCheckTest {
             ),
         )
     }
+
+    @Test
+    fun `Modifier factory functions are ignored`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun Modifier.Something() {
+                    Row {
+                    }
+                }
+            """.trimIndent()
+
+        modifierRuleAssertThat(code).hasNoLintViolations()
+    }
 }

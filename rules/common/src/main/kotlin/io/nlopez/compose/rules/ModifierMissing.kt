@@ -9,6 +9,7 @@ import io.nlopez.compose.core.report
 import io.nlopez.compose.core.util.definedInInterface
 import io.nlopez.compose.core.util.emitsContent
 import io.nlopez.compose.core.util.isInternal
+import io.nlopez.compose.core.util.isModifierReceiver
 import io.nlopez.compose.core.util.isOverride
 import io.nlopez.compose.core.util.isPreview
 import io.nlopez.compose.core.util.modifierParameter
@@ -18,16 +19,18 @@ import org.jetbrains.kotlin.psi.psiUtil.isPublic
 
 class ModifierMissing : ComposeKtVisitor {
 
-    override fun visitComposable(function: KtFunction, emitter: Emitter, config: ComposeKtConfig) {
+    override fun visitComposable(function: KtFunction, emitter: Emitter, config: ComposeKtConfig) = with(config) {
         // We want to find all composable functions that:
         //  - emit content
         //  - are not overridden or part of an interface
         //  - are not a @Preview composable
+        //  - are not Modifier factory functions
         if (
             function.returnsValue ||
             function.isOverride ||
             function.definedInInterface ||
-            function.isPreview
+            function.isPreview ||
+            function.isModifierReceiver
         ) {
             return
         }
@@ -48,10 +51,10 @@ class ModifierMissing : ComposeKtVisitor {
         if (!shouldCheck) return
 
         // If there is a modifier param, we bail
-        if (with(config) { function.modifierParameter } != null) return
+        if (function.modifierParameter != null) return
 
         // In case we didn't find any `modifier` parameters, we check if it emits content and report the error if so.
-        if (with(config) { function.emitsContent }) {
+        if (function.emitsContent) {
             emitter.report(function, MissingModifierContentComposable)
         }
     }

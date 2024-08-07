@@ -103,4 +103,18 @@ class ModifierWithoutDefaultCheckTest {
             """.trimIndent()
         modifierRuleAssertThat(code).hasNoLintViolations()
     }
+
+    @Test
+    fun `passes for Modifier factory functions`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun Modifier.something(modifier: Modifier) {
+                    Row(modifier = modifier) {
+                    }
+                }
+            """.trimIndent()
+        modifierRuleAssertThat(code).hasNoLintViolations()
+    }
 }
