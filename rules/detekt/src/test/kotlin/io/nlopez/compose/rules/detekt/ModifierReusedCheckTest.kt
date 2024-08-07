@@ -324,4 +324,74 @@ class ModifierReusedCheckTest {
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }
+
+    @Test
+    fun `passes when the modifier is followed by an early return`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun Something(modifier: Modifier) {
+                    if (LocalInspectionMode.current) {
+                        DebugPlaceholder(modifier = modifier)
+                        return
+                    }
+                    Box(modifier = modifier) {
+                    }
+                }
+            """.trimIndent()
+
+        val errors = rule.lint(code)
+        assertThat(errors).isEmpty()
+    }
+
+    @Test
+    fun `errors out when used multiple times even when the modifier is followed by an early return`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun Something(modifier: Modifier) {
+                    Box(modifier = modifier) {
+                    }
+                    if (LocalInspectionMode.current) {
+                        DebugPlaceholder(modifier = modifier)
+                        return
+                    }
+                }
+                @Composable
+                fun Something(modifier: Modifier) {
+                    if (LocalInspectionMode.current) {
+                        Text("bleh", modifier = modifier)
+                        DebugPlaceholder(modifier = modifier)
+                        return
+                    }
+                    Box(modifier = modifier) {}
+                }
+                @Composable
+                fun Something(modifier: Modifier) {
+                    if (LocalInspectionMode.current) {
+                        Text("bleh", modifier = modifier)
+                        if (x) {
+                            DebugPlaceholder(modifier = modifier)
+                            return
+                        }
+                    }
+                }
+            """.trimIndent()
+
+        val errors = rule.lint(code)
+        assertThat(errors)
+            .hasStartSourceLocations(
+                SourceLocation(3, 5),
+                SourceLocation(6, 9),
+                SourceLocation(13, 9),
+                SourceLocation(14, 9),
+                SourceLocation(22, 9),
+                SourceLocation(24, 13),
+            )
+        for (error in errors) {
+            assertThat(error).hasMessage(ModifierReused.ModifierShouldBeUsedOnceOnly)
+        }
+    }
 }

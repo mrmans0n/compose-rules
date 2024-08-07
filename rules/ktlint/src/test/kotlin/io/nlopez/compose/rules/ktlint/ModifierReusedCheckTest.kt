@@ -423,4 +423,92 @@ class ModifierReusedCheckTest {
 
         modifierRuleAssertThat(code).hasNoLintViolations()
     }
+
+    @Test
+    fun `passes when the modifier is followed by an early return`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun Something(modifier: Modifier) {
+                    if (LocalInspectionMode.current) {
+                        DebugPlaceholder(modifier = modifier)
+                        return
+                    }
+                    Box(modifier = modifier) {
+                    }
+                }
+            """.trimIndent()
+
+        modifierRuleAssertThat(code).hasNoLintViolations()
+    }
+
+    @Test
+    fun `errors out when used multiple times even when the modifier is followed by an early return`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun Something(modifier: Modifier) {
+                    Box(modifier = modifier) {
+                    }
+                    if (LocalInspectionMode.current) {
+                        DebugPlaceholder(modifier = modifier)
+                        return
+                    }
+                }
+                @Composable
+                fun Something(modifier: Modifier) {
+                    if (LocalInspectionMode.current) {
+                        Text("bleh", modifier = modifier)
+                        DebugPlaceholder(modifier = modifier)
+                        return
+                    }
+                    Box(modifier = modifier) {}
+                }
+                @Composable
+                fun Something(modifier: Modifier) {
+                    if (LocalInspectionMode.current) {
+                        Text("bleh", modifier = modifier)
+                        if (x) {
+                            DebugPlaceholder(modifier = modifier)
+                            return
+                        }
+                    }
+                }
+            """.trimIndent()
+
+        modifierRuleAssertThat(code).hasLintViolationsWithoutAutoCorrect(
+            LintViolation(
+                line = 3,
+                col = 5,
+                detail = ModifierReused.ModifierShouldBeUsedOnceOnly,
+            ),
+            LintViolation(
+                line = 6,
+                col = 9,
+                detail = ModifierReused.ModifierShouldBeUsedOnceOnly,
+            ),
+            LintViolation(
+                line = 13,
+                col = 9,
+                detail = ModifierReused.ModifierShouldBeUsedOnceOnly,
+            ),
+            LintViolation(
+                line = 14,
+                col = 9,
+                detail = ModifierReused.ModifierShouldBeUsedOnceOnly,
+            ),
+            LintViolation(
+                line = 22,
+                col = 9,
+                detail = ModifierReused.ModifierShouldBeUsedOnceOnly,
+            ),
+            LintViolation(
+                line = 24,
+                col = 13,
+                detail = ModifierReused.ModifierShouldBeUsedOnceOnly,
+            ),
+        )
+    }
 }
