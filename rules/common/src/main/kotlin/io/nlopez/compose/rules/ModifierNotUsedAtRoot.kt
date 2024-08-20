@@ -1,4 +1,4 @@
-// Copyright 2023 Nacho Lopez
+// Copyright 2024 Nacho Lopez
 // SPDX-License-Identifier: Apache-2.0
 package io.nlopez.compose.rules
 
@@ -13,7 +13,6 @@ import io.nlopez.compose.core.util.isInContentEmittersDenylist
 import io.nlopez.compose.core.util.mapSecond
 import io.nlopez.compose.core.util.modifierParameter
 import io.nlopez.compose.core.util.obtainAllModifierNames
-import org.jetbrains.kotlin.com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtFunction
 import org.jetbrains.kotlin.psi.psiUtil.parents
@@ -32,39 +31,23 @@ class ModifierNotUsedAtRoot : ComposeKtVisitor {
         val errors = code.findChildrenByClass<KtCallExpression>()
             .filter { it.calleeExpression?.text?.first()?.isUpperCase() == true }
             .mapNotNull { callExpression ->
-                val usage = callExpression.argumentsUsingModifiers(modifiers).firstOrNull() ?: return@mapNotNull null
-                callExpression to usage
-            }
-            .filterNot { (callExpression, _) ->
-                // If there is a parent that's a non-content emitter or deny-listed, we don't want to continue
-                callExpression.parents.filterIsInstance<KtCallExpression>().any { it.isInContentEmittersDenylist }
+                callExpression.argumentsUsingModifiers(modifiers).firstOrNull()
+                    ?.let { usage -> callExpression to usage }
             }
             .filter { (callExpression, _) ->
                 // we'll need to traverse upwards to the composable root and check if there is any parent that
                 // emits content: if this is the case, the main modifier should be used there instead.
-                callExpression.findFirstAncestorEmittingContent(stopAt = code) { it.emitsContent } != null
+                callExpression.parents.takeWhile { it != code }
+                    .filterIsInstance<KtCallExpression>()
+                    // If there is a parent that's a non-content emitter or deny-listed, we don't want to continue
+                    .takeWhile { !it.isInContentEmittersDenylist }
+                    .any { it.emitsContent }
             }
             .mapSecond()
 
         for (valueArgument in errors) {
             emitter.report(valueArgument, ComposableModifierShouldBeUsedAtTheTopMostPossiblePlace)
         }
-    }
-
-    private fun KtCallExpression.findFirstAncestorEmittingContent(
-        stopAt: PsiElement,
-        isContentEmitterPredicate: (KtCallExpression) -> Boolean,
-    ): KtCallExpression? {
-        val origin = this
-        var current: PsiElement = this
-        var result: KtCallExpression? = null
-        while (current != stopAt) {
-            if (current != origin && current is KtCallExpression && isContentEmitterPredicate(current)) {
-                result = current
-            }
-            current = current.parent
-        }
-        return result
     }
 
     companion object {
