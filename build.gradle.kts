@@ -14,12 +14,16 @@ allprojects {
 
     pluginManager.apply(libs.plugins.spotless.get().pluginId)
     configure<SpotlessExtension> {
+        val ktlintVersion = libs.versions.ktlint.get()
         kotlin {
             target("**/*.kt")
-            // ktlint("1.1.1")
-            ktlint(libs.versions.ktlint.get())
+            ktlint(ktlintVersion)
 
             licenseHeaderFile(rootProject.file("spotless/copyright.txt"))
+        }
+        kotlinGradle {
+            target("*.kts")
+            ktlint(ktlintVersion)
         }
     }
 
@@ -44,9 +48,6 @@ allprojects {
                 "-Xjvm-default=all",
                 // Enable context receivers
                 "-Xcontext-receivers",
-                // Enable K2 compiler
-                "-language-version=2.0",
-                "-Xsuppress-version-warnings",
             )
         }
     }
