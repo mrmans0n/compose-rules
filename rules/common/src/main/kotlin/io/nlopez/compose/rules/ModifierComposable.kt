@@ -12,7 +12,7 @@ import org.jetbrains.kotlin.psi.KtFunction
 class ModifierComposable : ComposeKtVisitor {
 
     override fun visitComposable(function: KtFunction, emitter: Emitter, config: ComposeKtConfig) {
-        if (!with(config) { function.isModifierReceiver }) return
+        if (!function.isModifierReceiver(config)) return
 
         emitter.report(function, ComposableModifier)
     }

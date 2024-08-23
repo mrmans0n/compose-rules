@@ -13,7 +13,7 @@ class ModifierNaming : ComposeKtVisitor {
 
     override fun visitComposable(function: KtFunction, emitter: Emitter, config: ComposeKtConfig) {
         // If there is a modifier param, we bail
-        val modifiers = function.valueParameters.filter { with(config) { it.isModifier } }
+        val modifiers = function.valueParameters.filter { it.isModifier(config) }
 
         // If there are no modifiers, or more than one, we don't care as much about the naming
         if (modifiers.isEmpty()) return

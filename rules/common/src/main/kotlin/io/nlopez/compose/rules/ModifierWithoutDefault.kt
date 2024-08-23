@@ -19,20 +19,20 @@ import org.jetbrains.kotlin.psi.KtFunction
 
 class ModifierWithoutDefault : ComposeKtVisitor {
 
-    override fun visitComposable(function: KtFunction, emitter: Emitter, config: ComposeKtConfig) = with(config) {
+    override fun visitComposable(function: KtFunction, emitter: Emitter, config: ComposeKtConfig) {
         if (
             function.definedInInterface ||
             function.isActual ||
             function.isOverride ||
             function.isAbstract ||
             function.isOpen ||
-            function.isModifierReceiver
+            function.isModifierReceiver(config)
         ) {
             return
         }
 
         // Look for modifier params in the composable signature, and if any without a default value is found, error out.
-        function.valueParameters.filter { it.isModifier }
+        function.valueParameters.filter { it.isModifier(config) }
             .filterNot { it.hasDefaultValue() }
             .forEach { modifierParameter ->
                 emitter.report(modifierParameter, MissingModifierDefaultParam, true).ifFix {

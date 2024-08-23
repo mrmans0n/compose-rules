@@ -13,9 +13,9 @@ import org.jetbrains.kotlin.psi.KtFunction
 
 class ContentTrailingLambda : ComposeKtVisitor {
 
-    override fun visitComposable(function: KtFunction, emitter: Emitter, config: ComposeKtConfig) = with(config) {
-        val lambdaTypes = function.containingKtFile.lambdaTypes
-        val composableLambdaTypes = function.containingKtFile.composableLambdaTypes
+    override fun visitComposable(function: KtFunction, emitter: Emitter, config: ComposeKtConfig) {
+        val lambdaTypes = function.containingKtFile.lambdaTypes(config)
+        val composableLambdaTypes = function.containingKtFile.composableLambdaTypes(config)
 
         val candidate = function.valueParameters
             .filter { it.name == "content" }

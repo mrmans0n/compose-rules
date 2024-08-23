@@ -16,7 +16,7 @@ import org.jetbrains.kotlin.psi.KtReturnExpression
 class ModifierComposed : ComposeKtVisitor {
 
     override fun visitFunction(function: KtFunction, emitter: Emitter, config: ComposeKtConfig) {
-        if (!with(config) { function.isModifierReceiver }) return
+        if (!function.isModifierReceiver(config)) return
         if (function.isComposable) return
 
         // If using a body expression, we can directly check for it being a call to `composed`

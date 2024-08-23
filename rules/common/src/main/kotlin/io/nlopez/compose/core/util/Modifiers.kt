@@ -77,21 +77,16 @@ private val ModifierNames by lazy {
     )
 }
 
-context(ComposeKtConfig)
-val KtCallableDeclaration.isModifier: Boolean
-    get() = typeReference?.text in ModifierNames + getSet("customModifiers", emptySet())
+fun KtCallableDeclaration.isModifier(config: ComposeKtConfig): Boolean =
+    typeReference?.text in ModifierNames + config.getSet("customModifiers", emptySet())
 
-context(ComposeKtConfig)
-val KtCallableDeclaration.isModifierReceiver: Boolean
-    get() = receiverTypeReference?.text in ModifierNames + getSet("customModifiers", emptySet())
+fun KtCallableDeclaration.isModifierReceiver(config: ComposeKtConfig): Boolean =
+    receiverTypeReference?.text in ModifierNames + config.getSet("customModifiers", emptySet())
 
-context(ComposeKtConfig)
-val KtFunction.modifierParameter: KtParameter?
-    get() {
-        val modifiers = valueParameters.filter { it.isModifier }
-        return modifiers.firstOrNull { it.name == "modifier" } ?: modifiers.firstOrNull()
-    }
+fun KtFunction.modifierParameter(config: ComposeKtConfig): KtParameter? {
+    val modifiers = valueParameters.filter { it.isModifier(config) }
+    return modifiers.firstOrNull { it.name == "modifier" } ?: modifiers.firstOrNull()
+}
 
-context(ComposeKtConfig)
-val KtFunction.modifierParameters: List<KtParameter>
-    get() = valueParameters.filter { it.isModifier }
+fun KtFunction.modifierParameters(config: ComposeKtConfig): List<KtParameter> =
+    valueParameters.filter { it.isModifier(config) }

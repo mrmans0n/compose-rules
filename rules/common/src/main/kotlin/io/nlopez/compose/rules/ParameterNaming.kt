@@ -12,11 +12,11 @@ import org.jetbrains.kotlin.psi.KtFunction
 
 class ParameterNaming : ComposeKtVisitor {
 
-    override fun visitComposable(function: KtFunction, emitter: Emitter, config: ComposeKtConfig) = with(config) {
+    override fun visitComposable(function: KtFunction, emitter: Emitter, config: ComposeKtConfig) {
         // For lambda parameters only: if it starts with `on`, we want it to not be in past tense, to be all consistent.
         // E.g. onClick, onTextChange, onValueChange, and a myriad of other examples in the compose foundation code.
 
-        val lambdaTypes = function.containingKtFile.lambdaTypes
+        val lambdaTypes = function.containingKtFile.lambdaTypes(config)
 
         val errors = function.valueParameters
             .filter { it.typeReference?.isLambda(lambdaTypes) == true }

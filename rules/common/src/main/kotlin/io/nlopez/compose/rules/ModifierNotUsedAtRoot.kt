@@ -19,8 +19,8 @@ import org.jetbrains.kotlin.psi.psiUtil.parents
 
 class ModifierNotUsedAtRoot : ComposeKtVisitor {
 
-    override fun visitComposable(function: KtFunction, emitter: Emitter, config: ComposeKtConfig) = with(config) {
-        val modifier = function.modifierParameter ?: return
+    override fun visitComposable(function: KtFunction, emitter: Emitter, config: ComposeKtConfig) {
+        val modifier = function.modifierParameter(config) ?: return
 
         // We only care about the main modifier for this rule
         if (modifier.name != "modifier") return
@@ -40,8 +40,8 @@ class ModifierNotUsedAtRoot : ComposeKtVisitor {
                 callExpression.parents.takeWhile { it != code }
                     .filterIsInstance<KtCallExpression>()
                     // If there is a parent that's a non-content emitter or deny-listed, we don't want to continue
-                    .takeWhile { !it.isInContentEmittersDenylist }
-                    .any { it.emitsContent }
+                    .takeWhile { !it.isInContentEmittersDenylist(config) }
+                    .any { it.emitsContent(config) }
             }
             .mapSecond()
 

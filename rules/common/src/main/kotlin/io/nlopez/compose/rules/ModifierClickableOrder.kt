@@ -23,7 +23,7 @@ class ModifierClickableOrder : ComposeKtVisitor {
     override fun visitComposable(function: KtFunction, emitter: Emitter, config: ComposeKtConfig) {
         val code = function.bodyBlockExpression ?: return
 
-        val initialModifierNames = with(config) { function.modifierParameters.mapNotNull { it.name } }
+        val initialModifierNames = function.modifierParameters(config).mapNotNull { it.name }
         val modifiers = initialModifierNames.flatMap { code.obtainAllModifierNames(it) }.toSet()
 
         val suspiciousOrderModifiers = code.findChildrenByClass<KtCallExpression>()

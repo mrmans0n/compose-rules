@@ -19,7 +19,7 @@ import org.jetbrains.kotlin.psi.psiUtil.isPublic
 
 class ModifierMissing : ComposeKtVisitor {
 
-    override fun visitComposable(function: KtFunction, emitter: Emitter, config: ComposeKtConfig) = with(config) {
+    override fun visitComposable(function: KtFunction, emitter: Emitter, config: ComposeKtConfig) {
         // We want to find all composable functions that:
         //  - emit content
         //  - are not overridden or part of an interface
@@ -30,7 +30,7 @@ class ModifierMissing : ComposeKtVisitor {
             function.isOverride ||
             function.definedInInterface ||
             function.isPreview ||
-            function.isModifierReceiver
+            function.isModifierReceiver(config)
         ) {
             return
         }
@@ -51,10 +51,10 @@ class ModifierMissing : ComposeKtVisitor {
         if (!shouldCheck) return
 
         // If there is a modifier param, we bail
-        if (function.modifierParameter != null) return
+        if (function.modifierParameter(config) != null) return
 
         // In case we didn't find any `modifier` parameters, we check if it emits content and report the error if so.
-        if (function.emitsContent) {
+        if (function.emitsContent(config)) {
             emitter.report(function, MissingModifierContentComposable)
         }
     }

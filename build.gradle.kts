@@ -46,8 +46,6 @@ allprojects {
             freeCompilerArgs.addAll(
                 // Enable default methods in interfaces
                 "-Xjvm-default=all",
-                // Enable context receivers
-                "-Xcontext-receivers",
             )
         }
     }

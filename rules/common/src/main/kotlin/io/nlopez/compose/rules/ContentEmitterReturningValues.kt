@@ -27,7 +27,7 @@ class ContentEmitterReturningValues : ComposeKtVisitor {
             .filterNot { it.hasReceiverType }
 
         // Now we want to get the count of direct emitters in them: the composables we know for a fact that output UI
-        val composableToEmissionCount = with(config) { composables.createDirectComposableToEmissionCountMapping() }
+        val composableToEmissionCount = composables.createDirectComposableToEmissionCountMapping(config)
 
         // Now we can give some extra passes through the list of composables, and try to get a more accurate count.
         // We want to make sure that if these composables are using other composables in this file that emit UI,
@@ -35,7 +35,7 @@ class ContentEmitterReturningValues : ComposeKtVisitor {
         // @Composable fun Comp1() { Text("Hi") }
         // @Composable fun Comp2() { Text("Hola") }
         // @Composable fun Comp3() { Comp1() Comp2() } // This wouldn't be picked up at first, but should after 1 loop
-        val mapping = with(config) { refineComposableToEmissionCountMapping(composableToEmissionCount) }
+        val mapping = refineComposableToEmissionCountMapping(composableToEmissionCount, config)
 
         // Data in currentMapping should have all the # of emissions inferred for each composable in this file,
         // so we want to iterate through all of them

@@ -19,7 +19,7 @@ import org.jetbrains.kotlin.psi.KtParameter
 class ParameterOrder : ComposeKtVisitor {
 
     override fun visitFile(file: KtFile, emitter: Emitter, config: ComposeKtConfig) {
-        val lambdaTypes = with(config) { file.lambdaTypes }
+        val lambdaTypes = file.lambdaTypes(config)
 
         val composables = file.findChildrenByClass<KtFunction>()
             .filter { it.isComposable }
@@ -53,7 +53,7 @@ class ParameterOrder : ComposeKtVisitor {
             // As ComposeModifierMissingCheck will catch modifiers without a Modifier default, we don't have to care
             // about that case. We will sort the params with defaults so that the modifier(s) go first.
             val sortedWithDefaults = withDefaults.sortedWith(
-                compareByDescending<KtParameter> { with(config) { it.isModifier } }
+                compareByDescending<KtParameter> { it.isModifier(config) }
                     .thenByDescending { it.name == "modifier" },
             )
 

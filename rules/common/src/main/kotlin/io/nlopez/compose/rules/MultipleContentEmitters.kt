@@ -30,7 +30,7 @@ class MultipleContentEmitters : ComposeKtVisitor {
             .filterNot { it.hasReceiverType }
 
         // Now we want to get the count of direct emitters in them: the composables we know for a fact that output UI
-        val composableToEmissionCount = with(config) { composables.createDirectComposableToEmissionCountMapping() }
+        val composableToEmissionCount = composables.createDirectComposableToEmissionCountMapping(config)
 
         // We can start showing errors, for composables that emit more than once (from the list of known composables)
         val directEmissionsReported = composableToEmissionCount.filterValues { it > 1 }.keys
@@ -44,7 +44,7 @@ class MultipleContentEmitters : ComposeKtVisitor {
         // @Composable fun Comp1() { Text("Hi") }
         // @Composable fun Comp2() { Text("Hola") }
         // @Composable fun Comp3() { Comp1() Comp2() } // This wouldn't be picked up at first, but should after 1 loop
-        val currentMapping = with(config) { refineComposableToEmissionCountMapping(composableToEmissionCount) }
+        val currentMapping = refineComposableToEmissionCountMapping(composableToEmissionCount, config)
 
         // Here we have the settled data after all the needed passes, so we want to show errors for them,
         // if they were not caught already by the 1st emission loop

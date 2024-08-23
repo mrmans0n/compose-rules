@@ -20,7 +20,7 @@ import org.jetbrains.kotlin.psi.KtReferenceExpression
 
 class LambdaParameterInRestartableEffect : ComposeKtVisitor {
     override fun visitFile(file: KtFile, emitter: Emitter, config: ComposeKtConfig) {
-        val lambdaTypes = with(config) { file.lambdaTypes }
+        val lambdaTypes = file.lambdaTypes(config)
         val composables = file.findChildrenByClass<KtFunction>()
             .filter { it.isComposable }
 
