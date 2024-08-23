@@ -22,57 +22,50 @@ import org.jetbrains.kotlin.psi.psiUtil.parents
 import org.jetbrains.kotlin.psi.psiUtil.referenceExpression
 import kotlin.math.max
 
-context(ComposeKtConfig)
-val KtFunction.emitsContent: Boolean
-    get() = when {
-        isComposable -> findChildrenByClass<KtCallExpression> { current ->
-            current !is KtCallExpression || !current.isInContentEmittersDenylist
-        }.any { it.emitsContent }
-        else -> false
-    }
+fun KtFunction.emitsContent(config: ComposeKtConfig): Boolean = when {
+    isComposable -> findChildrenByClass<KtCallExpression> { current ->
+        current !is KtCallExpression || !current.isInContentEmittersDenylist(config)
+    }.any { it.emitsContent(config) }
 
-context(ComposeKtConfig)
-val KtCallExpression.emitsContent: Boolean
-    get() {
-        val methodName = calleeExpression?.text ?: return false
+    else -> false
+}
 
-        // If in non emitters list, we assume it doesn't emit content
-        if (isInContentEmittersDenylist) return false
+fun KtCallExpression.emitsContent(config: ComposeKtConfig): Boolean {
+    val methodName = calleeExpression?.text ?: return false
 
-        return methodName in ComposableEmittersList + getSet("contentEmitters", emptySet()) ||
-            containsComposablesWithModifiers
-    }
+    // If in non emitters list, we assume it doesn't emit content
+    if (isInContentEmittersDenylist(config)) return false
 
-context(ComposeKtConfig)
-val KtCallExpression.isInContentEmittersDenylist: Boolean
-    get() {
-        val methodName = calleeExpression?.text ?: return false
+    return methodName in ComposableEmittersList + config.getSet("contentEmitters", emptySet()) ||
+        containsComposablesWithModifiers()
+}
 
-        // If in non emitters list, we assume it doesn't emit content
-        if (methodName in ComposableNonEmittersList) return true
+fun KtCallExpression.isInContentEmittersDenylist(config: ComposeKtConfig): Boolean {
+    val methodName = calleeExpression?.text ?: return false
 
-        // If in denylist, we will assume it doesn't emit content (regardless of anything else).
-        if (methodName in getSet("contentEmittersDenylist", emptySet())) return true
-        return false
-    }
+    // If in non emitters list, we assume it doesn't emit content
+    if (methodName in ComposableNonEmittersList) return true
 
-private val KtCallExpression.containsComposablesWithModifiers: Boolean
-    get() {
-        // Check if there is a "modifier" applied
-        val hasNamedModifier = valueArguments
-            .filter { it.isNamed() }
-            .any { it.getArgumentName()?.text == "modifier" }
+    // If in denylist, we will assume it doesn't emit content (regardless of anything else).
+    if (methodName in config.getSet("contentEmittersDenylist", emptySet())) return true
+    return false
+}
 
-        if (hasNamedModifier) return true
+private fun KtCallExpression.containsComposablesWithModifiers(): Boolean {
+    // Check if there is a "modifier" applied
+    val hasNamedModifier = valueArguments
+        .filter { it.isNamed() }
+        .any { it.getArgumentName()?.text == "modifier" }
 
-        // Check if there is any Modifier chain (e.g. `Modifier.fillMaxWidth()`)
-        return valueArguments.mapNotNull { it.getArgumentExpression() }
-            .filterIsInstance<KtDotQualifiedExpression>()
-            .any { it.rootExpression.text == "Modifier" }
-    }
+    if (hasNamedModifier) return true
 
-context(ComposeKtConfig)
-private fun KtExpression.uiEmitterCount(): Int {
+    // Check if there is any Modifier chain (e.g. `Modifier.fillMaxWidth()`)
+    return valueArguments.mapNotNull { it.getArgumentExpression() }
+        .filterIsInstance<KtDotQualifiedExpression>()
+        .any { it.rootExpression.text == "Modifier" }
+}
+
+private fun KtExpression.uiEmitterCount(config: ComposeKtConfig): Int {
     // For early return false positives detection we need to know where we are at. But yea, yikes.
     var totalEmittersFound = 0
     var currentBlockStartedAt = 0
@@ -93,7 +86,7 @@ private fun KtExpression.uiEmitterCount(): Int {
 
             is KtCallExpression -> when {
                 // Direct statements. E.g. Text("bleh")
-                current.emitsContent -> {
+                current.emitsContent(config) -> {
                     totalEmittersFound++
                     1
                 }
@@ -180,14 +173,13 @@ private fun KtExpression.uiEmitterCount(): Int {
     return max(emitterCount(this), 0)
 }
 
-context(ComposeKtConfig)
-private fun KtFunction.indirectUiEmitterCount(mapping: Map<KtFunction, Int>): Int {
+private fun KtFunction.indirectUiEmitterCount(mapping: Map<KtFunction, Int>, config: ComposeKtConfig): Int {
     val bodyBlock = bodyBlockExpression ?: return 0
     return bodyBlock.statements
         .filterIsInstance<KtCallExpression>()
         .count { callExpression ->
             // If it's a direct hit on our list, it should count directly
-            if (callExpression.emitsContent) return@count true
+            if (callExpression.emitsContent(config)) return@count true
 
             val name = callExpression.calleeExpression?.text ?: return@count false
             // If the hit is in the provided mapping, it means it is using a composable that we know emits UI,
@@ -197,20 +189,19 @@ private fun KtFunction.indirectUiEmitterCount(mapping: Map<KtFunction, Int>): In
         }
 }
 
-context(ComposeKtConfig)
-fun Sequence<KtFunction>.createDirectComposableToEmissionCountMapping(): Map<KtFunction, Int> =
-    associateWith { it.uiEmitterCount() }
+fun Sequence<KtFunction>.createDirectComposableToEmissionCountMapping(config: ComposeKtConfig): Map<KtFunction, Int> =
+    associateWith { it.uiEmitterCount(config) }
 
-context(ComposeKtConfig)
 fun refineComposableToEmissionCountMapping(
     initialMapping: Map<KtFunction, Int>,
+    config: ComposeKtConfig,
 ): Map<KtFunction, Int> {
     var current = initialMapping
 
     var shouldMakeAnotherPass = true
     while (shouldMakeAnotherPass) {
         val updatedMapping = current.mapValues { (functionNode, _) ->
-            functionNode.indirectUiEmitterCount(current)
+            functionNode.indirectUiEmitterCount(current, config)
         }
         when {
             updatedMapping != current -> current = updatedMapping

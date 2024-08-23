@@ -20,11 +20,11 @@ import org.jetbrains.kotlin.psi.psiUtil.siblings
 
 class ModifierReused : ComposeKtVisitor {
 
-    override fun visitComposable(function: KtFunction, emitter: Emitter, config: ComposeKtConfig) = with(config) {
-        if (!function.emitsContent) return
+    override fun visitComposable(function: KtFunction, emitter: Emitter, config: ComposeKtConfig) {
+        if (!function.emitsContent(config)) return
 
         val composableBlockExpression = function.bodyBlockExpression ?: return
-        val initialModifierNames = function.modifierParameters.mapNotNull { it.name }.toSet()
+        val initialModifierNames = function.modifierParameters(config).mapNotNull { it.name }.toSet()
         if (initialModifierNames.isEmpty()) return
 
         initialModifierNames
