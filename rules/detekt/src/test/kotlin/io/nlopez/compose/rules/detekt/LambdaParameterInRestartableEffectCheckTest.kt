@@ -104,6 +104,22 @@ class LambdaParameterInRestartableEffectCheckTest {
     }
 
     @Test
+    fun `passes when the a dot reference uses the same name as the lambda parameter`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun Something(onClick: () -> Unit) {
+                    LaunchedEffect(Unit) {
+                        viewModel.onClick()
+                    }
+                }
+            """.trimIndent()
+        val errors = rule.lint(code)
+        assertThat(errors).isEmpty()
+    }
+
+    @Test
     fun `error out when detecting a lambda named onDispose used in a non-DisposableEffect`() {
         @Language("kotlin")
         val code =
