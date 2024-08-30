@@ -17,6 +17,7 @@ import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtFunction
 import org.jetbrains.kotlin.psi.KtIfExpression
 import org.jetbrains.kotlin.psi.KtReferenceExpression
+import org.jetbrains.kotlin.psi.psiUtil.isDotSelector
 
 class LambdaParameterInRestartableEffect : ComposeKtVisitor {
     override fun visitFile(file: KtFile, emitter: Emitter, config: ComposeKtConfig) {
@@ -48,6 +49,9 @@ class LambdaParameterInRestartableEffect : ComposeKtVisitor {
                         ?: return@flatMap emptySequence()
 
                     val callExpressions = body.findChildrenByClass<KtCallExpression>()
+                        // Filter out dot receivers e.g. `something.myLambda()`
+                        .filterNot { it.isDotSelector() }
+
                     val isDisposableEffect = effect.calleeExpression?.text == "DisposableEffect"
 
                     // Lambdas used directly: myLambda()
