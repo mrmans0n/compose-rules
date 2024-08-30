@@ -6,7 +6,7 @@
 [![Maven Central](https://img.shields.io/maven-central/v/io.nlopez.compose.rules/common)](https://central.sonatype.com/search?q=g%3Aio.nlopez.compose.rules)
 
 > **Note**
-> This repository started a fork of [Twitter Jetpack Compose Rules](https://github.com/twitter/compose-rules) by the original main maintainer, and its development will continue here from now on. If you are migrating from that project, check out the [migration guide](https://mrmans0n.github.io/compose-rules/).
+> This repository started as a fork of [Twitter Jetpack Compose Rules](https://github.com/twitter/compose-rules) by the original main maintainer, and its development will continue here from now on. If you are migrating from that project, check out the [migration guide](https://mrmans0n.github.io/compose-rules/).
 
 ## Overview
 
