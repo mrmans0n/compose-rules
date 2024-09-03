@@ -8,7 +8,6 @@ import io.gitlab.arturbosch.detekt.api.CorrectableCodeSmell
 import io.gitlab.arturbosch.detekt.api.Entity
 import io.gitlab.arturbosch.detekt.api.Location
 import io.gitlab.arturbosch.detekt.api.Rule
-import io.nlopez.compose.core.ComposeKtConfig
 import io.nlopez.compose.core.ComposeKtVisitor
 import io.nlopez.compose.core.Decision
 import io.nlopez.compose.core.Emitter
@@ -24,7 +23,7 @@ abstract class DetektRule(config: Config = Config.empty) :
     Rule(config),
     ComposeKtVisitor {
 
-    private val config: ComposeKtConfig by lazy { DetektComposeKtConfig(this) }
+    private val config: DetektComposeKtConfig by lazy { DetektComposeKtConfig(this) }
 
     private val emitter: Emitter = Emitter { element, message, canBeAutoCorrected ->
         // Grab the named element if there were any, otherwise fall back to the whole PsiElement

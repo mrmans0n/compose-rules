@@ -68,6 +68,25 @@ class ModifierMissingCheckTest {
     }
 
     @Test
+    fun `passes when ignoreAnnotated is used`() {
+        val rule = ModifierMissingCheck(TestConfig("ignoreAnnotated" to listOf("Potato")))
+
+        @Language("kotlin")
+        val code =
+            """
+                @Potato
+                @Composable
+                fun Something1() {
+                    Row {
+                    }
+                }
+            """.trimIndent()
+
+        val errors = rule.lint(code)
+        assertThat(errors).isEmpty()
+    }
+
+    @Test
     fun `errors when a Composable without modifiers has a Composable inside with a modifier`() {
         @Language("kotlin")
         val code =

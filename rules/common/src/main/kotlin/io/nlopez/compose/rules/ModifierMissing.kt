@@ -8,6 +8,7 @@ import io.nlopez.compose.core.Emitter
 import io.nlopez.compose.core.report
 import io.nlopez.compose.core.util.definedInInterface
 import io.nlopez.compose.core.util.emitsContent
+import io.nlopez.compose.core.util.isAnnotatedWith
 import io.nlopez.compose.core.util.isInternal
 import io.nlopez.compose.core.util.isModifierReceiver
 import io.nlopez.compose.core.util.isOverride
@@ -34,6 +35,9 @@ class ModifierMissing : ComposeKtVisitor {
         ) {
             return
         }
+
+        // Ignore functions annotated with the given set of names
+        if (function.isAnnotatedWith(config.getSet("modifierMissingIgnoreAnnotated", emptySet()))) return
 
         // We want to check now the visibility to see whether it's allowed by the configuration
         // Possible values:

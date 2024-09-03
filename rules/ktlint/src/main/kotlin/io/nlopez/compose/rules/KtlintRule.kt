@@ -8,7 +8,6 @@ import com.pinterest.ktlint.rule.engine.core.api.RuleAutocorrectApproveHandler
 import com.pinterest.ktlint.rule.engine.core.api.RuleId
 import com.pinterest.ktlint.rule.engine.core.api.editorconfig.EditorConfig
 import com.pinterest.ktlint.rule.engine.core.api.editorconfig.EditorConfigProperty
-import io.nlopez.compose.core.ComposeKtConfig
 import io.nlopez.compose.core.ComposeKtVisitor
 import io.nlopez.compose.core.Decision
 import io.nlopez.compose.core.Emitter
@@ -40,7 +39,7 @@ abstract class KtlintRule(id: String, editorConfigProperties: Set<EditorConfigPr
         properties = editorConfig
     }
 
-    private val config: ComposeKtConfig by lazy { KtlintComposeKtConfig(properties, usesEditorConfigProperties) }
+    private val config: KtlintComposeKtConfig by lazy { KtlintComposeKtConfig(properties, usesEditorConfigProperties) }
 
     override fun beforeVisitChildNodes(
         node: ASTNode,
