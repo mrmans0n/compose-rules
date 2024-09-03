@@ -75,6 +75,15 @@ For `compositionlocal-allowlist` rule you can define a list of `CompositionLocal
 compose_allowed_composition_locals = LocalSomething,LocalSomethingElse
 ```
 
+### Ignore annotated functions with specific annotations for missing Modifier checks
+
+In the `modifier-missing-check` rule, you can define a list of annotations that, if present, will make it so the function is exempt from this rule.
+
+```editorconfig
+[*.{kt,kts}]
+compose_modifier_missing_ignore_annotated = Potato,Banana
+```
+
 ### Allowing matching function names
 
 The `naming-check` rule requires all composables that return a value to be lowercased. If you want to allow certain patterns though, you can configure a comma-separated list of matching regexes in your `.editorconfig` file:

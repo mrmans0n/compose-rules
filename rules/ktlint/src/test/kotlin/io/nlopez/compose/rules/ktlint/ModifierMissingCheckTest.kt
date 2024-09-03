@@ -88,6 +88,32 @@ class ModifierMissingCheckTest {
     }
 
     @Test
+    fun `passes when ignoreAnnotated is used`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Potato
+                @Composable
+                fun Something1() {
+                    Row {
+                    }
+                }
+                @Banana
+                @Composable
+                fun Something1() {
+                    Row {
+                    }
+                }
+            """.trimIndent()
+
+        modifierRuleAssertThat(code)
+            .withEditorConfigOverride(
+                modifierMissingIgnoreAnnotated to "Potato,Banana",
+            )
+            .hasNoLintViolations()
+    }
+
+    @Test
     fun `errors when a Composable without modifiers has a Composable inside with a modifier`() {
         @Language("kotlin")
         val code =

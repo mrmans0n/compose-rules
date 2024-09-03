@@ -78,6 +78,8 @@ Compose:
     # checkModifiersForVisibility: only_public
     # -- You can optionally add your own Modifier types
     # customModifiers: BananaModifier,PotatoModifier
+    # -- You can suppress this check in functions annotated with these annotations
+    # ignoreAnnotated: ['Potato', 'Banana']
   ModifierNaming:
     active: true
     # -- You can optionally add your own Modifier types

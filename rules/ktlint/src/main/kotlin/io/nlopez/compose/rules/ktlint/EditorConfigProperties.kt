@@ -266,3 +266,21 @@ val disallowUnstableCollections: EditorConfigProperty<Boolean> =
         ),
         defaultValue = false,
     )
+
+val modifierMissingIgnoreAnnotated: EditorConfigProperty<String> =
+    EditorConfigProperty(
+        type = PropertyType.LowerCasingPropertyType(
+            "compose_modifier_missing_ignore_annotated",
+            "A comma separated list of composable functions that should be exempt from the ModifierMissing check",
+            PropertyValueParser.IDENTITY_VALUE_PARSER,
+            emptySet(),
+        ),
+        defaultValue = "",
+        propertyMapper = { property, _ ->
+            when {
+                property?.isUnset == true -> ""
+                property?.getValueAs<String>() != null -> property.getValueAs<String>()
+                else -> property?.getValueAs()
+            }
+        },
+    )

@@ -14,6 +14,7 @@ class ModifierMissingCheck :
             contentEmittersProperty,
             customModifiers,
             contentEmittersDenylist,
+            modifierMissingIgnoreAnnotated,
         ),
     ),
     ComposeKtVisitor by ModifierMissing()

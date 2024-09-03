@@ -20,3 +20,6 @@ fun KtElement.isSuppressed(suppression: String): Boolean = parentsWithSelf.filte
     .flatMap { it.entries.asSequence() }
     .filterIsInstance<KtLiteralStringTemplateEntry>()
     .any { it.text == suppression }
+
+fun KtAnnotated.isAnnotatedWith(annotations: Set<String>): Boolean =
+    annotationEntries.any { it.calleeExpression?.text in annotations }
