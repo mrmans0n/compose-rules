@@ -1292,9 +1292,11 @@ This effectively ties the function to be called from a Column, but is still not 
 <p>Additionally, if there is a <code>content</code> lambda, it should be used as a trailing lambda.</p>
 <ol>
 <li>Required parameters (no default values)</li>
-<li>Optional parameters (have default values)
-    1. <code>modifier: Modifier = Modifier</code>
-    2. The rest of optional params</li>
+<li>Optional parameters (have default values)<ol>
+<li><code>modifier: Modifier = Modifier</code></li>
+<li>The rest of optional params</li>
+</ol>
+</li>
 <li>[Optionally] A trailing lambda. If there is a <code>content</code> slot, it should be it.</li>
 </ol>
 <pre class="mermaid"><code>  flowchart LR
