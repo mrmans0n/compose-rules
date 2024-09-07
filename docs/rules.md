@@ -268,8 +268,8 @@ Additionally, if there is a `content` lambda, it should be used as a trailing la
 
 1. Required parameters (no default values)
 2. Optional parameters (have default values)
-    1. `modifier: Modifier = Modifier`
-    2. The rest of optional params
+   1. `modifier: Modifier = Modifier`
+   2. The rest of optional params
 3. [Optionally] A trailing lambda. If there is a `content` slot, it should be it.
 
 ```mermaid
@@ -356,7 +356,6 @@ private fun MyComposable(
 ) {
     // ...
 }
-
 ```
 
 Related rule: [compose:vm-injection-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ViewModelInjection.kt)
