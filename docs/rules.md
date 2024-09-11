@@ -20,10 +20,12 @@ Related rule: [compose:vm-forwarding-check](https://github.com/mrmans0n/compose-
 
 Be careful when using `mutableStateOf` (or any of the other state builders) to make sure that you `remember` the instance. If you don't `remember` the state instance, a new state instance will be created when the function is recomposed.
 
-!!! info inline end "Rule"
+!!! info "Rule"
 
-    - ktlint: [compose:remember-missing-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/RememberStateMissing.kt)
-    - detekt: [RememberMissing](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/RememberStateMissing.kt)
+    | Linter | Rule Name |
+    |--------|-----------|
+    | ktlint | [compose:remember-missing-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/RememberStateMissing.kt) |
+    | detekt | [RememberMissing](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/RememberStateMissing.kt) |
 
 ### Use Immutable annotation whenever possible
 
