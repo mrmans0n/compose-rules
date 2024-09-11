@@ -1111,41 +1111,45 @@
 </ul>
 <p>Instead pass down the relevant data to the function, and optional lambdas for callbacks.</p>
 <p>More information: <a href="https://developer.android.com/jetpack/compose/state">State and Jetpack Compose</a></p>
-<p>Related rule:
-- ktlint: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ViewModelForwarding.kt">compose:vm-forwarding-check</a>
-- detekt: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ViewModelForwarding.kt">ViewModelForwarding</a></p>
+<div class="admonition info">
+<p>ktlint: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ViewModelForwarding.kt">compose:vm-forwarding-check</a>
+detekt: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ViewModelForwarding.kt">ViewModelForwarding</a></p>
+</div>
 <h3 id="state-should-be-remembered-in-composables">State should be remembered in composables<a class="headerlink" href="#state-should-be-remembered-in-composables" title="Permanent link">&para;</a></h3>
 <p>Be careful when using <code>mutableStateOf</code> (or any of the other state builders) to make sure that you <code>remember</code> the instance. If you don't <code>remember</code> the state instance, a new state instance will be created when the function is recomposed.</p>
-<p>Related rule:
-- ktlint: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/RememberStateMissing.kt">compose:remember-missing-check</a>
-- detekt: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/RememberStateMissing.kt">RememberMissing</a></p>
+<div class="admonition info">
+<p>ktlint: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/RememberStateMissing.kt">compose:remember-missing-check</a>
+detekt: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/RememberStateMissing.kt">RememberMissing</a></p>
+</div>
 <h3 id="use-immutable-annotation-whenever-possible">Use Immutable annotation whenever possible<a class="headerlink" href="#use-immutable-annotation-whenever-possible" title="Permanent link">&para;</a></h3>
 <p>The Compose Compiler tries to infer immutability and stability on value classes, but sometimes it gets it wrong, which then means that your UI will be doing more work than it needs. To force the compiler to see a class as 'immutable' you can apply the <code>@Immutable</code> annotation to the class.</p>
 <p>More info: <a href="https://developer.android.com/reference/kotlin/androidx/compose/runtime/Immutable">Immutable docs</a> and <a href="https://chris.banes.me/composable-metrics/">Composable metrics blog post</a></p>
-<p>Related rule: TBD</p>
 <h3 id="use-mutablestateof-type-specific-variants-when-possible">Use mutableStateOf type-specific variants when possible<a class="headerlink" href="#use-mutablestateof-type-specific-variants-when-possible" title="Permanent link">&para;</a></h3>
 <p><code>mutableIntStateOf</code>, <code>mutableLongStateOf</code>, <code>mutableDoubleStateOf</code>, <code>mutableFloatStateOf</code> are essentially counterparts to <code>mutableStateOf</code>, but with the added advantage of circumventing autoboxing on JVM platforms. This distinction renders them more memory efficient, making them the preferable choice when dealing with primitive types such as double, float, int, and long.</p>
 <p>Functionally are the same, but they are preferred when dealing with these specific types.</p>
-<p>Related rule:
-- ktlint: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/MutableStateAutoboxing.kt">compose:mutable-state-autoboxing</a>
-- detekt: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/MutableStateAutoboxing.kt">MutableStateAutoboxing</a></p>
+<div class="admonition info">
+<p>ktlint: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/MutableStateAutoboxing.kt">compose:mutable-state-autoboxing</a>
+detekt: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/MutableStateAutoboxing.kt">MutableStateAutoboxing</a></p>
+</div>
 <h2 id="composables">Composables<a class="headerlink" href="#composables" title="Permanent link">&para;</a></h2>
 <h3 id="do-not-use-inherently-mutable-types-as-parameters">Do not use inherently mutable types as parameters<a class="headerlink" href="#do-not-use-inherently-mutable-types-as-parameters" title="Permanent link">&para;</a></h3>
 <p>This practice follows on from the 'Hoist all the things' item above, where we said that state flows down. It might be tempting to pass mutable state down to a function to mutate the value.</p>
 <p>This is an anti-pattern though as it breaks the pattern of state flowing down, and events firing up. The mutation of the value is an event which should be modelled within the function API (a lambda callback).</p>
 <p>There are a few reasons for this, but the main one is that it is very easy to use a mutable object which does not trigger recomposition. Without triggering recomposition, your composables will not automatically update to reflect the updated value.</p>
 <p>Passing <code>ArrayList&lt;T&gt;</code> or <code>ViewModel</code> are common examples of this (but not limited to those types).</p>
-<p>Related rule:
-- ktlint: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/MutableParameters.kt">compose:mutable-params-check</a>
-- detekt: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/MutableParameters.kt">MutableParams</a></p>
+<div class="admonition info">
+<p>ktlint: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/MutableParameters.kt">compose:mutable-params-check</a>
+detekt: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/MutableParameters.kt">MutableParams</a></p>
+</div>
 <h3 id="do-not-use-mutablestate-as-a-parameter">Do not use MutableState as a parameter<a class="headerlink" href="#do-not-use-mutablestate-as-a-parameter" title="Permanent link">&para;</a></h3>
 <p>This practice also follows on from the 'Hoist all the things' item above. When using <code>MutableState&lt;T&gt;</code> in a @Composable function signature as a parameter, this is promoting joint ownership over a state between a component and its user.</p>
 <p>Instead, if possible, consider making the component stateless and concede the state change to the caller. If mutation of the parent’s owned property is required in the component, consider creating a ComponentState class with the domain specific meaningful field that is backed by <code>mutableStateOf(...)</code>.</p>
 <p>When a component accepts MutableState as a parameter, it gains the ability to change it. This results in the split ownership of the state, and the usage side that owns the state now has no control over how and when it will be changed from within the component’s implementation.</p>
 <p>More info: <a href="https://android.googlesource.com/platform/frameworks/support/+/androidx-main/compose/docs/compose-component-api-guidelines.md#mutablestate_t_as-a-parameter">Compose API guidelines</a></p>
-<p>Related rule:
-- ktlint: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/MutableStateParameter.kt">compose:mutable-state-param-check</a>
-- detekt: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/MutableStateParameter.kt">MutableStateParam</a></p>
+<div class="admonition info">
+<p>ktlint: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/MutableStateParameter.kt">compose:mutable-state-param-check</a>
+detekt: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/MutableStateParameter.kt">MutableStateParam</a></p>
+</div>
 <h3 id="be-mindful-of-the-arguments-you-use-inside-of-a-restarting-effect">Be mindful of the arguments you use inside of a restarting effect<a class="headerlink" href="#be-mindful-of-the-arguments-you-use-inside-of-a-restarting-effect" title="Permanent link">&para;</a></h3>
 <p>In Compose, effects like <code>LaunchedEffect</code>, <code>produceState</code>, or <code>DisposableEffect</code> can take multiple keys as arguments to control when the effect restarts. The typical form for these APIs is:</p>
 <p><div class="highlight"><pre><span></span><code><span class="n">EffectName</span><span class="p">(</span><span class="n">key1</span><span class="p">,</span><span class="w"> </span><span class="n">key2</span><span class="p">,</span><span class="w"> </span><span class="n">key3</span><span class="p">,</span><span class="w"> </span><span class="p">...)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">block</span><span class="w"> </span><span class="p">}</span>
@@ -1196,16 +1200,18 @@ Using the wrong keys to restart the effect can lead to:</p>
 <span class="p">}</span>
 </code></pre></div>
 <p>More info: <a href="https://developer.android.com/jetpack/compose/side-effects#restarting-effects">Restarting effects</a> and <a href="https://developer.android.com/jetpack/compose/side-effects#rememberupdatedstate">rememberUpdatedState</a></p>
-<p>Related rule:
-- ktlint: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/LambdaParameterInRestartableEffect.kt">compose:lambda-param-in-effect</a>
-- detekt: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/LambdaParameterInRestartableEffect.kt">LambdaParameterInRestartableEffect</a></p>
+<div class="admonition info">
+<p>ktlint: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/LambdaParameterInRestartableEffect.kt">compose:lambda-param-in-effect</a>
+detekt: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/LambdaParameterInRestartableEffect.kt">LambdaParameterInRestartableEffect</a></p>
+</div>
 <h3 id="do-not-emit-content-and-return-a-result">Do not emit content and return a result<a class="headerlink" href="#do-not-emit-content-and-return-a-result" title="Permanent link">&para;</a></h3>
 <p>Composable functions should either emit layout content, or return a value, but not both.</p>
 <p>If a composable should offer additional control surfaces to its caller, those control surfaces or callbacks should be provided as parameters to the composable function by the caller.</p>
 <p>More info: <a href="https://github.com/androidx/androidx/blob/androidx-main/compose/docs/compose-api-guidelines.md#emit-xor-return-a-value">Compose API guidelines</a></p>
-<p>Related rule:
-- ktlint: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/MultipleContentEmitters.kt">compose:content-emitter-returning-values-check</a>
-- detekt: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/MultipleContentEmitters.kt">compose:content-emitter-returning-values-check</a></p>
+<div class="admonition info">
+<p>ktlint: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/MultipleContentEmitters.kt">compose:content-emitter-returning-values-check</a>
+detekt: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/MultipleContentEmitters.kt">compose:content-emitter-returning-values-check</a></p>
+</div>
 <blockquote>
 <p><strong>Note</strong>: To add your custom composables so they are used in this rule (things like your design system composables), you can add <code>composeEmitters</code> to this rule config in Detekt, or <code>compose_emitters</code> to your .editorconfig in ktlint.</p>
 </blockquote>
@@ -1260,9 +1266,10 @@ Nesting of layouts has a drastically lower cost vs the view system, so developer
 <span class="p">}</span>
 </code></pre></div>
 This effectively ties the function to be called from a Column, but is still not recommended (although permitted).</p>
-<p>Related rule:
-- ktlint: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/MultipleContentEmitters.kt">compose:multiple-emitters-check</a>
-- detekt: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/MultipleContentEmitters.kt">MultipleEmitters</a></p>
+<div class="admonition info">
+<p>ktlint: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/MultipleContentEmitters.kt">compose:multiple-emitters-check</a>
+detekt: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/MultipleContentEmitters.kt">MultipleEmitters</a></p>
+</div>
 <blockquote>
 <p><strong>Note</strong>: To add your custom composables so they are used in this rule (things like your design system composables), you can add <code>composeEmitters</code> to this rule config in Detekt, or <code>compose_emitters</code> to your .editorconfig in ktlint.</p>
 </blockquote>
@@ -1285,33 +1292,38 @@ This effectively ties the function to be called from a Column, but is still not 
 <span class="w">    </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-<p>Related rule:
-- ktlint: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ContentTrailingLambda.kt">compose:content-trailing-lambda</a>
-- detekt: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ContentTrailingLambda.kt">ContentTrailingLambda</a></p>
+<div class="admonition info">
+<p>ktlint: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ContentTrailingLambda.kt">compose:content-trailing-lambda</a>
+detekt: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ContentTrailingLambda.kt">ContentTrailingLambda</a></p>
+</div>
 <h3 id="naming-compositionlocals-properly">Naming CompositionLocals properly<a class="headerlink" href="#naming-compositionlocals-properly" title="Permanent link">&para;</a></h3>
 <p><code>CompositionLocal</code>s should be named by using the adjective <code>Local</code> as prefix, followed by a descriptive noun that describes the value they hold. This makes it easier to know when a value comes from a <code>CompositionLocal</code>. Given that these are implicit dependencies, we should make them obvious.</p>
 <p>More information: <a href="https://android.googlesource.com/platform/frameworks/support/+/androidx-main/compose/docs/compose-api-guidelines.md#naming-compositionlocals">Naming CompositionLocals</a></p>
-<p>Related rule:
-- ktlint: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/composerules/CompositionLocalNaming.kt">compose:compositionlocal-naming</a>
-- detekt: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/composerules/CompositionLocalNaming.kt">CompositionLocalNaming</a></p>
+<div class="admonition info">
+<p>ktlint: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/composerules/CompositionLocalNaming.kt">compose:compositionlocal-naming</a>
+detekt: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/composerules/CompositionLocalNaming.kt">CompositionLocalNaming</a></p>
+</div>
 <h3 id="naming-multipreview-annotations-properly">Naming multipreview annotations properly<a class="headerlink" href="#naming-multipreview-annotations-properly" title="Permanent link">&para;</a></h3>
 <p>Multipreview annotations should be named by using <code>Previews</code> as a prefix. These annotations have to be explicitly named to make sure that they are clearly identifiable as a <code>@Preview</code> alternative on its usages.</p>
 <p>More information: <a href="https://developer.android.com/jetpack/compose/tooling#preview-multipreview">Multipreview annotations</a> and <a href="https://cs.android.com/androidx/platform/frameworks/support/+/androidx-main:compose/ui/ui-tooling-preview/src/androidMain/kotlin/androidx/compose/ui/tooling/preview/MultiPreviews.kt?q=MultiPreviews.kt">Google's own predefined annotations</a></p>
-<p>Related rule:
-- ktlint: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/PreviewAnnotationNaming.kt">compose:preview-annotation-naming</a>
-- detekt: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/PreviewAnnotationNaming.kt">PreviewAnnotationNaming</a></p>
+<div class="admonition info">
+<p>ktlint: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/PreviewAnnotationNaming.kt">compose:preview-annotation-naming</a>
+detekt: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/PreviewAnnotationNaming.kt">PreviewAnnotationNaming</a></p>
+</div>
 <h3 id="naming-composable-functions-properly">Naming @Composable functions properly<a class="headerlink" href="#naming-composable-functions-properly" title="Permanent link">&para;</a></h3>
 <p>Composable functions that return <code>Unit</code> should start with an uppercase letter. They are considered declarative entities that can be either present or absent in a composition and therefore follow the naming rules for classes.</p>
 <p>However, Composable functions that return a value should start with a lowercase letter instead. They should follow the standard <a href="https://kotlinlang.org/docs/reference/coding-conventions.html#function-names">Kotlin Coding Conventions</a> for the naming of functions for any function annotated <code>@Composable</code> that returns a value other than <code>Unit</code></p>
 <p>More information: <a href="https://github.com/androidx/androidx/blob/androidx-main/compose/docs/compose-api-guidelines.md#naming-unit-composable-functions-as-entities">Naming Unit @Composable functions as entities</a> and <a href="https://github.com/androidx/androidx/blob/androidx-main/compose/docs/compose-api-guidelines.md#naming-composable-functions-that-return-values">Naming @Composable functions that return values</a></p>
-<p>Related rule:
-- ktlint: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/Naming.kt">compose:naming-check</a>
-- detekt: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/Naming.kt">ComposableNaming</a></p>
+<div class="admonition info">
+<p>ktlint: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/Naming.kt">compose:naming-check</a>
+detekt: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/Naming.kt">ComposableNaming</a></p>
+</div>
 <h3 id="naming-composable-annotations-properly">Naming Composable annotations properly<a class="headerlink" href="#naming-composable-annotations-properly" title="Permanent link">&para;</a></h3>
 <p>Custom Composable annotations (tagged with <a href="https://developer.android.com/reference/kotlin/androidx/compose/runtime/ComposableTargetMarker#description()"><code>@ComposableTargetMarker</code></a>) should have the <code>Composable</code> suffix (for example, <code>@GoogleMapComposable</code> or <code>@MosaicComposable</code>).</p>
-<p>Related rule:
-- ktlint: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ComposableAnnotationNaming.kt">compose:composable-annotation-naming-check</a>
-- detekt: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ComposableAnnotationNaming.kt">ComposableAnnotationNaming</a></p>
+<div class="admonition info">
+<p>ktlint: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ComposableAnnotationNaming.kt">compose:composable-annotation-naming-check</a>
+detekt: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ComposableAnnotationNaming.kt">ComposableAnnotationNaming</a></p>
+</div>
 <h3 id="ordering-composable-parameters-properly">Ordering @Composable parameters properly<a class="headerlink" href="#ordering-composable-parameters-properly" title="Permanent link">&para;</a></h3>
 <p>When writing Kotlin, it's a good practice to write the parameters for your methods by putting the mandatory parameters first, followed by the optional ones (aka the ones with default values). By doing so, <a href="https://kotlinlang.org/docs/functions.html#default-arguments">we minimize the number times we will need to write the name for arguments explicitly</a>.</p>
 <p>Modifiers occupy the first optional parameter slot to set a consistent expectation for developers that they can always provide a modifier as the final positional parameter to an element call for any given element's common case.</p>
@@ -1344,9 +1356,10 @@ This effectively ties the function to be called from a Column, but is still not 
 <span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">}</span>
 </code></pre></div>
 <p>More information: <a href="https://kotlinlang.org/docs/functions.html#default-arguments">Kotlin default arguments</a>, <a href="https://developer.android.com/reference/kotlin/androidx/compose/ui/Modifier">Modifier docs</a> and <a href="https://github.com/androidx/androidx/blob/androidx-main/compose/docs/compose-api-guidelines.md#why-8">Elements accept and respect a Modifier parameter</a>.</p>
-<p>Related rule:
-- ktlint: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ParameterOrder.kt">compose:param-order-check</a>
-- detekt: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ParameterOrder.kt">ComposableParamOrder</a></p>
+<div class="admonition info">
+<p>ktlint: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ParameterOrder.kt">compose:param-order-check</a>
+detekt: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ParameterOrder.kt">ComposableParamOrder</a></p>
+</div>
 <h3 id="naming-parameters-properly">Naming parameters properly<a class="headerlink" href="#naming-parameters-properly" title="Permanent link">&para;</a></h3>
 <p>The parameters in composable functions that send events are typically named <code>on</code> + verb in the present tense, like in the very common examples in Compose foundation code: <code>onClick</code> or <code>onTextChange</code>.
 To try to enforce common standard, and for consistency’s sake, we'll want to adjust the tense of the verbs to present.</p>
@@ -1358,15 +1371,17 @@ To try to enforce common standard, and for consistency’s sake, we'll want to a
 <span class="nd">@Composable</span>
 <span class="kd">fun</span><span class="w"> </span><span class="nf">Avatar</span><span class="p">(</span><span class="n">onShow</span><span class="p">:</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="kt">Unit</span><span class="p">,</span><span class="w"> </span><span class="n">onChange</span><span class="p">:</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="kt">Unit</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">}</span>
 </code></pre></div>
-<p>Related rule:
-- ktlint: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ParameterNaming.kt">compose:parameter-naming</a>
-- detekt: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ParameterNaming.kt">ParameterNaming</a></p>
+<div class="admonition info">
+<p>ktlint: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ParameterNaming.kt">compose:parameter-naming</a>
+detekt: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ParameterNaming.kt">ParameterNaming</a></p>
+</div>
 <h3 id="movable-content-should-be-remembered">Movable content should be remembered<a class="headerlink" href="#movable-content-should-be-remembered" title="Permanent link">&para;</a></h3>
 <p>The methods used to create movable composable content (<code>movableContentOf</code> and <code>movableContentWithReceiverOf</code>) need to be used inside a <code>remember</code> function.</p>
 <p>To work as intended, they need to persist through compositions - as if they get detached from the composition, they will be immediately recycled.</p>
-<p>Related rule:
-- ktlint: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/RememberContentMissing.kt">compose:remember-content-missing-check</a>
-- detekt: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/RememberContentMissing.kt">RememberContentMissing</a></p>
+<div class="admonition info">
+<p>ktlint: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/RememberContentMissing.kt">compose:remember-content-missing-check</a>
+detekt: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/RememberContentMissing.kt">RememberContentMissing</a></p>
+</div>
 <h3 id="make-dependencies-explicit">Make dependencies explicit<a class="headerlink" href="#make-dependencies-explicit" title="Permanent link">&para;</a></h3>
 <h4 id="viewmodels">ViewModels<a class="headerlink" href="#viewmodels" title="Permanent link">&para;</a></h4>
 <p>When designing our composables, we should always try to be explicit about the dependencies they take in. If you acquire a ViewModel or an instance from DI in the body of the composable, you are making this dependency implicit, which has the downsides of making it hard to test and harder to reuse.</p>
@@ -1389,23 +1404,26 @@ In this composable, the dependencies are implicit. When testing it you would nee
 <span class="w">    </span><span class="c1">// ...</span>
 <span class="p">}</span>
 </code></pre></div>
-<p>Related rule:
-- ktlint: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ViewModelInjection.kt">compose:vm-injection-check</a>
-- detekt: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ViewModelInjection.kt">ViewModelInjection</a></p>
+<div class="admonition info">
+<p>ktlint: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ViewModelInjection.kt">compose:vm-injection-check</a>
+detekt: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ViewModelInjection.kt">ViewModelInjection</a></p>
+</div>
 <h4 id="compositionlocals"><code>CompositionLocal</code>s<a class="headerlink" href="#compositionlocals" title="Permanent link">&para;</a></h4>
 <p><code>CompositionLocal</code> makes a composable function's behavior harder to reason about. As they create implicit dependencies, callers of composables that use them need to make sure that a value for every CompositionLocal is satisfied, which is not apparent from the composable API alone.</p>
 <p>Although uncommon, there are <a href="https://developer.android.com/jetpack/compose/compositionlocal#deciding">legit usecases</a> for them, so this rule provides an allowlist so that you can add your <code>CompositionLocal</code> names to it so that they are not flagged by the rule.</p>
-<p>Related rule:
-- ktlint: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/CompositionLocalAllowlist.kt">compose:compositionlocal-allowlist</a>
-- detekt: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/CompositionLocalAllowlist.kt">CompositionLocalAllowlist</a></p>
+<div class="admonition info">
+<p>ktlint: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/CompositionLocalAllowlist.kt">compose:compositionlocal-allowlist</a>
+detekt: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/CompositionLocalAllowlist.kt">CompositionLocalAllowlist</a></p>
+</div>
 <blockquote>
 <p><strong>Note</strong>: To add your custom <code>CompositionLocal</code> to your allowlist, you can add <code>allowedCompositionLocals</code> to this rule config in Detekt, or <code>compose_allowed_composition_locals</code> to your .editorconfig in ktlint.</p>
 </blockquote>
 <h3 id="preview-composables-should-not-be-public">Preview composables should not be public<a class="headerlink" href="#preview-composables-should-not-be-public" title="Permanent link">&para;</a></h3>
 <p>When a composable function exists solely because it's a <code>@Preview</code>, it doesn't need to have public visibility because it won't be used in actual UI. To prevent folks from using it unknowingly, we should restrict its visibility to <code>private</code>.</p>
-<p>Related rule:
-- ktlint: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/PreviewPublic.kt">compose:preview-public-check</a>
-- detekt: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/PreviewPublic.kt">PreviewPublic</a></p>
+<div class="admonition info">
+<p>ktlint: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/PreviewPublic.kt">compose:preview-public-check</a>
+detekt: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/PreviewPublic.kt">PreviewPublic</a></p>
+</div>
 <blockquote>
 <p><strong>Note</strong>: If you are using Detekt, this may conflict with Detekt's <a href="https://detekt.dev/docs/rules/style/#unusedprivatemember">UnusedPrivateMember rule</a>.
 Be sure to set Detekt's <a href="https://detekt.dev/docs/introduction/compose/#unusedprivatemember">ignoreAnnotated configuration</a> to ['Preview'] for compatibility with this rule.</p>
@@ -1415,9 +1433,10 @@ Be sure to set Detekt's <a href="https://detekt.dev/docs/introduction/compose/#u
 <p>Modifiers are the beating heart of Compose UI. They encapsulate the idea of composition over inheritance, by allowing developers to attach logic and behavior to layouts.</p>
 <p>They are especially important for your public components, as they allow callers to customize the component to their wishes.</p>
 <p>More info: <a href="https://chrisbanes.me/posts/always-provide-a-modifier/">Always provide a Modifier parameter</a></p>
-<p>Related rule:
-- ktlint: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierMissing.kt">compose:modifier-missing-check</a>
-- detekt: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierMissing.kt">ModifierMissing</a></p>
+<div class="admonition info">
+<p>ktlint: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierMissing.kt">compose:modifier-missing-check</a>
+detekt: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierMissing.kt">ModifierMissing</a></p>
+</div>
 <h3 id="modifier-order-matters">Modifier order matters<a class="headerlink" href="#modifier-order-matters" title="Permanent link">&para;</a></h3>
 <p>The order of modifier functions is very important. Each function makes changes to the Modifier returned by the previous function, the sequence affects the final result. Let's see an example of this:</p>
 <p><div class="highlight"><pre><span></span><code><span class="c1">// ❌ The UI will be off, as the pressed state ripple will extend beyond the intended shape</span>
@@ -1455,16 +1474,18 @@ The entire area, including the clipped area and the clipped background, responds
 <span class="p">}</span>
 </code></pre></div>
 <p>More info: <a href="https://developer.android.com/jetpack/compose/modifiers#order-modifier-matters">Modifier documentation</a></p>
-<p>Related rule:
-- ktlint: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierClickableOrder.kt">compose:modifier-clickable-order</a>
-- detekt: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierClickableOrder.kt">ModifierClickableOrder</a></p>
+<div class="admonition info">
+<p>ktlint: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierClickableOrder.kt">compose:modifier-clickable-order</a>
+detekt: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierClickableOrder.kt">ModifierClickableOrder</a></p>
+</div>
 <h3 id="modifiers-should-be-used-at-the-top-most-layout-of-the-component">Modifiers should be used at the top-most layout of the component<a class="headerlink" href="#modifiers-should-be-used-at-the-top-most-layout-of-the-component" title="Permanent link">&para;</a></h3>
 <p>Modifiers should be applied once as a first modifier in the chain to the root-most layout in the component implementation.
 Since modifiers aim to modify the external behaviors and appearance of the component, they must be applied to the top-most layout and be the first modifiers in the hierarchy. It is allowed to chain other modifiers to the modifier passed as a param if needed.</p>
 <p>More info: <a href="https://github.com/androidx/androidx/blob/androidx-main/compose/docs/compose-component-api-guidelines.md#modifier-parameter">Compose Component API Guidelines</a></p>
-<p>Related rule:
-- ktlint: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierNotUsedAtRoot.kt">compose:modifier-not-used-at-root</a>
-- detekt: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierNotUsedAtRoot.kt">ModifierNotUsedAtRoot</a></p>
+<div class="admonition info">
+<p>ktlint: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierNotUsedAtRoot.kt">compose:modifier-not-used-at-root</a>
+detekt: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierNotUsedAtRoot.kt">ModifierNotUsedAtRoot</a></p>
+</div>
 <h3 id="dont-re-use-modifiers">Don't re-use modifiers<a class="headerlink" href="#dont-re-use-modifiers" title="Permanent link">&para;</a></h3>
 <p>Modifiers which are passed in are designed so that they should be used by a single layout node in the composable function. If the provided modifier is used by multiple composables at different levels, unwanted behaviour can happen.</p>
 <p>In the following example we've exposed a public modifier parameter, and then passed it to the root Column, but we've also passed it to each of the descendant calls, with some extra modifiers on top:</p>
@@ -1489,36 +1510,42 @@ This is not recommended. Instead, the provided modifier should only be used on t
 <span class="w">    </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-<p>Related rule:
-- ktlint: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierReused.kt">compose:modifier-reused-check</a>
-- detekt: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierReused.kt">ModifierReused</a></p>
+<div class="admonition info">
+<p>ktlint: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierReused.kt">compose:modifier-reused-check</a>
+detekt: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierReused.kt">ModifierReused</a></p>
+</div>
 <h3 id="modifiers-should-have-default-parameters">Modifiers should have default parameters<a class="headerlink" href="#modifiers-should-have-default-parameters" title="Permanent link">&para;</a></h3>
 <p>Composables that accept a Modifier as a parameter to be applied to the whole component represented by the composable function should name the parameter modifier and assign the parameter a default value of <code>Modifier</code>. It should appear as the first optional parameter in the parameter list; after all required parameters (except for trailing lambda parameters) but before any other parameters with default values. Any default modifiers desired by a composable function should come after the modifier parameter's value in the composable function's implementation, keeping Modifier as the default parameter value.</p>
 <p>More info: <a href="https://developer.android.com/reference/kotlin/androidx/compose/ui/Modifier">Modifier documentation</a></p>
-<p>Related rule:
-- ktlint: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierWithoutDefault.kt">compose:modifier-without-default-check</a>
-- detekt: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierWithoutDefault.kt">ModifierWithoutDefault</a></p>
+<div class="admonition info">
+<p>ktlint: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierWithoutDefault.kt">compose:modifier-without-default-check</a>
+detekt: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierWithoutDefault.kt">ModifierWithoutDefault</a></p>
+</div>
 <h3 id="naming-modifiers-properly">Naming modifiers properly<a class="headerlink" href="#naming-modifiers-properly" title="Permanent link">&para;</a></h3>
 <p>Composables that accept a Modifier as a parameter to be applied to the whole component represented by the composable function should name the parameter <code>modifier</code>.</p>
 <p>In cases where Composables accept modifiers to be applied to a specific subcomponent should name the parameter <code>xModifier</code> (e.g. <code>fooModifier</code> for a <code>Foo</code> subcomponent) and follow the same guidelines above for default values and behavior.</p>
 <p>More info: <a href="https://developer.android.com/reference/kotlin/androidx/compose/ui/Modifier">Modifier documentation</a></p>
-<p>Related rule:
-- ktlint: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierNaming.kt">compose:modifier-naming</a>
-- detekt: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierNaming.kt">ModifierNaming</a></p>
+<div class="admonition info">
+<p>ktlint: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierNaming.kt">compose:modifier-naming</a>
+detekt: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierNaming.kt">ModifierNaming</a></p>
+</div>
 <h3 id="avoid-modifier-extension-factory-functions">Avoid Modifier extension factory functions<a class="headerlink" href="#avoid-modifier-extension-factory-functions" title="Permanent link">&para;</a></h3>
 <p>Using <code>@Composable</code> builder functions for modifiers is not recommended, as they cause unnecessary recompositions. To avoid this, you should use <a href="https://developer.android.com/reference/kotlin/androidx/compose/ui/Modifier.Node">Modifier.Node</a> instead. It will allow you to accomplish the same things while being very performant.</p>
 <p>There is another API for creating custom modifiers, <code>composed {}</code>. This API is no longer recommended due to the performance issues it created, and like with the extension factory functions case, Modifier.Node is recommended instead.</p>
 <p>More info: <a href="https://developer.android.com/reference/kotlin/androidx/compose/ui/Modifier.Node">Modifier.Node</a>, <a href="https://proandroiddev.com/compose-modifier-node-and-where-to-find-it-merab-tato-kutalia-66f891c0e8">Compose Modifier.Node and where to find it, by Merab Tato Kutalia</a>, <a href="https://www.youtube.com/watch?v=BjGX2RftXsU">Compose modifiers deep dive, with Leland Richardson</a> and <a href="https://developer.android.com/reference/kotlin/androidx/compose/ui/package-summary#(androidx.compose.ui.Modifier).composed(kotlin.Function1,kotlin.Function1)">Composed modifier docs</a>.</p>
-<p>Related rules:
-- ktlint: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierComposable.kt">compose:modifier-composable-check</a> and <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierComposed.kt">compose:modifier-composed-check</a>
-- detekt: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierComposable.kt">ModifierComposable</a> and <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierComposed.kt">ModifierComposed</a></p>
+<p>!!! info ""Related rules:</p>
+<div class="codehilite"><pre><span></span><code>ktlint: [compose:modifier-composable-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierComposable.kt) and [compose:modifier-composed-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierComposed.kt)
+detekt: [ModifierComposable](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierComposable.kt) and [ModifierComposed](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierComposed.kt)
+</code></pre></div>
+
 <h2 id="componentdefaults">ComponentDefaults<a class="headerlink" href="#componentdefaults" title="Permanent link">&para;</a></h2>
 <h3 id="componentdefaults-object-should-match-the-composable-visibility">ComponentDefaults object should match the composable visibility<a class="headerlink" href="#componentdefaults-object-should-match-the-composable-visibility" title="Permanent link">&para;</a></h3>
 <p>If your composable has an associated <code>Defaults</code> object to contain its default values, this object should have the same visibility as the composable itself. This will allow consumers to be able to interact or build upon the original intended defaults, as opposed to having to maintain their own set of defaults by copy-pasting.</p>
 <p>More info: <a href="https://github.com/androidx/androidx/blob/androidx-main/compose/docs/compose-component-api-guidelines.md#default-expressions">Compose Component API Guidelines</a></p>
-<p>Related rule:
-- ktlint: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/DefaultsVisibility.kt">compose:defaults-visibility</a>
-- detekt: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/DefaultsVisibility.kt">DefaultsVisibility</a></p>
+<div class="admonition info">
+<p>ktlint: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/DefaultsVisibility.kt">compose:defaults-visibility</a>
+detekt: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/DefaultsVisibility.kt">DefaultsVisibility</a></p>
+</div>
 <h2 id="opt-in-rules">Opt-in rules<a class="headerlink" href="#opt-in-rules" title="Permanent link">&para;</a></h2>
 <blockquote>
 <p><strong>Note</strong>: These rules are disabled by default, you'll need to explicitly enable them individually in detekt/ktlint.</p>
@@ -1527,9 +1554,10 @@ This is not recommended. Instead, the provided modifier should only be used on t
 <p>Material Design 3 is the next evolution of Material Design. It includes updated theming, components, and Material You personalization features like dynamic color. It supersedes Material 2, and using Material 3 usage is recommended instead of Material 2.</p>
 <p>Enabling: <a href="https://mrmans0n.github.io/compose-rules/ktlint/#enabling-the-material-2-detector">ktlint</a>, <a href="https://mrmans0n.github.io/compose-rules/detekt/#enabling-rules">detekt</a></p>
 <p>More info: <a href="https://developer.android.com/develop/ui/compose/designsystems/material2-material3">Migration to Material 3</a></p>
-<p>Related rule:
-- ktlint: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/Material2.kt">compose:material-two</a>
-- detekt: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/Material2.kt">Material2</a></p>
+<div class="admonition info">
+<p>ktlint: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/Material2.kt">compose:material-two</a>
+detekt: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/Material2.kt">Material2</a></p>
+</div>
 <h3 id="avoid-using-unstable-collections">Avoid using unstable collections<a class="headerlink" href="#avoid-using-unstable-collections" title="Permanent link">&para;</a></h3>
 <blockquote>
 <p><strong>Note</strong>: This rule will become unnecessary from the Compose version where strong skipping is enabled by default.</p>
@@ -1555,9 +1583,10 @@ This is not recommended. Instead, the provided modifier should only be used on t
 <p><strong>Note</strong>: It is preferred to use Kotlinx Immutable Collections for this. As you can see, the wrapped case only includes the immutability promise with the annotation, but the underlying List is still mutable.</p>
 </blockquote>
 <p>More info: <a href="https://medium.com/androiddevelopers/jetpack-compose-stability-explained-79c10db270c8">Jetpack Compose Stability Explained</a>, <a href="https://github.com/Kotlin/kotlinx.collections.immutable">Kotlinx Immutable Collections</a></p>
-<p>Related rule:
-- ktlint: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/UnstableCollections.kt">compose:unstable-collections</a>
-- detekt: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/UnstableCollections.kt">UnstableCollections</a></p>
+<div class="admonition info">
+<p>ktlint: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/UnstableCollections.kt">compose:unstable-collections</a>
+detekt: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/UnstableCollections.kt">UnstableCollections</a></p>
+</div>
 
 
 
