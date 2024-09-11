@@ -20,23 +20,9 @@ Related rule: [compose:vm-forwarding-check](https://github.com/mrmans0n/compose-
 
 Be careful when using `mutableStateOf` (or any of the other state builders) to make sure that you `remember` the instance. If you don't `remember` the state instance, a new state instance will be created when the function is recomposed.
 
-!!! info "Rule"
-
-    | Linter | Rule Name |
-    |--------|-----------|
-    | ktlint | [compose:remember-missing-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/RememberStateMissing.kt) |
-    | detekt | [RememberMissing](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/RememberStateMissing.kt) |
-
-!!! info "Rule"
-
-    | ktlint | detekt |
-    |--------|-----------|
-    | [compose:remember-missing-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/RememberStateMissing.kt) | [RememberMissing](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/RememberStateMissing.kt) |
-
-| ktlint | detekt |
-|--------|--------|
+| ktlint                                                                                                                                                             | detekt                                                                                                                                              |
+|--------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------|
 | [compose:remember-missing-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/RememberStateMissing.kt) | [RememberMissing](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/RememberStateMissing.kt) |
-
 
 ### Use Immutable annotation whenever possible
 
@@ -44,7 +30,9 @@ The Compose Compiler tries to infer immutability and stability on value classes,
 
 More info: [Immutable docs](https://developer.android.com/reference/kotlin/androidx/compose/runtime/Immutable) and [Composable metrics blog post](https://chris.banes.me/composable-metrics/)
 
-Related rule: TBD
+| ktlint | detekt |
+|--------|--------|
+| TBD    | TBD    |
 
 ### Use mutableStateOf type-specific variants when possible
 
@@ -53,6 +41,10 @@ Related rule: TBD
 Functionally are the same, but they are preferred when dealing with these specific types.
 
 Related rule: [compose:mutable-state-autoboxing](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/MutableStateAutoboxing.kt)
+
+| ktlint                                                                                                                                                                 | detekt                                                                                                                                                       |
+|------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [compose:mutable-state-autoboxing](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/MutableStateAutoboxing.kt) | [MutableStateAutoboxing](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/MutableStateAutoboxing.kt) |
 
 ## Composables
 
