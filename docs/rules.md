@@ -16,7 +16,7 @@ More information: [State and Jetpack Compose](https://developer.android.com/jetp
 
 !!! info ""
 
-    :octicons-codescan-checkmark: [compose:vm-forwarding-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ViewModelForwarding.kt) (ktlint) [ViewModelForwarding](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ViewModelForwarding.kt) (detekt)
+    :octicons-codescan-checkmark-16: [compose:vm-forwarding-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ViewModelForwarding.kt) (ktlint) [ViewModelForwarding](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ViewModelForwarding.kt) (detekt)
 
 ### State should be remembered in composables
 
@@ -24,7 +24,7 @@ Be careful when using `mutableStateOf` (or any of the other state builders) to m
 
 !!! info ""
 
-    :octicons-codescan-checkmark: [compose:remember-missing-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/RememberStateMissing.kt) (ktlint) [RememberMissing](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/RememberStateMissing.kt) (detekt)
+    :octicons-codescan-checkmark-16: [compose:remember-missing-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/RememberStateMissing.kt) (ktlint) [RememberMissing](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/RememberStateMissing.kt) (detekt)
 
 ### Use mutableStateOf type-specific variants when possible
 
@@ -34,7 +34,7 @@ Functionally are the same, but they are preferred when dealing with these specif
 
 !!! info ""
 
-    :octicons-codescan-checkmark: [compose:mutable-state-autoboxing](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/MutableStateAutoboxing.kt) (ktlint) [MutableStateAutoboxing](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/MutableStateAutoboxing.kt) (detekt)
+    :octicons-codescan-checkmark-16: [compose:mutable-state-autoboxing](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/MutableStateAutoboxing.kt) (ktlint) [MutableStateAutoboxing](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/MutableStateAutoboxing.kt) (detekt)
 
 ## Composables
 
@@ -50,7 +50,7 @@ Passing `ArrayList<T>` or `ViewModel` are common examples of this (but not limit
 
 !!! info ""
 
-    :octicons-codescan-checkmark: [compose:mutable-params-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/MutableParameters.kt) (ktlint) [MutableParams](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/MutableParameters.kt) (detekt)
+    :octicons-codescan-checkmark-16: [compose:mutable-params-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/MutableParameters.kt) (ktlint) [MutableParams](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/MutableParameters.kt) (detekt)
 
 ### Do not use MutableState as a parameter
 
@@ -64,7 +64,7 @@ More info: [Compose API guidelines](https://android.googlesource.com/platform/fr
 
 !!! info ""
 
-    :octicons-codescan-checkmark: [compose:mutable-state-param-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/MutableStateParameter.kt) (ktlint) [MutableStateParam](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/MutableStateParameter.kt) (detekt)
+    :octicons-codescan-checkmark-16: [compose:mutable-state-param-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/MutableStateParameter.kt) (ktlint) [MutableStateParam](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/MutableStateParameter.kt) (detekt)
 
 ### Be mindful of the arguments you use inside of a restarting effect
 
@@ -123,7 +123,7 @@ More info: [Restarting effects](https://developer.android.com/jetpack/compose/si
 
 !!! info ""
 
-    :octicons-codescan-checkmark: [compose:lambda-param-in-effect](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/LambdaParameterInRestartableEffect.kt) (ktlint) [LambdaParameterInRestartableEffect](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/LambdaParameterInRestartableEffect.kt) (detekt)
+    :octicons-codescan-checkmark-16: [compose:lambda-param-in-effect](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/LambdaParameterInRestartableEffect.kt) (ktlint) [LambdaParameterInRestartableEffect](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/LambdaParameterInRestartableEffect.kt) (detekt)
 
 ### Do not emit content and return a result
 
@@ -135,7 +135,7 @@ More info: [Compose API guidelines](https://github.com/androidx/androidx/blob/an
 
 !!! info ""
 
-    :octicons-codescan-checkmark: [compose:content-emitter-returning-values-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/MultipleContentEmitters.kt) (ktlint) [compose:content-emitter-returning-values-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/MultipleContentEmitters.kt) (detekt)
+    :octicons-codescan-checkmark-16: [compose:content-emitter-returning-values-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/MultipleContentEmitters.kt) (ktlint) [compose:content-emitter-returning-values-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/MultipleContentEmitters.kt) (detekt)
 
 > **Note**: To add your custom composables so they are used in this rule (things like your design system composables), you can add `composeEmitters` to this rule config in Detekt, or `compose_emitters` to your .editorconfig in ktlint.
 
@@ -205,7 +205,7 @@ This effectively ties the function to be called from a Column, but is still not 
 
 !!! info ""
 
-    :octicons-codescan-checkmark: [compose:multiple-emitters-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/MultipleContentEmitters.kt) (ktlint) [MultipleEmitters](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/MultipleContentEmitters.kt) (detekt)
+    :octicons-codescan-checkmark-16: [compose:multiple-emitters-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/MultipleContentEmitters.kt) (ktlint) [MultipleEmitters](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/MultipleContentEmitters.kt) (detekt)
 
 > **Note**: To add your custom composables so they are used in this rule (things like your design system composables), you can add `composeEmitters` to this rule config in Detekt, or `compose_emitters` to your .editorconfig in ktlint.
 
@@ -234,7 +234,7 @@ fun Profile(user: User, modifier: Modifier = Modifier) {
 
 !!! info ""
 
-    :octicons-codescan-checkmark: [compose:content-trailing-lambda](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ContentTrailingLambda.kt) (ktlint) [ContentTrailingLambda](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ContentTrailingLambda.kt) (detekt)
+    :octicons-codescan-checkmark-16: [compose:content-trailing-lambda](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ContentTrailingLambda.kt) (ktlint) [ContentTrailingLambda](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ContentTrailingLambda.kt) (detekt)
 
 ### Naming CompositionLocals properly
 
@@ -244,7 +244,7 @@ More information: [Naming CompositionLocals](https://android.googlesource.com/pl
 
 !!! info ""
 
-    :octicons-codescan-checkmark: [compose:compositionlocal-naming](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/composerules/CompositionLocalNaming.kt) (ktlint) [CompositionLocalNaming](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/composerules/CompositionLocalNaming.kt) (detekt)
+    :octicons-codescan-checkmark-16: [compose:compositionlocal-naming](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/composerules/CompositionLocalNaming.kt) (ktlint) [CompositionLocalNaming](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/composerules/CompositionLocalNaming.kt) (detekt)
 
 ### Naming multipreview annotations properly
 
@@ -254,7 +254,7 @@ More information: [Multipreview annotations](https://developer.android.com/jetpa
 
 !!! info ""
 
-    :octicons-codescan-checkmark: [compose:preview-annotation-naming](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/PreviewAnnotationNaming.kt) (ktlint) [PreviewAnnotationNaming](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/PreviewAnnotationNaming.kt) (detekt)
+    :octicons-codescan-checkmark-16: [compose:preview-annotation-naming](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/PreviewAnnotationNaming.kt) (ktlint) [PreviewAnnotationNaming](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/PreviewAnnotationNaming.kt) (detekt)
 
 ### Naming @Composable functions properly
 
@@ -266,7 +266,7 @@ More information: [Naming Unit @Composable functions as entities](https://github
 
 !!! info ""
 
-    :octicons-codescan-checkmark: [compose:naming-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/Naming.kt) (ktlint) [ComposableNaming](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/Naming.kt) (detekt)
+    :octicons-codescan-checkmark-16: [compose:naming-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/Naming.kt) (ktlint) [ComposableNaming](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/Naming.kt) (detekt)
 
 ### Naming Composable annotations properly
 
@@ -274,7 +274,7 @@ Custom Composable annotations (tagged with [`@ComposableTargetMarker`](https://d
 
 !!! info ""
 
-    :octicons-codescan-checkmark: [compose:composable-annotation-naming-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ComposableAnnotationNaming.kt) (ktlint) [ComposableAnnotationNaming](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ComposableAnnotationNaming.kt) (detekt)
+    :octicons-codescan-checkmark-16: [compose:composable-annotation-naming-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ComposableAnnotationNaming.kt) (ktlint) [ComposableAnnotationNaming](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ComposableAnnotationNaming.kt) (detekt)
 
 ### Ordering @Composable parameters properly
 
@@ -318,7 +318,7 @@ More information: [Kotlin default arguments](https://kotlinlang.org/docs/functio
 
 !!! info ""
 
-    :octicons-codescan-checkmark: [compose:param-order-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ParameterOrder.kt) (ktlint) [ComposableParamOrder](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ParameterOrder.kt) (detekt)
+    :octicons-codescan-checkmark-16: [compose:param-order-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ParameterOrder.kt) (ktlint) [ComposableParamOrder](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ParameterOrder.kt) (detekt)
 
 ### Naming parameters properly
 
@@ -337,7 +337,7 @@ fun Avatar(onShow: () -> Unit, onChange: () -> Unit) { ... }
 
 !!! info ""
 
-    :octicons-codescan-checkmark: [compose:parameter-naming](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ParameterNaming.kt) (ktlint) [ParameterNaming](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ParameterNaming.kt) (detekt)
+    :octicons-codescan-checkmark-16: [compose:parameter-naming](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ParameterNaming.kt) (ktlint) [ParameterNaming](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ParameterNaming.kt) (detekt)
 
 ### Movable content should be remembered
 
@@ -347,7 +347,7 @@ To work as intended, they need to persist through compositions - as if they get 
 
 !!! info ""
 
-    :octicons-codescan-checkmark: [compose:remember-content-missing-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/RememberContentMissing.kt) (ktlint) [RememberContentMissing](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/RememberContentMissing.kt) (detekt)
+    :octicons-codescan-checkmark-16: [compose:remember-content-missing-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/RememberContentMissing.kt) (ktlint) [RememberContentMissing](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/RememberContentMissing.kt) (detekt)
 
 ### Make dependencies explicit
 
@@ -383,7 +383,7 @@ private fun MyComposable(
 
 !!! info ""
 
-    :octicons-codescan-checkmark: [compose:vm-injection-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ViewModelInjection.kt) (ktlint) [ViewModelInjection](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ViewModelInjection.kt) (detekt)
+    :octicons-codescan-checkmark-16: [compose:vm-injection-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ViewModelInjection.kt) (ktlint) [ViewModelInjection](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ViewModelInjection.kt) (detekt)
 
 #### `CompositionLocal`s
 
@@ -393,7 +393,7 @@ Although uncommon, there are [legit usecases](https://developer.android.com/jetp
 
 !!! info ""
 
-    :octicons-codescan-checkmark: [compose:compositionlocal-allowlist](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/CompositionLocalAllowlist.kt) (ktlint) [CompositionLocalAllowlist](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/CompositionLocalAllowlist.kt) (detekt)
+    :octicons-codescan-checkmark-16: [compose:compositionlocal-allowlist](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/CompositionLocalAllowlist.kt) (ktlint) [CompositionLocalAllowlist](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/CompositionLocalAllowlist.kt) (detekt)
 
 > **Note**: To add your custom `CompositionLocal` to your allowlist, you can add `allowedCompositionLocals` to this rule config in Detekt, or `compose_allowed_composition_locals` to your .editorconfig in ktlint.
 
@@ -403,7 +403,7 @@ When a composable function exists solely because it's a `@Preview`, it doesn't n
 
 !!! info ""
 
-    :octicons-codescan-checkmark: [compose:preview-public-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/PreviewPublic.kt) (ktlint) [PreviewPublic](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/PreviewPublic.kt) (detekt)
+    :octicons-codescan-checkmark-16: [compose:preview-public-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/PreviewPublic.kt) (ktlint) [PreviewPublic](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/PreviewPublic.kt) (detekt)
 
 > **Note**: If you are using Detekt, this may conflict with Detekt's [UnusedPrivateMember rule](https://detekt.dev/docs/rules/style/#unusedprivatemember).
 Be sure to set Detekt's [ignoreAnnotated configuration](https://detekt.dev/docs/introduction/compose/#unusedprivatemember) to ['Preview'] for compatibility with this rule.
@@ -420,7 +420,7 @@ More info: [Always provide a Modifier parameter](https://chrisbanes.me/posts/alw
 
 !!! info ""
 
-    :octicons-codescan-checkmark: [compose:modifier-missing-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierMissing.kt) (ktlint) [ModifierMissing](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierMissing.kt) (detekt)
+    :octicons-codescan-checkmark-16: [compose:modifier-missing-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierMissing.kt) (ktlint) [ModifierMissing](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierMissing.kt) (detekt)
 
 ### Modifier order matters
 
@@ -469,7 +469,7 @@ More info: [Modifier documentation](https://developer.android.com/jetpack/compos
 
 !!! info ""
 
-    :octicons-codescan-checkmark: [compose:modifier-clickable-order](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierClickableOrder.kt) (ktlint) [ModifierClickableOrder](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierClickableOrder.kt) (detekt)
+    :octicons-codescan-checkmark-16: [compose:modifier-clickable-order](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierClickableOrder.kt) (ktlint) [ModifierClickableOrder](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierClickableOrder.kt) (detekt)
 
 ### Modifiers should be used at the top-most layout of the component
 
@@ -480,7 +480,7 @@ More info: [Compose Component API Guidelines](https://github.com/androidx/androi
 
 !!! info ""
 
-    :octicons-codescan-checkmark: [compose:modifier-not-used-at-root](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierNotUsedAtRoot.kt) (ktlint) [ModifierNotUsedAtRoot](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierNotUsedAtRoot.kt) (detekt)
+    :octicons-codescan-checkmark-16: [compose:modifier-not-used-at-root](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierNotUsedAtRoot.kt) (ktlint) [ModifierNotUsedAtRoot](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierNotUsedAtRoot.kt) (detekt)
 
 ### Don't re-use modifiers
 
@@ -515,7 +515,7 @@ private fun InnerContent(modifier: Modifier = Modifier) {
 
 !!! info ""
 
-    :octicons-codescan-checkmark: [compose:modifier-reused-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierReused.kt) (ktlint) [ModifierReused](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierReused.kt) (detekt)
+    :octicons-codescan-checkmark-16: [compose:modifier-reused-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierReused.kt) (ktlint) [ModifierReused](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierReused.kt) (detekt)
 
 ### Modifiers should have default parameters
 
@@ -525,7 +525,7 @@ More info: [Modifier documentation](https://developer.android.com/reference/kotl
 
 !!! info ""
 
-    :octicons-codescan-checkmark: [compose:modifier-without-default-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierWithoutDefault.kt) (ktlint) [ModifierWithoutDefault](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierWithoutDefault.kt) (detekt)
+    :octicons-codescan-checkmark-16: [compose:modifier-without-default-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierWithoutDefault.kt) (ktlint) [ModifierWithoutDefault](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierWithoutDefault.kt) (detekt)
 
 ### Naming modifiers properly
 
@@ -537,7 +537,7 @@ More info: [Modifier documentation](https://developer.android.com/reference/kotl
 
 !!! info ""
 
-    :octicons-codescan-checkmark: [compose:modifier-naming](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierNaming.kt) (ktlint) [ModifierNaming](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierNaming.kt) (detekt)
+    :octicons-codescan-checkmark-16: [compose:modifier-naming](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierNaming.kt) (ktlint) [ModifierNaming](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierNaming.kt) (detekt)
 
 ### Avoid Modifier extension factory functions
 
@@ -549,7 +549,7 @@ More info: [Modifier.Node](https://developer.android.com/reference/kotlin/androi
 
 !!! info ""Related rules:
 
-    :octicons-codescan-checkmark: [compose:modifier-composable-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierComposable.kt) and [compose:modifier-composed-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierComposed.kt) (ktlint) [ModifierComposable](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierComposable.kt) and [ModifierComposed](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierComposed.kt) (detekt)
+    :octicons-codescan-checkmark-16: [compose:modifier-composable-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierComposable.kt) and [compose:modifier-composed-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierComposed.kt) (ktlint) [ModifierComposable](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierComposable.kt) and [ModifierComposed](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierComposed.kt) (detekt)
 
 ## ComponentDefaults
 
@@ -561,7 +561,7 @@ More info: [Compose Component API Guidelines](https://github.com/androidx/androi
 
 !!! info ""
 
-    :octicons-codescan-checkmark: [compose:defaults-visibility](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/DefaultsVisibility.kt) (ktlint) [DefaultsVisibility](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/DefaultsVisibility.kt) (detekt)
+    :octicons-codescan-checkmark-16: [compose:defaults-visibility](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/DefaultsVisibility.kt) (ktlint) [DefaultsVisibility](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/DefaultsVisibility.kt) (detekt)
 
 ## Opt-in rules
 
@@ -577,7 +577,7 @@ More info: [Migration to Material 3](https://developer.android.com/develop/ui/co
 
 !!! info ""
 
-    :octicons-codescan-checkmark: [compose:material-two](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/Material2.kt) (ktlint) [Material2](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/Material2.kt) (detekt)
+    :octicons-codescan-checkmark-16: [compose:material-two](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/Material2.kt) (ktlint) [Material2](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/Material2.kt) (detekt)
 
 ### Avoid using unstable collections
 
@@ -616,4 +616,4 @@ More info: [Jetpack Compose Stability Explained](https://medium.com/androiddevel
 
 !!! info ""
 
-    :octicons-codescan-checkmark: [compose:unstable-collections](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/UnstableCollections.kt) (ktlint) [UnstableCollections](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/UnstableCollections.kt) (detekt)
+    :octicons-codescan-checkmark-16: [compose:unstable-collections](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/UnstableCollections.kt) (ktlint) [UnstableCollections](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/UnstableCollections.kt) (detekt)
