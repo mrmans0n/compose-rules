@@ -1114,44 +1114,6 @@
 <p>Related rule: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ViewModelForwarding.kt">compose:vm-forwarding-check</a></p>
 <h3 id="state-should-be-remembered-in-composables">State should be remembered in composables<a class="headerlink" href="#state-should-be-remembered-in-composables" title="Permanent link">&para;</a></h3>
 <p>Be careful when using <code>mutableStateOf</code> (or any of the other state builders) to make sure that you <code>remember</code> the instance. If you don't <code>remember</code> the state instance, a new state instance will be created when the function is recomposed.</p>
-<div class="admonition info">
-<p class="admonition-title">Rule</p>
-<table>
-<thead>
-<tr>
-<th>Linter</th>
-<th>Rule Name</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>ktlint</td>
-<td><a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/RememberStateMissing.kt">compose:remember-missing-check</a></td>
-</tr>
-<tr>
-<td>detekt</td>
-<td><a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/RememberStateMissing.kt">RememberMissing</a></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="admonition info">
-<p class="admonition-title">Rule</p>
-<table>
-<thead>
-<tr>
-<th>ktlint</th>
-<th>detekt</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/RememberStateMissing.kt">compose:remember-missing-check</a></td>
-<td><a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/RememberStateMissing.kt">RememberMissing</a></td>
-</tr>
-</tbody>
-</table>
-</div>
 <table>
 <thead>
 <tr>
@@ -1169,11 +1131,38 @@
 <h3 id="use-immutable-annotation-whenever-possible">Use Immutable annotation whenever possible<a class="headerlink" href="#use-immutable-annotation-whenever-possible" title="Permanent link">&para;</a></h3>
 <p>The Compose Compiler tries to infer immutability and stability on value classes, but sometimes it gets it wrong, which then means that your UI will be doing more work than it needs. To force the compiler to see a class as 'immutable' you can apply the <code>@Immutable</code> annotation to the class.</p>
 <p>More info: <a href="https://developer.android.com/reference/kotlin/androidx/compose/runtime/Immutable">Immutable docs</a> and <a href="https://chris.banes.me/composable-metrics/">Composable metrics blog post</a></p>
-<p>Related rule: TBD</p>
+<table>
+<thead>
+<tr>
+<th>ktlint</th>
+<th>detekt</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>TBD</td>
+<td>TBD</td>
+</tr>
+</tbody>
+</table>
 <h3 id="use-mutablestateof-type-specific-variants-when-possible">Use mutableStateOf type-specific variants when possible<a class="headerlink" href="#use-mutablestateof-type-specific-variants-when-possible" title="Permanent link">&para;</a></h3>
 <p><code>mutableIntStateOf</code>, <code>mutableLongStateOf</code>, <code>mutableDoubleStateOf</code>, <code>mutableFloatStateOf</code> are essentially counterparts to <code>mutableStateOf</code>, but with the added advantage of circumventing autoboxing on JVM platforms. This distinction renders them more memory efficient, making them the preferable choice when dealing with primitive types such as double, float, int, and long.</p>
 <p>Functionally are the same, but they are preferred when dealing with these specific types.</p>
 <p>Related rule: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/MutableStateAutoboxing.kt">compose:mutable-state-autoboxing</a></p>
+<table>
+<thead>
+<tr>
+<th>ktlint</th>
+<th>detekt</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/MutableStateAutoboxing.kt">compose:mutable-state-autoboxing</a></td>
+<td><a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/MutableStateAutoboxing.kt">MutableStateAutoboxing</a></td>
+</tr>
+</tbody>
+</table>
 <h2 id="composables">Composables<a class="headerlink" href="#composables" title="Permanent link">&para;</a></h2>
 <h3 id="do-not-use-inherently-mutable-types-as-parameters">Do not use inherently mutable types as parameters<a class="headerlink" href="#do-not-use-inherently-mutable-types-as-parameters" title="Permanent link">&para;</a></h3>
 <p>This practice follows on from the 'Hoist all the things' item above, where we said that state flows down. It might be tempting to pass mutable state down to a function to mutate the value.</p>
