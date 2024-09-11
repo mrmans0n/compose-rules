@@ -1114,7 +1114,13 @@
 <p>Related rule: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ViewModelForwarding.kt">compose:vm-forwarding-check</a></p>
 <h3 id="state-should-be-remembered-in-composables">State should be remembered in composables<a class="headerlink" href="#state-should-be-remembered-in-composables" title="Permanent link">&para;</a></h3>
 <p>Be careful when using <code>mutableStateOf</code> (or any of the other state builders) to make sure that you <code>remember</code> the instance. If you don't <code>remember</code> the state instance, a new state instance will be created when the function is recomposed.</p>
-<p>Related rule: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/RememberStateMissing.kt">compose:remember-missing-check</a></p>
+<div class="admonition info inline end">
+<p class="admonition-title">Rule</p>
+<ul>
+<li>ktlint: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/RememberStateMissing.kt">compose:remember-missing-check</a></li>
+<li>detekt: <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/RememberStateMissing.kt">RememberMissing</a></li>
+</ul>
+</div>
 <h3 id="use-immutable-annotation-whenever-possible">Use Immutable annotation whenever possible<a class="headerlink" href="#use-immutable-annotation-whenever-possible" title="Permanent link">&para;</a></h3>
 <p>The Compose Compiler tries to infer immutability and stability on value classes, but sometimes it gets it wrong, which then means that your UI will be doing more work than it needs. To force the compiler to see a class as 'immutable' you can apply the <code>@Immutable</code> annotation to the class.</p>
 <p>More info: <a href="https://developer.android.com/reference/kotlin/androidx/compose/runtime/Immutable">Immutable docs</a> and <a href="https://chris.banes.me/composable-metrics/">Composable metrics blog post</a></p>
