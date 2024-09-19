@@ -51,6 +51,12 @@ Compose:
     # treatAsComposableLambda: MyComposableLambdaType
   DefaultsVisibility:
     active: true
+  LambdaParameterEventTrailing:
+    active: true
+    # -- You can optionally add your own composables here
+    # contentEmitters: MyComposable,MyOtherComposable
+    # -- You can add composables here that you don't want to count as content emitters (e.g. custom dialogs or modals)
+    # contentEmittersDenylist: MyNonEmitterComposable
   LambdaParameterInRestartableEffect:
     active: true
     # -- You can optionally have a list of types to be treated as lambdas (e.g. typedefs or fun interfaces not picked up automatically)

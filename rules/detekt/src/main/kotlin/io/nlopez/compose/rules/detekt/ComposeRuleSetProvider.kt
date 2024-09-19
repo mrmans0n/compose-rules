@@ -18,6 +18,7 @@ class ComposeRuleSetProvider : RuleSetProvider {
             ContentEmitterReturningValuesCheck(config),
             ContentTrailingLambdaCheck(config),
             DefaultsVisibilityCheck(config),
+            LambdaParameterEventTrailingCheck(config),
             LambdaParameterInRestartableEffectCheck(config),
             Material2Check(config),
             ModifierClickableOrderCheck(config),

@@ -13,19 +13,19 @@ import org.jetbrains.kotlin.psi.KtTypeElement
 import org.jetbrains.kotlin.psi.KtTypeReference
 import org.jetbrains.kotlin.psi.KtUserType
 
-fun KtTypeElement.isLambda(treatAsLambdaTypes: Set<String>): Boolean = when (this) {
+fun KtTypeElement.isLambda(treatAsLambdaTypes: Set<String> = emptySet()): Boolean = when (this) {
     is KtFunctionType -> true
     is KtNullableType -> innerType?.isLambda(treatAsLambdaTypes) == true
     is KtUserType -> referencedName in treatAsLambdaTypes
     else -> false
 }
 
-fun KtTypeReference.isLambda(treatAsLambdaTypes: Set<String>): Boolean =
+fun KtTypeReference.isLambda(treatAsLambdaTypes: Set<String> = emptySet()): Boolean =
     typeElement?.isLambda(treatAsLambdaTypes) == true
 
 fun KtTypeReference.isComposableLambda(
-    treatAsLambdaTypes: Set<String>,
-    treatAsComposableLambdaTypes: Set<String>,
+    treatAsLambdaTypes: Set<String> = emptySet(),
+    treatAsComposableLambdaTypes: Set<String> = emptySet(),
 ): Boolean = when (val element = typeElement) {
     null -> false
     is KtFunctionType -> isComposable
