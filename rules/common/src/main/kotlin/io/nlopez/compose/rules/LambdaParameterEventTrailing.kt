@@ -45,7 +45,7 @@ class LambdaParameterEventTrailing : ComposeKtVisitor {
 
             Composable functions that emit content usually reserve the trailing lambda syntax for the content slot, and that can lead to an assumption that other composables can be used in that lambda.
 
-            See https://mrmans0n.github.io/compose-rules/rules/#TODO for more information.
+            See https://mrmans0n.github.io/compose-rules/rules/#avoid-using-the-trailing-lambda-for-event-lambdas-in-ui-composables for more information.
         """.trimIndent()
     }
 }
