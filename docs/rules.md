@@ -20,7 +20,7 @@ More information: [State and Jetpack Compose](https://developer.android.com/jetp
 
 ### State should be remembered in composables
 
-Be careful when using `mutableStateOf` (or any of the other state builders) to make sure that you `remember` the instance. If you don't `remember` the state instance, a new state instance will be created when the function is recomposed.
+Be careful when using `mutableStateOf` (or any of the other `State<T>` builders) to make sure that you `remember` the instance. If you don't `remember` the state instance, a new state instance will be created when the function is recomposed.
 
 !!! info ""
 
@@ -236,6 +236,45 @@ fun Profile(user: User, modifier: Modifier = Modifier) {
 
     :material-chevron-right-box: [compose:content-trailing-lambda](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ContentTrailingLambda.kt) ktlint :material-chevron-right-box: [ContentTrailingLambda](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ContentTrailingLambda.kt) detekt
 
+### Avoid using the trailing lambda for event lambdas in UI Composables
+
+In Compose, trailing lambdas in composable functions are typically used for content slots. To avoid confusion and maintain consistency, event lambdas (e.g., `onClick`, `onValueChange`) should generally not be placed in the trailing position.
+
+Recommendations:
+
+- **Required** Event Lambdas: Place required event lambdas before the `Modifier` parameter. This clearly distinguishes them from content slots.
+- **Optional** Event Lambdas: When possible, avoid placing optional event lambdas as the last parameter. If an optional event lambda must be positioned at the end, consider adding a clarifying comment to the function definition.
+
+```kotlin
+// ❌ Using an event lambda (like onClick) as the trailing lambda when in a composable makes it error prone and awkward to read
+@Composable
+fun MyButton(modifier: Modifier = Modifier, onClick: () -> Unit) { /* ... */ }
+
+@Composable
+fun SomeUI(modifier: Modifier = Modifier) {
+    MyButton {
+        // This is an onClick, but by reading it people would assume it's a content slot
+    }
+}
+
+// ✅ By moving the event lambda to be before Modifier, we avoid confusion
+@Composable
+fun MyBetterButton(onClick: () -> Unit, modifier: Modifier = Modifier) { /* ... */ }
+
+@Composable
+fun SomeUI(modifier: Modifier = Modifier) {
+    MyBetterButton(
+        onClick = {
+            // Now this param is straightforward to understand
+        },
+    )
+}
+```
+
+!!! info ""
+
+    :material-chevron-right-box: [compose:lambda-param-event-trailing](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ContentTrailingLambda.kt) ktlint :material-chevron-right-box: [LambdaParameterEventTrailing](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/LambdaParameterEventTrailing.kt) detekt
+
 ### Naming CompositionLocals properly
 
 `CompositionLocal`s should be named by using the adjective `Local` as prefix, followed by a descriptive noun that describes the value they hold. This makes it easier to know when a value comes from a `CompositionLocal`. Given that these are implicit dependencies, we should make them obvious.
@@ -328,11 +367,11 @@ To try to enforce common standard, and for consistency’s sake, we'll want to a
 ```kotlin
 // ❌
 @Composable
-fun Avatar(onShown: () -> Unit, onChanged: () -> Unit) { ... }
+fun Avatar(onShown: () -> Unit, onChanged: () -> Unit) { /* ... */ }
 
 // ✅
 @Composable
-fun Avatar(onShow: () -> Unit, onChange: () -> Unit) { ... }
+fun Avatar(onShow: () -> Unit, onChange: () -> Unit) { /* ... */ }
 ```
 
 !!! info ""
