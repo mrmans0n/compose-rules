@@ -464,14 +464,12 @@
 <h2 id="migrating-from-twitter-compose-rules">Migrating from Twitter Compose Rules<a class="headerlink" href="#migrating-from-twitter-compose-rules" title="Permanent link">&para;</a></h2>
 <p>The process to migrate to these rules coming from the Twitter ones is simple.</p>
 <ol>
-<li>
-<p>Change the project coordinates in your gradle build scripts
-    2. For detekt, <code>com.twitter.compose.rules:detekt:$version</code> becomes <code>io.nlopez.compose.rules:detekt:$version</code>
-    3. For ktlint, <code>com.twitter.compose.rules:ktlint:$version</code> becomes <code>io.nlopez.compose.rules:ktlint:$version</code>.</p>
+<li>Change the project coordinates in your gradle build scripts<ol>
+<li>For detekt, <code>com.twitter.compose.rules:detekt:$version</code> becomes <code>io.nlopez.compose.rules:detekt:$version</code></li>
+<li>For ktlint, <code>com.twitter.compose.rules:ktlint:$version</code> becomes <code>io.nlopez.compose.rules:ktlint:$version</code></li>
+</ol>
 </li>
-<li>
-<p>Update <code>$version</code> to the latest: <img alt="Latest version" src="https://img.shields.io/maven-central/v/io.nlopez.compose.rules/common" /> - see the project <a href="https://github.com/mrmans0n/compose-rules/releases">releases page</a>.</p>
-</li>
+<li>Update <code>$version</code> to the latest: <img alt="Latest version" src="https://img.shields.io/maven-central/v/io.nlopez.compose.rules/common" /> - see the project <a href="https://github.com/mrmans0n/compose-rules/releases">releases page</a>.</li>
 <li><strong>If you are using Detekt</strong>: update the config file (e.g. <code>detekt.yml</code>) so that the rule set name <code>TwitterCompose</code> becomes <code>Compose</code>. Keep in mind that there are a lot of new rules in this repo that weren't in Twitter's, so you'd be better copying over from the <a href="https://mrmans0n.github.io/compose-rules/detekt">example configuration</a>.</li>
 <li>Done!</li>
 </ol>
