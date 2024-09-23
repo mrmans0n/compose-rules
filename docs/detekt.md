@@ -142,14 +142,17 @@ Compose:
     # viewModelFactories: hiltViewModel,potatoViewModel
 ```
 
+
 ### Disabling a specific rule
 
 To disable a rule you have to follow the [instructions from the detekt documentation](https://detekt.dev/docs/introduction/suppressing-rules), and use the id of the rule you want to disable.
 
-For example, to disable `ComposableNaming`:
+For example, to disable `ComposableNaming` in a particular method, you can suppress it.
 
 ```kotlin
 @Suppress("ComposableNaming")
 @Composable
 fun myNameIsWrong() { }
 ```
+
+You can also disable rules altogether by changing the `active: true` to `active: false` in your detekt configuration yml file.
