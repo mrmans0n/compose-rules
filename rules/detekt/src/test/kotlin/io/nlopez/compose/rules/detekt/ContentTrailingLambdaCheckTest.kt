@@ -94,4 +94,17 @@ class ContentTrailingLambdaCheckTest {
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }
+
+    @Test
+    fun `passes when content is not composable`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun A(content: () -> Unit, text: String) {}
+            """.trimIndent()
+
+        val errors = rule.lint(code)
+        assertThat(errors).isEmpty()
+    }
 }

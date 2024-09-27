@@ -16,6 +16,7 @@ class ComposeRuleSetProvider : RuleSetProvider {
             CompositionLocalAllowlistCheck(config),
             CompositionLocalNamingCheck(config),
             ContentEmitterReturningValuesCheck(config),
+            ContentSlotReusedCheck(config),
             ContentTrailingLambdaCheck(config),
             DefaultsVisibilityCheck(config),
             LambdaParameterEventTrailingCheck(config),

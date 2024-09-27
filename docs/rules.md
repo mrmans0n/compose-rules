@@ -236,6 +236,47 @@ fun Profile(user: User, modifier: Modifier = Modifier) {
 
     :material-chevron-right-box: [compose:content-trailing-lambda](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ContentTrailingLambda.kt) ktlint :material-chevron-right-box: [ContentTrailingLambda](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ContentTrailingLambda.kt) detekt
 
+### Content slots should not be reused in branching code
+
+Content slot parameters should not be disposed and recomposed when the parent composable changes, structurally or visually (changes that are typically due to branching code).
+
+Developers should ensure that the lifecycle of visible slot parameter composables either matches the lifecycle of the composable accepting the slot or is connected to the slot's visibility within the viewport.
+
+To ensure proper behavior, you could either:
+
+- Use `remember { movableContentOf { ... } }` to make sure the content is preserved correctly; or
+- Create a custom layout where the internal state of the slot is preserved.
+
+```kotlin
+// ❌
+@Composable
+fun Avatar(user: User, content: @Composable () -> Unit) {
+    if (user.isFollower) {
+        content()
+    } else {
+        content()
+    }
+}
+
+// ✅
+@Composable
+fun Avatar(user: User, content: @Composable () -> Unit) {
+    val content = remember { movableContentOf { content() } }
+    if (user.isFollower) {
+        content()
+    } else {
+        content()
+    }
+}
+```
+
+More information: [Lifecycle expectations for slot parameters](https://android.googlesource.com/platform/frameworks/support/+/androidx-main/compose/docs/compose-component-api-guidelines.md#lifecycle-expectations-for-slot-parameters)
+
+!!! info ""
+
+    :material-chevron-right-box: [compose:content-slot-reused](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ContentSlotReused.kt) ktlint :material-chevron-right-box: [ContentSlotReused](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ContentSlotReused.kt) detekt
+
+
 ### Avoid using the trailing lambda for event lambdas in UI Composables
 
 In Compose, trailing lambdas in composable functions are typically used for content slots. To avoid confusion and maintain consistency, event lambdas (e.g., `onClick`, `onValueChange`) should generally not be placed in the trailing position.
