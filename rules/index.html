@@ -20,7 +20,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.37">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.38">
     
     
       
@@ -435,6 +435,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#content-slots-should-not-be-reused-in-branching-code" class="md-nav__link">
+    <span class="md-ellipsis">
+      Content slots should not be reused in branching code
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#avoid-using-the-trailing-lambda-for-event-lambdas-in-ui-composables" class="md-nav__link">
     <span class="md-ellipsis">
       Avoid using the trailing lambda for event lambdas in UI Composables
@@ -821,6 +830,15 @@
   <a href="#slots-for-main-content-should-be-the-trailing-lambda" class="md-nav__link">
     <span class="md-ellipsis">
       Slots for main content should be the trailing lambda
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#content-slots-should-not-be-reused-in-branching-code" class="md-nav__link">
+    <span class="md-ellipsis">
+      Content slots should not be reused in branching code
     </span>
   </a>
   
@@ -1283,6 +1301,39 @@ This effectively ties the function to be called from a Column, but is still not 
 </code></pre></div>
 <div class="admonition info">
 <p><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14c1.11 0 2-.89 2-2V5a2 2 0 0 0-2-2M9.71 18l-1.42-1.41L12.88 12 8.29 7.41 9.71 6l6 6z"/></svg></span> <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ContentTrailingLambda.kt">compose:content-trailing-lambda</a> ktlint <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14c1.11 0 2-.89 2-2V5a2 2 0 0 0-2-2M9.71 18l-1.42-1.41L12.88 12 8.29 7.41 9.71 6l6 6z"/></svg></span> <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ContentTrailingLambda.kt">ContentTrailingLambda</a> detekt</p>
+</div>
+<h3 id="content-slots-should-not-be-reused-in-branching-code">Content slots should not be reused in branching code<a class="headerlink" href="#content-slots-should-not-be-reused-in-branching-code" title="Permanent link">&para;</a></h3>
+<p>Content slot parameters should not be disposed and recomposed when the parent composable changes, structurally or visually (changes that are typically due to branching code).</p>
+<p>Developers should ensure that the lifecycle of visible slot parameter composables either matches the lifecycle of the composable accepting the slot or is connected to the slot's visibility within the viewport.</p>
+<p>To ensure proper behavior, you could either:</p>
+<ul>
+<li>Use <code>remember { movableContentOf { ... } }</code> to make sure the content is preserved correctly; or</li>
+<li>Create a custom layout where the internal state of the slot is preserved.</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="c1">// ❌</span>
+<span class="nd">@Composable</span>
+<span class="kd">fun</span><span class="w"> </span><span class="nf">Avatar</span><span class="p">(</span><span class="n">user</span><span class="p">:</span><span class="w"> </span><span class="n">User</span><span class="p">,</span><span class="w"> </span><span class="n">content</span><span class="p">:</span><span class="w"> </span><span class="nd">@Composable</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="kt">Unit</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">user</span><span class="p">.</span><span class="na">isFollower</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">content</span><span class="p">()</span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">content</span><span class="p">()</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// ✅</span>
+<span class="nd">@Composable</span>
+<span class="kd">fun</span><span class="w"> </span><span class="nf">Avatar</span><span class="p">(</span><span class="n">user</span><span class="p">:</span><span class="w"> </span><span class="n">User</span><span class="p">,</span><span class="w"> </span><span class="n">content</span><span class="p">:</span><span class="w"> </span><span class="nd">@Composable</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="kt">Unit</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">content</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">remember</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">movableContentOf</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">content</span><span class="p">()</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">}</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">user</span><span class="p">.</span><span class="na">isFollower</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">content</span><span class="p">()</span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">content</span><span class="p">()</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>More information: <a href="https://android.googlesource.com/platform/frameworks/support/+/androidx-main/compose/docs/compose-component-api-guidelines.md#lifecycle-expectations-for-slot-parameters">Lifecycle expectations for slot parameters</a></p>
+<div class="admonition info">
+<p><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14c1.11 0 2-.89 2-2V5a2 2 0 0 0-2-2M9.71 18l-1.42-1.41L12.88 12 8.29 7.41 9.71 6l6 6z"/></svg></span> <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ContentSlotReused.kt">compose:content-slot-reused</a> ktlint <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14c1.11 0 2-.89 2-2V5a2 2 0 0 0-2-2M9.71 18l-1.42-1.41L12.88 12 8.29 7.41 9.71 6l6 6z"/></svg></span> <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ContentSlotReused.kt">ContentSlotReused</a> detekt</p>
 </div>
 <h3 id="avoid-using-the-trailing-lambda-for-event-lambdas-in-ui-composables">Avoid using the trailing lambda for event lambdas in UI Composables<a class="headerlink" href="#avoid-using-the-trailing-lambda-for-event-lambdas-in-ui-composables" title="Permanent link">&para;</a></h3>
 <p>In Compose, trailing lambdas in composable functions are typically used for content slots. To avoid confusion and maintain consistency, event lambdas (e.g., <code>onClick</code>, <code>onValueChange</code>) should generally not be placed in the trailing position.</p>
