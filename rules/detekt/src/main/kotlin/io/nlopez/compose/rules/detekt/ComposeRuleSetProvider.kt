@@ -38,6 +38,7 @@ class ComposeRuleSetProvider : RuleSetProvider {
             ParameterNamingCheck(config),
             ParameterOrderCheck(config),
             PreviewAnnotationNamingCheck(config),
+            PreviewNamingCheck(config),
             PreviewPublicCheck(config),
             RememberContentMissingCheck(config),
             RememberStateMissingCheck(config),

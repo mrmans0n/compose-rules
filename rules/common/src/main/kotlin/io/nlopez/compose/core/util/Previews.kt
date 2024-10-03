@@ -9,4 +9,4 @@ val KtAnnotated.isPreview: Boolean
     get() = annotationEntries.any { it.isPreviewAnnotation }
 
 val KtAnnotationEntry.isPreviewAnnotation: Boolean
-    get() = calleeExpression?.text?.run { contains("Preview") } == true
+    get() = calleeExpression?.text?.contains("Preview") == true
