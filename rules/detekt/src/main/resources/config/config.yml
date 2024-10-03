@@ -52,7 +52,7 @@ Compose:
   PreviewAnnotationNaming:
     active: true
   PreviewNaming:
-    active: true
+    active: false
   PreviewPublic:
     active: true
   RememberMissing:
