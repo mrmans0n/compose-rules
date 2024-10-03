@@ -16,7 +16,7 @@ class ContentSlotReusedCheck(config: Config) :
     override val issue: Issue = Issue(
         id = "ContentSlotReused",
         severity = Severity.Defect,
-        description = ContentSlotReused.ContentSlotReusedInDifferentBranches,
+        description = ContentSlotReused.ContentSlotsShouldNotBeReused,
         debt = Debt.TEN_MINS,
     )
 }

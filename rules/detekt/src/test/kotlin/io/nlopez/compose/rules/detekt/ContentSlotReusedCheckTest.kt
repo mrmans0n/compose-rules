@@ -19,7 +19,7 @@ class ContentSlotReusedCheckTest {
     private val rule = ContentSlotReusedCheck(testConfig)
 
     @Test
-    fun `errors when there is a slot being reused in different branches`() {
+    fun `errors when there is a slot being reused`() {
         @Language("kotlin")
         val code =
             """
@@ -42,6 +42,11 @@ class ContentSlotReusedCheckTest {
                 fun D(text: String, content: Potato) {
                     potato?.let { content() } ?: content()
                 }
+                @Composable
+                fun E(text: String, content: @Composable () -> Unit) {
+                    val content1 = remember { movableContentOf { content() } }
+                    val content2 = remember { movableContentOf { content() } }
+                }
             """.trimIndent()
 
         val errors = rule.lint(code)
@@ -51,9 +56,45 @@ class ContentSlotReusedCheckTest {
                 SourceLocation(6, 21),
                 SourceLocation(13, 21),
                 SourceLocation(17, 21),
+                SourceLocation(21, 21),
             )
         for (error in errors) {
-            assertThat(error).hasMessage(ContentSlotReused.ContentSlotReusedInDifferentBranches)
+            assertThat(error).hasMessage(ContentSlotReused.ContentSlotsShouldNotBeReused)
+        }
+    }
+
+    @Test
+    fun `errors when there is a nullable slot being reused`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun A(text: String, content: (@Composable () -> Unit)? = null) {
+                    if (x) content?.invoke() else content?.invoke()
+                }
+                @Composable
+                fun B(text: String, content: (@Composable () -> Unit)? = null) {
+                    when {
+                        x -> content?.invoke()
+                        else -> content?.invoke()
+                    }
+                }
+                @Composable
+                fun C(text: String, content: (@Composable () -> Unit)? = null) {
+                    val content1 = remember { movableContentOf { content?.invoke() } }
+                    val content2 = remember { movableContentOf { content?.invoke() } }
+                }
+            """.trimIndent()
+
+        val errors = rule.lint(code)
+        assertThat(errors)
+            .hasStartSourceLocations(
+                SourceLocation(2, 21),
+                SourceLocation(6, 21),
+                SourceLocation(13, 21),
+            )
+        for (error in errors) {
+            assertThat(error).hasMessage(ContentSlotReused.ContentSlotsShouldNotBeReused)
         }
     }
 
