@@ -10,6 +10,7 @@ import io.nlopez.compose.core.util.isPreview
 import org.jetbrains.kotlin.psi.KtFunction
 
 class PreviewNaming : ComposeKtVisitor {
+    override val isOptIn: Boolean = true
 
     override fun visitComposable(function: KtFunction, emitter: Emitter, config: ComposeKtConfig) {
         if (!function.isPreview) return

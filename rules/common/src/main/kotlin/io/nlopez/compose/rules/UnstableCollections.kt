@@ -11,6 +11,7 @@ import org.jetbrains.kotlin.psi.KtFunction
 import java.util.*
 
 class UnstableCollections : ComposeKtVisitor {
+    override val isOptIn: Boolean = true
 
     override fun visitComposable(function: KtFunction, emitter: Emitter, config: ComposeKtConfig) {
         for (param in function.valueParameters.filter { it.isTypeUnstableCollection }) {

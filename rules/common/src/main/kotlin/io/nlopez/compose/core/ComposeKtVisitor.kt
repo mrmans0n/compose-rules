@@ -7,6 +7,8 @@ import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtFunction
 
 interface ComposeKtVisitor {
+    val isOptIn: Boolean
+        get() = false
 
     fun visitFunction(function: KtFunction, emitter: Emitter, config: ComposeKtConfig) {}
 
