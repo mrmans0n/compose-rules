@@ -50,6 +50,7 @@ val KnownUnstableCollectionTypesRegex = sequenceOf(
 fun KtCallableDeclaration.contentSlots(
     treatAsLambdaTypes: Set<String>,
     treatAsComposableLambdaTypes: Set<String>,
-): List<KtParameter> = valueParameters.filter { parameter ->
-    parameter.typeReference?.isComposableLambda(treatAsLambdaTypes, treatAsComposableLambdaTypes) == true
-}
+): Sequence<KtParameter> = valueParameters.asSequence()
+    .filter { parameter ->
+        parameter.typeReference?.isComposableLambda(treatAsLambdaTypes, treatAsComposableLambdaTypes) == true
+    }

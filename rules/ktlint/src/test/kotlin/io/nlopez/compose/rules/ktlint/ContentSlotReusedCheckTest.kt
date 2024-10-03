@@ -13,7 +13,7 @@ class ContentSlotReusedCheckTest {
     private val ruleAssertThat = assertThatRule { ContentSlotReusedCheck() }
 
     @Test
-    fun `errors when there is a slot being reused in different branches`() {
+    fun `errors when there is a slot being reused`() {
         @Language("kotlin")
         val code =
             """
@@ -36,6 +36,11 @@ class ContentSlotReusedCheckTest {
                 fun D(text: String, content: Potato) {
                     potato?.let { content() } ?: content()
                 }
+                @Composable
+                fun E(text: String, content: @Composable () -> Unit) {
+                    val content1 = remember { movableContentOf { content() } }
+                    val content2 = remember { movableContentOf { content() } }
+                }
             """.trimIndent()
 
         ruleAssertThat(code)
@@ -44,22 +49,70 @@ class ContentSlotReusedCheckTest {
                 LintViolation(
                     line = 2,
                     col = 21,
-                    detail = ContentSlotReused.ContentSlotReusedInDifferentBranches,
+                    detail = ContentSlotReused.ContentSlotsShouldNotBeReused,
                 ),
                 LintViolation(
                     line = 6,
                     col = 21,
-                    detail = ContentSlotReused.ContentSlotReusedInDifferentBranches,
+                    detail = ContentSlotReused.ContentSlotsShouldNotBeReused,
                 ),
                 LintViolation(
                     line = 13,
                     col = 21,
-                    detail = ContentSlotReused.ContentSlotReusedInDifferentBranches,
+                    detail = ContentSlotReused.ContentSlotsShouldNotBeReused,
                 ),
                 LintViolation(
                     line = 17,
                     col = 21,
-                    detail = ContentSlotReused.ContentSlotReusedInDifferentBranches,
+                    detail = ContentSlotReused.ContentSlotsShouldNotBeReused,
+                ),
+                LintViolation(
+                    line = 21,
+                    col = 21,
+                    detail = ContentSlotReused.ContentSlotsShouldNotBeReused,
+                ),
+            )
+    }
+
+    @Test
+    fun `errors when there is a nullable slot being reused`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun A(text: String, content: (@Composable () -> Unit)? = null) {
+                    if (x) content?.invoke() else content?.invoke()
+                }
+                @Composable
+                fun B(text: String, content: (@Composable () -> Unit)? = null) {
+                    when {
+                        x -> content?.invoke()
+                        else -> content?.invoke()
+                    }
+                }
+                @Composable
+                fun C(text: String, content: (@Composable () -> Unit)? = null) {
+                    val content1 = remember { movableContentOf { content?.invoke() } }
+                    val content2 = remember { movableContentOf { content?.invoke() } }
+                }
+            """.trimIndent()
+
+        ruleAssertThat(code)
+            .hasLintViolationsWithoutAutoCorrect(
+                LintViolation(
+                    line = 2,
+                    col = 21,
+                    detail = ContentSlotReused.ContentSlotsShouldNotBeReused,
+                ),
+                LintViolation(
+                    line = 6,
+                    col = 21,
+                    detail = ContentSlotReused.ContentSlotsShouldNotBeReused,
+                ),
+                LintViolation(
+                    line = 13,
+                    col = 21,
+                    detail = ContentSlotReused.ContentSlotsShouldNotBeReused,
                 ),
             )
     }
