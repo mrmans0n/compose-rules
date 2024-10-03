@@ -69,20 +69,24 @@ class ContentSlotReusedCheckTest {
         val code =
             """
                 @Composable
-                fun A(text: String, content: (@Composable () -> Unit)? = null) {
+                fun A(text: String, content: @Composable (() -> Unit)? = null) {
                     if (x) content?.invoke() else content?.invoke()
                 }
                 @Composable
-                fun B(text: String, content: (@Composable () -> Unit)? = null) {
+                fun B(text: String, content: @Composable (() -> Unit)? = null) {
                     when {
                         x -> content?.invoke()
                         else -> content?.invoke()
                     }
                 }
                 @Composable
-                fun C(text: String, content: (@Composable () -> Unit)? = null) {
+                fun C(text: String, content: @Composable (() -> Unit)? = null) {
                     val content1 = remember { movableContentOf { content?.invoke() } }
                     val content2 = remember { movableContentOf { content?.invoke() } }
+                }
+                @Composable
+                fun D(content: Potato? = null) {
+                    if (x) content?.invoke() else content?.invoke()
                 }
             """.trimIndent()
 
@@ -92,6 +96,7 @@ class ContentSlotReusedCheckTest {
                 SourceLocation(2, 21),
                 SourceLocation(6, 21),
                 SourceLocation(13, 21),
+                SourceLocation(18, 7),
             )
         for (error in errors) {
             assertThat(error).hasMessage(ContentSlotReused.ContentSlotsShouldNotBeReused)
@@ -125,6 +130,14 @@ class ContentSlotReusedCheckTest {
                 }
                 fun B(content: Plum, text: String) {
                     if (x) content() else content()
+                }
+                @Composable
+                fun C(content: (() -> Unit)? = null) {
+                    if (x) content?.invoke() else content?.invoke()
+                }
+                @Composable
+                fun D(content: Plum? = null) {
+                    if (x) content?.invoke() else content?.invoke()
                 }
             """.trimIndent()
 

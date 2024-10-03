@@ -30,7 +30,8 @@ fun KtTypeReference.isComposableLambda(
     null -> false
     is KtFunctionType -> isComposable
     is KtNullableType -> (isComposable && element.isLambda(treatAsLambdaTypes)) ||
-        element.innerType?.isLambda(treatAsComposableLambdaTypes) == true
+        // Only possibility for this to not have a @Composable annotation is for it to be a KtUserType
+        (element.innerType as? KtUserType)?.referencedName in treatAsComposableLambdaTypes
 
     is KtUserType -> (isComposable && element.referencedName in treatAsLambdaTypes) ||
         element.referencedName in treatAsComposableLambdaTypes
