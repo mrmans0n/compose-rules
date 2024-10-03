@@ -130,9 +130,10 @@ compose_check_modifiers_for_visibility = only_public
 ```
 
 Possible values are:
-* `only_public`: (default) Will check for missing modifiers only for public composables.
-* `public_and_internal`: Will check for missing modifiers in both public and internal composables.
-* `all`: Will check for missing modifiers in all composables.
+
+- `only_public`: (default) Will check for missing modifiers only for public composables.
+- `public_and_internal`: Will check for missing modifiers in both public and internal composables.
+- `all`: Will check for missing modifiers in all composables.
 
 ### Configure custom Modifier names
 
@@ -200,6 +201,7 @@ compose_preview_naming_strategy = suffix
 ```
 
 Possible values of `compose_preview_naming_strategy` are:
+
 - `suffix`: Previews should have `Preview` as suffix.
 - `prefix`: Previews should have `Preview` as prefix.
 - `anywhere`: Previews should contain `Preview` in their names.
