@@ -884,10 +884,12 @@ compose_allowed_forwarding_of_types = .*MyViewModel,PotatoViewModel
 <div class="highlight"><pre><span></span><code>[*.{kt,kts}]
 compose_check_modifiers_for_visibility = only_public
 </code></pre></div>
-<p>Possible values are:
-* <code>only_public</code>: (default) Will check for missing modifiers only for public composables.
-* <code>public_and_internal</code>: Will check for missing modifiers in both public and internal composables.
-* <code>all</code>: Will check for missing modifiers in all composables.</p>
+<p>Possible values are:</p>
+<ul>
+<li><code>only_public</code>: (default) Will check for missing modifiers only for public composables.</li>
+<li><code>public_and_internal</code>: Will check for missing modifiers in both public and internal composables.</li>
+<li><code>all</code>: Will check for missing modifiers in all composables.</li>
+</ul>
 <h3 id="configure-custom-modifier-names">Configure custom Modifier names<a class="headerlink" href="#configure-custom-modifier-names" title="Permanent link">&para;</a></h3>
 <p>Most of the modifier-related rules will look for modifiers based their type: either Modifier or GlanceModifier type. Some libraries might add their own flavor of Modifier to the mix, and it might make sense to enforce the same rules we have for the other default modifiers. To support that, you can configure this in your <code>.editorconfig</code> file:</p>
 <div class="highlight"><pre><span></span><code>[*.{kt,kts}]
@@ -925,10 +927,12 @@ compose_disallow_unstable_collections = true
 compose_preview_naming_enabled = true
 compose_preview_naming_strategy = suffix
 </code></pre></div>
-<p>Possible values of <code>compose_preview_naming_strategy</code> are:
-- <code>suffix</code>: Previews should have <code>Preview</code> as suffix.
-- <code>prefix</code>: Previews should have <code>Preview</code> as prefix.
-- <code>anywhere</code>: Previews should contain <code>Preview</code> in their names.</p>
+<p>Possible values of <code>compose_preview_naming_strategy</code> are:</p>
+<ul>
+<li><code>suffix</code>: Previews should have <code>Preview</code> as suffix.</li>
+<li><code>prefix</code>: Previews should have <code>Preview</code> as prefix.</li>
+<li><code>anywhere</code>: Previews should contain <code>Preview</code> in their names.</li>
+</ul>
 <h3 id="disable-standardfunction-naming-rule-for-composable">Disable <code>standard:function-naming</code> rule for Composable<a class="headerlink" href="#disable-standardfunction-naming-rule-for-composable" title="Permanent link">&para;</a></h3>
 <p>The function name for a Composable starts with an uppercase. This causes the ktlint rule <code>standard:function-naming</code> to report a violation. This rule can be configured to ignore Composable functions in your <code>.editorconfig</code> file:</p>
 <div class="highlight"><pre><span></span><code>[*.{kt,kts}]
