@@ -125,6 +125,11 @@ Compose:
     # treatAsLambda: MyLambdaType
   PreviewAnnotationNaming:
     active: true
+  PreviewNaming:
+    active: false # Opt-in, disabled by default.
+    # -- You can optionally configure the naming strategy for previews.
+    # -- Possible values are: `suffix`, `prefix`, `anywhere`. By default, it will be `suffix`.
+    # previewNamingStrategy: suffix
   PreviewPublic:
     active: true
   RememberMissing:

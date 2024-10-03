@@ -645,7 +645,9 @@ More info: [Compose Component API Guidelines](https://github.com/androidx/androi
 
 ## Opt-in rules
 
-> **Note**: These rules are disabled by default, you'll need to explicitly enable them individually in detekt/ktlint.
+!!! note "These rules are disabled by default"
+
+    You'll need to explicitly enable them individually in your project's detekt/ktlint configuration.
 
 ### Don't use Material 2
 
@@ -661,7 +663,9 @@ More info: [Migration to Material 3](https://developer.android.com/develop/ui/co
 
 ### Avoid using unstable collections
 
-> **Note**: This rule will become unnecessary from the Compose version where strong skipping is enabled by default.
+!!! tip "Did you know?"
+
+    You can add the kotlin collections to your stability configuration (`kotlin.collections.*`) to make this rule unnecessary.
 
 Collections are defined as interfaces (e.g. `List<T>`, `Map<T>`, `Set<T>`) in Kotlin, which can't guarantee that they are actually immutable. For example, you could write:
 
@@ -697,3 +701,19 @@ More info: [Jetpack Compose Stability Explained](https://medium.com/androiddevel
 !!! info ""
 
     :material-chevron-right-box: [compose:unstable-collections](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/UnstableCollections.kt) ktlint :material-chevron-right-box: [UnstableCollections](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/UnstableCollections.kt) detekt
+
+### Naming previews properly
+
+You can configure the naming strategy for previews, so that they follow your project's naming conventions.
+
+By default, enabling this rule will make sure that previews use `Preview` as suffix.
+
+In case you want to change this, you can configure the `previewNamingStrategy` property to one of the following values:
+
+- `suffix`: Previews should have `Preview` as suffix.
+- `prefix`: Previews should have `Preview` as prefix.
+- `anywhere`: Previews should contain `Preview` in their names.
+
+!!! info ""
+
+    :material-chevron-right-box: [compose:preview-naming](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/PreviewNamign.kt) ktlint :material-chevron-right-box: [PreviewNaming](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/PreviewNaming.kt) detekt

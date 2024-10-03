@@ -51,6 +51,8 @@ Compose:
     active: true
   PreviewAnnotationNaming:
     active: true
+  PreviewNaming:
+    active: true
   PreviewPublic:
     active: true
   RememberMissing:

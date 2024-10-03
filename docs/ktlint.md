@@ -189,6 +189,21 @@ The `unstable-collections` rule will flag any usage of any unstable collection (
 compose_disallow_unstable_collections = true
 ```
 
+### Enabling and configuring the preview naming detector
+
+If you want to enforce a naming strategy for previews, you can enable the `compose:preview-naming` rule and configure the `compose_preview_naming_strategy` property in your `.editorconfig` file:
+
+```editorconfig
+[*.{kt,kts}]
+compose_preview_naming_enabled = true
+compose_preview_naming_strategy = suffix
+```
+
+Possible values of `compose_preview_naming_strategy` are:
+- `suffix`: Previews should have `Preview` as suffix.
+- `prefix`: Previews should have `Preview` as prefix.
+- `anywhere`: Previews should contain `Preview` in their names.
+
 ### Disable `standard:function-naming` rule for Composable
 
 The function name for a Composable starts with an uppercase. This causes the ktlint rule `standard:function-naming` to report a violation. This rule can be configured to ignore Composable functions in your `.editorconfig` file:

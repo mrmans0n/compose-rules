@@ -284,3 +284,32 @@ val modifierMissingIgnoreAnnotated: EditorConfigProperty<String> =
             }
         },
     )
+
+val composePreviewNamingEnabled: EditorConfigProperty<Boolean> =
+    EditorConfigProperty(
+        type = PropertyType.LowerCasingPropertyType(
+            "compose_preview_naming_enabled",
+            "When enabled, preview composables should follow the configured naming strategy.",
+            PropertyValueParser.BOOLEAN_VALUE_PARSER,
+            setOf(true.toString(), false.toString()),
+        ),
+        defaultValue = false,
+    )
+
+val composePreviewNamingStrategy: EditorConfigProperty<String> =
+    EditorConfigProperty(
+        type = PropertyType.LowerCasingPropertyType(
+            "compose_preview_naming_strategy",
+            "The naming strategy for preview composables.",
+            PropertyValueParser.IDENTITY_VALUE_PARSER,
+            emptySet(),
+        ),
+        defaultValue = "suffix",
+        propertyMapper = { property, _ ->
+            when {
+                property?.isUnset == true -> ""
+                property?.getValueAs<String>() != null -> property.getValueAs<String>()
+                else -> property?.getValueAs()
+            }
+        },
+    )
