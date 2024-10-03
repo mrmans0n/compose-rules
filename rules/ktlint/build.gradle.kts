@@ -32,4 +32,5 @@ dependencies {
     testImplementation(libs.junit5.params)
     testImplementation(libs.assertj)
     testImplementation(libs.reflections)
+    testImplementation(libs.konsist)
 }

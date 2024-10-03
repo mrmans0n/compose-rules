@@ -6,11 +6,17 @@ import com.charleskorn.kaml.Yaml
 import com.charleskorn.kaml.YamlMap
 import com.charleskorn.kaml.YamlScalar
 import com.charleskorn.kaml.yamlMap
+import com.lemonappdev.konsist.api.Konsist
+import com.lemonappdev.konsist.api.ext.list.withAllParentsOf
+import com.lemonappdev.konsist.api.verify.assertTrue
 import io.gitlab.arturbosch.detekt.api.Config
+import io.nlopez.compose.core.ComposeKtVisitor
 import io.nlopez.compose.rules.DetektRule
 import org.assertj.core.api.AssertionsForInterfaceTypes.assertThat
 import org.junit.jupiter.api.Test
 import org.reflections.Reflections
+import org.reflections.scanners.Scanners
+import org.reflections.util.ConfigurationBuilder
 import java.io.File
 
 class ComposeRuleSetProviderTest {
@@ -89,5 +95,34 @@ class ComposeRuleSetProviderTest {
                 .describedAs { "Rule $key must be active: $shouldBeActive in the config" }
                 .isEqualTo(shouldBeActive)
         }
+    }
+
+    @Test
+    fun `ensure all available rules have a detekt rule`() {
+        val detektRulesReflections = Reflections(ruleSetProvider.javaClass.packageName)
+        val detektRuleNames = detektRulesReflections.getSubTypesOf(DetektRule::class.java).map { it.simpleName }
+
+        val commonRulesReflections = Reflections(
+            ConfigurationBuilder()
+                .setClassLoaders(arrayOf(ComposeKtVisitor::class.java.classLoader))
+                .setScanners(Scanners.SubTypes),
+        )
+        val ruleNames = commonRulesReflections.getSubTypesOf(ComposeKtVisitor::class.java).map { it.simpleName }
+
+        for (ruleName in ruleNames) {
+            assertThat(detektRuleNames)
+                .describedAs { "$ruleName should have a detekt rule named ${ruleName}Check" }
+                .contains("${ruleName}Check")
+        }
+    }
+
+    @Test
+    fun `ensure all detekt rules have a unit test`() {
+        Konsist.scopeFromProduction()
+            .classes()
+            .withAllParentsOf(DetektRule::class)
+            .assertTrue { clazz ->
+                clazz.testClasses { it.hasNameContaining(clazz.name) }.isNotEmpty()
+            }
     }
 }
