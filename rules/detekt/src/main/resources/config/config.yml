@@ -11,7 +11,7 @@ Compose:
     active: true
   ContentEmitterReturningValues:
     active: true
-  ContentSlotReusedCheck:
+  ContentSlotReused:
     active: true
   ContentTrailingLambda:
     active: true

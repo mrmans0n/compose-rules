@@ -16,6 +16,8 @@ detekt-test = { module = "io.gitlab.arturbosch.detekt:detekt-test", version.ref 
 
 kotlin-compiler = { module = "org.jetbrains.kotlin:kotlin-compiler-embeddable", version.ref = "kotlin" }
 
+kaml = "com.charleskorn.kaml:kaml:0.61.0"
+
 junit5 = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
 junit5-params = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "junit" }
 assertj = "org.assertj:assertj-core:3.26.3"
@@ -23,6 +25,7 @@ reflections = "org.reflections:reflections:0.10.2"
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 mavenPublish = "com.vanniktech.maven.publish:0.29.0"
 spotless = { id = "com.diffplug.spotless", version = "6.25.0" }
 shadowJar = { id = "com.github.johnrengelman.shadow", version = "8.1.1" }

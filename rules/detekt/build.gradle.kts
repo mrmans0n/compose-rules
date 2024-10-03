@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 plugins {
     alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.shadowJar)
 }
 
@@ -31,4 +32,5 @@ dependencies {
     testImplementation(libs.junit5.params)
     testImplementation(libs.assertj)
     testImplementation(libs.reflections)
+    testImplementation(libs.kaml)
 }
