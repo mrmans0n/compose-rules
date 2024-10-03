@@ -472,6 +472,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#enabling-and-configuring-the-preview-naming-detector" class="md-nav__link">
+    <span class="md-ellipsis">
+      Enabling and configuring the preview naming detector
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#disable-standardfunction-naming-rule-for-composable" class="md-nav__link">
     <span class="md-ellipsis">
       Disable standard:function-naming rule for Composable
@@ -748,6 +757,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#enabling-and-configuring-the-preview-naming-detector" class="md-nav__link">
+    <span class="md-ellipsis">
+      Enabling and configuring the preview naming detector
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#disable-standardfunction-naming-rule-for-composable" class="md-nav__link">
     <span class="md-ellipsis">
       Disable standard:function-naming rule for Composable
@@ -901,6 +919,16 @@ compose_allowed_from_m2 = icons.filled,Button
 <div class="highlight"><pre><span></span><code>[*.{kt,kts}]
 compose_disallow_unstable_collections = true
 </code></pre></div>
+<h3 id="enabling-and-configuring-the-preview-naming-detector">Enabling and configuring the preview naming detector<a class="headerlink" href="#enabling-and-configuring-the-preview-naming-detector" title="Permanent link">&para;</a></h3>
+<p>If you want to enforce a naming strategy for previews, you can enable the <code>compose:preview-naming</code> rule and configure the <code>compose_preview_naming_strategy</code> property in your <code>.editorconfig</code> file:</p>
+<div class="highlight"><pre><span></span><code>[*.{kt,kts}]
+compose_preview_naming_enabled = true
+compose_preview_naming_strategy = suffix
+</code></pre></div>
+<p>Possible values of <code>compose_preview_naming_strategy</code> are:
+- <code>suffix</code>: Previews should have <code>Preview</code> as suffix.
+- <code>prefix</code>: Previews should have <code>Preview</code> as prefix.
+- <code>anywhere</code>: Previews should contain <code>Preview</code> in their names.</p>
 <h3 id="disable-standardfunction-naming-rule-for-composable">Disable <code>standard:function-naming</code> rule for Composable<a class="headerlink" href="#disable-standardfunction-naming-rule-for-composable" title="Permanent link">&para;</a></h3>
 <p>The function name for a Composable starts with an uppercase. This causes the ktlint rule <code>standard:function-naming</code> to report a violation. This rule can be configured to ignore Composable functions in your <code>.editorconfig</code> file:</p>
 <div class="highlight"><pre><span></span><code>[*.{kt,kts}]

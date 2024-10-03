@@ -692,6 +692,15 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#naming-previews-properly" class="md-nav__link">
+    <span class="md-ellipsis">
+      Naming previews properly
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1088,6 +1097,15 @@
   <a href="#avoid-using-unstable-collections" class="md-nav__link">
     <span class="md-ellipsis">
       Avoid using unstable collections
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#naming-previews-properly" class="md-nav__link">
+    <span class="md-ellipsis">
+      Naming previews properly
     </span>
   </a>
   
@@ -1601,9 +1619,10 @@ This is not recommended. Instead, the provided modifier should only be used on t
 <p><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14c1.11 0 2-.89 2-2V5a2 2 0 0 0-2-2M9.71 18l-1.42-1.41L12.88 12 8.29 7.41 9.71 6l6 6z"/></svg></span> <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/DefaultsVisibility.kt">compose:defaults-visibility</a> ktlint <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14c1.11 0 2-.89 2-2V5a2 2 0 0 0-2-2M9.71 18l-1.42-1.41L12.88 12 8.29 7.41 9.71 6l6 6z"/></svg></span> <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/DefaultsVisibility.kt">DefaultsVisibility</a> detekt</p>
 </div>
 <h2 id="opt-in-rules">Opt-in rules<a class="headerlink" href="#opt-in-rules" title="Permanent link">&para;</a></h2>
-<blockquote>
-<p><strong>Note</strong>: These rules are disabled by default, you'll need to explicitly enable them individually in detekt/ktlint.</p>
-</blockquote>
+<div class="admonition note">
+<p class="admonition-title">These rules are disabled by default</p>
+<p>You'll need to explicitly enable them individually in your project's detekt/ktlint configuration.</p>
+</div>
 <h3 id="dont-use-material-2">Don't use Material 2<a class="headerlink" href="#dont-use-material-2" title="Permanent link">&para;</a></h3>
 <p>Material Design 3 is the next evolution of Material Design. It includes updated theming, components, and Material You personalization features like dynamic color. It supersedes Material 2, and using Material 3 usage is recommended instead of Material 2.</p>
 <p>Enabling: <a href="https://mrmans0n.github.io/compose-rules/ktlint/#enabling-the-material-2-detector">ktlint</a>, <a href="https://mrmans0n.github.io/compose-rules/detekt/#enabling-rules">detekt</a></p>
@@ -1612,9 +1631,10 @@ This is not recommended. Instead, the provided modifier should only be used on t
 <p><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14c1.11 0 2-.89 2-2V5a2 2 0 0 0-2-2M9.71 18l-1.42-1.41L12.88 12 8.29 7.41 9.71 6l6 6z"/></svg></span> <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/Material2.kt">compose:material-two</a> ktlint <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14c1.11 0 2-.89 2-2V5a2 2 0 0 0-2-2M9.71 18l-1.42-1.41L12.88 12 8.29 7.41 9.71 6l6 6z"/></svg></span> <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/Material2.kt">Material2</a> detekt</p>
 </div>
 <h3 id="avoid-using-unstable-collections">Avoid using unstable collections<a class="headerlink" href="#avoid-using-unstable-collections" title="Permanent link">&para;</a></h3>
-<blockquote>
-<p><strong>Note</strong>: This rule will become unnecessary from the Compose version where strong skipping is enabled by default.</p>
-</blockquote>
+<div class="admonition tip">
+<p class="admonition-title">Did you know?</p>
+<p>You can add the kotlin collections to your stability configuration (<code>kotlin.collections.*</code>) to make this rule unnecessary.</p>
+</div>
 <p>Collections are defined as interfaces (e.g. <code>List&lt;T&gt;</code>, <code>Map&lt;T&gt;</code>, <code>Set&lt;T&gt;</code>) in Kotlin, which can't guarantee that they are actually immutable. For example, you could write:</p>
 <div class="highlight"><pre><span></span><code><span class="c1">// ❌ The compiler won&#39;t be able to infer that the list is immutable</span>
 <span class="kd">val</span><span class="w"> </span><span class="nv">list</span><span class="p">:</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mutableListOf</span><span class="p">()</span>
@@ -1638,6 +1658,18 @@ This is not recommended. Instead, the provided modifier should only be used on t
 <p>More info: <a href="https://medium.com/androiddevelopers/jetpack-compose-stability-explained-79c10db270c8">Jetpack Compose Stability Explained</a>, <a href="https://github.com/Kotlin/kotlinx.collections.immutable">Kotlinx Immutable Collections</a></p>
 <div class="admonition info">
 <p><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14c1.11 0 2-.89 2-2V5a2 2 0 0 0-2-2M9.71 18l-1.42-1.41L12.88 12 8.29 7.41 9.71 6l6 6z"/></svg></span> <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/UnstableCollections.kt">compose:unstable-collections</a> ktlint <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14c1.11 0 2-.89 2-2V5a2 2 0 0 0-2-2M9.71 18l-1.42-1.41L12.88 12 8.29 7.41 9.71 6l6 6z"/></svg></span> <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/UnstableCollections.kt">UnstableCollections</a> detekt</p>
+</div>
+<h3 id="naming-previews-properly">Naming previews properly<a class="headerlink" href="#naming-previews-properly" title="Permanent link">&para;</a></h3>
+<p>You can configure the naming strategy for previews, so that they follow your project's naming conventions.</p>
+<p>By default, enabling this rule will make sure that previews use <code>Preview</code> as suffix.</p>
+<p>In case you want to change this, you can configure the <code>previewNamingStrategy</code> property to one of the following values:</p>
+<ul>
+<li><code>suffix</code>: Previews should have <code>Preview</code> as suffix.</li>
+<li><code>prefix</code>: Previews should have <code>Preview</code> as prefix.</li>
+<li><code>anywhere</code>: Previews should contain <code>Preview</code> in their names.</li>
+</ul>
+<div class="admonition info">
+<p><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14c1.11 0 2-.89 2-2V5a2 2 0 0 0-2-2M9.71 18l-1.42-1.41L12.88 12 8.29 7.41 9.71 6l6 6z"/></svg></span> <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/PreviewNamign.kt">compose:preview-naming</a> ktlint <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14c1.11 0 2-.89 2-2V5a2 2 0 0 0-2-2M9.71 18l-1.42-1.41L12.88 12 8.29 7.41 9.71 6l6 6z"/></svg></span> <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/PreviewNaming.kt">PreviewNaming</a> detekt</p>
 </div>
 
 
