@@ -1,0 +1,38 @@
+package io.nlopez.compose.rules.ktlint
+
+import com.pinterest.ktlint.test.KtLintAssertThat.Companion.assertThatRule
+import com.pinterest.ktlint.test.LintViolation
+import io.nlopez.compose.rules.${ruleName}
+import org.intellij.lang.annotations.Language
+import org.junit.jupiter.api.Test
+
+class ${ktlintRuleName}Test {
+
+    private val ruleAssertThat = assertThatRule { ${ktlintRuleName}() }
+
+    @Test
+    fun `errors for X case`() {
+        @Language("kotlin")
+        val code =
+            """
+            TODO()
+            """.trimIndent()
+        ruleAssertThat(code).hasLintViolationsWithoutAutoCorrect(
+            LintViolation(
+                line = 2,
+                col = 5,
+                detail = ${ruleName}.${ruleName}ErrorMessage,
+            ),
+        )
+    }
+
+    @Test
+    fun `passes for X case`() {
+        @Language("kotlin")
+        val code =
+            """
+            TODO()
+            """.trimIndent()
+        ruleAssertThat(code).hasNoLintViolations()
+    }
+}
