@@ -1,0 +1,9 @@
+package io.nlopez.compose.rules.ktlint
+
+import io.nlopez.compose.core.ComposeKtVisitor
+import io.nlopez.compose.rules.${ruleName}
+import io.nlopez.compose.rules.KtlintRule
+
+class ${ruleName} :
+    KtlintRule("compose:${ktlintRuleId}"),
+    ComposeKtVisitor by ${ruleName}()

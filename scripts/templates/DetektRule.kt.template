@@ -1,0 +1,21 @@
+package io.nlopez.compose.rules.detekt
+
+import io.gitlab.arturbosch.detekt.api.Config
+import io.gitlab.arturbosch.detekt.api.Debt
+import io.gitlab.arturbosch.detekt.api.Issue
+import io.gitlab.arturbosch.detekt.api.Severity
+import io.nlopez.compose.core.ComposeKtVisitor
+import io.nlopez.compose.rules.${ruleName}
+import io.nlopez.compose.rules.DetektRule
+
+class ${detektRuleName}(config: Config) :
+    DetektRule(config),
+    ComposeKtVisitor by ${ruleName}() {
+
+    override val issue: Issue = Issue(
+        id = "${ruleName}",
+        severity = Severity.CodeSmell,
+        description = ${ruleName}.${ruleName}ErrorMessage,
+        debt = Debt.FIVE_MINS,
+    )
+}

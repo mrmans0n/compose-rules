@@ -1,0 +1,14 @@
+package io.nlopez.compose.rules
+
+import io.nlopez.compose.core.ComposeKtVisitor
+
+class ${ruleName} : ComposeKtVisitor {
+
+    companion object {
+        val ${ruleName}ErrorMessage = """
+            TODO
+
+            See https://mrmans0n.github.io/compose-rules/rules/#TODO for more information.
+        """.trimIndent()
+    }
+}
