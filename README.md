@@ -1,5 +1,6 @@
 ![Compose Rules](art/logo.webp)
 
+
 # The Jetpack Compose Rules - Static analysis of @Composable functions for ktlint and detekt
 
 [![Build & test](https://github.com/mrmans0n/compose-rules/actions/workflows/build.yaml/badge.svg?branch=main)](https://github.com/mrmans0n/compose-rules/actions/workflows/build.yaml?query=branch%3Amain)
