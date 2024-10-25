@@ -37,6 +37,19 @@ ktlint -R ktlint-compose-<VERSION>-all.jar
 
 You can use this same [uber jar from the releases page](https://github.com/mrmans0n/compose-rules/releases/) with the [ktlint IntelliJ plugin](https://plugins.jetbrains.com/plugin/15057-ktlint) if the rules are compiled against the same ktlint version used for that release. You can configure the custom ruleset in the preferences page of the plugin.
 
+## Supported versions matrix
+
+| Version                    | Ktlint version | Kotlin (Syntax) |
+|----------------------------|----------------|-----------------|
+| 0.4.17+ (SNAPSHOT for now) | 1.4.0          | 2.0.21          |
+| 0.4.12+                    | 1.3.1          | 2.0.20          |
+| 0.4.6+                     | 1.3.1          | 2.0.0           |
+| 0.4.5                      | 1.3.0          | 2.0.0           |
+| 0.3.12+                    | 1.2.1          | 1.9.23          |
+| 0.3.9+                     | 1.1.1          | 1.9.22          |
+
+Older version support can be found in the [release notes](https://github.com/mrmans0n/compose-rules/releases).
+
 ## Configuring rules
 
 ### Providing custom content emitters

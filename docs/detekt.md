@@ -6,7 +6,18 @@ dependencies {
 }
 ```
 
-### Using with detekt CLI / detekt IDE plugin
+## Supported versions matrix
+
+| Version | Detekt version | Kotlin (Syntax) |
+|---------|----------------|-----------------|
+| 0.4.16+ | 1.23.7         | 2.0.21          |
+| 0.4.12+ | 1.23.7         | 2.0.20          |
+| 0.4.2+  | 1.23.6         | 2.0.0           |
+| 0.3.13+ | 1.23.6         | 1.9.23          |
+
+Older version support can be found in the [release notes](https://github.com/mrmans0n/compose-rules/releases).
+
+## Using with detekt CLI / detekt IDE plugin
 
 The [releases](https://github.com/mrmans0n/compose-rules/releases) page contains an [uber jar](https://stackoverflow.com/questions/11947037/what-is-an-uber-jar) for each version release that can be used to run with the [CLI version of detekt](https://detekt.dev/docs/gettingstarted/cli).
 
@@ -16,7 +27,7 @@ detekt -p detekt-compose-<VERSION>-all.jar -c your/config/detekt.yml
 
 For the IDE plugin, you'll need to add the uber jar to the list of custom plugins in its configuration, and don't forget to also enable the rules in the yml config provided to the plugin for it to work.
 
-### Enabling rules
+## Enabling rules
 
 For the rules to be picked up, you will need to enable them in your `detekt.yml` configuration file.
 
@@ -153,7 +164,7 @@ Compose:
 ```
 
 
-### Disabling a specific rule
+## Disabling a specific rule
 
 To disable a rule you have to follow the [instructions from the detekt documentation](https://detekt.dev/docs/introduction/suppressing-rules), and use the id of the rule you want to disable.
 
