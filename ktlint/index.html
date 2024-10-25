@@ -355,6 +355,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#supported-versions-matrix" class="md-nav__link">
+    <span class="md-ellipsis">
+      Supported versions matrix
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#configuring-rules" class="md-nav__link">
     <span class="md-ellipsis">
       Configuring rules
@@ -640,6 +649,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#supported-versions-matrix" class="md-nav__link">
+    <span class="md-ellipsis">
+      Supported versions matrix
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#configuring-rules" class="md-nav__link">
     <span class="md-ellipsis">
       Configuring rules
@@ -861,6 +879,49 @@
 <div class="highlight"><pre><span></span><code>ktlint<span class="w"> </span>-R<span class="w"> </span>ktlint-compose-&lt;VERSION&gt;-all.jar
 </code></pre></div></p>
 <p>You can use this same <a href="https://github.com/mrmans0n/compose-rules/releases/">uber jar from the releases page</a> with the <a href="https://plugins.jetbrains.com/plugin/15057-ktlint">ktlint IntelliJ plugin</a> if the rules are compiled against the same ktlint version used for that release. You can configure the custom ruleset in the preferences page of the plugin.</p>
+<h2 id="supported-versions-matrix">Supported versions matrix<a class="headerlink" href="#supported-versions-matrix" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Version</th>
+<th>Ktlint version</th>
+<th>Kotlin (Syntax)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0.4.17+ (SNAPSHOT for now)</td>
+<td>1.4.0</td>
+<td>2.0.21</td>
+</tr>
+<tr>
+<td>0.4.12+</td>
+<td>1.3.1</td>
+<td>2.0.20</td>
+</tr>
+<tr>
+<td>0.4.6+</td>
+<td>1.3.1</td>
+<td>2.0.0</td>
+</tr>
+<tr>
+<td>0.4.5</td>
+<td>1.3.0</td>
+<td>2.0.0</td>
+</tr>
+<tr>
+<td>0.3.12+</td>
+<td>1.2.1</td>
+<td>1.9.23</td>
+</tr>
+<tr>
+<td>0.3.9+</td>
+<td>1.1.1</td>
+<td>1.9.22</td>
+</tr>
+</tbody>
+</table>
+<p>Older version support can be found in the <a href="https://github.com/mrmans0n/compose-rules/releases">release notes</a>.</p>
 <h2 id="configuring-rules">Configuring rules<a class="headerlink" href="#configuring-rules" title="Permanent link">&para;</a></h2>
 <h3 id="providing-custom-content-emitters">Providing custom content emitters<a class="headerlink" href="#providing-custom-content-emitters" title="Permanent link">&para;</a></h3>
 <p>There are some rules (<code>compose:content-emitter-returning-values-check</code>, <code>compose:modifier-not-used-at-root</code> and <code>compose:multiple-emitters-check</code>) that use predefined list of known composables that emit content. But you can add your own too! In your <code>.editorconfig</code> file, you'll need to add a <code>compose_content_emitters</code> property followed by a list of composable names separated by commas. You would typically want the composables that are part of your custom design system to be in this list.</p>

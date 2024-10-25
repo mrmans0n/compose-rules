@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#using-with-detekt-cli-detekt-ide-plugin" class="md-skip">
+        <a href="#supported-versions-matrix" class="md-skip">
           Skip to content
         </a>
       
@@ -339,6 +339,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#supported-versions-matrix" class="md-nav__link">
+    <span class="md-ellipsis">
+      Supported versions matrix
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#using-with-detekt-cli-detekt-ide-plugin" class="md-nav__link">
     <span class="md-ellipsis">
       Using with detekt CLI / detekt IDE plugin
@@ -418,6 +427,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#supported-versions-matrix" class="md-nav__link">
+    <span class="md-ellipsis">
+      Supported versions matrix
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#using-with-detekt-cli-detekt-ide-plugin" class="md-nav__link">
     <span class="md-ellipsis">
       Using with detekt CLI / detekt IDE plugin
@@ -469,12 +487,45 @@
 <span class="w">    </span><span class="n">detektPlugins</span><span class="w"> </span><span class="s2">&quot;io.nlopez.compose.rules:detekt:&lt;VERSION&gt;&quot;</span>
 <span class="o">}</span>
 </code></pre></div>
-<h3 id="using-with-detekt-cli-detekt-ide-plugin">Using with detekt CLI / detekt IDE plugin<a class="headerlink" href="#using-with-detekt-cli-detekt-ide-plugin" title="Permanent link">&para;</a></h3>
+<h2 id="supported-versions-matrix">Supported versions matrix<a class="headerlink" href="#supported-versions-matrix" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Version</th>
+<th>Detekt version</th>
+<th>Kotlin (Syntax)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0.4.16+</td>
+<td>1.23.7</td>
+<td>2.0.21</td>
+</tr>
+<tr>
+<td>0.4.12+</td>
+<td>1.23.7</td>
+<td>2.0.20</td>
+</tr>
+<tr>
+<td>0.4.2+</td>
+<td>1.23.6</td>
+<td>2.0.0</td>
+</tr>
+<tr>
+<td>0.3.13+</td>
+<td>1.23.6</td>
+<td>1.9.23</td>
+</tr>
+</tbody>
+</table>
+<p>Older version support can be found in the <a href="https://github.com/mrmans0n/compose-rules/releases">release notes</a>.</p>
+<h2 id="using-with-detekt-cli-detekt-ide-plugin">Using with detekt CLI / detekt IDE plugin<a class="headerlink" href="#using-with-detekt-cli-detekt-ide-plugin" title="Permanent link">&para;</a></h2>
 <p>The <a href="https://github.com/mrmans0n/compose-rules/releases">releases</a> page contains an <a href="https://stackoverflow.com/questions/11947037/what-is-an-uber-jar">uber jar</a> for each version release that can be used to run with the <a href="https://detekt.dev/docs/gettingstarted/cli">CLI version of detekt</a>.</p>
 <div class="highlight"><pre><span></span><code>detekt<span class="w"> </span>-p<span class="w"> </span>detekt-compose-&lt;VERSION&gt;-all.jar<span class="w"> </span>-c<span class="w"> </span>your/config/detekt.yml
 </code></pre></div>
 <p>For the IDE plugin, you'll need to add the uber jar to the list of custom plugins in its configuration, and don't forget to also enable the rules in the yml config provided to the plugin for it to work.</p>
-<h3 id="enabling-rules">Enabling rules<a class="headerlink" href="#enabling-rules" title="Permanent link">&para;</a></h3>
+<h2 id="enabling-rules">Enabling rules<a class="headerlink" href="#enabling-rules" title="Permanent link">&para;</a></h2>
 <p>For the rules to be picked up, you will need to enable them in your <code>detekt.yml</code> configuration file.</p>
 <div class="highlight"><pre><span></span><code><span class="nt">Compose</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">ComposableAnnotationNaming</span><span class="p">:</span>
@@ -606,7 +657,7 @@
 <span class="w">    </span><span class="c1"># -- You can optionally add your own ViewModel factories here</span>
 <span class="w">    </span><span class="c1"># viewModelFactories: hiltViewModel,potatoViewModel</span>
 </code></pre></div>
-<h3 id="disabling-a-specific-rule">Disabling a specific rule<a class="headerlink" href="#disabling-a-specific-rule" title="Permanent link">&para;</a></h3>
+<h2 id="disabling-a-specific-rule">Disabling a specific rule<a class="headerlink" href="#disabling-a-specific-rule" title="Permanent link">&para;</a></h2>
 <p>To disable a rule you have to follow the <a href="https://detekt.dev/docs/introduction/suppressing-rules">instructions from the detekt documentation</a>, and use the id of the rule you want to disable.</p>
 <p>For example, to disable <code>ComposableNaming</code> in a particular method, you can suppress it.</p>
 <div class="highlight"><pre><span></span><code><span class="nd">@Suppress</span><span class="p">(</span><span class="s">&quot;ComposableNaming&quot;</span><span class="p">)</span>
