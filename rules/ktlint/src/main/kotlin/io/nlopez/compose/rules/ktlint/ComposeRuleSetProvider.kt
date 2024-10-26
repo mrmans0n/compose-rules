@@ -45,6 +45,8 @@ class ComposeRuleSetProvider :
         RuleProvider { UnstableCollectionsCheck() },
         RuleProvider { ViewModelForwardingCheck() },
         RuleProvider { ViewModelInjectionCheck() },
+        RuleProvider { EnforceIconTextButtonRule() },
+        RuleProvider { EnforceIconTextButtonRule22() },
     )
 
     private companion object {
