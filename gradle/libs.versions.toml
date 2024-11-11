@@ -16,7 +16,7 @@ detekt-test = { module = "io.gitlab.arturbosch.detekt:detekt-test", version.ref 
 
 kotlin-compiler = { module = "org.jetbrains.kotlin:kotlin-compiler-embeddable", version.ref = "kotlin" }
 
-kaml = "com.charleskorn.kaml:kaml:0.62.2"
+kaml = "com.charleskorn.kaml:kaml:0.63.0"
 
 junit5 = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
 junit5-params = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "junit" }
