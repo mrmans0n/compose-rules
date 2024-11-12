@@ -33,7 +33,6 @@ class CompositionLocalAllowlist : ComposeKtVisitor {
     companion object {
         val CompositionLocalNotInAllowlist = """
             CompositionLocals are implicit dependencies and creating new ones should be avoided.
-
             See https://mrmans0n.github.io/compose-rules/rules/#compositionlocals for more information.
         """.trimIndent()
     }

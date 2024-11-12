@@ -37,12 +37,10 @@ class ModifierNaming : ComposeKtVisitor {
     companion object {
         val ModifiersAreSupposedToBeCalledModifierWhenAlone = """
             Modifier parameters should be called `modifier`.
-
             See https://mrmans0n.github.io/compose-rules/rules/#naming-modifiers-properly for more information.
         """.trimIndent()
         val ModifiersAreSupposedToEndInModifierWhenMultiple = """
             Modifier parameters should be called `modifier` or end in `Modifier` if there are more than one in the same @Composable.
-
             See https://mrmans0n.github.io/compose-rules/rules/#naming-modifiers-properly for more information.
         """.trimIndent()
     }

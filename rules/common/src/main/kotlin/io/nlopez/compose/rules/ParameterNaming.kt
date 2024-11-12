@@ -232,9 +232,7 @@ class ParameterNaming : ComposeKtVisitor {
 
         val LambdaParametersInPresentTense = """
             Lambda parameters in a composable function should be in present tense, not past tense.
-
             Examples: `onClick` and not `onClicked`, `onTextChange` and not `onTextChanged`, etc.
-
             See https://mrmans0n.github.io/compose-rules/rules/#naming-parameters-properly for more information.
         """.trimIndent()
     }

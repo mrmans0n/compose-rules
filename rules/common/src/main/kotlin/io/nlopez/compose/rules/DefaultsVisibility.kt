@@ -98,10 +98,7 @@ class DefaultsVisibility : ComposeKtVisitor {
 
         fun createMessage(composableVisibility: String, defaultObjectName: String, defaultObjectVisibility: String) =
             """
-            `Defaults` objects should match visibility of the composables they serve.
-
-            `$defaultObjectName` is $defaultObjectVisibility but it should be $composableVisibility.
-
+            `Defaults` objects should match visibility of the composables they serve. `$defaultObjectName` is $defaultObjectVisibility but it should be $composableVisibility.
             See https://mrmans0n.github.io/compose-rules/rules/#componentdefaults-object-should-match-the-composable-visibility for more information.
             """.trimIndent()
     }

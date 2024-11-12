@@ -23,7 +23,6 @@ class PreviewAnnotationNaming : ComposeKtVisitor {
     companion object {
         val PreviewAnnotationDoesNotStartWithPreview = """
             MultiPreview annotations should start with `Preview` as prefix.
-
             See https://mrmans0n.github.io/compose-rules/rules/#naming-multipreview-annotations-properly for more information.
         """.trimIndent()
     }

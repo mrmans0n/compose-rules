@@ -149,7 +149,6 @@ class ViewModelForwarding : ComposeKtVisitor {
         private val defaultStateHolderNames = listOf(".*ViewModel", ".*Presenter")
         val AvoidViewModelForwarding = """
             Forwarding a ViewModel/Presenter through multiple @Composable functions should be avoided. Consider using state hoisting.
-
             See https://mrmans0n.github.io/compose-rules/rules/#hoist-all-the-things for more information.
         """.trimIndent()
     }

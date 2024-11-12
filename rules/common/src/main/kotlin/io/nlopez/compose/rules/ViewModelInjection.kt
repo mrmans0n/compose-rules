@@ -160,9 +160,7 @@ class ViewModelInjection : ComposeKtVisitor {
 
         fun errorMessage(factoryName: String) = """
             Implicit dependencies of composables should be made explicit.
-
             Usages of $factoryName to acquire a ViewModel should be done in composable default parameters, so that it is more testable and flexible.
-
             See https://mrmans0n.github.io/compose-rules/rules/#viewmodels for more information.
         """.trimIndent()
     }

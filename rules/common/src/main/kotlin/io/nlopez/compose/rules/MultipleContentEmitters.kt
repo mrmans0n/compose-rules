@@ -60,7 +60,6 @@ class MultipleContentEmitters : ComposeKtVisitor {
 
         val MultipleContentEmittersDetected = """
             Composable functions should only be emitting content into the composition from one source at their top level.
-
             See https://mrmans0n.github.io/compose-rules/rules/#do-not-emit-multiple-pieces-of-content for more information.
         """.trimIndent()
     }

@@ -253,120 +253,101 @@ class MutableStateAutoboxing : ComposeKtVisitor {
         // Primitives
         val MutableStateAutoboxingInt = """
             Using mutableIntStateOf is recommended over mutableStateOf<Int>, as it uses the Int primitive directly which is more performant.
-
             See https://mrmans0n.github.io/compose-rules/rules/#use-mutablestateof-type-specific-variants-when-possible for more information.
         """.trimIndent()
 
         val MutableStateAutoboxingLong = """
             Using mutableLongStateOf is recommended over mutableStateOf<Long>, as it uses the Long primitive directly which is more performant.
-
             See https://mrmans0n.github.io/compose-rules/rules/#use-mutablestateof-type-specific-variants-when-possible for more information.
         """.trimIndent()
 
         val MutableStateAutoboxingDouble = """
             Using mutableDoubleStateOf is recommended over mutableStateOf<Double>, as it uses the Double primitive directly which is more performant.
-
             See https://mrmans0n.github.io/compose-rules/rules/#use-mutablestateof-type-specific-variants-when-possible for more information.
         """.trimIndent()
 
         val MutableStateAutoboxingFloat = """
             Using mutableFloatStateOf is recommended over mutableStateOf<Float>, as it uses the Float primitive directly which is more performant.
-
             See https://mrmans0n.github.io/compose-rules/rules/#use-mutablestateof-type-specific-variants-when-possible for more information.
         """.trimIndent()
 
         // Primitive Lists
         val MutableStateAutoboxingIntList = """
             Using mutableIntListOf is recommended over mutableStateOf Immutable/Persistent/List<Int> due to its better performance.
-
             See https://mrmans0n.github.io/compose-rules/rules/#use-mutablestateof-type-specific-variants-when-possible for more information.
         """.trimIndent()
 
         val MutableStateAutoboxingLongList = """
             Using mutableLongListOf is recommended over mutableStateOf Immutable/Persistent/List<Long> due to its better performance.
-
             See https://mrmans0n.github.io/compose-rules/rules/#use-mutablestateof-type-specific-variants-when-possible for more information.
         """.trimIndent()
 
         val MutableStateAutoboxingFloatList = """
             Using mutableFloatListOf is recommended over mutableStateOf Immutable/Persistent/List<Float> due to its better performance.
-
             See https://mrmans0n.github.io/compose-rules/rules/#use-mutablestateof-type-specific-variants-when-possible for more information.
         """.trimIndent()
 
         // Primitive Sets
         val MutableStateAutoboxingIntSet = """
             Using mutableIntSetOf is recommended over mutableStateOf Immutable/Persistent/Set<Int> due to its better performance.
-
             See https://mrmans0n.github.io/compose-rules/rules/#use-mutablestateof-type-specific-variants-when-possible for more information.
         """.trimIndent()
 
         val MutableStateAutoboxingLongSet = """
             Using mutableLongSetOf is recommended over mutableStateOf Immutable/Persistent/Set<Long> due to its better performance.
-
             See https://mrmans0n.github.io/compose-rules/rules/#use-mutablestateof-type-specific-variants-when-possible for more information.
         """.trimIndent()
 
         val MutableStateAutoboxingFloatSet = """
             Using mutableFloatSetOf is recommended over mutableStateOf Immutable/Persistent/Set<Float> due to its better performance.
-
             See https://mrmans0n.github.io/compose-rules/rules/#use-mutablestateof-type-specific-variants-when-possible for more information.
         """.trimIndent()
 
         // Maps (Int -> X)
         val MutableStateAutoboxingIntIntMap = """
             Using mutableIntIntMapOf is recommended over mutableStateOf Immutable/Persistent/Map<Int, Int> due to its better performance.
-
             See https://mrmans0n.github.io/compose-rules/rules/#use-mutablestateof-type-specific-variants-when-possible for more information.
         """.trimIndent()
 
         val MutableStateAutoboxingIntLongMap = """
             Using mutableIntLongMapOf is recommended over mutableStateOf Immutable/Persistent/Map<Int, Long> due to its better performance.
-
             See https://mrmans0n.github.io/compose-rules/rules/#use-mutablestateof-type-specific-variants-when-possible for more information.
         """.trimIndent()
 
         val MutableStateAutoboxingIntFloatMap = """
             Using mutableIntFloatMapOf is recommended over mutableStateOf Immutable/Persistent/Map<Int, Float> due to its better performance.
-
             See https://mrmans0n.github.io/compose-rules/rules/#use-mutablestateof-type-specific-variants-when-possible for more information.
         """.trimIndent()
 
         // Maps (Long -> X)
         val MutableStateAutoboxingLongIntMap = """
             Using mutableLongIntMapOf is recommended over mutableStateOf Immutable/Persistent/Map<Long, Int> due to its better performance.
-
             See https://mrmans0n.github.io/compose-rules/rules/#use-mutablestateof-type-specific-variants-when-possible for more information.
         """.trimIndent()
 
         val MutableStateAutoboxingLongLongMap = """
             Using mutableLongLongMapOf is recommended over mutableStateOf Immutable/Persistent/Map<Long, Long> due to its better performance.
-
             See https://mrmans0n.github.io/compose-rules/rules/#use-mutablestateof-type-specific-variants-when-possible for more information.
         """.trimIndent()
 
         val MutableStateAutoboxingLongFloatMap = """
             Using mutableLongFloatMapOf is recommended over mutableStateOf Immutable/Persistent/Map<Long, Float> due to its better performance.
-
             See https://mrmans0n.github.io/compose-rules/rules/#use-mutablestateof-type-specific-variants-when-possible for more information.
         """.trimIndent()
 
         // Maps (Float -> X)
         val MutableStateAutoboxingFloatIntMap = """
             Using mutableFloatIntMapOf is recommended over mutableStateOf Immutable/Persistent/Map<Float, Int> due to its better performance.
-
             See https://mrmans0n.github.io/compose-rules/rules/#use-mutablestateof-type-specific-variants-when-possible for more information.
         """.trimIndent()
 
         val MutableStateAutoboxingFloatLongMap = """
             Using mutableFloatLongMapOf is recommended over mutableStateOf Immutable/Persistent/Map<Float, Long> due to its better performance.
-
             See https://mrmans0n.github.io/compose-rules/rules/#use-mutablestateof-type-specific-variants-when-possible for more information.
         """.trimIndent()
 
         val MutableStateAutoboxingFloatFloatMap = """
             Using mutableFloatFloatMapOf is recommended over mutableStateOf Immutable/Persistent/Map<Float, Float> due to its better performance.
-
             See https://mrmans0n.github.io/compose-rules/rules/#use-mutablestateof-type-specific-variants-when-possible for more information.
         """.trimIndent()
     }

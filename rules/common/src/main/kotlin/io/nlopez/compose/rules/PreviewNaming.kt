@@ -62,19 +62,16 @@ class PreviewNaming : ComposeKtVisitor {
     companion object {
         val PreviewDoesNotStartWithPreview = """
             Preview functions should have `Preview` as prefix, per your project's configuration.
-
             See https://mrmans0n.github.io/compose-rules/rules/#naming-previews-properly for more information.
         """.trimIndent()
 
         val PreviewDoesNotEndWithPreview = """
             Preview functions should have `Preview` as suffix, per your project's configuration.
-
             See https://mrmans0n.github.io/compose-rules/rules/#naming-previews-properly for more information.
         """.trimIndent()
 
         val PreviewDoesNotContainPreview = """
             Preview functions should contain `Preview` in their names, per your project's configuration.
-
             See https://mrmans0n.github.io/compose-rules/rules/#naming-previews-properly for more information.
         """.trimIndent()
     }
