@@ -28,7 +28,6 @@ class ComposableAnnotationNaming : ComposeKtVisitor {
     companion object {
         val ComposableAnnotationDoesNotEndWithComposable = """
             Composable annotations (e.g. tagged with `@ComposableTargetMarker`) should have the `Composable` suffix.
-
             See https://mrmans0n.github.io/compose-rules/rules/#naming-composable-annotations-properly for more information.
         """.trimIndent()
     }

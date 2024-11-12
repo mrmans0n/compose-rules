@@ -31,7 +31,6 @@ class ContentTrailingLambda : ComposeKtVisitor {
     companion object {
         val ContentShouldBeTrailingLambda = """
             A @Composable `content` parameter should be moved to be the trailing lambda in a composable function.
-
             See https://mrmans0n.github.io/compose-rules/rules/#slots-for-main-content-should-be-the-trailing-lambda for more information.
         """.trimIndent()
     }

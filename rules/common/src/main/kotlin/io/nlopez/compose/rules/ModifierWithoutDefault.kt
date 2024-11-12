@@ -47,7 +47,6 @@ class ModifierWithoutDefault : ComposeKtVisitor {
     companion object {
         val MissingModifierDefaultParam = """
             This @Composable function has a modifier parameter but it doesn't have a default value.
-
             See https://mrmans0n.github.io/compose-rules/rules/#modifiers-should-have-default-parameters for more information.
         """.trimIndent()
     }

@@ -47,7 +47,6 @@ class RememberContentMissing : ComposeKtVisitor {
         val MovableContentWithReceiverOfNotRemembered = errorMessage("movableContentWithReceiverOf")
         private fun errorMessage(name: String): String = """
             Using `$name` in a @Composable function without it being remembered can cause visual problems, as the content would be recycled when detached from the composition.
-
             See https://mrmans0n.github.io/compose-rules/rules/#movable-content-should-be-remembered for more information.
         """.trimIndent()
     }

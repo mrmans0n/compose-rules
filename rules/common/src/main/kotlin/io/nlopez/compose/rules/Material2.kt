@@ -85,7 +85,6 @@ class Material2 : ComposeKtVisitor {
         )
         val DisallowedUsageOfMaterial2 = """
             Compose Material 2 is disallowed by your configuration.
-
             See https://mrmans0n.github.io/compose-rules/rules/#dont-use-material-2 for more information.
         """.trimIndent()
     }

@@ -21,7 +21,6 @@ class ModifierComposable : ComposeKtVisitor {
         val ComposableModifier = """
             Using @Composable builder functions for modifiers is not recommended, as they cause unnecessary recompositions.
             You should consider migrating this modifier to be based on Modifier.Node instead.
-
             See https://mrmans0n.github.io/compose-rules/rules/#avoid-modifier-extension-factory-functions for more information.
         """.trimIndent()
     }

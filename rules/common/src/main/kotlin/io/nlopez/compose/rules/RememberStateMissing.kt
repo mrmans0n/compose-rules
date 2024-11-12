@@ -40,7 +40,6 @@ class RememberStateMissing : ComposeKtVisitor {
         fun errorMessage(name: String): String = """
             Using `$name` in a @Composable function without it being inside of a remember function.
             If you don't remember the state instance, a new state instance will be created when the function is recomposed.
-
             See https://mrmans0n.github.io/compose-rules/rules/#state-should-be-remembered-in-composables for more information.
         """.trimIndent()
     }

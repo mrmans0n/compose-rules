@@ -49,9 +49,7 @@ class ContentSlotReused : ComposeKtVisitor {
     companion object {
         val ContentSlotsShouldNotBeReused = """
             Content slots should not be reused in different code branches/scopes of a composable function, to preserve the slot internal state.
-
             You can wrap the slot in a remember { movableContentOf { ... }} block to make sure their internal state is preserved correctly.
-
             See https://mrmans0n.github.io/compose-rules/rules/#content-slots-should-not-be-reused-in-branching-code for more information.
         """.trimIndent()
     }
