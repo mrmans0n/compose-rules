@@ -52,5 +52,5 @@ fun KtCallableDeclaration.contentSlots(
     treatAsComposableLambdaTypes: Set<String>,
 ): Sequence<KtParameter> = valueParameters.asSequence()
     .filter { parameter ->
-        parameter.typeReference?.isComposableLambda(treatAsLambdaTypes, treatAsComposableLambdaTypes) == true
+        parameter.typeReference?.isComposableUiEmitterLambda(treatAsLambdaTypes, treatAsComposableLambdaTypes) == true
     }

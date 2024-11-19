@@ -170,4 +170,23 @@ class ContentSlotReusedCheckTest {
             .withEditorConfigOverride(treatAsComposableLambda to "Potato", treatAsLambda to "Plum")
             .hasNoLintViolations()
     }
+
+    @Test
+    fun `passes when content does not return Unit`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun A(text: String, content: @Composable () -> String) {
+                    if (x) content() else content()
+                }
+                @Composable
+                fun B(text: String, content: @Composable (() -> String)?) {
+                    if (x) content() else content()
+                }
+
+            """.trimIndent()
+
+        ruleAssertThat(code).hasNoLintViolations()
+    }
 }
