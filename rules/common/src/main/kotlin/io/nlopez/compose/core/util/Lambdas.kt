@@ -39,6 +39,37 @@ fun KtTypeReference.isComposableLambda(
     else -> false
 }
 
+fun KtTypeReference.isComposableUiEmitterLambda(
+    treatAsLambdaTypes: Set<String> = emptySet(),
+    treatAsComposableLambdaTypes: Set<String> = emptySet(),
+): Boolean = when (val element = typeElement) {
+    null -> false
+    is KtFunctionType -> isComposable && element.returnsUnit
+    is KtNullableType -> (isComposable && element.isLambda(treatAsLambdaTypes)) ||
+        // Only possibility for this to not have a @Composable annotation is for it to be a KtUserType
+        (element.innerType as? KtUserType)?.referencedName in treatAsComposableLambdaTypes
+
+    is KtUserType -> (isComposable && element.referencedName in treatAsLambdaTypes) ||
+        element.referencedName in treatAsComposableLambdaTypes
+
+    else -> false
+}
+
+val KtTypeElement.returnsUnit: Boolean
+    get() = when (this) {
+        is KtFunctionType -> returnTypeReference?.text == "Unit"
+        is KtNullableType -> innerType?.returnsUnit == true
+        else -> false
+    }
+
+val KtTypeReference.returnsUnit: Boolean
+    get() = when (val element = typeElement) {
+        null -> false
+        is KtFunctionType -> element.returnsUnit
+        is KtNullableType -> element.innerType?.returnsUnit == true
+        else -> false
+    }
+
 fun KtFile.lambdaTypes(config: ComposeKtConfig): Set<String> = buildSet {
     // Add the provided types
     addAll(config.getSet("treatAsLambda", emptySet()))
