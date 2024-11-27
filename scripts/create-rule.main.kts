@@ -7,7 +7,8 @@ import org.apache.velocity.app.VelocityEngine
 import org.apache.velocity.runtime.RuntimeConstants
 import java.io.File
 import java.io.StringWriter
-import java.util.*
+import java.util.Locale
+import java.util.Properties
 import kotlin.system.exitProcess
 
 fun printUsage() {
@@ -77,8 +78,7 @@ val engine = VelocityEngine(
     }
 ).apply { init() }
 
-val context = VelocityContext()
-context.apply {
+val context = VelocityContext().apply {
     put("ruleName", ruleName)
     put("detektRuleName", "${newRule}Check")
     put("ktlintRuleName", "${newRule}Check")
@@ -126,7 +126,14 @@ engine.writeTemplate(
     targetName = "${ruleName}CheckTest",
     context = context
 )
+
+println("Adding to detekt default ruleset...")
+val detektConfig = rootDir.resolve("rules/detekt/src/main/resources/config/config.yml")
+detektConfig.appendText("""
+  $ruleName:
+    active: true
+"""
+)
 // Desirable improvements to add:
-// - add to detekt's default ruleset yml rules/detekt/src/main/resources/config/config.yml
 // - add rule to docs/detekt.md "default rule" values
 // - add entry in docs/rules.md (likely at the end)
