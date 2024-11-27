@@ -55,9 +55,9 @@ Compose:
     active: false
   PreviewPublic:
     active: true
-  RememberMissing:
-    active: true
   RememberContentMissing:
+    active: true
+  RememberMissing:
     active: true
   UnstableCollections:
     active: false
