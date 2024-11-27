@@ -98,6 +98,30 @@ class ComposeRuleSetProviderTest {
     }
 
     @Test
+    fun `ensure all rules in the default config are in alphabetical order`() {
+        val rules = ruleSet.rules.filterIsInstance<DetektRule>()
+            .map { it.ruleId }
+            .sorted()
+
+        // Grab the config file and read it
+        val defaultConfig = javaClass.classLoader.getResource("config/config.yml")
+        assertThat(defaultConfig).isNotNull()
+        requireNotNull(defaultConfig)
+        val file = File(defaultConfig.toURI())
+
+        // Parse the config file
+        val parsed = Yaml.default.parseToYamlNode(file.readText())
+        val configRules = parsed.yamlMap.get<YamlMap>("Compose")?.entries
+        requireNotNull(configRules)
+
+        // Check that all rules in the package are listed in the config
+        val configRuleIds = configRules.keys.map { it.content }
+        assertThat(configRuleIds)
+            .describedAs { "all rules in the ruleset are listed alphabetically in the default config" }
+            .containsExactlyElementsOf(rules)
+    }
+
+    @Test
     fun `ensure all available rules have a detekt rule`() {
         val detektRulesReflections = Reflections(ruleSetProvider.javaClass.packageName)
         val detektRuleNames = detektRulesReflections.getSubTypesOf(DetektRule::class.java).map { it.simpleName }
