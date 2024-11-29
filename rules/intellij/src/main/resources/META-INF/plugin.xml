@@ -1,0 +1,11 @@
+<idea-plugin>
+    <depends>com.intellij.gradle</depends>
+    <depends>org.jetbrains.kotlin</depends>
+    <depends>com.intellij.modules.platform</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <externalAnnotator
+            language="kotlin"
+            implementationClass="io.nlopez.compose.annotator.ComposeAnnotator"/>
+    </extensions>
+</idea-plugin>

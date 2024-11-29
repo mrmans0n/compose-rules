@@ -32,7 +32,7 @@ google-services.json
 # Android Profiling
 *.hprof
 
-# Banish DS_Store files 
+# Banish DS_Store files
 .DS_Store
 
 # MkDocs site
@@ -40,3 +40,6 @@ site/
 
 # Fleet
 **/.fleet/settings.json
+
+# IntelliJ
+.intellijPlatform/
