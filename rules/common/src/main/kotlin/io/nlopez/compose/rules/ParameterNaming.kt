@@ -122,7 +122,9 @@ class ParameterNaming : ComposeKtVisitor {
                 "Lain",
                 "Lay",
                 "Led",
-                "Left",
+                // While it's true that it's a violation as a verb, it shouldn't be when it's an adjective/adverb.
+                // As we can't know, let's make an exception.
+                // "Left",
                 "Lent",
                 "Lit",
                 "Lost",
