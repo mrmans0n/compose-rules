@@ -21,7 +21,7 @@ kaml = "com.charleskorn.kaml:kaml:0.66.0"
 junit5 = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
 junit5-params = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "junit" }
 assertj = "org.assertj:assertj-core:3.26.3"
-konsist = "com.lemonappdev:konsist:0.17.1"
+konsist = "com.lemonappdev:konsist:0.17.2"
 reflections = "org.reflections:reflections:0.10.2"
 
 [plugins]
