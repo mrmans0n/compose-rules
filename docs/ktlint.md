@@ -39,15 +39,16 @@ You can use this same [uber jar from the releases page](https://github.com/mrman
 
 ## Supported versions matrix
 
-| Version  | Ktlint version | Kotlin (Syntax) |
-|----------|----------------|-----------------|
-| 0.4.18+  | 1.4.1          | 2.0.21          |
-| 0.4.17   | 1.4.0          | 2.0.21          |
-| 0.4.12+  | 1.3.1          | 2.0.20          |
-| 0.4.6+   | 1.3.1          | 2.0.0           |
-| 0.4.5    | 1.3.0          | 2.0.0           |
-| 0.3.12+  | 1.2.1          | 1.9.23          |
-| 0.3.9+   | 1.1.1          | 1.9.22          |
+| Version | Ktlint version | Kotlin (Syntax) |
+|---------|----------------|-----------------|
+| 0.4.21+ | 1.5.0          | 2.0.21          |
+| 0.4.18+ | 1.4.1          | 2.0.21          |
+| 0.4.17  | 1.4.0          | 2.0.21          |
+| 0.4.12+ | 1.3.1          | 2.0.20          |
+| 0.4.6+  | 1.3.1          | 2.0.0           |
+| 0.4.5   | 1.3.0          | 2.0.0           |
+| 0.3.12+ | 1.2.1          | 1.9.23          |
+| 0.3.9+  | 1.1.1          | 1.9.22          |
 
 Older version support can be found in the [release notes](https://github.com/mrmans0n/compose-rules/releases).
 
