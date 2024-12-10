@@ -621,15 +621,13 @@ More info: [Modifier documentation](https://developer.android.com/reference/kotl
 
 ### Avoid Modifier extension factory functions
 
-Using `@Composable` builder functions for modifiers is not recommended, as they cause unnecessary recompositions. To avoid this, you should use [Modifier.Node](https://developer.android.com/reference/kotlin/androidx/compose/ui/Modifier.Node) instead. It will allow you to accomplish the same things while being very performant.
-
-There is another API for creating custom modifiers, `composed {}`. This API is no longer recommended due to the performance issues it created, and like with the extension factory functions case, Modifier.Node is recommended instead.
+For `@Composable` extension factory functions, there is an API for creating custom modifiers, `composed {}`. This API is no longer recommended due to the performance issues it created, and like with the extension factory functions case, Modifier.Node is recommended instead.
 
 More info: [Modifier.Node](https://developer.android.com/reference/kotlin/androidx/compose/ui/Modifier.Node), [Compose Modifier.Node and where to find it, by Merab Tato Kutalia](https://proandroiddev.com/compose-modifier-node-and-where-to-find-it-merab-tato-kutalia-66f891c0e8), [Compose modifiers deep dive, with Leland Richardson](https://www.youtube.com/watch?v=BjGX2RftXsU) and [Composed modifier docs](https://developer.android.com/reference/kotlin/androidx/compose/ui/package-summary#(androidx.compose.ui.Modifier).composed(kotlin.Function1,kotlin.Function1)).
 
 !!! info ""
 
-    :material-chevron-right-box: [compose:modifier-composable-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierComposable.kt) and [compose:modifier-composed-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierComposed.kt) ktlint :material-chevron-right-box: [ModifierComposable](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierComposable.kt) and [ModifierComposed](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierComposed.kt) detekt
+    :material-chevron-right-box: [compose:modifier-composed-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierComposed.kt) ktlint :material-chevron-right-box: [ModifierComposed](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierComposed.kt) detekt
 
 ## ComponentDefaults
 

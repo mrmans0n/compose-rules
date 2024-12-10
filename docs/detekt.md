@@ -86,10 +86,6 @@ Compose:
     active: true
     # -- You can optionally add your own Modifier types
     # customModifiers: BananaModifier,PotatoModifier
-  ModifierComposable:
-    active: true
-    # -- You can optionally add your own Modifier types
-    # customModifiers: BananaModifier,PotatoModifier
   ModifierComposed:
     active: true
     # -- You can optionally add your own Modifier types
