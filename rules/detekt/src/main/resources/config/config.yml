@@ -25,8 +25,6 @@ Compose:
     active: false
   ModifierClickableOrder:
     active: true
-  ModifierComposable:
-    active: true
   ModifierComposed:
     active: true
   ModifierMissing:

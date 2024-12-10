@@ -23,7 +23,6 @@ class ComposeRuleSetProvider :
         RuleProvider { LambdaParameterInRestartableEffectCheck() },
         RuleProvider { Material2Check() },
         RuleProvider { ModifierClickableOrderCheck() },
-        RuleProvider { ModifierComposableCheck() },
         RuleProvider { ModifierComposedCheck() },
         RuleProvider { ModifierMissingCheck() },
         RuleProvider { ModifierNamingCheck() },
