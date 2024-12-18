@@ -23,8 +23,8 @@ tasks.shadowJar {
 }
 
 dependencies {
-    api(libs.ktlint.rule.engine)
-    api(libs.ktlint.cli.ruleset.core)
+    compileOnly(libs.ktlint.rule.engine)
+    compileOnly(libs.ktlint.cli.ruleset.core)
     api(projects.rules.common)
 
     testImplementation(libs.ktlint.test)
