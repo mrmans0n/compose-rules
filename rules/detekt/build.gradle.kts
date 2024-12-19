@@ -24,7 +24,7 @@ tasks.shadowJar {
 }
 
 dependencies {
-    compileOnlyOrApi(libs.detekt.core)
+    api(libs.detekt.core)
     compileOnlyOrApi(projects.rules.common)
 
     testImplementation(libs.detekt.test)
@@ -34,4 +34,5 @@ dependencies {
     testImplementation(libs.reflections)
     testImplementation(libs.kaml)
     testImplementation(libs.konsist)
+    testImplementation(libs.kotlin.compiler)
 }
