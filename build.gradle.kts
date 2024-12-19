@@ -63,6 +63,7 @@ allprojects {
             when {
                 name == "api" && project.hasProperty("uberJar") -> extendsFrom(this@create)
                 name == "compileOnly" -> extendsFrom(this@create)
+                name == "testImplementation" -> extendsFrom(this@create)
             }
         }
     }
