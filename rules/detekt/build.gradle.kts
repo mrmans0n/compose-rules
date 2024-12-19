@@ -24,8 +24,8 @@ tasks.shadowJar {
 }
 
 dependencies {
-    api(libs.detekt.core)
-    api(projects.rules.common)
+    compileOnlyOrApi(libs.detekt.core)
+    compileOnlyOrApi(projects.rules.common)
 
     testImplementation(libs.detekt.test)
     testImplementation(libs.junit5)

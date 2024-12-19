@@ -54,6 +54,18 @@ allprojects {
     if (project != rootProject) {
         pluginManager.apply(libs.plugins.mavenPublish.get().pluginId)
     }
+
+    project.configurations.create("compileOnlyOrApi") {
+        isCanBeConsumed = false
+        isCanBeResolved = true
+
+        project.configurations.configureEach {
+            when {
+                name == "api" && project.hasProperty("uberJar") -> extendsFrom(this@create)
+                name == "compileOnly" -> extendsFrom(this@create)
+            }
+        }
+    }
 }
 
 tasks.register("printVersion") {
