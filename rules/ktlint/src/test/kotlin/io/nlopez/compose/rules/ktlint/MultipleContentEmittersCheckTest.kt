@@ -496,4 +496,45 @@ class MultipleContentEmittersCheckTest {
             ),
         )
     }
+
+    @Test
+    fun `passes when it's a valid composable with a nested function`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun Something() {
+                    @Composable
+                    fun Potato() {
+                        Text("1")
+                    }
+                    Potato()
+                }
+            """.trimIndent()
+        emittersRuleAssertThat(code).hasNoLintViolations()
+    }
+
+    @Test
+    fun `fails when a composable uses nested functions to emit multiple pieces of content`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun Something() {
+                    @Composable
+                    fun Potato() {
+                        Text("1")
+                    }
+                    Potato()
+                    Potato()
+                }
+            """.trimIndent()
+        emittersRuleAssertThat(code).hasLintViolationsWithoutAutoCorrect(
+            LintViolation(
+                line = 2,
+                col = 5,
+                detail = MultipleContentEmitters.MultipleContentEmittersDetected,
+            ),
+        )
+    }
 }

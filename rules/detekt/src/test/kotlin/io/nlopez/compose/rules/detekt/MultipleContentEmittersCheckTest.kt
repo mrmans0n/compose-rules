@@ -443,4 +443,47 @@ class MultipleContentEmittersCheckTest {
             assertThat(error).hasMessage(MultipleContentEmitters.MultipleContentEmittersDetected)
         }
     }
+
+    @Test
+    fun `passes when it's a valid composable but has a local composable function`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun Something() {
+                    @Composable
+                    fun Potato() {
+                        Text("1")
+                    }
+                    Potato()
+                }
+            """.trimIndent()
+        val errors = rule.lint(code)
+        assertThat(errors).isEmpty()
+    }
+
+    @Test
+    fun `fails when a composable uses nested functions to emit multiple pieces of content`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun Something() {
+                    @Composable
+                    fun Potato() {
+                        Text("1")
+                    }
+                    Potato()
+                    Potato()
+                }
+            """.trimIndent()
+        val errors = rule.lint(code)
+        assertThat(errors)
+            .hasStartSourceLocations(
+                SourceLocation(2, 5),
+            )
+        for (error in errors) {
+            assertThat(error).hasMessage(MultipleContentEmitters.MultipleContentEmittersDetected)
+        }
+    }
 }
