@@ -14,6 +14,7 @@ import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtFunction
 import org.jetbrains.kotlin.psi.KtIfExpression
 import org.jetbrains.kotlin.psi.KtLoopExpression
+import org.jetbrains.kotlin.psi.KtNamedFunction
 import org.jetbrains.kotlin.psi.KtProperty
 import org.jetbrains.kotlin.psi.KtReturnExpression
 import org.jetbrains.kotlin.psi.KtSafeQualifiedExpression
@@ -69,11 +70,21 @@ private fun KtExpression.uiEmitterCount(config: ComposeKtConfig): Int {
     // For early return false positives detection we need to know where we are at. But yea, yikes.
     var totalEmittersFound = 0
     var currentBlockStartedAt = 0
+    val origin = this
 
     // Function for actually counting. As we can't know how big the code would be, let's be careful wrt recursion.
     val emitterCount = DeepRecursiveFunction<KtExpression?, Int> { current ->
         when (current) {
             null -> 0
+
+            // A function body with a name, a normal method (e.g. @Composable fun A() { Text("bleh") })
+            // It's treated separately as KtDeclarationWithBody to try to root out false positives in local functions
+            is KtNamedFunction -> {
+                when {
+                    current != origin && current.isComposable && current.isNested -> 0
+                    else -> callRecursive(current.bodyBlockExpression)
+                }
+            }
 
             // Something like a function body or a var declaration. E.g. @Composable fun A() { Text("bleh") }
             is KtDeclarationWithBody -> callRecursive(current.bodyBlockExpression)

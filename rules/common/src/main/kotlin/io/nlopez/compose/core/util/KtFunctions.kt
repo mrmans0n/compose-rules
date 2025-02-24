@@ -5,8 +5,11 @@ package io.nlopez.compose.core.util
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.KtClass
 import org.jetbrains.kotlin.psi.KtClassBody
+import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtFunction
 import org.jetbrains.kotlin.psi.KtModifierListOwner
+import org.jetbrains.kotlin.psi.KtNamedFunction
+import org.jetbrains.kotlin.psi.psiUtil.parents
 import org.jetbrains.kotlin.psi.psiUtil.visibilityModifierType
 
 val KtFunction.returnsValue: Boolean
@@ -44,3 +47,6 @@ val KtFunction.isOperator: Boolean
 
 val KtFunction.definedInInterface: Boolean
     get() = ((parent as? KtClassBody)?.parent as? KtClass)?.isInterface() ?: false
+
+val KtNamedFunction.isNested: Boolean
+    get() = parents.takeWhile { it !is KtFile }.any { it is KtNamedFunction }
