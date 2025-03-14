@@ -75,6 +75,7 @@ class ParameterNamingCheckTest {
                     onWrite: () -> Unit,
                     onPotato: Potato,
                     onEmbed: () -> Unit,
+                    onDone: () -> Unit,
                     onFocusChanged: () -> Unit,
                     onPlaced: (LayoutCoordinates) -> Unit,
                     onValueChangeFinished: () -> Unit,

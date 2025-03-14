@@ -230,6 +230,7 @@ class ParameterNaming : ComposeKtVisitor {
                 "onFocusChanged",
                 "onPlaced", // androidx.compose.ui.layout
                 "onValueChangeFinished", // androidx.compose.material3.RangeSlider
+                "onDone", // androidx.compose.foundation.text
             )
         }
 
