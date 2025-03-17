@@ -96,14 +96,15 @@ class ParameterNamingCheckTest {
             """
                 @Composable
                 fun A(
-                    onSizeChanged: (Int) -> Unit,
+                    onSizeChanged: () -> Unit,
+                    onGloballyPositioned: () -> Unit,
                 ) {}
             """.trimIndent()
 
         ruleAssertThat(code)
             .withEditorConfigOverride(
                 treatAsLambda to "Potato",
-                allowedLambda to "onSizeChanged",
+                allowedLambda to "onSizeChanged,onGloballyPositioned",
             )
             .hasNoLintViolations()
     }
