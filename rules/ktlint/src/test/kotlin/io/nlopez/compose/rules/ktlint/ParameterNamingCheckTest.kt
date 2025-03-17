@@ -88,4 +88,23 @@ class ParameterNamingCheckTest {
             )
             .hasNoLintViolations()
     }
+
+    @Test
+    fun `passes when a param lambda is in the past tense but it's in the allowlist`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun A(
+                    onSizeChanged: (Int) -> Unit,
+                ) {}
+            """.trimIndent()
+
+        ruleAssertThat(code)
+            .withEditorConfigOverride(
+                treatAsLambda to "Potato",
+                allowedLambda to "onSizeChanged",
+            )
+            .hasNoLintViolations()
+    }
 }
