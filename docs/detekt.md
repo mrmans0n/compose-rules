@@ -130,6 +130,8 @@ Compose:
     active: true
     # -- You can optionally have a list of types to be treated as lambdas (e.g. typedefs or fun interfaces not picked up automatically)
     # treatAsLambda: MyLambdaType
+    # -- You can optionally add your allowed lambda names (e.g., usages from the past found in the official Compose code)
+    # allowedLambda: onSizeChanged, onGloballyPositioned
   PreviewAnnotationNaming:
     active: true
   PreviewNaming:
