@@ -259,7 +259,7 @@ val disallowMaterial2: EditorConfigProperty<Boolean> =
 val allowedLambda: EditorConfigProperty<String> =
     EditorConfigProperty(
         type = PropertyType.LowerCasingPropertyType(
-            "compose_allowed_lambda",
+            "compose_allowed_composable_lambda_names",
             "A comma separated list of lambda name that are allowed",
             PropertyValueParser.IDENTITY_VALUE_PARSER,
             emptySet(),
