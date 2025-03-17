@@ -90,6 +90,15 @@ For `compositionlocal-allowlist` rule you can define a list of `CompositionLocal
 compose_allowed_composition_locals = LocalSomething,LocalSomethingElse
 ```
 
+### Providing a list of allowed Composable Lambda Names
+
+For `parameter-naming` rule you can define a list of `Lambda`s that are allowed in your codebase. For example, usages from the past found in the official Compose code.
+
+```editorconfig
+[*.{kt,kts}]
+compose_allowed_composable_lambda_names = onSizeChanged,onGloballyPositioned
+```
+
 ### Ignore annotated functions with specific annotations for missing Modifier checks
 
 In the `modifier-missing-check` rule, you can define a list of annotations that, if present, will make it so the function is exempt from this rule.
