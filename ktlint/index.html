@@ -22,7 +22,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.8">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.9">
     
     
       
@@ -30,7 +30,7 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.8608ea7d.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.4af4bdda.min.css">
       
         
         <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
@@ -413,6 +413,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#providing-a-list-of-allowed-composable-lambda-names" class="md-nav__link">
+    <span class="md-ellipsis">
+      Providing a list of allowed Composable Lambda Names
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ignore-annotated-functions-with-specific-annotations-for-missing-modifier-checks" class="md-nav__link">
     <span class="md-ellipsis">
       Ignore annotated functions with specific annotations for missing Modifier checks
@@ -709,6 +718,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#providing-a-list-of-allowed-composable-lambda-names" class="md-nav__link">
+    <span class="md-ellipsis">
+      Providing a list of allowed Composable Lambda Names
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ignore-annotated-functions-with-specific-annotations-for-missing-modifier-checks" class="md-nav__link">
     <span class="md-ellipsis">
       Ignore annotated functions with specific annotations for missing Modifier checks
@@ -958,6 +976,11 @@ compose_view_model_factories = myViewModel,potatoViewModel
 <p>For <code>compositionlocal-allowlist</code> rule you can define a list of <code>CompositionLocal</code>s that are allowed in your codebase.</p>
 <div class="highlight"><pre><span></span><code>[*.{kt,kts}]
 compose_allowed_composition_locals = LocalSomething,LocalSomethingElse
+</code></pre></div>
+<h3 id="providing-a-list-of-allowed-composable-lambda-names">Providing a list of allowed Composable Lambda Names<a class="headerlink" href="#providing-a-list-of-allowed-composable-lambda-names" title="Permanent link">&para;</a></h3>
+<p>For <code>parameter-naming</code> rule you can define a list of parameter names for function types that are allowed in your codebase. For example, usages from the past found in the official Compose code.</p>
+<div class="highlight"><pre><span></span><code>[*.{kt,kts}]
+compose_allowed_lambda_parameter_names = onSizeChanged,onGloballyPositioned
 </code></pre></div>
 <h3 id="ignore-annotated-functions-with-specific-annotations-for-missing-modifier-checks">Ignore annotated functions with specific annotations for missing Modifier checks<a class="headerlink" href="#ignore-annotated-functions-with-specific-annotations-for-missing-modifier-checks" title="Permanent link">&para;</a></h3>
 <p>In the <code>modifier-missing-check</code> rule, you can define a list of annotations that, if present, will make it so the function is exempt from this rule.</p>
