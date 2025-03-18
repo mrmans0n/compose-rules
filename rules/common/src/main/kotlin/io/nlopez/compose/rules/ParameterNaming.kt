@@ -17,16 +17,20 @@ class ParameterNaming : ComposeKtVisitor {
         // E.g. onClick, onTextChange, onValueChange, and a myriad of other examples in the compose foundation code.
 
         val lambdaTypes = function.containingKtFile.lambdaTypes(config)
+        val allowed = config.getSet("allowedLambdaParameterNames", emptySet())
 
         val errors = function.valueParameters
+            .asSequence()
             .filter { it.typeReference?.isLambda(lambdaTypes) == true }
             .filter {
                 // As per why not force lambdas to all start with `on`, we cannot really know when they are used for
                 // lazy initialization purposes -- and also don't want to be overly annoying.
                 it.name?.startsWith("on") == true
             }
+            .filterNot { it.name in allowed }
             .filterNot { it.name in ExceptionsInCompose }
             .filter { it.name?.isPastTense == true }
+            .toList()
 
         for (error in errors) {
             emitter.report(error, LambdaParametersInPresentTense)

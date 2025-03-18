@@ -9,6 +9,6 @@ import io.nlopez.compose.rules.ParameterNaming
 class ParameterNamingCheck :
     KtlintRule(
         id = "compose:parameter-naming",
-        editorConfigProperties = setOf(treatAsLambda),
+        editorConfigProperties = setOf(treatAsLambda, allowedLambdaParameterNames),
     ),
     ComposeKtVisitor by ParameterNaming()

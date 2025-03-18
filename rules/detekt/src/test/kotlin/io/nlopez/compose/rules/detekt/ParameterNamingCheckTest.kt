@@ -14,6 +14,7 @@ class ParameterNamingCheckTest {
 
     private val testConfig = TestConfig(
         "treatAsLambda" to listOf("Potato"),
+        "allowedLambdaParameterNames" to listOf("onGloballyPositioned", "onSizeChanged"),
     )
     private val rule = ParameterNamingCheck(testConfig)
 
@@ -71,6 +72,22 @@ class ParameterNamingCheckTest {
                     onFocusChanged: () -> Unit,
                     onPlaced: (LayoutCoordinates) -> Unit,
                     onValueChangeFinished: () -> Unit,
+                ) {}
+            """.trimIndent()
+
+        val errors = rule.lint(code)
+        assertThat(errors).isEmpty()
+    }
+
+    @Test
+    fun `passes when a param lambda is in the past tense but it's in the allowlist`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun A(
+                    onSizeChanged: (Int) -> Unit,
+                    onGloballyPositioned: () -> Unit,
                 ) {}
             """.trimIndent()
 
