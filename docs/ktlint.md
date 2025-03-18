@@ -92,7 +92,7 @@ compose_allowed_composition_locals = LocalSomething,LocalSomethingElse
 
 ### Providing a list of allowed Composable Lambda Names
 
-For `parameter-naming` rule you can define a list of `Lambda`s that are allowed in your codebase. For example, usages from the past found in the official Compose code.
+For `parameter-naming` rule you can define a list of parameter names for function types that are allowed in your codebase. For example, usages from the past found in the official Compose code.
 
 ```editorconfig
 [*.{kt,kts}]
