@@ -256,10 +256,10 @@ val disallowMaterial2: EditorConfigProperty<Boolean> =
         defaultValue = false,
     )
 
-val allowedLambda: EditorConfigProperty<String> =
+val allowedLambdaParameterNames: EditorConfigProperty<String> =
     EditorConfigProperty(
         type = PropertyType.LowerCasingPropertyType(
-            "compose_allowed_lambda",
+            "compose_allowed_lambda_parameter_names",
             "A comma separated list of lambda name that are allowed",
             PropertyValueParser.IDENTITY_VALUE_PARSER,
             emptySet(),

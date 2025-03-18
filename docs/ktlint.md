@@ -96,7 +96,7 @@ For `parameter-naming` rule you can define a list of `Lambda`s that are allowed 
 
 ```editorconfig
 [*.{kt,kts}]
-compose_allowed_lambda = onSizeChanged,onGloballyPositioned
+compose_allowed_lambda_parameter_names = onSizeChanged,onGloballyPositioned
 ```
 
 ### Ignore annotated functions with specific annotations for missing Modifier checks

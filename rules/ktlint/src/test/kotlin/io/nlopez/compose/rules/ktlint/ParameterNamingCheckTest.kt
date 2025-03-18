@@ -104,7 +104,7 @@ class ParameterNamingCheckTest {
         ruleAssertThat(code)
             .withEditorConfigOverride(
                 treatAsLambda to "Potato",
-                allowedLambda to "onSizeChanged,onGloballyPositioned",
+                allowedLambdaParameterNames to "onSizeChanged,onGloballyPositioned",
             )
             .hasNoLintViolations()
     }

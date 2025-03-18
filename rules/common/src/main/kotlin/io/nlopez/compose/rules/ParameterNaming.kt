@@ -17,7 +17,7 @@ class ParameterNaming : ComposeKtVisitor {
         // E.g. onClick, onTextChange, onValueChange, and a myriad of other examples in the compose foundation code.
 
         val lambdaTypes = function.containingKtFile.lambdaTypes(config)
-        val allowed = config.getSet("allowedLambda", emptySet())
+        val allowed = config.getSet("allowedLambdaParameterNames", emptySet())
 
         val errors = function.valueParameters
             .asSequence()

@@ -14,7 +14,7 @@ class ParameterNamingCheckTest {
 
     private val testConfig = TestConfig(
         "treatAsLambda" to listOf("Potato"),
-        "allowedLambda" to listOf("onGloballyPositioned", "onSizeChanged"),
+        "allowedLambdaParameterNames" to listOf("onGloballyPositioned", "onSizeChanged"),
     )
     private val rule = ParameterNamingCheck(testConfig)
 
