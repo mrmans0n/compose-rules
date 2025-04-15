@@ -142,6 +142,18 @@ class LambdaParameterInRestartableEffectCheckTest {
                         onDispose(onDispose)
                     }
                 }
+                @Composable
+                fun Something(onDispose: () -> Unit) {
+                    LifecycleStartEffect(Unit) {
+                        onStopOrDispose(onDispose)
+                    }
+                }
+                @Composable
+                fun Something(onDispose: () -> Unit) {
+                    LifecycleResumeEffect(Unit) {
+                        onPauseOrDispose(onDispose)
+                    }
+                }
 
                 // TODO ideally these would also be caught, but may require type resolution
                 @Composable
@@ -170,6 +182,16 @@ class LambdaParameterInRestartableEffectCheckTest {
                     col = 15,
                     detail = LambdaParameterInRestartableEffect.LambdaUsedInRestartableEffect,
                 ),
+                LintViolation(
+                    line = 14,
+                    col = 15,
+                    detail = LambdaParameterInRestartableEffect.LambdaUsedInRestartableEffect,
+                ),
+                LintViolation(
+                    line = 20,
+                    col = 15,
+                    detail = LambdaParameterInRestartableEffect.LambdaUsedInRestartableEffect,
+                ),
             )
     }
 
@@ -183,6 +205,38 @@ class LambdaParameterInRestartableEffectCheckTest {
                     val latestOnDispose by rememberUpdatedState(onDispose)
                     DisposableEffect(Unit) {
                         onDispose(latestOnDispose)
+                    }
+                }
+            """.trimIndent()
+        ruleAssertThat(code).hasNoLintViolations()
+    }
+
+    @Test
+    fun `passes when a lambda named onStopOrDispose is present but unused in LifecycleStartEffect`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun Something(onDispose: () -> Unit) {
+                    val latestOnDispose by rememberUpdatedState(onDispose)
+                    LifecycleStartEffect(Unit) {
+                        onStopOrDispose(latestOnDispose)
+                    }
+                }
+            """.trimIndent()
+        ruleAssertThat(code).hasNoLintViolations()
+    }
+
+    @Test
+    fun `passes when a lambda named onPauseOrDispose is present but unused in LifecycleResumeEffect`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun Something(onDispose: () -> Unit) {
+                    val latestOnDispose by rememberUpdatedState(onDispose)
+                    LifecycleResumeEffect(Unit) {
+                        onPauseOrDispose(latestOnDispose)
                     }
                 }
             """.trimIndent()

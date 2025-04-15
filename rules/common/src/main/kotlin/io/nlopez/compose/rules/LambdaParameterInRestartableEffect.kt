@@ -52,15 +52,24 @@ class LambdaParameterInRestartableEffect : ComposeKtVisitor {
                         // Filter out dot receivers e.g. `something.myLambda()`
                         .filterNot { it.isDotSelector() }
 
-                    val isDisposableEffect = effect.calleeExpression?.text == "DisposableEffect"
+                    val effectCallee = effect.calleeExpression?.text
+                    val isDisposableEffect = effectCallee == "DisposableEffect"
+                    val isLifecycleEffect = effectCallee == "LifecycleStartEffect" ||
+                        effectCallee == "LifecycleResumeEffect"
 
                     // Lambdas used directly: myLambda()
                     val invoked = callExpressions
                         .let { expressions ->
-                            if (isDisposableEffect) {
-                                expressions.filter { it.calleeExpression?.text != "onDispose" }
-                            } else {
-                                expressions
+                            when {
+                                isDisposableEffect -> {
+                                    expressions.filter { it.calleeExpression?.text != "onDispose" }
+                                }
+                                isLifecycleEffect -> {
+                                    expressions.filter { it.calleeExpression?.text !in LifecycleEffectScopeFunctions }
+                                }
+                                else -> {
+                                    expressions
+                                }
                             }
                         }
                         .mapNotNull { it.calleeExpression?.text }
@@ -120,5 +129,7 @@ class LambdaParameterInRestartableEffect : ComposeKtVisitor {
             However, if the effect is not to be restarted, you will need to use `rememberUpdatedState` on the parameter and use its result in the effect.
             See https://mrmans0n.github.io/compose-rules/rules/#be-mindful-of-the-arguments-you-use-inside-of-a-restarting-effect for more information.
         """.trimIndent()
+
+        private val LifecycleEffectScopeFunctions = setOf("onStopOrDispose", "onPauseOrDispose")
     }
 }

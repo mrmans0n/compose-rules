@@ -344,6 +344,9 @@ private val RestartableEffects by lazy {
         "LaunchedEffect",
         "produceState",
         "DisposableEffect",
+        "LifecycleEventEffect", // androidx.lifecycle.compose
+        "LifecycleResumeEffect",
+        "LifecycleStartEffect",
         "produceRetainedState", // Circuit
     )
 }
