@@ -17,7 +17,7 @@ class MutableStateParameter : ComposeKtVisitor {
     }
 
     companion object {
-        private val MutableStateRegex = "MutableState<.*>\\??".toRegex()
+        private val MutableStateRegex = "(MutableState<.*>|Mutable(Int|Float|Double|Long)State)\\??".toRegex()
 
         val MutableStateParameterInCompose = """
             MutableState shouldn't be used as a parameter in a @Composable function, as it promotes joint ownership over a state between a component and its user.
