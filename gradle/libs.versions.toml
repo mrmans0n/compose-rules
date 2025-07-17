@@ -1,7 +1,9 @@
 [versions]
-kotlin = "2.1.20"
+kotlin = "2.1.20" # Used for the actual coding
 ktlint = "1.5.0"
+kotlin-ktlint = "2.1.0"
 detekt = "1.23.8"
+kotlin-detekt = "2.0.20"
 junit = "5.11.4"
 
 [libraries]
@@ -15,6 +17,8 @@ detekt-core = { module = "io.gitlab.arturbosch.detekt:detekt-core", version.ref 
 detekt-test = { module = "io.gitlab.arturbosch.detekt:detekt-test", version.ref = "detekt" }
 
 kotlin-compiler = { module = "org.jetbrains.kotlin:kotlin-compiler-embeddable", version.ref = "kotlin" }
+kotlin-compiler-detekt = { module = "org.jetbrains.kotlin:kotlin-compiler-embeddable", version.ref = "kotlin-detekt" }
+kotlin-compiler-ktlint = { module = "org.jetbrains.kotlin:kotlin-compiler-embeddable", version.ref = "kotlin-ktlint" }
 
 kaml = "com.charleskorn.kaml:kaml:0.81.0"
 
