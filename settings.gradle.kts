@@ -22,6 +22,8 @@ enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 rootProject.name = "compose-rules"
 include(
     ":rules:common",
+    ":rules:common-detekt",
+    ":rules:common-ktlint",
     ":rules:detekt",
     ":rules:ktlint",
 )

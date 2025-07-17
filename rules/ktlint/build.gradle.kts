@@ -25,7 +25,7 @@ tasks.shadowJar {
 dependencies {
     compileOnlyOrApi(libs.ktlint.rule.engine)
     compileOnlyOrApi(libs.ktlint.cli.ruleset.core)
-    api(projects.rules.common)
+    api(projects.rules.commonKtlint)
 
     testImplementation(libs.ktlint.test)
     testImplementation(libs.junit5)
@@ -33,4 +33,5 @@ dependencies {
     testImplementation(libs.assertj)
     testImplementation(libs.reflections)
     testImplementation(libs.konsist)
+    testImplementation(libs.kotlin.compiler.ktlint)
 }
