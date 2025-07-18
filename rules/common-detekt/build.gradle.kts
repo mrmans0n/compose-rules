@@ -6,7 +6,7 @@ plugins {
 }
 
 dependencies {
-    compileOnlyOrApi(libs.kotlin.compiler.detekt)
+    api(libs.kotlin.compiler.detekt)
 
     testImplementation(libs.junit5)
     testImplementation(libs.junit5.params)
