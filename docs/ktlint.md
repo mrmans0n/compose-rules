@@ -41,6 +41,7 @@ You can use this same [uber jar from the releases page](https://github.com/mrman
 
 | Version | Ktlint version | Kotlin (Syntax) |
 |---------|----------------|-----------------|
+| 0.4.24  | 1.6.0          | 2.1.21          |
 | 0.4.23  | 1.5.0          | 2.1.0           |
 | 0.4.18+ | 1.4.1          | 2.0.21          |
 | 0.4.17  | 1.4.0          | 2.0.21          |

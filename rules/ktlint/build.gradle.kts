@@ -31,6 +31,8 @@ dependencies {
     testImplementation(libs.ktlint.test)
     testImplementation(libs.junit5)
     testImplementation(libs.junit5.params)
+    testImplementation(libs.junit5.engine)
+    testImplementation(libs.junit5.platform.launcher)
     testImplementation(libs.assertj)
     testImplementation(libs.reflections)
     testImplementation(libs.konsist)
