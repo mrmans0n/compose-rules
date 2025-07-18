@@ -1,5 +1,5 @@
 [versions]
-kotlin = "2.1.20" # Used for the actual coding
+kotlin = "2.2.0" # Used for the actual coding
 ktlint = "1.6.0"
 kotlin-ktlint = "2.1.21"
 detekt = "1.23.8"
