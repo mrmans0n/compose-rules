@@ -1,10 +1,11 @@
 [versions]
 kotlin = "2.1.20" # Used for the actual coding
-ktlint = "1.5.0"
-kotlin-ktlint = "2.1.0"
+ktlint = "1.6.0"
+kotlin-ktlint = "2.1.21"
 detekt = "1.23.8"
 kotlin-detekt = "2.0.20"
-junit = "5.11.4"
+junit = "5.13.3"
+junit-platform = "1.13.3"
 
 [libraries]
 ktlint-core = { module = "com.pinterest.ktlint:ktlint-core", version.ref = "ktlint" }
@@ -24,6 +25,8 @@ kaml = "com.charleskorn.kaml:kaml:0.81.0"
 
 junit5 = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
 junit5-params = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "junit" }
+junit5-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit" }
+junit5-platform-launcher = { module = "org.junit.platform:junit-platform-launcher", version.ref = "junit-platform" }
 assertj = "org.assertj:assertj-core:3.27.3"
 konsist = "com.lemonappdev:konsist:0.17.3"
 reflections = "org.reflections:reflections:0.10.2"
