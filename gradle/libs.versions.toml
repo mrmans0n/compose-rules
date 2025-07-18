@@ -21,7 +21,7 @@ kotlin-compiler = { module = "org.jetbrains.kotlin:kotlin-compiler-embeddable", 
 kotlin-compiler-detekt = { module = "org.jetbrains.kotlin:kotlin-compiler-embeddable", version.ref = "kotlin-detekt" }
 kotlin-compiler-ktlint = { module = "org.jetbrains.kotlin:kotlin-compiler-embeddable", version.ref = "kotlin-ktlint" }
 
-kaml = "com.charleskorn.kaml:kaml:0.81.0"
+kaml = "com.charleskorn.kaml:kaml:0.85.0"
 
 junit5 = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
 junit5-params = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "junit" }
