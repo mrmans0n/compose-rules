@@ -51,9 +51,6 @@ allprojects {
     }
 
     version = project.property("VERSION_NAME") ?: "0.0.0"
-    if (project != rootProject) {
-        pluginManager.apply(libs.plugins.mavenPublish.get().pluginId)
-    }
 
     project.configurations.create("compileOnlyOrApi") {
         isCanBeConsumed = false

@@ -3,6 +3,7 @@
 plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.shadowJar)
+    alias(libs.plugins.mavenPublish)
 }
 
 // if publishing and it's not the uber jar, we want to remove the shadowRuntimeElements variant
