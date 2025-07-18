@@ -66,7 +66,7 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
 
       - name: Deploy to Sonatype
-        run: ./gradlew clean :rules:ktlint:publishToMavenCentral :rules:detekt:publishToMavenCentral --no-parallel --no-daemon --no-configuration-cache --stacktrace
+        run: ./gradlew clean publishAndReleaseToMavenCentral --no-parallel --no-daemon --no-configuration-cache --stacktrace
         env:
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
