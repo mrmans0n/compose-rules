@@ -3,7 +3,7 @@ kotlin = "2.2.0" # Used for the actual coding
 ktlint = "1.7.0"
 kotlin-ktlint = "2.2.0"
 detekt = "1.23.8"
-kotlin-detekt = "2.2.0"
+kotlin-detekt = "2.0.20"
 junit = "5.13.3"
 junit-platform = "1.13.3"
 
