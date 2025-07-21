@@ -1,6 +1,6 @@
 [versions]
 kotlin = "2.2.0" # Used for the code of the rules
-ktlint = "1.7.0"
+ktlint = "1.7.1"
 kotlin-ktlint = "2.2.0" # Update only when ktlint version updates
 detekt = "1.23.8"
 kotlin-detekt = "2.0.20" # Update only when detekt version updates
