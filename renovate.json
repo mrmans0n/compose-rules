@@ -1,6 +1,25 @@
 {
     "extends": [
-        "config:base"
+        "config:recommended"
     ],
-    "includeForks": true
+    "includeForks": true,
+    "packageRules": [
+        {
+            "description": "Limit kaml updates to every 15 days",
+            "matchPackageNames": ["com.charleskorn.kaml**"],
+            "schedule": ["* 0-3 1,15 * *"]
+        },
+        {
+            "description": "Group detekt and kotlin-detekt updates together",
+            "matchFileNames": ["gradle/libs.versions.toml"],
+            "matchDepNames": ["detekt", "kotlin-detekt"],
+            "groupName": "detekt dependencies"
+        },
+        {
+            "description": "Group ktlint and kotlin-ktlint updates together",
+            "matchFileNames": ["gradle/libs.versions.toml"],
+            "matchDepNames": ["ktlint", "kotlin-ktlint"],
+            "groupName": "detekt dependencies"
+        }
+    ]
 }
