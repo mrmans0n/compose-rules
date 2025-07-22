@@ -33,6 +33,32 @@ class MutableStateParameterCheckTest {
     }
 
     @Test
+    fun `errors when a Composable has primitive MutableState parameters`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun Something(
+                    a: MutableIntState,
+                    b: MutableFloatState,
+                    c: MutableDoubleState,
+                    d: MutableLongState
+                ) {}
+            """.trimIndent()
+        val errors = rule.lint(code)
+        assertThat(errors)
+            .hasStartSourceLocations(
+                SourceLocation(3, 5),
+                SourceLocation(4, 5),
+                SourceLocation(5, 5),
+                SourceLocation(6, 5),
+            )
+        for (error in errors) {
+            assertThat(error).hasMessage(MutableStateParameter.MutableStateParameterInCompose)
+        }
+    }
+
+    @Test
     fun `no errors when a Composable has valid parameters`() {
         @Language("kotlin")
         val code =
