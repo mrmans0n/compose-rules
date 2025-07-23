@@ -22,6 +22,6 @@ The process to migrate to these rules coming from the Twitter ones is simple.
 1. Change the project coordinates in your gradle build scripts
    2. For detekt, `com.twitter.compose.rules:detekt:$version` becomes `io.nlopez.compose.rules:detekt:$version`
    3. For ktlint, `com.twitter.compose.rules:ktlint:$version` becomes `io.nlopez.compose.rules:ktlint:$version`
-4. Update `$version` to the latest: ![Latest version](https://img.shields.io/maven-central/v/io.nlopez.compose.rules/common) - see the project [releases page](https://github.com/mrmans0n/compose-rules/releases).
+4. Update `$version` to the latest: ![Latest version](https://img.shields.io/maven-central/v/io.nlopez.compose.rules/ktlint) - see the project [releases page](https://github.com/mrmans0n/compose-rules/releases).
 5. **If you are using Detekt**: update the config file (e.g. `detekt.yml`) so that the rule set name `TwitterCompose` becomes `Compose`. Keep in mind that there are a lot of new rules in this repo that weren't in Twitter's, so you'd be better copying over from the [example configuration](https://mrmans0n.github.io/compose-rules/detekt).
 6. Done!
