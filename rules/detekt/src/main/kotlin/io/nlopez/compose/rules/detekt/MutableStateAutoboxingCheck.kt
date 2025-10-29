@@ -2,22 +2,16 @@
 // SPDX-License-Identifier: Apache-2.0
 package io.nlopez.compose.rules.detekt
 
-import io.gitlab.arturbosch.detekt.api.Config
-import io.gitlab.arturbosch.detekt.api.Debt
-import io.gitlab.arturbosch.detekt.api.Issue
-import io.gitlab.arturbosch.detekt.api.Severity
+import dev.detekt.api.Config
 import io.nlopez.compose.core.ComposeKtVisitor
 import io.nlopez.compose.rules.DetektRule
 import io.nlopez.compose.rules.MutableStateAutoboxing
+import java.net.URI
 
 class MutableStateAutoboxingCheck(config: Config) :
-    DetektRule(config),
-    ComposeKtVisitor by MutableStateAutoboxing() {
-    override val issue: Issue = Issue(
-        id = "MutableStateAutoboxing",
-        severity = Severity.Performance,
-        description = "Using mutableInt/Long/Double/FloatStateOf is recommended over mutableStateOf<X> for " +
-            "Int/Long/Double/Float, as it uses the primitives directly which is more performant.",
-        debt = Debt.FIVE_MINS,
-    )
-}
+    DetektRule(
+        config = config,
+        description = "Avoid autoboxing when creating MutableState",
+        url = URI("https://mrmans0n.github.io/compose-rules/rules/#mutable-state-autoboxing"),
+    ),
+    ComposeKtVisitor by MutableStateAutoboxing()

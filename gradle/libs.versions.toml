@@ -2,8 +2,8 @@
 kotlin = "2.2.0" # Used for the code of the rules
 ktlint = "1.8.0"
 kotlin-ktlint = "2.2.21" # Update only when ktlint version updates
-detekt = "1.23.8"
-kotlin-detekt = "2.0.20" # Update only when detekt version updates
+detekt = "2.0.0-alpha.1"
+kotlin-detekt = "2.2.10" # Update only when detekt version updates
 junit = "5.14.1"
 junit-platform = "1.14.1"
 
@@ -17,11 +17,12 @@ ktlint-rule-engine = { module = "com.pinterest.ktlint:ktlint-rule-engine", versi
 ktlint-cli-ruleset-core = { module = "com.pinterest.ktlint:ktlint-cli-ruleset-core", version.ref = "ktlint" }
 ktlint-test = { module = "com.pinterest.ktlint:ktlint-test", version.ref = "ktlint" }
 
-detekt-core = { module = "io.gitlab.arturbosch.detekt:detekt-core", version.ref = "detekt" }
-detekt-test = { module = "io.gitlab.arturbosch.detekt:detekt-test", version.ref = "detekt" }
+detekt-core = { module = "dev.detekt:detekt-core", version.ref = "detekt" }
+detekt-test = { module = "dev.detekt:detekt-test", version.ref = "detekt" }
+detekt-psi-utils = { module = "dev.detekt:detekt-psi-utils", version.ref = "detekt" }
 
-kotlin-compiler = { module = "org.jetbrains.kotlin:kotlin-compiler-embeddable", version.ref = "kotlin" }
-kotlin-compiler-detekt = { module = "org.jetbrains.kotlin:kotlin-compiler-embeddable", version.ref = "kotlin-detekt" }
+kotlin-compiler = { module = "org.jetbrains.kotlin:kotlin-compiler", version.ref = "kotlin" }
+kotlin-compiler-detekt = { module = "org.jetbrains.kotlin:kotlin-compiler", version.ref = "kotlin-detekt" }
 kotlin-compiler-ktlint = { module = "org.jetbrains.kotlin:kotlin-compiler-embeddable", version.ref = "kotlin-ktlint" }
 
 kaml = "com.charleskorn.kaml:kaml:0.104.0"

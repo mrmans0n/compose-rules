@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package io.nlopez.compose.core
 
-import org.jetbrains.kotlin.com.intellij.psi.PsiElement
+import com.intellij.psi.PsiElement
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 

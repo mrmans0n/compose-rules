@@ -80,7 +80,7 @@ fun KtFile.lambdaTypes(config: ComposeKtConfig): Set<String> = buildSet {
 
     // Add fun interfaces
     addAll(
-        findChildrenByClass<KtClass>()
+        findAllChildrenByClass<KtClass>()
             .filter { it.isInterface() && it.hasModifier(KtTokens.FUN_KEYWORD) }
             .mapNotNull { it.name },
     )
@@ -88,7 +88,7 @@ fun KtFile.lambdaTypes(config: ComposeKtConfig): Set<String> = buildSet {
     // Add typealias with functional types
     // NOTE: it has to be last, so that isLambda picks up fun interfaces / config stuff in lambdaTypes
     addAll(
-        findChildrenByClass<KtTypeAlias>()
+        findAllChildrenByClass<KtTypeAlias>()
             .filter { it.getTypeReference()?.isLambda(this) == true }
             .mapNotNull { it.name },
     )
@@ -100,7 +100,7 @@ fun KtFile.composableLambdaTypes(config: ComposeKtConfig): Set<String> = buildSe
 
     // Add fun interfaces that have their sam method as composable
     addAll(
-        findChildrenByClass<KtClass>()
+        findAllChildrenByClass<KtClass>()
             .filter { it.isInterface() && it.hasModifier(KtTokens.FUN_KEYWORD) }
             .filter { funInterface ->
                 // Find if the method that has no implementation (aka the SAM) is @Composable
@@ -116,7 +116,7 @@ fun KtFile.composableLambdaTypes(config: ComposeKtConfig): Set<String> = buildSe
     // Add typealias with functional types
     // NOTE: it has to be last, so that isLambda picks up fun interfaces / config stuff in lambdaTypes
     addAll(
-        findChildrenByClass<KtTypeAlias>()
+        findAllChildrenByClass<KtTypeAlias>()
             .filter {
                 val typeReference = it.getTypeReference() ?: return@filter false
                 when (val typeElement = typeReference.typeElement) {

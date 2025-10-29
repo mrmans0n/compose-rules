@@ -2,22 +2,16 @@
 // SPDX-License-Identifier: Apache-2.0
 package io.nlopez.compose.rules.detekt
 
-import io.gitlab.arturbosch.detekt.api.Config
-import io.gitlab.arturbosch.detekt.api.Debt
-import io.gitlab.arturbosch.detekt.api.Issue
-import io.gitlab.arturbosch.detekt.api.Severity
+import dev.detekt.api.Config
 import io.nlopez.compose.core.ComposeKtVisitor
 import io.nlopez.compose.rules.DetektRule
 import io.nlopez.compose.rules.ModifierWithoutDefault
+import java.net.URI
 
 class ModifierWithoutDefaultCheck(config: Config) :
-    DetektRule(config),
-    ComposeKtVisitor by ModifierWithoutDefault() {
-
-    override val issue: Issue = Issue(
-        id = "ModifierWithoutDefault",
-        severity = Severity.CodeSmell,
-        description = ModifierWithoutDefault.MissingModifierDefaultParam,
-        debt = Debt.FIVE_MINS,
-    )
-}
+    DetektRule(
+        config = config,
+        description = "Modifier parameters should have a default value",
+        url = URI("https://mrmans0n.github.io/compose-rules/rules/#modifier-without-default"),
+    ),
+    ComposeKtVisitor by ModifierWithoutDefault()

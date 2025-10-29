@@ -25,7 +25,7 @@ fun KtBlockExpression.obtainAllModifierNames(initialName: String): List<String> 
         // Find usages in the current block (the original composable)
         tempModifierNames += findModifierManipulations { tempModifierNames.contains(it) }
         // Find usages in child composable blocks
-        tempModifierNames += findChildrenByClass<KtBlockExpression>()
+        tempModifierNames += findAllChildrenByClass<KtBlockExpression>()
             .flatMap { block -> block.findModifierManipulations { tempModifierNames.contains(it) } }
     }
     return tempModifierNames.toList()
@@ -38,7 +38,7 @@ fun KtBlockExpression.obtainAllModifierNames(initialName: String): List<String> 
 private fun KtBlockExpression.findModifierManipulations(contains: (String) -> Boolean): List<String> = statements
     .filterIsInstance<KtProperty>()
     .flatMap { property ->
-        property.findChildrenByClass<KtReferenceExpression>()
+        property.findAllChildrenByClass<KtReferenceExpression>()
             .filter { referenceExpression ->
                 val parent = referenceExpression.parent
                 parent !is KtCallExpression &&

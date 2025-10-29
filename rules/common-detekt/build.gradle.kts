@@ -6,7 +6,8 @@ plugins {
 }
 
 dependencies {
-    api(libs.kotlin.compiler.detekt)
+    api(libs.detekt.core)
+    api(libs.detekt.psi.utils)
 
     testImplementation(libs.junit5)
     testImplementation(libs.junit5.params)

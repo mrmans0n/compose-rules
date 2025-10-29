@@ -2,21 +2,21 @@
 // SPDX-License-Identifier: Apache-2.0
 package io.nlopez.compose.rules
 
+import com.intellij.psi.PsiElement
+import com.intellij.psi.impl.source.tree.ElementType
+import com.intellij.psi.impl.source.tree.LeafPsiElement
 import io.nlopez.compose.core.ComposeKtConfig
 import io.nlopez.compose.core.ComposeKtVisitor
 import io.nlopez.compose.core.Emitter
 import io.nlopez.compose.core.ifFix
 import io.nlopez.compose.core.util.definedInInterface
-import io.nlopez.compose.core.util.findChildrenByClass
+import io.nlopez.compose.core.util.findAllChildrenByClass
 import io.nlopez.compose.core.util.findDirectChildrenByClass
 import io.nlopez.compose.core.util.findDirectFirstChildByClass
 import io.nlopez.compose.core.util.firstChildLeafOrSelf
 import io.nlopez.compose.core.util.isOverride
 import io.nlopez.compose.core.util.lastChildLeafOrSelf
 import io.nlopez.compose.core.util.nextCodeSibling
-import org.jetbrains.kotlin.com.intellij.psi.PsiElement
-import org.jetbrains.kotlin.com.intellij.psi.impl.source.tree.ElementType
-import org.jetbrains.kotlin.com.intellij.psi.impl.source.tree.LeafPsiElement
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtFunction
 import org.jetbrains.kotlin.psi.KtFunctionType
@@ -34,7 +34,7 @@ class ViewModelInjection : ComposeKtVisitor {
         val knownViewModelFactories = DefaultKnownViewModelFactories +
             config.getSet("viewModelFactories", emptySet())
 
-        bodyBlock.findChildrenByClass<KtProperty>()
+        bodyBlock.findAllChildrenByClass<KtProperty>()
             .flatMap { property ->
                 property.findDirectChildrenByClass<KtCallExpression>()
                     .filter { it.calleeExpression?.text in knownViewModelFactories }

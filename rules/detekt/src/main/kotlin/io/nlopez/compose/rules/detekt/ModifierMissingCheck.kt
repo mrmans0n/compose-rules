@@ -2,11 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 package io.nlopez.compose.rules.detekt
 
-import io.gitlab.arturbosch.detekt.api.Config
-import io.gitlab.arturbosch.detekt.api.Debt
-import io.gitlab.arturbosch.detekt.api.Issue
-import io.gitlab.arturbosch.detekt.api.Severity
-import io.gitlab.arturbosch.detekt.api.config
+import dev.detekt.api.Config
+import dev.detekt.api.config
 import io.nlopez.compose.core.ComposeKtConfig
 import io.nlopez.compose.core.ComposeKtVisitor
 import io.nlopez.compose.core.Emitter
@@ -14,14 +11,14 @@ import io.nlopez.compose.core.util.isAnnotatedWith
 import io.nlopez.compose.rules.DetektRule
 import io.nlopez.compose.rules.ModifierMissing
 import org.jetbrains.kotlin.psi.KtFunction
+import java.net.URI
 
-class ModifierMissingCheck(config: Config) : DetektRule(config) {
-    override val issue: Issue = Issue(
-        id = "ModifierMissing",
-        severity = Severity.Defect,
-        description = ModifierMissing.MissingModifierContentComposable,
-        debt = Debt.TEN_MINS,
-    )
+class ModifierMissingCheck(config: Config) :
+    DetektRule(
+        config = config,
+        description = "Composable functions should accept a Modifier parameter",
+        url = URI("https://mrmans0n.github.io/compose-rules/rules/#modifier-missing"),
+    ) {
     private val visitor: ComposeKtVisitor = ModifierMissing()
 
     // On the docs it looks like this is a common suppressor that should be available everywhere,
