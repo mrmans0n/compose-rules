@@ -7,7 +7,7 @@ import io.nlopez.compose.core.ComposeKtVisitor
 import io.nlopez.compose.core.Emitter
 import io.nlopez.compose.core.report
 import io.nlopez.compose.core.util.createDirectComposableToEmissionCountMapping
-import io.nlopez.compose.core.util.findChildrenByClass
+import io.nlopez.compose.core.util.findAllChildrenByClass
 import io.nlopez.compose.core.util.hasReceiverType
 import io.nlopez.compose.core.util.isComposable
 import io.nlopez.compose.core.util.refineComposableToEmissionCountMapping
@@ -18,7 +18,7 @@ import org.jetbrains.kotlin.psi.KtFunction
 class ContentEmitterReturningValues : ComposeKtVisitor {
 
     override fun visitFile(file: KtFile, emitter: Emitter, config: ComposeKtConfig) {
-        val composables = file.findChildrenByClass<KtFunction>()
+        val composables = file.findAllChildrenByClass<KtFunction>()
             .filter { it.isComposable }
             // We don't want to analyze composables that are extension functions, as they might be things like
             // BoxScope which are legit, and we want to avoid false positives.

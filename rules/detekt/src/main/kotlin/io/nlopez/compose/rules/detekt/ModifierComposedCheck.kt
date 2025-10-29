@@ -2,21 +2,16 @@
 // SPDX-License-Identifier: Apache-2.0
 package io.nlopez.compose.rules.detekt
 
-import io.gitlab.arturbosch.detekt.api.Config
-import io.gitlab.arturbosch.detekt.api.Debt
-import io.gitlab.arturbosch.detekt.api.Issue
-import io.gitlab.arturbosch.detekt.api.Severity
+import dev.detekt.api.Config
 import io.nlopez.compose.core.ComposeKtVisitor
 import io.nlopez.compose.rules.DetektRule
 import io.nlopez.compose.rules.ModifierComposed
+import java.net.URI
 
 class ModifierComposedCheck(config: Config) :
-    DetektRule(config),
-    ComposeKtVisitor by ModifierComposed() {
-    override val issue: Issue = Issue(
-        id = "ModifierComposed",
-        severity = Severity.Performance,
-        description = ModifierComposed.ComposedModifier,
-        debt = Debt.TEN_MINS,
-    )
-}
+    DetektRule(
+        config = config,
+        description = "Modifier.composed should be used with caution",
+        url = URI("https://mrmans0n.github.io/compose-rules/rules/#modifier-composed"),
+    ),
+    ComposeKtVisitor by ModifierComposed()

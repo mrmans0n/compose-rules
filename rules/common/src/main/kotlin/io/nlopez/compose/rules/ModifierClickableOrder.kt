@@ -7,7 +7,8 @@ import io.nlopez.compose.core.ComposeKtVisitor
 import io.nlopez.compose.core.Emitter
 import io.nlopez.compose.core.report
 import io.nlopez.compose.core.util.argumentsUsingModifiers
-import io.nlopez.compose.core.util.findChildrenByClass
+import io.nlopez.compose.core.util.findAllChildrenByClass
+import io.nlopez.compose.core.util.findDirectChildrenByClass
 import io.nlopez.compose.core.util.modifierParameters
 import io.nlopez.compose.core.util.obtainAllModifierNames
 import org.jetbrains.kotlin.psi.KtCallExpression
@@ -26,7 +27,7 @@ class ModifierClickableOrder : ComposeKtVisitor {
         val initialModifierNames = function.modifierParameters(config).mapNotNull { it.name }
         val modifiers = initialModifierNames.flatMap { code.obtainAllModifierNames(it) }.toSet()
 
-        val suspiciousOrderModifiers = code.findChildrenByClass<KtCallExpression>()
+        val suspiciousOrderModifiers = code.findAllChildrenByClass<KtCallExpression>()
             .filter { it.calleeExpression?.text?.first()?.isUpperCase() == true }
             .flatMap { callExpression ->
                 callExpression.argumentsUsingModifiers(modifiers + "Modifier")

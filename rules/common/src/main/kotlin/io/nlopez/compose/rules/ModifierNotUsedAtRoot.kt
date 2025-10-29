@@ -8,7 +8,7 @@ import io.nlopez.compose.core.Emitter
 import io.nlopez.compose.core.report
 import io.nlopez.compose.core.util.argumentsUsingModifiers
 import io.nlopez.compose.core.util.emitsContent
-import io.nlopez.compose.core.util.findChildrenByClass
+import io.nlopez.compose.core.util.findAllChildrenByClass
 import io.nlopez.compose.core.util.isInContentEmittersDenylist
 import io.nlopez.compose.core.util.mapSecond
 import io.nlopez.compose.core.util.modifierParameter
@@ -28,7 +28,7 @@ class ModifierNotUsedAtRoot : ComposeKtVisitor {
 
         val modifiers = code.obtainAllModifierNames("modifier").toSet()
 
-        val errors = code.findChildrenByClass<KtCallExpression>()
+        val errors = code.findAllChildrenByClass<KtCallExpression>()
             .filter { it.calleeExpression?.text?.first()?.isUpperCase() == true }
             .mapNotNull { callExpression ->
                 callExpression.argumentsUsingModifiers(modifiers).firstOrNull()

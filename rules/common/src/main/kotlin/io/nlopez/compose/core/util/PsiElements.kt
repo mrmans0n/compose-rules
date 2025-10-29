@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 package io.nlopez.compose.core.util
 
-import org.jetbrains.kotlin.com.intellij.psi.PsiElement
-import org.jetbrains.kotlin.com.intellij.psi.PsiNameIdentifierOwner
+import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiNameIdentifierOwner
 import org.jetbrains.kotlin.psi.psiUtil.endOffset
 import org.jetbrains.kotlin.psi.psiUtil.parentsWithSelf
 import org.jetbrains.kotlin.psi.psiUtil.siblings
@@ -13,11 +13,11 @@ import java.util.LinkedList
 
 val PsiElementAlwaysTruePredicate: (PsiElement) -> Boolean = { true }
 
-inline fun <reified T : PsiElement> PsiElement.findChildrenByClass(
+inline fun <reified T : PsiElement> PsiElement.findAllChildrenByClass(
     noinline shouldVisitChildren: (PsiElement) -> Boolean = PsiElementAlwaysTruePredicate,
 ): Sequence<T> = sequence {
     val queue: Deque<PsiElement> = LinkedList()
-    queue.add(this@findChildrenByClass)
+    queue.add(this@findAllChildrenByClass)
     while (queue.isNotEmpty()) {
         val current = queue.pop()
         if (current is T) {

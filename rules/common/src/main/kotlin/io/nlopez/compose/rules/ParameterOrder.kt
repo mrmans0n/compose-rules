@@ -6,7 +6,7 @@ import io.nlopez.compose.core.ComposeKtConfig
 import io.nlopez.compose.core.ComposeKtVisitor
 import io.nlopez.compose.core.Emitter
 import io.nlopez.compose.core.report
-import io.nlopez.compose.core.util.findChildrenByClass
+import io.nlopez.compose.core.util.findAllChildrenByClass
 import io.nlopez.compose.core.util.isComposable
 import io.nlopez.compose.core.util.isLambda
 import io.nlopez.compose.core.util.isModifier
@@ -21,7 +21,7 @@ class ParameterOrder : ComposeKtVisitor {
     override fun visitFile(file: KtFile, emitter: Emitter, config: ComposeKtConfig) {
         val lambdaTypes = file.lambdaTypes(config)
 
-        val composables = file.findChildrenByClass<KtFunction>()
+        val composables = file.findAllChildrenByClass<KtFunction>()
             .filter { it.isComposable }
 
         for (function in composables) {

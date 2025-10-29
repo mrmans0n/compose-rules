@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 package io.nlopez.compose.core.util
 
-import org.jetbrains.kotlin.com.intellij.lang.ASTNode
-import org.jetbrains.kotlin.com.intellij.psi.PsiComment
+import com.intellij.lang.ASTNode
+import com.intellij.psi.PsiComment
 import org.jetbrains.kotlin.lexer.KtTokens
 
 fun ASTNode.lastChildLeafOrSelf(): ASTNode {
