@@ -4,8 +4,8 @@ ktlint = "1.7.1"
 kotlin-ktlint = "2.2.0" # Update only when ktlint version updates
 detekt = "1.23.8"
 kotlin-detekt = "2.0.20" # Update only when detekt version updates
-junit = "5.14.0"
-junit-platform = "1.14.0"
+junit = "5.14.1"
+junit-platform = "1.14.1"
 
 [libraries]
 ktlint-core = { module = "com.pinterest.ktlint:ktlint-core", version.ref = "ktlint" }
