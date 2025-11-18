@@ -47,7 +47,9 @@ abstract class KtlintRule(id: String, editorConfigProperties: Set<EditorConfigPr
     ) {
         when (val psi = node.psi) {
             is KtFile -> visitFile(psi, emit.toEmitter(), config)
+
             is KtClass -> visitClass(psi, emit.toEmitter(), config)
+
             is KtFunction -> {
                 val emitter = emit.toEmitter()
                 visitFunction(psi, emitter, config)

@@ -101,6 +101,7 @@ private fun KtExpression.uiEmitterCount(config: ComposeKtConfig): Int {
                     totalEmittersFound++
                     1
                 }
+
                 // Scoped functions like run, with, etc.
                 current.calleeExpression?.text in KotlinScopeFunctions ->
                     callRecursive(current.lambdaArguments.singleOrNull()?.getLambdaExpression()?.bodyExpression)
