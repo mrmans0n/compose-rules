@@ -234,6 +234,7 @@ private val ComposableNonEmittersList by lazy {
         "AlertDialog",
         "DatePickerDialog",
         "Dialog",
+        "DropdownMenu",
         "ModalBottomSheetLayout",
         "ModalBottomSheet",
         "Popup",
