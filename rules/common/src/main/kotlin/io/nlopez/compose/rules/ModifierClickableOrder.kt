@@ -55,9 +55,13 @@ class ModifierClickableOrder : ComposeKtVisitor {
             if (currentSelector is KtCallExpression) {
                 when {
                     shapeAlteringCandidate && currentSelector.isClickableInteraction -> return currentSelector
+
                     currentSelector.isClipWithShape -> shapeAlteringCandidate = true
+
                     currentSelector.isBorderWithShape -> shapeAlteringCandidate = true
+
                     currentSelector.isBackgroundWithShape -> shapeAlteringCandidate = true
+
                     currentSelector.isThen -> {
                         val param = currentSelector.valueArguments.firstOrNull()
                         if (param != null) {
@@ -118,11 +122,14 @@ class ModifierClickableOrder : ComposeKtVisitor {
         get() = when (val expression = getArgumentExpression()) {
             // MyShape()
             is KtCallExpression -> expression.calleeExpression?.text?.endsWith("Shape") == true
+
             // MyShape
             is KtReferenceExpression -> expression.text.endsWith("Shape")
+
             // if (x) MyShape else MyOtherShape
             is KtIfExpression -> expression.then?.text?.endsWith("Shape") == true ||
                 expression.`else`?.text?.endsWith("Shape") == true
+
             // MaterialTheme.shapes.x or LocalShapes.current.x or AppShapes.x or MyThemeShapes.x
             is KtDotQualifiedExpression -> expression.text.startsWith("MaterialTheme.shapes") ||
                 expression.text.contains("Shape")

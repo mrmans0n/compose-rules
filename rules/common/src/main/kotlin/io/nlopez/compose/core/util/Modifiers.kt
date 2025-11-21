@@ -59,6 +59,7 @@ fun KtCallExpression.argumentsUsingModifiers(modifierNames: Set<String>): List<K
             is KtReferenceExpression -> {
                 expression.text in modifierNames
             }
+
             // if it's MyComposable(modifier.fillMaxWidth()) or similar
             is KtDotQualifiedExpression -> {
                 // On cases of multiple nested KtDotQualifiedExpressions (e.g. multiple chained methods)

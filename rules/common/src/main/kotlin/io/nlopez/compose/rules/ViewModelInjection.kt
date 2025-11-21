@@ -86,6 +86,7 @@ class ViewModelInjection : ComposeKtVisitor {
                 (parameterList.node.lastChildLeafOrSelf() as LeafPsiElement)
                     .rawReplaceWithText("${newParam.text})")
             }
+
             // If the last element is a function, we need to preserve the trailing lambda, so we will insert
             // the code before that last param
             lastParameters.last().typeReference?.typeElement is KtFunctionType -> {
@@ -104,6 +105,7 @@ class ViewModelInjection : ComposeKtVisitor {
                     lastToken.rawReplaceWithText("${lastToken.text} $newCode,")
                 }
             }
+
             // Add as the last parameter
             else -> {
                 // Ideally this should just be:

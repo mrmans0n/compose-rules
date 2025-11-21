@@ -64,9 +64,11 @@ class LambdaParameterInRestartableEffect : ComposeKtVisitor {
                                 isDisposableEffect -> {
                                     expressions.filter { it.calleeExpression?.text != "onDispose" }
                                 }
+
                                 isLifecycleEffect -> {
                                     expressions.filter { it.calleeExpression?.text !in LifecycleEffectScopeFunctions }
                                 }
+
                                 else -> {
                                     expressions
                                 }
@@ -83,6 +85,7 @@ class LambdaParameterInRestartableEffect : ComposeKtVisitor {
                                 is KtReferenceExpression -> {
                                     if (expression.text in lambdaParameterNames) expression.text else null
                                 }
+
                                 // something(if (x) myLambda else otherThing)
                                 is KtIfExpression -> {
                                     if (expression.then?.text in lambdaParameterNames) {
