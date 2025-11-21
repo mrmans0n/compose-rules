@@ -33,6 +33,7 @@ private fun KtCallExpression.ancestorsParameterNamesSequence(stopAt: PsiElement)
         when {
             // Normal parameters
             parameter.name != null -> listOfNotNull(parameter.name)
+
             // Destructured parameters
             parameter.destructuringDeclaration != null ->
                 parameter.destructuringDeclaration!!
