@@ -157,6 +157,10 @@ class ViewModelInjection : ComposeKtVisitor {
                 "mavericksViewModel",
                 // Tangle (Anvil extensions)
                 "tangleViewModel",
+                // Metro (expected name)
+                "metroViewModel",
+                // Anvil (expected name)
+                "anvilViewModel",
             )
         }
 
