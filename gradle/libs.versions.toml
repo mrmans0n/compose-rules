@@ -7,6 +7,9 @@ kotlin-detekt = "2.0.20" # Update only when detekt version updates
 junit = "5.14.1"
 junit-platform = "1.14.1"
 
+# Compose BOM (for samples)
+compose-bom = "2024.12.01"
+
 [libraries]
 ktlint-core = { module = "com.pinterest.ktlint:ktlint-core", version.ref = "ktlint" }
 ktlint-rule-engine-core = { module = "com.pinterest.ktlint:ktlint-rule-engine-core", version.ref = "ktlint" }
@@ -23,6 +26,12 @@ kotlin-compiler-ktlint = { module = "org.jetbrains.kotlin:kotlin-compiler-embedd
 
 kaml = "com.charleskorn.kaml:kaml:0.102.0"
 
+# Compose libraries (for samples - versions managed by BOM)
+compose-bom = { module = "androidx.compose:compose-bom", version.ref = "compose-bom" }
+compose-runtime = { module = "androidx.compose.runtime:runtime" }
+compose-foundation = { module = "androidx.compose.foundation:foundation" }
+compose-material3 = { module = "androidx.compose.material3:material3" }
+
 junit5 = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
 junit5-params = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "junit" }
 junit5-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit" }
@@ -34,6 +43,8 @@ reflections = "org.reflections:reflections:0.10.2"
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 mavenPublish = "com.vanniktech.maven.publish:0.35.0"
 spotless = { id = "com.diffplug.spotless", version = "8.1.0" }
 shadowJar = { id = "com.gradleup.shadow", version = "9.0.2" }
+detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }

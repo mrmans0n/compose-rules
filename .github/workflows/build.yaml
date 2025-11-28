@@ -43,6 +43,34 @@ jobs:
             **/build/test-results/*
             **/build/reports/*
 
+  integration-tests:
+    runs-on: ubuntu-latest
+    needs: [ build ]
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup JDK
+        uses: actions/setup-java@v5
+        with:
+            distribution: 'zulu'
+            java-version: 24
+
+      - name: Copy CI gradle.properties
+        run: mkdir -p ~/.gradle ; cp .github/ci-gradle.properties ~/.gradle/gradle.properties
+
+      - uses: gradle/actions/setup-gradle@v5
+
+      - name: Build rule artifacts
+        run: ./gradlew :rules:detekt:assemble :rules:ktlint:assemble
+
+      - name: Test detekt sample
+        run: ./scripts/test-detekt-sample.sh
+
+      - name: Test ktlint sample
+        run: ./scripts/test-ktlint-sample.sh
+
   deploy:
     if: github.event_name == 'push' && github.repository == 'mrmans0n/compose-rules'
     runs-on: ubuntu-latest

@@ -1,0 +1,101 @@
+# Detekt configuration for testing compose-rules
+# All Compose rules are enabled to catch violations
+
+# Recommended detekt configuration for Compose projects
+# See: https://detekt.dev/docs/introduction/compose
+
+naming:
+  FunctionNaming:
+    # Allow PascalCase for @Composable functions that return Unit
+    ignoreAnnotated:
+      - 'Composable'
+  TopLevelPropertyNaming:
+    # Compose style: PascalCase for top-level constants (e.g., FooPadding instead of FOO_PADDING)
+    constantPattern: '[A-Z][A-Za-z0-9]*'
+
+complexity:
+  LongParameterList:
+    # Composables often have many parameters with default values
+    ignoreDefaultParameters: true
+    functionThreshold: 10
+  TooManyFunctions:
+    # Don't count @Preview functions toward the limit
+    ignoreAnnotatedFunctions:
+      - 'Preview'
+
+style:
+  MagicNumber:
+    # Allow Color(0xFFEA6D7E) style declarations
+    ignorePropertyDeclaration: true
+    ignoreCompanionObjectPropertyDeclaration: true
+  UnusedPrivateMember:
+    # Don't flag @Preview composables as unused
+    ignoreAnnotated:
+      - 'Preview'
+
+Compose:
+  ComposableAnnotationNaming:
+    active: true
+  ComposableNaming:
+    active: true
+  ComposableParamOrder:
+    active: true
+  CompositionLocalAllowlist:
+    active: true
+  CompositionLocalNaming:
+    active: true
+  ContentEmitterReturningValues:
+    active: true
+  ContentTrailingLambda:
+    active: true
+  ContentSlotReused:
+    active: true
+  DefaultsVisibility:
+    active: true
+  LambdaParameterEventTrailing:
+    active: true
+  LambdaParameterInRestartableEffect:
+    active: true
+  Material2:
+    active: false
+  ModifierClickableOrder:
+    active: true
+  ModifierComposed:
+    active: true
+  ModifierMissing:
+    active: true
+  ModifierNaming:
+    active: true
+  ModifierNotUsedAtRoot:
+    active: true
+  ModifierReused:
+    active: true
+  ModifierWithoutDefault:
+    active: true
+  MultipleEmitters:
+    active: true
+  MutableParams:
+    active: true
+  MutableStateAutoboxing:
+    active: true
+  MutableStateParam:
+    active: true
+  ParameterNaming:
+    active: true
+  PreviewAnnotationNaming:
+    active: true
+  PreviewNaming:
+    active: false
+  PreviewPublic:
+    active: true
+  RememberMissing:
+    active: true
+  RememberContentMissing:
+    active: true
+  UnstableCollections:
+    active: false
+  ViewModelForwarding:
+    active: true
+  ViewModelInjection:
+    active: true
+
