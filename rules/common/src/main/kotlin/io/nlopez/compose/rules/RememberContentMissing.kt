@@ -5,7 +5,7 @@ package io.nlopez.compose.rules
 import io.nlopez.compose.core.ComposeKtConfig
 import io.nlopez.compose.core.ComposeKtVisitor
 import io.nlopez.compose.core.Emitter
-import io.nlopez.compose.core.util.findChildrenByClass
+import io.nlopez.compose.core.util.findAllChildrenByClass
 import io.nlopez.compose.core.util.isRemembered
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtFunction
@@ -15,7 +15,7 @@ class RememberContentMissing : ComposeKtVisitor {
     override fun visitComposable(function: KtFunction, emitter: Emitter, config: ComposeKtConfig) {
         // To keep memory consumption in check, we first traverse down until we see one of our known functions
         // that need remembering
-        function.findChildrenByClass<KtCallExpression>()
+        function.findAllChildrenByClass<KtCallExpression>()
             .filter { it.calleeExpression?.text in ContentThatNeedsRemembering }
             // Only for those, we traverse up to [function], to see if it was actually remembered
             .filterNot { it.isRemembered(function) }

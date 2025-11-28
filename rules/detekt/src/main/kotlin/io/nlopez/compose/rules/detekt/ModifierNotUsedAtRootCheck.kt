@@ -2,21 +2,16 @@
 // SPDX-License-Identifier: Apache-2.0
 package io.nlopez.compose.rules.detekt
 
-import io.gitlab.arturbosch.detekt.api.Config
-import io.gitlab.arturbosch.detekt.api.Debt
-import io.gitlab.arturbosch.detekt.api.Issue
-import io.gitlab.arturbosch.detekt.api.Severity
+import dev.detekt.api.Config
 import io.nlopez.compose.core.ComposeKtVisitor
 import io.nlopez.compose.rules.DetektRule
 import io.nlopez.compose.rules.ModifierNotUsedAtRoot
+import java.net.URI
 
 class ModifierNotUsedAtRootCheck(config: Config) :
-    DetektRule(config),
-    ComposeKtVisitor by ModifierNotUsedAtRoot() {
-    override val issue: Issue = Issue(
-        id = "ModifierNotUsedAtRoot",
-        severity = Severity.Defect,
-        description = ModifierNotUsedAtRoot.ComposableModifierShouldBeUsedAtTheTopMostPossiblePlace,
-        debt = Debt.FIVE_MINS,
-    )
-}
+    DetektRule(
+        config = config,
+        description = "Modifier parameters should be used at the root level composable",
+        url = URI("https://mrmans0n.github.io/compose-rules/rules/#modifier-not-used-at-root"),
+    ),
+    ComposeKtVisitor by ModifierNotUsedAtRoot()

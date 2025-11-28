@@ -8,7 +8,7 @@ import io.nlopez.compose.core.Emitter
 import io.nlopez.compose.core.util.KotlinItObjectScopeFunctions
 import io.nlopez.compose.core.util.KotlinScopeFunctions
 import io.nlopez.compose.core.util.definedInInterface
-import io.nlopez.compose.core.util.findChildrenByClass
+import io.nlopez.compose.core.util.findAllChildrenByClass
 import io.nlopez.compose.core.util.findDirectChildrenByClass
 import io.nlopez.compose.core.util.isActual
 import io.nlopez.compose.core.util.isOverride
@@ -125,7 +125,7 @@ class ViewModelForwarding : ComposeKtVisitor {
         }
 
         val callExpressions = bodyBlock
-            .findChildrenByClass<KtCallExpression>()
+            .findAllChildrenByClass<KtCallExpression>()
             .filterNot { it in alreadyProcessedCallExpressions }
         scanCallExpressions(callExpressions = callExpressions)
     }

@@ -17,7 +17,6 @@ complexity:
   LongParameterList:
     # Composables often have many parameters with default values
     ignoreDefaultParameters: true
-    functionThreshold: 10
   TooManyFunctions:
     # Don't count @Preview functions toward the limit
     ignoreAnnotatedFunctions:
@@ -28,7 +27,7 @@ style:
     # Allow Color(0xFFEA6D7E) style declarations
     ignorePropertyDeclaration: true
     ignoreCompanionObjectPropertyDeclaration: true
-  UnusedPrivateMember:
+  UnusedPrivateFunction:
     # Don't flag @Preview composables as unused
     ignoreAnnotated:
       - 'Preview'

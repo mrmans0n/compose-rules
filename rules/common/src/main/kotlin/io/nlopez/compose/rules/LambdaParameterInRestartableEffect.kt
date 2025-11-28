@@ -6,7 +6,7 @@ import io.nlopez.compose.core.ComposeKtConfig
 import io.nlopez.compose.core.ComposeKtVisitor
 import io.nlopez.compose.core.Emitter
 import io.nlopez.compose.core.report
-import io.nlopez.compose.core.util.findChildrenByClass
+import io.nlopez.compose.core.util.findAllChildrenByClass
 import io.nlopez.compose.core.util.findShadowingRedeclarations
 import io.nlopez.compose.core.util.isComposable
 import io.nlopez.compose.core.util.isLambda
@@ -22,12 +22,12 @@ import org.jetbrains.kotlin.psi.psiUtil.isDotSelector
 class LambdaParameterInRestartableEffect : ComposeKtVisitor {
     override fun visitFile(file: KtFile, emitter: Emitter, config: ComposeKtConfig) {
         val lambdaTypes = file.lambdaTypes(config)
-        val composables = file.findChildrenByClass<KtFunction>()
+        val composables = file.findAllChildrenByClass<KtFunction>()
             .filter { it.isComposable }
 
         for (composable in composables) {
             // We are only interested in composables with restartable effects (the ones that have keys)
-            val effects = composable.findChildrenByClass<KtCallExpression>()
+            val effects = composable.findAllChildrenByClass<KtCallExpression>()
                 .filter { it.isRestartableEffect }
 
             if (effects.none()) continue
@@ -48,7 +48,7 @@ class LambdaParameterInRestartableEffect : ComposeKtVisitor {
                     val body = effect.lambdaArguments.lastOrNull()?.getLambdaExpression()?.bodyExpression
                         ?: return@flatMap emptySequence()
 
-                    val callExpressions = body.findChildrenByClass<KtCallExpression>()
+                    val callExpressions = body.findAllChildrenByClass<KtCallExpression>()
                         // Filter out dot receivers e.g. `something.myLambda()`
                         .filterNot { it.isDotSelector() }
 

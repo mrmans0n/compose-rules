@@ -2,15 +2,17 @@
 // SPDX-License-Identifier: Apache-2.0
 package io.nlopez.compose.rules
 
+import com.intellij.psi.impl.source.tree.LeafPsiElement
 import io.nlopez.compose.core.ComposeKtConfig
 import io.nlopez.compose.core.ComposeKtVisitor
 import io.nlopez.compose.core.Emitter
 import io.nlopez.compose.core.ifFix
+import io.nlopez.compose.core.util.findDirectFirstChildByClass
 import io.nlopez.compose.core.util.firstChildLeafOrSelf
 import io.nlopez.compose.core.util.isPreview
-import org.jetbrains.kotlin.com.intellij.psi.impl.source.tree.LeafPsiElement
-import org.jetbrains.kotlin.lexer.KtTokens
+import io.nlopez.compose.core.util.lastChildLeafOrSelf
 import org.jetbrains.kotlin.psi.KtFunction
+import org.jetbrains.kotlin.psi.KtModifierListOwner
 import org.jetbrains.kotlin.psi.psiUtil.isPublic
 
 class PreviewPublic : ComposeKtVisitor {
@@ -26,10 +28,13 @@ class PreviewPublic : ComposeKtVisitor {
             //  function.addModifier(KtTokens.PRIVATE_KEYWORD)
 
             // For now we need to do it by hand with ASTNode: find the "fun" modifier, and prepend "private".
-            val node = function.node.findChildByType(KtTokens.FUN_KEYWORD)
+            val node = function.node.findChildByType(org.jetbrains.kotlin.lexer.KtTokens.FUN_KEYWORD)
                 ?.firstChildLeafOrSelf() as? LeafPsiElement
                 ?: return@ifFix
-            node.rawReplaceWithText(KtTokens.PRIVATE_KEYWORD.value + " " + KtTokens.FUN_KEYWORD.value)
+            node.rawReplaceWithText(
+                org.jetbrains.kotlin.lexer.KtTokens.PRIVATE_KEYWORD.value + " " +
+                    org.jetbrains.kotlin.lexer.KtTokens.FUN_KEYWORD.value,
+            )
         }
     }
 

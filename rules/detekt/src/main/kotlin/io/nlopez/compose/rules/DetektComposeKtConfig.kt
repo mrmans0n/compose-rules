@@ -2,8 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package io.nlopez.compose.rules
 
-import io.gitlab.arturbosch.detekt.api.Config
-import io.gitlab.arturbosch.detekt.api.internal.valueOrDefaultCommaSeparated
+import dev.detekt.api.Config
 import io.nlopez.compose.core.ComposeKtConfig
 
 /**
@@ -27,8 +26,18 @@ internal class DetektComposeKtConfig(private val config: Config) : ComposeKtConf
         }
     }
 
-    override fun getList(key: String, default: List<String>): List<String> =
-        valueOrPut(key) { config.valueOrDefaultCommaSeparated(key, default) } ?: default
+    override fun getList(key: String, default: List<String>): List<String> = valueOrPut(key) {
+        try {
+            // Try to get as a list first (detekt 2.0 native list support)
+            config.valueOrNull<List<String>>(key)
+        } catch (e: ClassCastException) {
+            // Fall back to string parsing for backward compatibility
+            config.valueOrNull<String>(key)
+                ?.split(',', ';')
+                ?.map { it.trim() }
+                ?.filter { it.isNotEmpty() }
+        } ?: default
+    } ?: default
 
     override fun getSet(key: String, default: Set<String>): Set<String> =
         valueOrPut(key) { getList(key, default.toList()).toSet() } ?: default

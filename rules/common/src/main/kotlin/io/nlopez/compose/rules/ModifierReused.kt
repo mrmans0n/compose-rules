@@ -2,17 +2,17 @@
 // SPDX-License-Identifier: Apache-2.0
 package io.nlopez.compose.rules
 
+import com.intellij.psi.PsiElement
 import io.nlopez.compose.core.ComposeKtConfig
 import io.nlopez.compose.core.ComposeKtVisitor
 import io.nlopez.compose.core.Emitter
 import io.nlopez.compose.core.util.emitsContent
-import io.nlopez.compose.core.util.findChildrenByClass
+import io.nlopez.compose.core.util.findAllChildrenByClass
 import io.nlopez.compose.core.util.isAnyShadowed
 import io.nlopez.compose.core.util.isUsingModifiers
 import io.nlopez.compose.core.util.modifierParameters
 import io.nlopez.compose.core.util.obtainAllModifierNames
 import io.nlopez.compose.core.util.walkBackwards
-import org.jetbrains.kotlin.com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtFunction
 import org.jetbrains.kotlin.psi.KtReturnExpression
@@ -34,7 +34,7 @@ class ModifierReused : ComposeKtVisitor {
             }
             .forEach { modifierNames ->
                 // Find all composable-looking CALL_EXPRESSIONs that are using any of these modifier names
-                composableBlockExpression.findChildrenByClass<KtCallExpression>()
+                composableBlockExpression.findAllChildrenByClass<KtCallExpression>()
                     .filter { it.calleeExpression?.text?.first()?.isUpperCase() == true }
                     .filter { it.isUsingModifiers(modifierNames) }
                     // For those modifiers, we look at the parents and see if any of them is a function that has a param with

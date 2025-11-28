@@ -2,21 +2,16 @@
 // SPDX-License-Identifier: Apache-2.0
 package io.nlopez.compose.rules.detekt
 
-import io.gitlab.arturbosch.detekt.api.Config
-import io.gitlab.arturbosch.detekt.api.Debt
-import io.gitlab.arturbosch.detekt.api.Issue
-import io.gitlab.arturbosch.detekt.api.Severity
+import dev.detekt.api.Config
 import io.nlopez.compose.core.ComposeKtVisitor
 import io.nlopez.compose.rules.DetektRule
 import io.nlopez.compose.rules.ViewModelForwarding
+import java.net.URI
 
 class ViewModelForwardingCheck(config: Config) :
-    DetektRule(config),
-    ComposeKtVisitor by ViewModelForwarding() {
-    override val issue: Issue = Issue(
-        id = "ViewModelForwarding",
-        severity = Severity.CodeSmell,
-        description = ViewModelForwarding.AvoidViewModelForwarding,
-        debt = Debt.TWENTY_MINS,
-    )
-}
+    DetektRule(
+        config = config,
+        description = "ViewModels should not be passed down the Composable tree",
+        url = URI("https://mrmans0n.github.io/compose-rules/rules/#viewmodel-forwarding"),
+    ),
+    ComposeKtVisitor by ViewModelForwarding()
