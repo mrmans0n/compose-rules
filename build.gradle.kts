@@ -18,12 +18,14 @@ allprojects {
         val ktlintVersion = libs.versions.ktlint.get()
         kotlin {
             target("**/*.kt")
+            targetExclude("**/samples/**/*.kt")
             ktlint(ktlintVersion)
 
             licenseHeaderFile(rootProject.file("spotless/copyright.txt"))
         }
         kotlinGradle {
             target("*.kts")
+            targetExclude("**/samples/**/*.kts")
             ktlint(ktlintVersion)
         }
     }

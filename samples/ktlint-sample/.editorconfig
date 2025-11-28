@@ -1,0 +1,12 @@
+# EditorConfig configuration for testing compose-rules with ktlint
+root = true
+
+[*.{kt,kts}]
+# Disable the standard function-naming rule for Composables
+ktlint_function_naming_ignore_when_annotated_with = Composable
+
+# Compose-specific configurations can be added here if needed
+# For example:
+# compose_content_emitters = MyCustomComposable
+# compose_allowed_composable_function_names = .*Presenter
+
