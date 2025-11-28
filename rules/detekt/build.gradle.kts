@@ -9,9 +9,11 @@ plugins {
 
 // if publishing and it's not the uber jar, we want to remove the shadowRuntimeElements variant
 if (!project.hasProperty("uberJar")) {
-    val javaComponent = components["java"] as AdhocComponentWithVariants
-    javaComponent.withVariantsFromConfiguration(configurations["shadowRuntimeElements"]) {
-        skip()
+    afterEvaluate {
+        val javaComponent = components["java"] as AdhocComponentWithVariants
+        javaComponent.withVariantsFromConfiguration(configurations["shadowRuntimeElements"]) {
+            skip()
+        }
     }
 }
 
