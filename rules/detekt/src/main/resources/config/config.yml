@@ -1,6 +1,10 @@
 Compose:
   ComposableAnnotationNaming:
     active: true
+  ComposableNaming:
+    active: true
+  ComposableParamOrder:
+    active: true
   CompositionLocalAllowlist:
     active: true
   CompositionLocalNaming:
@@ -33,19 +37,15 @@ Compose:
     active: true
   ModifierWithoutDefault:
     active: true
-  MultipleContentEmitters:
+  MultipleEmitters:
     active: true
-  MutableParameters:
+  MutableParams:
     active: true
   MutableStateAutoboxing:
     active: true
-  MutableStateParameter:
-    active: true
-  Naming:
+  MutableStateParam:
     active: true
   ParameterNaming:
-    active: true
-  ParameterOrder:
     active: true
   PreviewAnnotationNaming:
     active: true
@@ -55,7 +55,7 @@ Compose:
     active: true
   RememberContentMissing:
     active: true
-  RememberStateMissing:
+  RememberMissing:
     active: true
   UnstableCollections:
     active: false
