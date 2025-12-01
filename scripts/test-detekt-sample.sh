@@ -12,6 +12,15 @@ ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 SAMPLE_DIR="$ROOT_DIR/samples/detekt-sample"
 
 echo "=== Testing detekt sample ==="
+
+# Build the main project first if JARs don't exist
+if ! ls "$ROOT_DIR"/rules/detekt/build/libs/*.jar >/dev/null 2>&1; then
+    echo "Building main project to ensure dependencies are available..."
+    "$ROOT_DIR/gradlew" assemble > /dev/null 2>&1
+else
+    echo "Using existing JAR files (skipping build)..."
+fi
+
 echo "Running detekt check on sample project..."
 
 # Run detekt and capture output (expecting it to fail with violations)

@@ -12,6 +12,15 @@ ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 SAMPLE_DIR="$ROOT_DIR/samples/ktlint-sample"
 
 echo "=== Testing ktlint sample ==="
+
+# Build the main project first if JARs don't exist
+if ! ls "$ROOT_DIR"/rules/ktlint/build/libs/*.jar >/dev/null 2>&1; then
+    echo "Building main project to ensure dependencies are available..."
+    "$ROOT_DIR/gradlew" assemble > /dev/null 2>&1
+else
+    echo "Using existing JAR files (skipping build)..."
+fi
+
 echo "Running spotless check on sample project..."
 
 # Run spotless and capture output (expecting it to fail with violations)
