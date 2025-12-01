@@ -8,7 +8,7 @@ import io.nlopez.compose.core.Emitter
 import io.nlopez.compose.core.report
 import io.nlopez.compose.core.util.composableLambdaTypes
 import io.nlopez.compose.core.util.contentSlots
-import io.nlopez.compose.core.util.findChildrenByClass
+import io.nlopez.compose.core.util.findAllChildrenByClass
 import io.nlopez.compose.core.util.findShadowingRedeclarations
 import io.nlopez.compose.core.util.isTypeNullable
 import io.nlopez.compose.core.util.lambdaTypes
@@ -34,13 +34,13 @@ class ContentSlotReused : ComposeKtVisitor {
         val slotName = slot.name?.takeIf { it.isNotEmpty() } ?: return emptySequence()
         val slots = when {
             // content?.invoke()
-            slot.isTypeNullable -> findChildrenByClass<KtSafeQualifiedExpression>()
+            slot.isTypeNullable -> findAllChildrenByClass<KtSafeQualifiedExpression>()
                 .filter { it.receiverExpression.text == slotName }
                 .mapNotNull { it.selectorExpression as? KtCallExpression }
                 .filter { it.calleeExpression?.text == "invoke" }
 
             // content()
-            else -> findChildrenByClass<KtCallExpression>().filter { it.calleeExpression?.text == slotName }
+            else -> findAllChildrenByClass<KtCallExpression>().filter { it.calleeExpression?.text == slotName }
         }
         // Return and remove shadowed usages
         return slots.filter { it.findShadowingRedeclarations(parameterName = slotName, stopAt = this).count() == 0 }

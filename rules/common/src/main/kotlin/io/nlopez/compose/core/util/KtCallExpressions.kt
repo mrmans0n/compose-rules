@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package io.nlopez.compose.core.util
 
-import org.jetbrains.kotlin.com.intellij.psi.PsiElement
+import com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtCallableDeclaration
 import org.jetbrains.kotlin.psi.KtDeclarationWithInitializer

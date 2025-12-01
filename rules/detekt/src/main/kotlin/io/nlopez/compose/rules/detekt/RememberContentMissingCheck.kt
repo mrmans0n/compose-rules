@@ -2,24 +2,16 @@
 // SPDX-License-Identifier: Apache-2.0
 package io.nlopez.compose.rules.detekt
 
-import io.gitlab.arturbosch.detekt.api.Config
-import io.gitlab.arturbosch.detekt.api.Debt
-import io.gitlab.arturbosch.detekt.api.Issue
-import io.gitlab.arturbosch.detekt.api.Severity
+import dev.detekt.api.Config
 import io.nlopez.compose.core.ComposeKtVisitor
 import io.nlopez.compose.rules.DetektRule
 import io.nlopez.compose.rules.RememberContentMissing
+import java.net.URI
 
 class RememberContentMissingCheck(config: Config) :
-    DetektRule(config),
-    ComposeKtVisitor by RememberContentMissing() {
-
-    override val issue: Issue = Issue(
-        id = "RememberContentMissing",
-        severity = Severity.Defect,
-        description = """
-            Using movableContentOf/movableContentWithReceiverOf in a @Composable function without it being remembered can cause visual problems, as the content would be recycled when detached from the composition.
-        """.trimIndent(),
-        debt = Debt.FIVE_MINS,
-    )
-}
+    DetektRule(
+        config = config,
+        description = "Content-producing composables should be remembered",
+        url = URI("https://mrmans0n.github.io/compose-rules/rules/#remember-content-missing"),
+    ),
+    ComposeKtVisitor by RememberContentMissing()

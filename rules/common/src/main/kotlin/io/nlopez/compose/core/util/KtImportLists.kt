@@ -2,11 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 package io.nlopez.compose.core.util
 
+import com.intellij.psi.impl.source.tree.CompositeElement
+import com.intellij.psi.impl.source.tree.ElementType
+import com.intellij.psi.impl.source.tree.LeafPsiElement
+import com.intellij.psi.impl.source.tree.PsiWhiteSpaceImpl
 import org.jetbrains.kotlin.KtNodeTypes
-import org.jetbrains.kotlin.com.intellij.psi.impl.source.tree.CompositeElement
-import org.jetbrains.kotlin.com.intellij.psi.impl.source.tree.ElementType
-import org.jetbrains.kotlin.com.intellij.psi.impl.source.tree.LeafPsiElement
-import org.jetbrains.kotlin.com.intellij.psi.impl.source.tree.PsiWhiteSpaceImpl
 import org.jetbrains.kotlin.psi.KtImportList
 import org.jetbrains.kotlin.psi.psiUtil.children
 

@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 package io.nlopez.compose.core.util
 
+import com.intellij.psi.PsiElement
 import io.nlopez.compose.core.ComposeKtConfig
-import org.jetbrains.kotlin.com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.KtBinaryExpression
 import org.jetbrains.kotlin.psi.KtBlockExpression
@@ -24,7 +24,7 @@ import org.jetbrains.kotlin.psi.psiUtil.referenceExpression
 import kotlin.math.max
 
 fun KtFunction.emitsContent(config: ComposeKtConfig): Boolean = when {
-    isComposable -> findChildrenByClass<KtCallExpression> { current ->
+    isComposable -> findAllChildrenByClass<KtCallExpression> { current ->
         current !is KtCallExpression || !current.isInContentEmittersDenylist(config)
     }.any { it.emitsContent(config) }
 

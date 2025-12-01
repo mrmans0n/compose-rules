@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package io.nlopez.compose.rules
 
-import io.gitlab.arturbosch.detekt.test.TestConfig
+import dev.detekt.test.TestConfig
 import org.assertj.core.api.AssertionsForInterfaceTypes.assertThat
 import org.junit.jupiter.api.Test
 

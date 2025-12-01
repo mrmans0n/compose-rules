@@ -2,25 +2,16 @@
 // SPDX-License-Identifier: Apache-2.0
 package io.nlopez.compose.rules.detekt
 
-import io.gitlab.arturbosch.detekt.api.Config
-import io.gitlab.arturbosch.detekt.api.Debt
-import io.gitlab.arturbosch.detekt.api.Issue
-import io.gitlab.arturbosch.detekt.api.Severity
+import dev.detekt.api.Config
 import io.nlopez.compose.core.ComposeKtVisitor
 import io.nlopez.compose.rules.DetektRule
 import io.nlopez.compose.rules.ParameterNaming
+import java.net.URI
 
 class ParameterNamingCheck(config: Config) :
-    DetektRule(config),
-    ComposeKtVisitor by ParameterNaming() {
-    override val issue: Issue = Issue(
-        id = "ParameterNaming",
-        severity = Severity.CodeSmell,
-        description = """
-        Lambda parameters in a composable function should be in present tense, not past tense.
-
-        Examples: `onClick` and not `onClicked`, `onTextChange` and not `onTextChanged`, etc.
-        """.trimIndent(),
-        debt = Debt.FIVE_MINS,
-    )
-}
+    DetektRule(
+        config = config,
+        description = "Parameters in Composable functions should follow proper naming conventions",
+        url = URI("https://mrmans0n.github.io/compose-rules/rules/#parameter-naming"),
+    ),
+    ComposeKtVisitor by ParameterNaming()

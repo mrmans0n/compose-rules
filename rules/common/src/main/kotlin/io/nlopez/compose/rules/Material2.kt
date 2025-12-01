@@ -7,7 +7,7 @@ import io.nlopez.compose.core.ComposeKtVisitor
 import io.nlopez.compose.core.Emitter
 import io.nlopez.compose.core.report
 import io.nlopez.compose.core.util.dedupUsingOutermost
-import io.nlopez.compose.core.util.findChildrenByClass
+import io.nlopez.compose.core.util.findAllChildrenByClass
 import io.nlopez.compose.core.util.plus
 import io.nlopez.compose.core.util.range
 import io.nlopez.compose.core.util.runIfNotNull
@@ -40,7 +40,7 @@ class Material2 : ComposeKtVisitor {
         }
 
         // Find usages that don't need imports (e.g. androidx.compose.material.Icons.Arrow being used directly)
-        val dotQualified = file.findChildrenByClass<KtDotQualifiedExpression>()
+        val dotQualified = file.findAllChildrenByClass<KtDotQualifiedExpression>()
             // Ignore the ones in imports
             .runIfNotNull(file.importList) { imps -> filter { it.startOffset !in imps.range } }
             // Ignore the ones in package definitions

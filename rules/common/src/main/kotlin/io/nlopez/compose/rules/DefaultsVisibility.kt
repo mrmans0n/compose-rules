@@ -6,7 +6,7 @@ import io.nlopez.compose.core.ComposeKtConfig
 import io.nlopez.compose.core.ComposeKtVisitor
 import io.nlopez.compose.core.Emitter
 import io.nlopez.compose.core.report
-import io.nlopez.compose.core.util.findChildrenByClass
+import io.nlopez.compose.core.util.findAllChildrenByClass
 import io.nlopez.compose.core.util.isComposable
 import io.nlopez.compose.core.util.isInternal
 import io.nlopez.compose.core.util.isPrivate
@@ -21,14 +21,14 @@ import org.jetbrains.kotlin.psi.psiUtil.isPublic
 class DefaultsVisibility : ComposeKtVisitor {
 
     override fun visitFile(file: KtFile, emitter: Emitter, config: ComposeKtConfig) {
-        val composables = file.findChildrenByClass<KtFunction>()
+        val composables = file.findAllChildrenByClass<KtFunction>()
             .filter { it.isComposable }
 
         val composableNamesForDefaults = composables.mapNotNull { it.name }.map { it + "Defaults" }.toSet()
 
         // Default holders should be the ones named ${composableName}Defaults and defined in the same .kt file as them,
         // as they should be co-located. Maybe a possible future rule would be to check for co-location of these.
-        val defaultObjects = file.findChildrenByClass<KtClassOrObject>()
+        val defaultObjects = file.findAllChildrenByClass<KtClassOrObject>()
             .filter { it.name in composableNamesForDefaults }
 
         if (defaultObjects.count() == 0) return
@@ -45,14 +45,14 @@ class DefaultsVisibility : ComposeKtVisitor {
                     // Check parameter defaults first
                     val hasReferenceInParameters = composable.valueParameters
                         .mapNotNull { it.defaultValue }
-                        .flatMap { it.findChildrenByClass<KtReferenceExpression>() }
+                        .flatMap { it.findAllChildrenByClass<KtReferenceExpression>() }
                         .any { it.text == defaultObject.name }
 
                     if (hasReferenceInParameters) return@filter true
 
                     // If none found, check the code then.
                     val body = composable.bodyBlockExpression ?: return@filter false
-                    return@filter body.findChildrenByClass<KtReferenceExpression>()
+                    return@filter body.findAllChildrenByClass<KtReferenceExpression>()
                         .any { it.text == defaultObject.name }
                 }
                 // Now we want to obtain just the most visible visibility in case there are more than one hit

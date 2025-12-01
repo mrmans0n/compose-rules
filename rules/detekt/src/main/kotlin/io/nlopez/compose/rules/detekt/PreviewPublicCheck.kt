@@ -2,22 +2,16 @@
 // SPDX-License-Identifier: Apache-2.0
 package io.nlopez.compose.rules.detekt
 
-import io.gitlab.arturbosch.detekt.api.Config
-import io.gitlab.arturbosch.detekt.api.Debt
-import io.gitlab.arturbosch.detekt.api.Issue
-import io.gitlab.arturbosch.detekt.api.Severity
+import dev.detekt.api.Config
 import io.nlopez.compose.core.ComposeKtVisitor
 import io.nlopez.compose.rules.DetektRule
 import io.nlopez.compose.rules.PreviewPublic
+import java.net.URI
 
 class PreviewPublicCheck(config: Config) :
-    DetektRule(config),
-    ComposeKtVisitor by PreviewPublic() {
-
-    override val issue: Issue = Issue(
-        id = "PreviewPublic",
-        severity = Severity.CodeSmell,
-        description = PreviewPublic.ComposablesPreviewShouldNotBePublic,
-        debt = Debt.FIVE_MINS,
-    )
-}
+    DetektRule(
+        config = config,
+        description = "Preview composables should not be public",
+        url = URI("https://mrmans0n.github.io/compose-rules/rules/#preview-public"),
+    ),
+    ComposeKtVisitor by PreviewPublic()

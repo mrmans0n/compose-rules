@@ -2,17 +2,17 @@
 // SPDX-License-Identifier: Apache-2.0
 package io.nlopez.compose.rules
 
+import com.intellij.psi.PsiElement
 import io.nlopez.compose.core.ComposeKtConfig
 import io.nlopez.compose.core.ComposeKtVisitor
 import io.nlopez.compose.core.Emitter
 import io.nlopez.compose.core.report
-import io.nlopez.compose.core.util.findChildrenByClass
+import io.nlopez.compose.core.util.findAllChildrenByClass
 import io.nlopez.compose.core.util.isDouble
 import io.nlopez.compose.core.util.isFloat
 import io.nlopez.compose.core.util.isInt
 import io.nlopez.compose.core.util.isLong
 import io.nlopez.compose.core.util.mapFirst
-import org.jetbrains.kotlin.com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtConstantExpression
 import org.jetbrains.kotlin.psi.KtExpression
@@ -190,7 +190,7 @@ class MutableStateAutoboxing : ComposeKtVisitor {
     private val KtCallExpression.singleArgumentExpression: KtExpression?
         get() = valueArguments.singleOrNull()?.getArgumentExpression()
 
-    private fun PsiElement.findMutableStateOf() = findChildrenByClass<KtCallExpression>()
+    private fun PsiElement.findMutableStateOf() = findAllChildrenByClass<KtCallExpression>()
         .filter { it.calleeExpression?.text == "mutableStateOf" }
         .filter { it.valueArguments.size == 1 }
 
