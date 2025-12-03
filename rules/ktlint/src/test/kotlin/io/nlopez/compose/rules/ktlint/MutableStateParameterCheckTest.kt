@@ -67,6 +67,73 @@ class MutableStateParameterCheckTest {
     }
 
     @Test
+    fun `errors when a Composable has collection-based MutableState parameters`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun Something(
+                    a: MutableIntList,
+                    b: MutableLongList,
+                    c: MutableFloatList,
+                    d: MutableIntSet,
+                    e: MutableLongSet,
+                    f: MutableFloatSet,
+                    g: MutableIntIntMap,
+                    h: MutableLongLongMap,
+                    i: MutableFloatFloatMap
+                ) {}
+            """.trimIndent()
+        mutableParamRuleAssertThat(code).hasLintViolationsWithoutAutoCorrect(
+            LintViolation(
+                line = 3,
+                col = 5,
+                detail = MutableStateParameter.MutableStateParameterInCompose,
+            ),
+            LintViolation(
+                line = 4,
+                col = 5,
+                detail = MutableStateParameter.MutableStateParameterInCompose,
+            ),
+            LintViolation(
+                line = 5,
+                col = 5,
+                detail = MutableStateParameter.MutableStateParameterInCompose,
+            ),
+            LintViolation(
+                line = 6,
+                col = 5,
+                detail = MutableStateParameter.MutableStateParameterInCompose,
+            ),
+            LintViolation(
+                line = 7,
+                col = 5,
+                detail = MutableStateParameter.MutableStateParameterInCompose,
+            ),
+            LintViolation(
+                line = 8,
+                col = 5,
+                detail = MutableStateParameter.MutableStateParameterInCompose,
+            ),
+            LintViolation(
+                line = 9,
+                col = 5,
+                detail = MutableStateParameter.MutableStateParameterInCompose,
+            ),
+            LintViolation(
+                line = 10,
+                col = 5,
+                detail = MutableStateParameter.MutableStateParameterInCompose,
+            ),
+            LintViolation(
+                line = 11,
+                col = 5,
+                detail = MutableStateParameter.MutableStateParameterInCompose,
+            ),
+        )
+    }
+
+    @Test
     fun `no errors when a Composable has valid parameters`() {
         @Language("kotlin")
         val code =

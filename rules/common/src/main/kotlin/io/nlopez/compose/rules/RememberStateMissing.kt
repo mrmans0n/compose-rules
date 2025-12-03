@@ -30,10 +30,29 @@ class RememberStateMissing : ComposeKtVisitor {
         private val MethodsThatNeedRemembering = setOf(
             "derivedStateOf",
             "mutableStateOf",
+            // Primitives
             "mutableIntStateOf",
             "mutableFloatStateOf",
             "mutableDoubleStateOf",
             "mutableLongStateOf",
+            // Primitive Lists
+            "mutableIntListOf",
+            "mutableLongListOf",
+            "mutableFloatListOf",
+            // Primitive Sets
+            "mutableIntSetOf",
+            "mutableLongSetOf",
+            "mutableFloatSetOf",
+            // Primitive Maps
+            "mutableIntIntMapOf",
+            "mutableIntLongMapOf",
+            "mutableIntFloatMapOf",
+            "mutableLongIntMapOf",
+            "mutableLongLongMapOf",
+            "mutableLongFloatMapOf",
+            "mutableFloatIntMapOf",
+            "mutableFloatLongMapOf",
+            "mutableFloatFloatMapOf",
         )
         private val MethodsAndErrorsThatNeedRemembering = MethodsThatNeedRemembering.associateWith { errorMessage(it) }
 
