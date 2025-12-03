@@ -569,7 +569,7 @@ Modifiers which are passed in are designed so that they should be used by a sing
 In the following example we've exposed a public modifier parameter, and then passed it to the root Column, but we've also passed it to each of the descendant calls, with some extra modifiers on top:
 
 ```kotlin
-// ❌ When changing `modifier` at the call site, it will the whole layout in unintended ways
+// ❌ When changing `modifier` at the call site, it will affect the whole layout in unintended ways
 @Composable
 private fun InnerContent(modifier: Modifier = Modifier) {
     Column(modifier) {
