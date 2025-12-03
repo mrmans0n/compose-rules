@@ -1789,7 +1789,7 @@ Since modifiers aim to modify the external behaviors and appearance of the compo
 <h3 id="dont-re-use-modifiers">Don't re-use modifiers<a class="headerlink" href="#dont-re-use-modifiers" title="Permanent link">&para;</a></h3>
 <p>Modifiers which are passed in are designed so that they should be used by a single layout node in the composable function. If the provided modifier is used by multiple composables at different levels, unwanted behaviour can happen.</p>
 <p>In the following example we've exposed a public modifier parameter, and then passed it to the root Column, but we've also passed it to each of the descendant calls, with some extra modifiers on top:</p>
-<p><div class="highlight"><pre><span></span><code><span class="c1">// ❌ When changing `modifier` at the call site, it will the whole layout in unintended ways</span>
+<p><div class="highlight"><pre><span></span><code><span class="c1">// ❌ When changing `modifier` at the call site, it will affect the whole layout in unintended ways</span>
 <span class="nd">@Composable</span>
 <span class="kd">private</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">InnerContent</span><span class="p">(</span><span class="n">modifier</span><span class="p">:</span><span class="w"> </span><span class="n">Modifier</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Modifier</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="n">Column</span><span class="p">(</span><span class="n">modifier</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
@@ -1845,7 +1845,7 @@ This is not recommended. Instead, the provided modifier should only be used on t
 <p>You'll need to explicitly enable them individually in your project's detekt/ktlint configuration.</p>
 </div>
 <h3 id="dont-use-material-2">Don't use Material 2<a class="headerlink" href="#dont-use-material-2" title="Permanent link">&para;</a></h3>
-<p>Material Design 3 is the next evolution of Material Design. It includes updated theming, components, and Material You personalization features like dynamic color. It supersedes Material 2, and using Material 3 usage is recommended instead of Material 2.</p>
+<p>Material Design 3 is the next evolution of Material Design. It includes updated theming, components, and Material You personalization features like dynamic color. It supersedes Material 2, and using Material 3 is recommended instead of Material 2.</p>
 <p>Enabling: <a href="https://mrmans0n.github.io/compose-rules/ktlint/#enabling-the-material-2-detector">ktlint</a>, <a href="https://mrmans0n.github.io/compose-rules/detekt/#enabling-rules">detekt</a></p>
 <p>More info: <a href="https://developer.android.com/develop/ui/compose/designsystems/material2-material3">Migration to Material 3</a></p>
 <div class="admonition info">
