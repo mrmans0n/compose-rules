@@ -221,4 +221,57 @@ class RememberStateMissingCheckTest {
             """.trimIndent()
         rememberRuleAssertThat(code).hasNoLintViolations()
     }
+
+    @Test
+    fun `passes when a retain mutableStateOf is used in a Composable`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun MyComposable(
+                    something: State<String> = retain { mutableStateOf("X") }
+                ) {
+                    val something = retain { mutableStateOf("X") }
+                    val something2 by retain { mutableStateOf("Y") }
+                }
+            """.trimIndent()
+        rememberRuleAssertThat(code).hasNoLintViolations()
+    }
+
+    @Test
+    fun `passes when a retain derivedStateOf is used in a Composable`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun MyComposable(
+                    something: State<String> = retain { derivedStateOf { "X" } }
+                ) {
+                    val something = retain { derivedStateOf { "X" } }
+                    val something2 by retain { derivedStateOf { "Y" } }
+                }
+            """.trimIndent()
+        rememberRuleAssertThat(code).hasNoLintViolations()
+    }
+
+    @Test
+    fun `passes when retained collection-based mutableState functions are used in a Composable`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun MyComposable() {
+                    val a = retain { mutableIntListOf() }
+                    val b = retain { mutableLongListOf() }
+                    val c = retain { mutableFloatListOf() }
+                    val d = retain { mutableIntSetOf() }
+                    val e = retain { mutableLongSetOf() }
+                    val f = retain { mutableFloatSetOf() }
+                    val g = retain { mutableIntIntMapOf() }
+                    val h = retain { mutableLongLongMapOf() }
+                    val i = retain { mutableFloatFloatMapOf() }
+                }
+            """.trimIndent()
+        rememberRuleAssertThat(code).hasNoLintViolations()
+    }
 }

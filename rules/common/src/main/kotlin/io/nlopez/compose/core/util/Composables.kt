@@ -356,4 +356,7 @@ private val RestartableEffects by lazy {
 fun KtCallExpression.isRemembered(stopAt: PsiElement): Boolean = parents
     .takeWhile { it != stopAt }
     .filterIsInstance<KtCallExpression>()
-    .any { it.calleeExpression?.text?.startsWith("remember") == true }
+    .map { it.calleeExpression?.text }
+    .any { name ->
+        name != null && (name.startsWith("remember") || name == "retain")
+    }
