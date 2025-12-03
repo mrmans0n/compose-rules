@@ -134,4 +134,61 @@ class RememberStateMissingCheckTest {
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }
+
+    @Test
+    fun `errors when non-remembered collection-based mutableState functions are used in a Composable`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun MyComposable() {
+                    val a = mutableIntListOf()
+                    val b = mutableLongListOf()
+                    val c = mutableFloatListOf()
+                    val d = mutableIntSetOf()
+                    val e = mutableLongSetOf()
+                    val f = mutableFloatSetOf()
+                    val g = mutableIntIntMapOf()
+                    val h = mutableLongLongMapOf()
+                    val i = mutableFloatFloatMapOf()
+                }
+            """.trimIndent()
+        val errors = rule.lint(code)
+        assertThat(errors).hasSize(9)
+            .hasStartSourceLocations(
+                SourceLocation(3, 13),
+                SourceLocation(4, 13),
+                SourceLocation(5, 13),
+                SourceLocation(6, 13),
+                SourceLocation(7, 13),
+                SourceLocation(8, 13),
+                SourceLocation(9, 13),
+                SourceLocation(10, 13),
+                SourceLocation(11, 13),
+            )
+        // Just verify the first error message contains the expected pattern
+        assertThat(errors.first()).hasMessage(RememberStateMissing.errorMessage("mutableIntListOf"))
+    }
+
+    @Test
+    fun `passes when remembered collection-based mutableState functions are used in a Composable`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun MyComposable() {
+                    val a = remember { mutableIntListOf() }
+                    val b = remember { mutableLongListOf() }
+                    val c = remember { mutableFloatListOf() }
+                    val d = remember { mutableIntSetOf() }
+                    val e = remember { mutableLongSetOf() }
+                    val f = remember { mutableFloatSetOf() }
+                    val g = remember { mutableIntIntMapOf() }
+                    val h = remember { mutableLongLongMapOf() }
+                    val i = remember { mutableFloatFloatMapOf() }
+                }
+            """.trimIndent()
+        val errors = rule.lint(code)
+        assertThat(errors).isEmpty()
+    }
 }

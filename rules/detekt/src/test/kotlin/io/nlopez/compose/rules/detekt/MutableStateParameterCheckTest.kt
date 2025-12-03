@@ -59,6 +59,42 @@ class MutableStateParameterCheckTest {
     }
 
     @Test
+    fun `errors when a Composable has collection-based MutableState parameters`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun Something(
+                    a: MutableIntList,
+                    b: MutableLongList,
+                    c: MutableFloatList,
+                    d: MutableIntSet,
+                    e: MutableLongSet,
+                    f: MutableFloatSet,
+                    g: MutableIntIntMap,
+                    h: MutableLongLongMap,
+                    i: MutableFloatFloatMap
+                ) {}
+            """.trimIndent()
+        val errors = rule.lint(code)
+        assertThat(errors)
+            .hasStartSourceLocations(
+                SourceLocation(3, 5),
+                SourceLocation(4, 5),
+                SourceLocation(5, 5),
+                SourceLocation(6, 5),
+                SourceLocation(7, 5),
+                SourceLocation(8, 5),
+                SourceLocation(9, 5),
+                SourceLocation(10, 5),
+                SourceLocation(11, 5),
+            )
+        for (error in errors) {
+            assertThat(error).hasMessage(MutableStateParameter.MutableStateParameterInCompose)
+        }
+    }
+
+    @Test
     fun `no errors when a Composable has valid parameters`() {
         @Language("kotlin")
         val code =
