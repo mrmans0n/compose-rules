@@ -569,7 +569,7 @@ Modifiers which are passed in are designed so that they should be used by a sing
 In the following example we've exposed a public modifier parameter, and then passed it to the root Column, but we've also passed it to each of the descendant calls, with some extra modifiers on top:
 
 ```kotlin
-// ❌ When changing `modifier` at the call site, it will the whole layout in unintended ways
+// ❌ When changing `modifier` at the call site, it will affect the whole layout in unintended ways
 @Composable
 private fun InnerContent(modifier: Modifier = Modifier) {
     Column(modifier) {
@@ -649,7 +649,7 @@ More info: [Compose Component API Guidelines](https://github.com/androidx/androi
 
 ### Don't use Material 2
 
-Material Design 3 is the next evolution of Material Design. It includes updated theming, components, and Material You personalization features like dynamic color. It supersedes Material 2, and using Material 3 usage is recommended instead of Material 2.
+Material Design 3 is the next evolution of Material Design. It includes updated theming, components, and Material You personalization features like dynamic color. It supersedes Material 2, and using Material 3 is recommended instead of Material 2.
 
 Enabling: [ktlint](https://mrmans0n.github.io/compose-rules/ktlint/#enabling-the-material-2-detector), [detekt](https://mrmans0n.github.io/compose-rules/detekt/#enabling-rules)
 
