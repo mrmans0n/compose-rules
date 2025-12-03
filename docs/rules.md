@@ -649,7 +649,7 @@ More info: [Compose Component API Guidelines](https://github.com/androidx/androi
 
 ### Don't use Material 2
 
-Material Design 3 is the next evolution of Material Design. It includes updated theming, components, and Material You personalization features like dynamic color. It supersedes Material 2, and using Material 3 usage is recommended instead of Material 2.
+Material Design 3 is the next evolution of Material Design. It includes updated theming, components, and Material You personalization features like dynamic color. It supersedes Material 2, and using Material 3 is recommended instead of Material 2.
 
 Enabling: [ktlint](https://mrmans0n.github.io/compose-rules/ktlint/#enabling-the-material-2-detector), [detekt](https://mrmans0n.github.io/compose-rules/detekt/#enabling-rules)
 
