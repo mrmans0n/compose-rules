@@ -59,4 +59,56 @@ class RememberContentMissingCheckTest {
             ),
         )
     }
+
+    @Test
+    fun `passes when a remembered movableContentOf is used in a Composable`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun MyComposable() {
+                    val something = remember { movableContentOf { Text("X") } }
+                }
+            """.trimIndent()
+        rememberRuleAssertThat(code).hasNoLintViolations()
+    }
+
+    @Test
+    fun `passes when a remembered movableContentWithReceiverOf is used in a Composable`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun MyComposable() {
+                    val something = remember { movableContentWithReceiverOf { Text("X") } }
+                }
+            """.trimIndent()
+        rememberRuleAssertThat(code).hasNoLintViolations()
+    }
+
+    @Test
+    fun `passes when a retain movableContentOf is used in a Composable`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun MyComposable() {
+                    val something = retain { movableContentOf { Text("X") } }
+                }
+            """.trimIndent()
+        rememberRuleAssertThat(code).hasNoLintViolations()
+    }
+
+    @Test
+    fun `passes when a retain movableContentWithReceiverOf is used in a Composable`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun MyComposable() {
+                    val something = retain { movableContentWithReceiverOf { Text("X") } }
+                }
+            """.trimIndent()
+        rememberRuleAssertThat(code).hasNoLintViolations()
+    }
 }
