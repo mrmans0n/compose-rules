@@ -28,14 +28,14 @@ See [Spotless Ktlint Integration](https://github.com/diffplug/spotless/tree/main
 
 ## Using with ktlint CLI or the ktlint IntelliJ plugin
 
-The [releases](https://github.com/mrmans0n/compose-rules/releases) page contains an [uber jar](https://stackoverflow.com/questions/11947037/what-is-an-uber-jar) for each version release that can be used for these purposes. In the [releases](https://github.com/mrmans0n/compose-rules/releases/) page you can identify them by the suffix `-all.jar`.
+The [releases](https://github.com/mrmans0n/compose-rules/releases) page contains an [uber jar](https://stackoverflow.com/questions/11947037/what-is-an-uber-jar) for each version. Look for files with the `-all.jar` suffix.
 
 To use with [ktlint CLI](https://ktlint.github.io/#getting-started):
 ```shell
 ktlint -R ktlint-compose-<VERSION>-all.jar
 ```
 
-You can use this same [uber jar from the releases page](https://github.com/mrmans0n/compose-rules/releases/) with the [ktlint IntelliJ plugin](https://plugins.jetbrains.com/plugin/15057-ktlint) if the rules are compiled against the same ktlint version used for that release. You can configure the custom ruleset in the preferences page of the plugin.
+You can also use this uber jar with the [ktlint IntelliJ plugin](https://plugins.jetbrains.com/plugin/15057-ktlint), provided the rules are compiled against the same ktlint version. Configure the custom ruleset in the plugin's preferences.
 
 ## Supported versions matrix
 
@@ -60,7 +60,7 @@ Older version support can be found in the [release notes](https://github.com/mrm
 
 ### Providing custom content emitters
 
-There are some rules (`compose:content-emitter-returning-values-check`, `compose:modifier-not-used-at-root` and `compose:multiple-emitters-check`) that use predefined list of known composables that emit content. But you can add your own too! In your `.editorconfig` file, you'll need to add a `compose_content_emitters` property followed by a list of composable names separated by commas. You would typically want the composables that are part of your custom design system to be in this list.
+Some rules (`compose:content-emitter-returning-values-check`, `compose:modifier-not-used-at-root`, `compose:multiple-emitters-check`) use a predefined list of composables that emit content. You can add your own (e.g., design system composables) in your `.editorconfig` file:
 
 ```editorconfig
 [*.{kt,kts}]
@@ -69,7 +69,7 @@ compose_content_emitters = MyComposable,MyOtherComposable
 
 ### Providing exceptions to content emitters
 
-Sometimes we'll want to not count a Composable towards the multiple content emitters (`compose:multiple-emitters-check`) rule. This is useful, for example, if the composable function actually emits content but that content is painted in a different window (like a dialog or a modal). For those cases, we can use a denylist `compose_content_emitters_denyylist` to add those composable names separated by commas.
+Sometimes a composable emits content in a different window (like a dialog or modal) and shouldn't count toward the `compose:multiple-emitters-check` rule. Use the denylist to exclude these:
 
 ```editorconfig
 [*.{kt,kts}]
@@ -78,7 +78,7 @@ compose_content_emitters_denylist = MyModalComposable,MyDialogComposable
 
 ### Providing custom ViewModel factories
 
-The `vm-injection-check` rule will check against common ViewModel factories (eg `viewModel` from AAC, `weaverViewModel` from Weaver, `hiltViewModel` from Hilt + Compose, etc), but you can configure your `.editorconfig` file to add your own, as a list of comma-separated strings:
+The `vm-injection-check` rule checks common ViewModel factories (`viewModel`, `hiltViewModel`, etc.). Add your own:
 
 ```editorconfig
 [*.{kt,kts}]
@@ -114,7 +114,7 @@ compose_modifier_missing_ignore_annotated = Potato,Banana
 
 ### Allowing matching function names
 
-The `naming-check` rule requires all composables that return a value to be lowercased. If you want to allow certain patterns though, you can configure a comma-separated list of matching regexes in your `.editorconfig` file:
+The `naming-check` rule requires composables that return a value to be lowercased. To allow certain patterns, configure a comma-separated list of regexes:
 
 ```editorconfig
 [*.{kt,kts}]
@@ -123,7 +123,7 @@ compose_allowed_composable_function_names = .*Presenter,.*SomethingElse
 
 ### Allowing custom state holder names
 
-The `vm-forwarding-check` rule will, by default, design as a state holder any class ending on "ViewModel" or "Presenter". You can, however, add new types of names to the mix via a comma-separated list of matching regexes in your `.editorconfig` file:
+The `vm-forwarding-check` rule treats classes ending in "ViewModel" or "Presenter" as state holders by default. Add custom patterns via regexes:
 
 ```editorconfig
 [*.{kt,kts}]
@@ -132,7 +132,7 @@ compose_allowed_state_holder_names = .*ViewModel,.*Presenter,.*Component,.*Somet
 
 ### Allowlist for composable names that aren't affected by the ViewModelForwarding rule
 
-The `vm-forwarding-check` will catch VMs/state holder classes that are relayed to other composables. However, in some situations this can be a valid use-case. The rule can be configured so that all the names of composables that match a list of regexes are exempt to this rule. You can configure this in your `.editorconfig` file:
+The `vm-forwarding-check` catches ViewModels/state holders relayed to other composables. To allow specific composable names:
 
 ```editorconfig
 [*.{kt,kts}]
@@ -141,7 +141,7 @@ compose_allowed_forwarding = .*Content,.*SomethingElse
 
 ### Allowlist for ViewModel/state holder names that aren't affected by the ViewModelForwarding rule
 
-The `vm-forwarding-check` will catch VMs/state holder classes that are relayed to other composables. However, in some situations this can be a valid use-case. The rule can be configured so that all the names of ViewModels that match a list of regexes are exempt to this rule. You can configure this in your `.editorconfig` file:
+To allow specific ViewModel/state holder types to be forwarded:
 
 ```editorconfig
 [*.{kt,kts}]
@@ -150,7 +150,7 @@ compose_allowed_forwarding_of_types = .*MyViewModel,PotatoViewModel
 
 ### Configure the visibility of the composables where to check for missing modifiers
 
-The `modifier-missing-check` rule will, by default, only look for missing modifiers for public composables. If you want to lower the visibility threshold to check also internal compoosables, or all composables, you can configure it in your `.editorconfig` file:
+The `modifier-missing-check` rule will, by default, only check public composables for missing modifiers. To also check internal or all composables, configure it in your `.editorconfig` file:
 
 ```editorconfig
 [*.{kt,kts}]
@@ -165,7 +165,7 @@ Possible values are:
 
 ### Configure custom Modifier names
 
-Most of the modifier-related rules will look for modifiers based their type: either Modifier or GlanceModifier type. Some libraries might add their own flavor of Modifier to the mix, and it might make sense to enforce the same rules we have for the other default modifiers. To support that, you can configure this in your `.editorconfig` file:
+Most modifier-related rules identify modifiers by type (`Modifier` or `GlanceModifier`). If your library has a custom Modifier type, you can add it so the same rules apply:
 
 ```editorconfig
 [*.{kt,kts}]
@@ -174,7 +174,7 @@ compose_custom_modifiers = BananaModifier,PotatoModifier
 
 ### Configure types to treat as lambdas (e.g. for ParamOrder check)
 
-The `param-order-check` rule will do its best to identify trailing lambdas. However, in cases where a typedef / functional interface is being used, we might want to have this rule to treat them as if they were lambdas: not reporting them if they are the last in a method signature and they don't have a default value. To give ktlint some hints, you can configure this in your `.editorconfig` file:
+The `param-order-check` rule identifies trailing lambdas automatically. For typedefs or functional interfaces that should be treated as lambdas, add hints:
 
 ```editorconfig
 [*.{kt,kts}]
@@ -183,7 +183,7 @@ compose_treat_as_lambda = MyLambdaType,MyOtherLambdaType
 
 ### Configure types to treat as composable lambdas (e.g. for ContentTrailingLambda check)
 
-The `content-trailing-lambda` rule will do its best to identify `@Composable` trailing lambdas. However, in cases where a typedef / functional interface is being used, we might want to have this rule to treat them as if they were composable lambdas: not reporting them if they are the last in a method signature and they don't have a default value. To give ktlint some hints, you can configure this in your `.editorconfig` file:
+The `content-trailing-lambda` rule identifies `@Composable` trailing lambdas automatically. For typedefs or functional interfaces that should be treated as composable lambdas:
 
 ```editorconfig
 [*.{kt,kts}]
@@ -192,16 +192,14 @@ compose_treat_as_composable_lambda = MyLambdaComposableType,MyOtherComposableLam
 
 ### Enabling the Material 2 detector
 
-The `material-two` rule will flag any usage of a Material 2 API. This rule is disabled by default, so you'll need to explicitly enable it in your `.editorconfig` file:
+The `material-two` rule flags Material 2 API usage. Disabled by default; enable it in your `.editorconfig` file:
 
 ```editorconfig
 [*.{kt,kts}]
 compose_disallow_material2 = true
 ```
 
-You might also want to disallow Material 2, but allow a specific set / subset of APIs. The rule allows this too.
-
-For example, let's say you want to allow all filled icons (whose fully qualified names are androidx.compose.material.icons.filled.*) and the `Button` composable (androidx.compose.material.Button). This is how you'd allow those:
+You can also allow specific Material 2 APIs during migration. For example, to allow filled icons and `Button`:
 
 ```editorconfig
 [*.{kt,kts}]
@@ -211,7 +209,7 @@ compose_allowed_from_m2 = icons.filled,Button
 
 ### Enabling the unstable collections detector
 
-The `unstable-collections` rule will flag any usage of any unstable collection (e.g. List/Set/Map). This rule is disabled by default, so you'll need to explicitly enable it in your `.editorconfig` file:
+The `unstable-collections` rule flags unstable collection usage (List/Set/Map). Disabled by default:
 
 ```editorconfig
 [*.{kt,kts}]
@@ -220,7 +218,7 @@ compose_disallow_unstable_collections = true
 
 ### Enabling and configuring the preview naming detector
 
-If you want to enforce a naming strategy for previews, you can enable the `compose:preview-naming` rule and configure the `compose_preview_naming_strategy` property in your `.editorconfig` file:
+To enforce a naming strategy for previews, enable the rule and configure the strategy:
 
 ```editorconfig
 [*.{kt,kts}]
@@ -236,7 +234,7 @@ Possible values of `compose_preview_naming_strategy` are:
 
 ### Disable `standard:function-naming` rule for Composable
 
-The function name for a Composable starts with an uppercase. This causes the ktlint rule `standard:function-naming` to report a violation. This rule can be configured to ignore Composable functions in your `.editorconfig` file:
+Composable function names start with uppercase, which causes ktlint's `standard:function-naming` rule to report violations. Configure it to ignore Composable functions:
 
 ```editorconfig
 [*.{kt,kts}]

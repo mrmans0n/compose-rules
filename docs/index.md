@@ -1,11 +1,12 @@
-The Compose Rules is a set of custom Ktlint / Detekt rules to ensure that your composables don't fall into common pitfalls, that might be easy to miss in code reviews.
+Compose Rules is a set of custom ktlint / detekt rules to ensure that your composables don't fall into common pitfalls that might be easy to miss in code reviews.
 
 ## Why
-It can be challenging for big teams to start adopting Compose, particularly because not everyone will start at same time or with the same patterns. We tried to ease the pain by creating a set of Compose static checks.
 
-Compose has lots of superpowers but also has a bunch of footguns to be aware of [as seen in this Twitter Thread](https://twitter.com/mrmans0n/status/1507390768796909571).
+It can be challenging for big teams to adopt Compose, particularly because not everyone starts at the same time or with the same patterns. We created these static checks to ease that pain.
 
-This is where our static checks come in. We want to detect as many potential issues as we can, as quickly as we can. In this case we want an error to show prior to engineers having to review code. Similar to other static check libraries we hope this leads to a "don't shoot the messengers" philosphy which will foster healthy Compose adoption.
+Compose has lots of superpowers but also has a bunch of footguns to be aware of, [as seen in this Twitter thread](https://twitter.com/mrmans0n/status/1507390768796909571).
+
+This is where static checks come in. We want to detect as many potential issues as possible, as early as possible—ideally before code review. Similar to other static analysis libraries, we hope this fosters a "don't shoot the messenger" philosophy and healthy Compose adoption.
 
 ## Using with ktlint
 
@@ -17,11 +18,11 @@ You can refer to the [Using with detekt](https://mrmans0n.github.io/compose-rule
 
 ## Migrating from Twitter Compose Rules
 
-The process to migrate to these rules coming from the Twitter ones is simple.
+Migrating from the Twitter Compose Rules is straightforward:
 
-1. Change the project coordinates in your gradle build scripts
-   2. For detekt, `com.twitter.compose.rules:detekt:$version` becomes `io.nlopez.compose.rules:detekt:$version`
-   3. For ktlint, `com.twitter.compose.rules:ktlint:$version` becomes `io.nlopez.compose.rules:ktlint:$version`
-4. Update `$version` to the latest: ![Latest version](https://img.shields.io/maven-central/v/io.nlopez.compose.rules/ktlint) - see the project [releases page](https://github.com/mrmans0n/compose-rules/releases).
-5. **If you are using Detekt**: update the config file (e.g. `detekt.yml`) so that the rule set name `TwitterCompose` becomes `Compose`. Keep in mind that there are a lot of new rules in this repo that weren't in Twitter's, so you'd be better copying over from the [example configuration](https://mrmans0n.github.io/compose-rules/detekt).
-6. Done!
+1. Update the project coordinates in your Gradle build scripts:
+      - For detekt: `com.twitter.compose.rules:detekt:$version` → `io.nlopez.compose.rules:detekt:$version`
+      - For ktlint: `com.twitter.compose.rules:ktlint:$version` → `io.nlopez.compose.rules:ktlint:$version`
+2. Update `$version` to the latest: ![Latest version](https://img.shields.io/maven-central/v/io.nlopez.compose.rules/ktlint) — see the [releases page](https://github.com/mrmans0n/compose-rules/releases).
+3. **If using detekt**: Update your config file (e.g., `detekt.yml`) to rename the rule set from `TwitterCompose` to `Compose`. Since this repo has many new rules that weren't in Twitter's, consider copying from the [example configuration](https://mrmans0n.github.io/compose-rules/detekt).
+4. Done!

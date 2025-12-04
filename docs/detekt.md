@@ -1,4 +1,4 @@
-When using the [detekt Gradle Plugin](https://detekt.dev/docs/gettingstarted/gradle), you can specify the dependency on this set of rules by using `detektPlugins`.
+Add the dependency using `detektPlugins` in your [detekt Gradle Plugin](https://detekt.dev/docs/gettingstarted/gradle) configuration:
 
 ```groovy
 dependencies {
@@ -21,17 +21,17 @@ Older version support can be found in the [release notes](https://github.com/mrm
 
 ## Using with detekt CLI / detekt IDE plugin
 
-The [releases](https://github.com/mrmans0n/compose-rules/releases) page contains an [uber jar](https://stackoverflow.com/questions/11947037/what-is-an-uber-jar) for each version release that can be used to run with the [CLI version of detekt](https://detekt.dev/docs/gettingstarted/cli).
+The [releases](https://github.com/mrmans0n/compose-rules/releases) page contains an [uber jar](https://stackoverflow.com/questions/11947037/what-is-an-uber-jar) for each version that can be used with the [detekt CLI](https://detekt.dev/docs/gettingstarted/cli):
 
 ```shell
 detekt -p detekt-compose-<VERSION>-all.jar -c your/config/detekt.yml
 ```
 
-For the IDE plugin, you'll need to add the uber jar to the list of custom plugins in its configuration, and don't forget to also enable the rules in the yml config provided to the plugin for it to work.
+For the IDE plugin, add the uber jar to the custom plugins list and enable the rules in the yml config.
 
 ## Enabling rules
 
-For the rules to be picked up, you will need to enable them in your `detekt.yml` configuration file.
+Enable the rules in your `detekt.yml` configuration file:
 
 ```yaml
 Compose:
@@ -166,9 +166,7 @@ Compose:
 
 ## Disabling a specific rule
 
-To disable a rule you have to follow the [instructions from the detekt documentation](https://detekt.dev/docs/introduction/suppressing-rules), and use the id of the rule you want to disable.
-
-For example, to disable `ComposableNaming` in a particular method, you can suppress it.
+Follow the [detekt documentation](https://detekt.dev/docs/introduction/suppressing-rules) to suppress specific rules. For example:
 
 ```kotlin
 @Suppress("ComposableNaming")
