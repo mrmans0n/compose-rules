@@ -81,6 +81,28 @@ class MultipleContentEmittersCheckTest {
     }
 
     @Test
+    fun `passes when the composable has a context parameter`() {
+        @Language("kotlin")
+        val code =
+            """
+                context(columnScope: ColumnScope)
+                @Composable
+                fun Something() {
+                    Text("Hi")
+                    Text("Hola")
+                }
+                context(rowScope: RowScope)
+                @Composable
+                fun Something() {
+                    Spacer()
+                    Text("Hola")
+                }
+            """.trimIndent()
+        val errors = rule.lint(code)
+        assertThat(errors).isEmpty()
+    }
+
+    @Test
     fun `errors when a Composable function has more than one UI emitter at the top level`() {
         @Language("kotlin")
         val code =

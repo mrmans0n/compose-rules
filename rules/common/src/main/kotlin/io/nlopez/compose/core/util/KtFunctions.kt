@@ -50,3 +50,16 @@ val KtFunction.definedInInterface: Boolean
 
 val KtNamedFunction.isNested: Boolean
     get() = parents.takeWhile { it !is KtFile }.any { it is KtNamedFunction }
+
+/**
+ * Returns true if the function has any context receivers or context parameters.
+ *
+ * Context receivers use the old syntax: `context(ColumnScope)`
+ * Context parameters use the new syntax: `context(columnScope: ColumnScope)`
+ */
+val KtNamedFunction.hasAnyContextArguments: Boolean
+    get() {
+        val contextReceiverList = contextReceiverList ?: return false
+        return contextReceiverList.contextReceivers().isNotEmpty() ||
+            contextReceiverList.contextParameters().isNotEmpty()
+    }

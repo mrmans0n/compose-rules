@@ -8,24 +8,26 @@ import io.nlopez.compose.core.Emitter
 import io.nlopez.compose.core.report
 import io.nlopez.compose.core.util.createDirectComposableToEmissionCountMapping
 import io.nlopez.compose.core.util.findAllChildrenByClass
+import io.nlopez.compose.core.util.hasAnyContextArguments
 import io.nlopez.compose.core.util.hasReceiverType
 import io.nlopez.compose.core.util.isComposable
 import io.nlopez.compose.core.util.refineComposableToEmissionCountMapping
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtFunction
+import org.jetbrains.kotlin.psi.KtNamedFunction
 
 class MultipleContentEmitters : ComposeKtVisitor {
 
     override fun visitFile(file: KtFile, emitter: Emitter, config: ComposeKtConfig) {
         // CHECK #1 : We want to find the composables first that are at risk of emitting content from multiple sources.
-        val composables = file.findAllChildrenByClass<KtFunction>()
+        val composables = file.findAllChildrenByClass<KtNamedFunction>()
             .filter { it.isComposable }
             // We don't want to analyze composables that are extension functions, as they might be things like
             // BoxScope which are legit, and we want to avoid false positives.
             .filter { it.hasBlockBody() }
-            // Same applies to context receivers: we could have a BoxScope/ColumnScope/RowScope and it'd be legit.
-            // We don't have a way to know for sure, so we'd better avoid the issue altogether.
-            .filter { it.contextReceivers.isEmpty() }
+            // Same applies to context receivers/parameters: we could have a BoxScope/ColumnScope/RowScope
+            // and it'd be legit. We don't have a way to know for sure, so we'd better avoid the issue altogether.
+            .filterNot { it.hasAnyContextArguments }
             // We want only methods with a body
             .filterNot { it.hasReceiverType }
 
