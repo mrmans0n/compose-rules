@@ -53,3 +53,40 @@ jobs:
                 tag: v${{ env.VERSION }}
                 asset_name: detekt-compose-${{ env.VERSION }}-all.jar
                 overwrite: true
+
+          - name: Extract dependency versions and update release notes
+            if: success() && !endsWith(env.VERSION, '-SNAPSHOT')
+            env:
+                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            run: |
+                # Parse versions from libs.versions.toml
+                DETEKT_VERSION=$(grep '^detekt = ' gradle/libs.versions.toml | sed 's/detekt = "\(.*\)"/\1/')
+                KOTLIN_DETEKT_VERSION=$(grep '^kotlin-detekt = ' gradle/libs.versions.toml | sed 's/kotlin-detekt = "\(.*\)".*/\1/')
+                KTLINT_VERSION=$(grep '^ktlint = ' gradle/libs.versions.toml | sed 's/ktlint = "\(.*\)"/\1/')
+                KOTLIN_KTLINT_VERSION=$(grep '^kotlin-ktlint = ' gradle/libs.versions.toml | sed 's/kotlin-ktlint = "\(.*\)".*/\1/')
+
+                echo "Detekt: $DETEKT_VERSION (Kotlin $KOTLIN_DETEKT_VERSION)"
+                echo "Ktlint: $KTLINT_VERSION (Kotlin $KOTLIN_KTLINT_VERSION)"
+
+                # Get current release body
+                RELEASE_ID=$(gh api repos/${{ github.repository }}/releases/tags/v${{ env.VERSION }} --jq '.id')
+                CURRENT_BODY=$(gh api repos/${{ github.repository }}/releases/$RELEASE_ID --jq '.body')
+
+                # Check if dependency matrix already exists in the body
+                if echo "$CURRENT_BODY" | grep -q "## Dependency Matrix"; then
+                    echo "Dependency matrix already exists, skipping update"
+                    exit 0
+                fi
+
+                # Create the dependency matrix table (using printf for proper newlines)
+                DEPENDENCY_TABLE=$(printf "## Dependency Matrix\n\n| version | kotlin version |\n| ------- | -------------- |\n| detekt %s | %s |\n| ktlint %s | %s |" "$DETEKT_VERSION" "$KOTLIN_DETEKT_VERSION" "$KTLINT_VERSION" "$KOTLIN_KTLINT_VERSION")
+
+                # Append the dependency matrix to the release body
+                NEW_BODY=$(printf "%s\n\n%s" "$CURRENT_BODY" "$DEPENDENCY_TABLE")
+
+                # Update the release
+                gh api repos/${{ github.repository }}/releases/$RELEASE_ID \
+                    -X PATCH \
+                    -f body="$NEW_BODY"
+
+                echo "Release notes updated with dependency matrix"
