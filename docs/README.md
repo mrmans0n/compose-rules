@@ -20,7 +20,7 @@ The documentation is **versioned** using [mike](https://github.com/jimporter/mik
 
 ### Viewing Different Versions
 
-Visit the [documentation site](https://mrmans0h.github.io/compose-rules/) and use the version selector in the header to
+Visit the [documentation site](https://mrmans0n.github.io/compose-rules/) and use the version selector in the header to
 switch between:
 
 - Latest stable version (default)
@@ -67,7 +67,7 @@ Visit `http://localhost:8000` to see the versioned site.
 When your PR is merged to `main`:
 
 - The `next` version of the docs will be automatically updated
-- Changes will be visible at `https://mrmans0h.github.io/compose-rules/next/`
+- Changes will be visible at `https://mrmans0n.github.io/compose-rules/next/`
 
 When a new release is created:
 
