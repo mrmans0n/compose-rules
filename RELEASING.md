@@ -13,6 +13,8 @@
    1. Make sure the release name and the tags associated to it match. If not, you make them match.
    2. Publish the draft of the release.
 
+   This will trigger a GitHub Action workflow that will publish the versioned documentation for this release.
+
 4. Update the `VERSION_NAME` in `gradle.properties` to the next SNAPSHOT version by adding `-SNAPSHOT` to the version.
 5. Commit and push to main
 
@@ -21,3 +23,29 @@
    $ git push
    ```
 6. You're done! 🎉
+
+## Documentation Versioning
+
+The documentation is automatically versioned using [mike](https://github.com/jimporter/mike):
+
+- **Stable versions**: When a release tag (e.g., `v0.5.0`) is pushed, the documentation is deployed as a versioned site
+  and the `latest` alias is updated to point to this version.
+- **Development version**: Commits to `main` branch update the `next` version, which represents the unreleased
+  development documentation.
+- **Default version**: The documentation site defaults to `latest`, which always points to the most recent stable
+  release.
+
+### Working with documentation locally
+
+To preview the documentation with versioning locally:
+
+```bash
+# Install dependencies (first time only)
+uv sync
+
+# Serve the current docs (without versioning)
+uv run mkdocs serve
+
+# Or use mike to preview versioned docs
+uv run mike serve
+```
