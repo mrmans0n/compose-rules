@@ -9,6 +9,6 @@ import io.nlopez.compose.rules.ParameterOrder
 class ParameterOrderCheck :
     KtlintRule(
         id = "compose:param-order-check",
-        editorConfigProperties = setOf(treatAsLambda),
+        editorConfigProperties = setOf(treatAsLambda, treatAsComposableLambda),
     ),
     ComposeKtVisitor by ParameterOrder()

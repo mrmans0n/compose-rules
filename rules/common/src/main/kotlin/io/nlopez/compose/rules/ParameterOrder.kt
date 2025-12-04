@@ -6,8 +6,10 @@ import io.nlopez.compose.core.ComposeKtConfig
 import io.nlopez.compose.core.ComposeKtVisitor
 import io.nlopez.compose.core.Emitter
 import io.nlopez.compose.core.report
+import io.nlopez.compose.core.util.composableLambdaTypes
 import io.nlopez.compose.core.util.findAllChildrenByClass
 import io.nlopez.compose.core.util.isComposable
+import io.nlopez.compose.core.util.isComposableLambda
 import io.nlopez.compose.core.util.isLambda
 import io.nlopez.compose.core.util.isModifier
 import io.nlopez.compose.core.util.lambdaTypes
@@ -20,6 +22,7 @@ class ParameterOrder : ComposeKtVisitor {
 
     override fun visitFile(file: KtFile, emitter: Emitter, config: ComposeKtConfig) {
         val lambdaTypes = file.lambdaTypes(config)
+        val composableLambdaTypes = file.composableLambdaTypes(config)
 
         val composables = file.findAllChildrenByClass<KtFunction>()
             .filter { it.isComposable }
@@ -60,8 +63,24 @@ class ParameterOrder : ComposeKtVisitor {
             // We create our ideal ordering of params for the ideal composable.
             val properOrder = withoutDefaults + sortedWithDefaults + trailingLambda
 
+            // Special case: If the proper order would move a NON-COMPOSABLE lambda with a default value to the
+            // last position (making it a trailing lambda) and there's no existing trailing lambda, we should be
+            // lenient. This avoids forcing non-composable lambdas with defaults to become trailing lambdas, which
+            // is undesirable in Compose. However, composable lambdas (like content slots) are perfectly fine as
+            // trailing lambdas, so we should still report those.
+            val shouldBeLenient = !hasTrailingFunction &&
+                properOrder.lastOrNull()?.let { lastParam ->
+                    val typeRef = lastParam.typeReference
+                    lastParam.hasDefaultValue() &&
+                        typeRef?.isLambda(treatAsLambdaTypes = lambdaTypes) == true &&
+                        typeRef.isComposableLambda(
+                            treatAsLambdaTypes = lambdaTypes,
+                            treatAsComposableLambdaTypes = composableLambdaTypes,
+                        ).not()
+                } == true
+
             // If it's not the same as the current order, we show the rule violation.
-            if (currentOrder != properOrder) {
+            if (!shouldBeLenient && currentOrder != properOrder) {
                 emitter.report(function, createErrorMessage(currentOrder, properOrder))
             }
         }
