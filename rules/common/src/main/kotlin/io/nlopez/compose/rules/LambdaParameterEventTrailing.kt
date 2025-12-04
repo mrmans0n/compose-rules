@@ -43,7 +43,7 @@ class LambdaParameterEventTrailing : ComposeKtVisitor {
         val EventLambdaIsTrailingLambda = """
             Lambda parameters in a @Composable that are for events (e.g. onClick, onChange, etc) and are required (they don't have a default value) should not be used as the trailing parameter.
             Composable functions that emit content usually reserve the trailing lambda syntax for the content slot, and that can lead to an assumption that other composables can be used in that lambda.
-            See https://mrmans0n.github.io/compose-rules/rules/#avoid-using-the-trailing-lambda-for-event-lambdas-in-ui-composables for more information.
+            See https://mrmans0n.github.io/compose-rules/rules/#avoid-trailing-lambdas-for-event-handlers for more information.
         """.trimIndent()
     }
 }
