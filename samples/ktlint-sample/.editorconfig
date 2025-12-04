@@ -10,3 +10,4 @@ ktlint_function_naming_ignore_when_annotated_with = Composable
 # compose_content_emitters = MyCustomComposable
 # compose_allowed_composable_function_names = .*Presenter
 
+

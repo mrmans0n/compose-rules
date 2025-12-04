@@ -59,11 +59,11 @@ jobs:
             env:
                 GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
             run: |
-                # Parse versions from libs.versions.toml
-                DETEKT_VERSION=$(grep '^detekt = ' gradle/libs.versions.toml | sed 's/detekt = "\(.*\)"/\1/')
-                KOTLIN_DETEKT_VERSION=$(grep '^kotlin-detekt = ' gradle/libs.versions.toml | sed 's/kotlin-detekt = "\(.*\)".*/\1/')
-                KTLINT_VERSION=$(grep '^ktlint = ' gradle/libs.versions.toml | sed 's/ktlint = "\(.*\)"/\1/')
-                KOTLIN_KTLINT_VERSION=$(grep '^kotlin-ktlint = ' gradle/libs.versions.toml | sed 's/kotlin-ktlint = "\(.*\)".*/\1/')
+                # Parse versions from libs.versions.toml (match only version strings, not plugin definitions)
+                DETEKT_VERSION=$(grep '^detekt = "' gradle/libs.versions.toml | sed 's/detekt = "\([^"]*\)".*/\1/')
+                KOTLIN_DETEKT_VERSION=$(grep '^kotlin-detekt = "' gradle/libs.versions.toml | sed 's/kotlin-detekt = "\([^"]*\)".*/\1/')
+                KTLINT_VERSION=$(grep '^ktlint = "' gradle/libs.versions.toml | sed 's/ktlint = "\([^"]*\)".*/\1/')
+                KOTLIN_KTLINT_VERSION=$(grep '^kotlin-ktlint = "' gradle/libs.versions.toml | sed 's/kotlin-ktlint = "\([^"]*\)".*/\1/')
 
                 echo "Detekt: $DETEKT_VERSION (Kotlin $KOTLIN_DETEKT_VERSION)"
                 echo "Ktlint: $KTLINT_VERSION (Kotlin $KOTLIN_KTLINT_VERSION)"
