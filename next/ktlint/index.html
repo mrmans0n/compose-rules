@@ -12,7 +12,7 @@
         <meta name="author" content="Nacho Lopez">
       
       
-        <link rel="canonical" href="https://mrmans0h.github.io/compose-rules/next/ktlint/">
+        <link rel="canonical" href="https://mrmans0n.github.io/compose-rules/next/ktlint/">
       
       
         <link rel="prev" href="..">
@@ -1038,11 +1038,11 @@
 <h2 id="using-with-spotless">Using with spotless<a class="headerlink" href="#using-with-spotless" title="Permanent link">&para;</a></h2>
 <p>See <a href="https://github.com/diffplug/spotless/tree/main/plugin-gradle#ktlint">Spotless Ktlint Integration</a>.</p>
 <h2 id="using-with-ktlint-cli-or-the-ktlint-intellij-plugin">Using with ktlint CLI or the ktlint IntelliJ plugin<a class="headerlink" href="#using-with-ktlint-cli-or-the-ktlint-intellij-plugin" title="Permanent link">&para;</a></h2>
-<p>The <a href="https://github.com/mrmans0n/compose-rules/releases">releases</a> page contains an <a href="https://stackoverflow.com/questions/11947037/what-is-an-uber-jar">uber jar</a> for each version release that can be used for these purposes. In the <a href="https://github.com/mrmans0n/compose-rules/releases/">releases</a> page you can identify them by the suffix <code>-all.jar</code>.</p>
+<p>The <a href="https://github.com/mrmans0n/compose-rules/releases">releases</a> page contains an <a href="https://stackoverflow.com/questions/11947037/what-is-an-uber-jar">uber jar</a> for each version. Look for files with the <code>-all.jar</code> suffix.</p>
 <p>To use with <a href="https://ktlint.github.io/#getting-started">ktlint CLI</a>:
 <div class="highlight"><pre><span></span><code>ktlint<span class="w"> </span>-R<span class="w"> </span>ktlint-compose-&lt;VERSION&gt;-all.jar
 </code></pre></div></p>
-<p>You can use this same <a href="https://github.com/mrmans0n/compose-rules/releases/">uber jar from the releases page</a> with the <a href="https://plugins.jetbrains.com/plugin/15057-ktlint">ktlint IntelliJ plugin</a> if the rules are compiled against the same ktlint version used for that release. You can configure the custom ruleset in the preferences page of the plugin.</p>
+<p>You can also use this uber jar with the <a href="https://plugins.jetbrains.com/plugin/15057-ktlint">ktlint IntelliJ plugin</a>, provided the rules are compiled against the same ktlint version. Configure the custom ruleset in the plugin's preferences.</p>
 <h2 id="supported-versions-matrix">Supported versions matrix<a class="headerlink" href="#supported-versions-matrix" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -1118,17 +1118,17 @@
 <p>Older version support can be found in the <a href="https://github.com/mrmans0n/compose-rules/releases">release notes</a>.</p>
 <h2 id="configuring-rules">Configuring rules<a class="headerlink" href="#configuring-rules" title="Permanent link">&para;</a></h2>
 <h3 id="providing-custom-content-emitters">Providing custom content emitters<a class="headerlink" href="#providing-custom-content-emitters" title="Permanent link">&para;</a></h3>
-<p>There are some rules (<code>compose:content-emitter-returning-values-check</code>, <code>compose:modifier-not-used-at-root</code> and <code>compose:multiple-emitters-check</code>) that use predefined list of known composables that emit content. But you can add your own too! In your <code>.editorconfig</code> file, you'll need to add a <code>compose_content_emitters</code> property followed by a list of composable names separated by commas. You would typically want the composables that are part of your custom design system to be in this list.</p>
+<p>Some rules (<code>compose:content-emitter-returning-values-check</code>, <code>compose:modifier-not-used-at-root</code>, <code>compose:multiple-emitters-check</code>) use a predefined list of composables that emit content. You can add your own (e.g., design system composables) in your <code>.editorconfig</code> file:</p>
 <div class="highlight"><pre><span></span><code>[*.{kt,kts}]
 compose_content_emitters = MyComposable,MyOtherComposable
 </code></pre></div>
 <h3 id="providing-exceptions-to-content-emitters">Providing exceptions to content emitters<a class="headerlink" href="#providing-exceptions-to-content-emitters" title="Permanent link">&para;</a></h3>
-<p>Sometimes we'll want to not count a Composable towards the multiple content emitters (<code>compose:multiple-emitters-check</code>) rule. This is useful, for example, if the composable function actually emits content but that content is painted in a different window (like a dialog or a modal). For those cases, we can use a denylist <code>compose_content_emitters_denyylist</code> to add those composable names separated by commas.</p>
+<p>Sometimes a composable emits content in a different window (like a dialog or modal) and shouldn't count toward the <code>compose:multiple-emitters-check</code> rule. Use the denylist to exclude these:</p>
 <div class="highlight"><pre><span></span><code>[*.{kt,kts}]
 compose_content_emitters_denylist = MyModalComposable,MyDialogComposable
 </code></pre></div>
 <h3 id="providing-custom-viewmodel-factories">Providing custom ViewModel factories<a class="headerlink" href="#providing-custom-viewmodel-factories" title="Permanent link">&para;</a></h3>
-<p>The <code>vm-injection-check</code> rule will check against common ViewModel factories (eg <code>viewModel</code> from AAC, <code>weaverViewModel</code> from Weaver, <code>hiltViewModel</code> from Hilt + Compose, etc), but you can configure your <code>.editorconfig</code> file to add your own, as a list of comma-separated strings:</p>
+<p>The <code>vm-injection-check</code> rule checks common ViewModel factories (<code>viewModel</code>, <code>hiltViewModel</code>, etc.). Add your own:</p>
 <div class="highlight"><pre><span></span><code>[*.{kt,kts}]
 compose_view_model_factories = myViewModel,potatoViewModel
 </code></pre></div>
@@ -1148,27 +1148,27 @@ compose_allowed_lambda_parameter_names = onSizeChanged,onGloballyPositioned
 compose_modifier_missing_ignore_annotated = Potato,Banana
 </code></pre></div>
 <h3 id="allowing-matching-function-names">Allowing matching function names<a class="headerlink" href="#allowing-matching-function-names" title="Permanent link">&para;</a></h3>
-<p>The <code>naming-check</code> rule requires all composables that return a value to be lowercased. If you want to allow certain patterns though, you can configure a comma-separated list of matching regexes in your <code>.editorconfig</code> file:</p>
+<p>The <code>naming-check</code> rule requires composables that return a value to be lowercased. To allow certain patterns, configure a comma-separated list of regexes:</p>
 <div class="highlight"><pre><span></span><code>[*.{kt,kts}]
 compose_allowed_composable_function_names = .*Presenter,.*SomethingElse
 </code></pre></div>
 <h3 id="allowing-custom-state-holder-names">Allowing custom state holder names<a class="headerlink" href="#allowing-custom-state-holder-names" title="Permanent link">&para;</a></h3>
-<p>The <code>vm-forwarding-check</code> rule will, by default, design as a state holder any class ending on "ViewModel" or "Presenter". You can, however, add new types of names to the mix via a comma-separated list of matching regexes in your <code>.editorconfig</code> file:</p>
+<p>The <code>vm-forwarding-check</code> rule treats classes ending in "ViewModel" or "Presenter" as state holders by default. Add custom patterns via regexes:</p>
 <div class="highlight"><pre><span></span><code>[*.{kt,kts}]
 compose_allowed_state_holder_names = .*ViewModel,.*Presenter,.*Component,.*SomethingElse
 </code></pre></div>
 <h3 id="allowlist-for-composable-names-that-arent-affected-by-the-viewmodelforwarding-rule">Allowlist for composable names that aren't affected by the ViewModelForwarding rule<a class="headerlink" href="#allowlist-for-composable-names-that-arent-affected-by-the-viewmodelforwarding-rule" title="Permanent link">&para;</a></h3>
-<p>The <code>vm-forwarding-check</code> will catch VMs/state holder classes that are relayed to other composables. However, in some situations this can be a valid use-case. The rule can be configured so that all the names of composables that match a list of regexes are exempt to this rule. You can configure this in your <code>.editorconfig</code> file:</p>
+<p>The <code>vm-forwarding-check</code> catches ViewModels/state holders relayed to other composables. To allow specific composable names:</p>
 <div class="highlight"><pre><span></span><code>[*.{kt,kts}]
 compose_allowed_forwarding = .*Content,.*SomethingElse
 </code></pre></div>
 <h3 id="allowlist-for-viewmodelstate-holder-names-that-arent-affected-by-the-viewmodelforwarding-rule">Allowlist for ViewModel/state holder names that aren't affected by the ViewModelForwarding rule<a class="headerlink" href="#allowlist-for-viewmodelstate-holder-names-that-arent-affected-by-the-viewmodelforwarding-rule" title="Permanent link">&para;</a></h3>
-<p>The <code>vm-forwarding-check</code> will catch VMs/state holder classes that are relayed to other composables. However, in some situations this can be a valid use-case. The rule can be configured so that all the names of ViewModels that match a list of regexes are exempt to this rule. You can configure this in your <code>.editorconfig</code> file:</p>
+<p>To allow specific ViewModel/state holder types to be forwarded:</p>
 <div class="highlight"><pre><span></span><code>[*.{kt,kts}]
 compose_allowed_forwarding_of_types = .*MyViewModel,PotatoViewModel
 </code></pre></div>
 <h3 id="configure-the-visibility-of-the-composables-where-to-check-for-missing-modifiers">Configure the visibility of the composables where to check for missing modifiers<a class="headerlink" href="#configure-the-visibility-of-the-composables-where-to-check-for-missing-modifiers" title="Permanent link">&para;</a></h3>
-<p>The <code>modifier-missing-check</code> rule will, by default, only look for missing modifiers for public composables. If you want to lower the visibility threshold to check also internal compoosables, or all composables, you can configure it in your <code>.editorconfig</code> file:</p>
+<p>The <code>modifier-missing-check</code> rule will, by default, only check public composables for missing modifiers. To also check internal or all composables, configure it in your <code>.editorconfig</code> file:</p>
 <div class="highlight"><pre><span></span><code>[*.{kt,kts}]
 compose_check_modifiers_for_visibility = only_public
 </code></pre></div>
@@ -1179,38 +1179,37 @@ compose_check_modifiers_for_visibility = only_public
 <li><code>all</code>: Will check for missing modifiers in all composables.</li>
 </ul>
 <h3 id="configure-custom-modifier-names">Configure custom Modifier names<a class="headerlink" href="#configure-custom-modifier-names" title="Permanent link">&para;</a></h3>
-<p>Most of the modifier-related rules will look for modifiers based their type: either Modifier or GlanceModifier type. Some libraries might add their own flavor of Modifier to the mix, and it might make sense to enforce the same rules we have for the other default modifiers. To support that, you can configure this in your <code>.editorconfig</code> file:</p>
+<p>Most modifier-related rules identify modifiers by type (<code>Modifier</code> or <code>GlanceModifier</code>). If your library has a custom Modifier type, you can add it so the same rules apply:</p>
 <div class="highlight"><pre><span></span><code>[*.{kt,kts}]
 compose_custom_modifiers = BananaModifier,PotatoModifier
 </code></pre></div>
 <h3 id="configure-types-to-treat-as-lambdas-eg-for-paramorder-check">Configure types to treat as lambdas (e.g. for ParamOrder check)<a class="headerlink" href="#configure-types-to-treat-as-lambdas-eg-for-paramorder-check" title="Permanent link">&para;</a></h3>
-<p>The <code>param-order-check</code> rule will do its best to identify trailing lambdas. However, in cases where a typedef / functional interface is being used, we might want to have this rule to treat them as if they were lambdas: not reporting them if they are the last in a method signature and they don't have a default value. To give ktlint some hints, you can configure this in your <code>.editorconfig</code> file:</p>
+<p>The <code>param-order-check</code> rule identifies trailing lambdas automatically. For typedefs or functional interfaces that should be treated as lambdas, add hints:</p>
 <div class="highlight"><pre><span></span><code>[*.{kt,kts}]
 compose_treat_as_lambda = MyLambdaType,MyOtherLambdaType
 </code></pre></div>
 <h3 id="configure-types-to-treat-as-composable-lambdas-eg-for-contenttrailinglambda-check">Configure types to treat as composable lambdas (e.g. for ContentTrailingLambda check)<a class="headerlink" href="#configure-types-to-treat-as-composable-lambdas-eg-for-contenttrailinglambda-check" title="Permanent link">&para;</a></h3>
-<p>The <code>content-trailing-lambda</code> rule will do its best to identify <code>@Composable</code> trailing lambdas. However, in cases where a typedef / functional interface is being used, we might want to have this rule to treat them as if they were composable lambdas: not reporting them if they are the last in a method signature and they don't have a default value. To give ktlint some hints, you can configure this in your <code>.editorconfig</code> file:</p>
+<p>The <code>content-trailing-lambda</code> rule identifies <code>@Composable</code> trailing lambdas automatically. For typedefs or functional interfaces that should be treated as composable lambdas:</p>
 <div class="highlight"><pre><span></span><code>[*.{kt,kts}]
 compose_treat_as_composable_lambda = MyLambdaComposableType,MyOtherComposableLambdaType
 </code></pre></div>
 <h3 id="enabling-the-material-2-detector">Enabling the Material 2 detector<a class="headerlink" href="#enabling-the-material-2-detector" title="Permanent link">&para;</a></h3>
-<p>The <code>material-two</code> rule will flag any usage of a Material 2 API. This rule is disabled by default, so you'll need to explicitly enable it in your <code>.editorconfig</code> file:</p>
+<p>The <code>material-two</code> rule flags Material 2 API usage. Disabled by default; enable it in your <code>.editorconfig</code> file:</p>
 <div class="highlight"><pre><span></span><code>[*.{kt,kts}]
 compose_disallow_material2 = true
 </code></pre></div>
-<p>You might also want to disallow Material 2, but allow a specific set / subset of APIs. The rule allows this too.</p>
-<p>For example, let's say you want to allow all filled icons (whose fully qualified names are androidx.compose.material.icons.filled.*) and the <code>Button</code> composable (androidx.compose.material.Button). This is how you'd allow those:</p>
+<p>You can also allow specific Material 2 APIs during migration. For example, to allow filled icons and <code>Button</code>:</p>
 <div class="highlight"><pre><span></span><code>[*.{kt,kts}]
 compose_disallow_material2 = true
 compose_allowed_from_m2 = icons.filled,Button
 </code></pre></div>
 <h3 id="enabling-the-unstable-collections-detector">Enabling the unstable collections detector<a class="headerlink" href="#enabling-the-unstable-collections-detector" title="Permanent link">&para;</a></h3>
-<p>The <code>unstable-collections</code> rule will flag any usage of any unstable collection (e.g. List/Set/Map). This rule is disabled by default, so you'll need to explicitly enable it in your <code>.editorconfig</code> file:</p>
+<p>The <code>unstable-collections</code> rule flags unstable collection usage (List/Set/Map). Disabled by default:</p>
 <div class="highlight"><pre><span></span><code>[*.{kt,kts}]
 compose_disallow_unstable_collections = true
 </code></pre></div>
 <h3 id="enabling-and-configuring-the-preview-naming-detector">Enabling and configuring the preview naming detector<a class="headerlink" href="#enabling-and-configuring-the-preview-naming-detector" title="Permanent link">&para;</a></h3>
-<p>If you want to enforce a naming strategy for previews, you can enable the <code>compose:preview-naming</code> rule and configure the <code>compose_preview_naming_strategy</code> property in your <code>.editorconfig</code> file:</p>
+<p>To enforce a naming strategy for previews, enable the rule and configure the strategy:</p>
 <div class="highlight"><pre><span></span><code>[*.{kt,kts}]
 compose_preview_naming_enabled = true
 compose_preview_naming_strategy = suffix
@@ -1222,7 +1221,7 @@ compose_preview_naming_strategy = suffix
 <li><code>anywhere</code>: Previews should contain <code>Preview</code> in their names.</li>
 </ul>
 <h3 id="disable-standardfunction-naming-rule-for-composable">Disable <code>standard:function-naming</code> rule for Composable<a class="headerlink" href="#disable-standardfunction-naming-rule-for-composable" title="Permanent link">&para;</a></h3>
-<p>The function name for a Composable starts with an uppercase. This causes the ktlint rule <code>standard:function-naming</code> to report a violation. This rule can be configured to ignore Composable functions in your <code>.editorconfig</code> file:</p>
+<p>Composable function names start with uppercase, which causes ktlint's <code>standard:function-naming</code> rule to report violations. Configure it to ignore Composable functions:</p>
 <div class="highlight"><pre><span></span><code>[*.{kt,kts}]
 ktlint_function_naming_ignore_when_annotated_with = Composable
 </code></pre></div>

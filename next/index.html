@@ -12,7 +12,7 @@
         <meta name="author" content="Nacho Lopez">
       
       
-        <link rel="canonical" href="https://mrmans0h.github.io/compose-rules/next/">
+        <link rel="canonical" href="https://mrmans0n.github.io/compose-rules/next/">
       
       
       
@@ -542,25 +542,23 @@
 
   <h1>Overview</h1>
 
-<p>The Compose Rules is a set of custom Ktlint / Detekt rules to ensure that your composables don't fall into common pitfalls, that might be easy to miss in code reviews.</p>
+<p>Compose Rules is a set of custom ktlint / detekt rules to ensure that your composables don't fall into common pitfalls that might be easy to miss in code reviews.</p>
 <h2 id="why">Why<a class="headerlink" href="#why" title="Permanent link">&para;</a></h2>
-<p>It can be challenging for big teams to start adopting Compose, particularly because not everyone will start at same time or with the same patterns. We tried to ease the pain by creating a set of Compose static checks.</p>
-<p>Compose has lots of superpowers but also has a bunch of footguns to be aware of <a href="https://twitter.com/mrmans0n/status/1507390768796909571">as seen in this Twitter Thread</a>.</p>
-<p>This is where our static checks come in. We want to detect as many potential issues as we can, as quickly as we can. In this case we want an error to show prior to engineers having to review code. Similar to other static check libraries we hope this leads to a "don't shoot the messengers" philosphy which will foster healthy Compose adoption.</p>
+<p>It can be challenging for big teams to adopt Compose, particularly because not everyone starts at the same time or with the same patterns. We created these static checks to ease that pain.</p>
+<p>Compose has lots of superpowers but also has a bunch of footguns to be aware of, <a href="https://twitter.com/mrmans0n/status/1507390768796909571">as seen in this Twitter thread</a>.</p>
+<p>This is where static checks come in. We want to detect as many potential issues as possible, as early as possible—ideally before code review. Similar to other static analysis libraries, we hope this fosters a "don't shoot the messenger" philosophy and healthy Compose adoption.</p>
 <h2 id="using-with-ktlint">Using with ktlint<a class="headerlink" href="#using-with-ktlint" title="Permanent link">&para;</a></h2>
 <p>You can refer to the <a href="https://mrmans0n.github.io/compose-rules/ktlint">Using with ktlint</a> documentation.</p>
 <h2 id="using-with-detekt">Using with detekt<a class="headerlink" href="#using-with-detekt" title="Permanent link">&para;</a></h2>
 <p>You can refer to the <a href="https://mrmans0n.github.io/compose-rules/detekt">Using with detekt</a> documentation.</p>
 <h2 id="migrating-from-twitter-compose-rules">Migrating from Twitter Compose Rules<a class="headerlink" href="#migrating-from-twitter-compose-rules" title="Permanent link">&para;</a></h2>
-<p>The process to migrate to these rules coming from the Twitter ones is simple.</p>
+<p>Migrating from the Twitter Compose Rules is straightforward:</p>
 <ol>
-<li>Change the project coordinates in your gradle build scripts<ol>
-<li>For detekt, <code>com.twitter.compose.rules:detekt:$version</code> becomes <code>io.nlopez.compose.rules:detekt:$version</code></li>
-<li>For ktlint, <code>com.twitter.compose.rules:ktlint:$version</code> becomes <code>io.nlopez.compose.rules:ktlint:$version</code></li>
-</ol>
-</li>
-<li>Update <code>$version</code> to the latest: <img alt="Latest version" src="https://img.shields.io/maven-central/v/io.nlopez.compose.rules/ktlint" /> - see the project <a href="https://github.com/mrmans0n/compose-rules/releases">releases page</a>.</li>
-<li><strong>If you are using Detekt</strong>: update the config file (e.g. <code>detekt.yml</code>) so that the rule set name <code>TwitterCompose</code> becomes <code>Compose</code>. Keep in mind that there are a lot of new rules in this repo that weren't in Twitter's, so you'd be better copying over from the <a href="https://mrmans0n.github.io/compose-rules/detekt">example configuration</a>.</li>
+<li>Update the project coordinates in your Gradle build scripts:
+      - For detekt: <code>com.twitter.compose.rules:detekt:$version</code> → <code>io.nlopez.compose.rules:detekt:$version</code>
+      - For ktlint: <code>com.twitter.compose.rules:ktlint:$version</code> → <code>io.nlopez.compose.rules:ktlint:$version</code></li>
+<li>Update <code>$version</code> to the latest: <img alt="Latest version" src="https://img.shields.io/maven-central/v/io.nlopez.compose.rules/ktlint" /> — see the <a href="https://github.com/mrmans0n/compose-rules/releases">releases page</a>.</li>
+<li><strong>If using detekt</strong>: Update your config file (e.g., <code>detekt.yml</code>) to rename the rule set from <code>TwitterCompose</code> to <code>Compose</code>. Since this repo has many new rules that weren't in Twitter's, consider copying from the <a href="https://mrmans0n.github.io/compose-rules/detekt">example configuration</a>.</li>
 <li>Done!</li>
 </ol>
 
