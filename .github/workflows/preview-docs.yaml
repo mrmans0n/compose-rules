@@ -9,7 +9,9 @@ on:
       - 'requirements.txt'
       - 'pyproject.toml'
 
-concurrency: preview-${{ github.ref }}
+concurrency:
+  group: gh-pages-deploy
+  cancel-in-progress: false
 
 jobs:
   preview_docs:
