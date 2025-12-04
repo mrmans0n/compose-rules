@@ -130,7 +130,7 @@ class LambdaParameterInRestartableEffect : ComposeKtVisitor {
             Lambda parameters in a @Composable that are referenced directly inside of restarting effects can cause issues or unpredictable behavior.
             If restarting the effect is ok, you can add the reference to this parameter as a key in that effect, so when the parameter changes, a new effect is created.
             However, if the effect is not to be restarted, you will need to use `rememberUpdatedState` on the parameter and use its result in the effect.
-            See https://mrmans0n.github.io/compose-rules/rules/#be-mindful-of-the-arguments-you-use-inside-of-a-restarting-effect for more information.
+            See https://mrmans0n.github.io/compose-rules/rules/#be-mindful-of-effect-keys for more information.
         """.trimIndent()
 
         private val LifecycleEffectScopeFunctions = setOf("onStopOrDispose", "onPauseOrDispose")
