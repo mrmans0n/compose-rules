@@ -350,6 +350,7 @@ private val RestartableEffects by lazy {
         "LifecycleResumeEffect",
         "LifecycleStartEffect",
         "produceRetainedState", // Circuit
+        "KeyedEffect", // Common name in many projects of a non-suspending LaunchedEffect alternative
     )
 }
 
