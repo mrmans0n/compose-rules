@@ -352,17 +352,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#migrating-from-twitter-compose-rules" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Migrating from Twitter Compose Rules
-      
-    </span>
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -509,17 +498,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#migrating-from-twitter-compose-rules" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Migrating from Twitter Compose Rules
-      
-    </span>
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -551,16 +529,6 @@
 <p>You can refer to the <a href="https://mrmans0n.github.io/compose-rules/ktlint">Using with ktlint</a> documentation.</p>
 <h2 id="using-with-detekt">Using with detekt<a class="headerlink" href="#using-with-detekt" title="Permanent link">&para;</a></h2>
 <p>You can refer to the <a href="https://mrmans0n.github.io/compose-rules/detekt">Using with detekt</a> documentation.</p>
-<h2 id="migrating-from-twitter-compose-rules">Migrating from Twitter Compose Rules<a class="headerlink" href="#migrating-from-twitter-compose-rules" title="Permanent link">&para;</a></h2>
-<p>Migrating from the Twitter Compose Rules is straightforward:</p>
-<ol>
-<li>Update the project coordinates in your Gradle build scripts:
-      - For detekt: <code>com.twitter.compose.rules:detekt:$version</code> → <code>io.nlopez.compose.rules:detekt:$version</code>
-      - For ktlint: <code>com.twitter.compose.rules:ktlint:$version</code> → <code>io.nlopez.compose.rules:ktlint:$version</code></li>
-<li>Update <code>$version</code> to the latest: <img alt="Latest version" src="https://img.shields.io/maven-central/v/io.nlopez.compose.rules/ktlint" /> — see the <a href="https://github.com/mrmans0n/compose-rules/releases">releases page</a>.</li>
-<li><strong>If using detekt</strong>: Update your config file (e.g., <code>detekt.yml</code>) to rename the rule set from <code>TwitterCompose</code> to <code>Compose</code>. Since this repo has many new rules that weren't in Twitter's, consider copying from the <a href="https://mrmans0n.github.io/compose-rules/detekt">example configuration</a>.</li>
-<li>Done!</li>
-</ol>
 
 
 
