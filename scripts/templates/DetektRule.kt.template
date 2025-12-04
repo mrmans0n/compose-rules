@@ -1,21 +1,17 @@
+// Copyright 2025 Nacho Lopez
+// SPDX-License-Identifier: Apache-2.0
 package io.nlopez.compose.rules.detekt
 
-import io.gitlab.arturbosch.detekt.api.Config
-import io.gitlab.arturbosch.detekt.api.Debt
-import io.gitlab.arturbosch.detekt.api.Issue
-import io.gitlab.arturbosch.detekt.api.Severity
+import dev.detekt.api.Config
 import io.nlopez.compose.core.ComposeKtVisitor
-import io.nlopez.compose.rules.${ruleName}
 import io.nlopez.compose.rules.DetektRule
+import io.nlopez.compose.rules.${ruleName}
+import java.net.URI
 
 class ${detektRuleName}(config: Config) :
-    DetektRule(config),
-    ComposeKtVisitor by ${ruleName}() {
-
-    override val issue: Issue = Issue(
-        id = "${ruleName}",
-        severity = Severity.CodeSmell,
+    DetektRule(
+        config = config,
         description = ${ruleName}.${ruleName}ErrorMessage,
-        debt = Debt.FIVE_MINS,
-    )
-}
+        url = URI("https://mrmans0n.github.io/compose-rules/rules/#${ktlintRuleId}"),
+    ),
+    ComposeKtVisitor by ${ruleName}()
