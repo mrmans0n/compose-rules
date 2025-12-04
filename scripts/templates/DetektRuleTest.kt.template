@@ -1,10 +1,12 @@
+// Copyright 2025 Nacho Lopez
+// SPDX-License-Identifier: Apache-2.0
 package io.nlopez.compose.rules.detekt
 
-import io.gitlab.arturbosch.detekt.api.Config
-import io.gitlab.arturbosch.detekt.api.SourceLocation
-import io.gitlab.arturbosch.detekt.test.assertThat
-import io.gitlab.arturbosch.detekt.test.lint
+import dev.detekt.api.Config
+import dev.detekt.api.SourceLocation
+import dev.detekt.test.lint
 import io.nlopez.compose.rules.${ruleName}
+import io.nlopez.compose.rules.detekt.assertThat
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
 
@@ -20,12 +22,12 @@ class ${detektRuleName}Test {
             TODO()
             """.trimIndent()
         val errors = rule.lint(code)
-        assertThat(errors).hasStartSourceLocations(
-            SourceLocation(2, 5),
-        )
+        assertThat(errors)
+            .hasStartSourceLocations(
+                SourceLocation(1, 1),
+            )
         for (error in errors) {
-            assertThat(error)
-                .hasMessage(${ruleName}.${ruleName}ErrorMessage)
+            assertThat(error).hasMessage(${ruleName}.${ruleName}ErrorMessage)
         }
     }
 

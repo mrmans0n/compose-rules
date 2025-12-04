@@ -76,12 +76,13 @@ while (!rootDir.resolve("settings.gradle.kts").exists()) {
 
 println("Setting up templates...")
 
+val templatesDir = rootDir.resolve("scripts/templates").absolutePath
 val engine = VelocityEngine(
     Properties().apply {
         setProperty(
             RuntimeConstants.FILE_RESOURCE_LOADER_PATH,
-            "templates"
-        ) // Adjust the path to your templates directory
+            templatesDir
+        )
     }
 ).apply { init() }
 
@@ -134,7 +135,7 @@ engine.writeTemplate(
     context = context
 )
 
-println("Adding to detekt default ruleset...")
+println("Adding to detekt default ruleset config...")
 val detektConfig = rootDir.resolve("rules/detekt/src/main/resources/config/config.yml")
 
 // Parse the config file
@@ -158,6 +159,41 @@ val newDetektConfig = buildString {
 
 detektConfig.writeText(newDetektConfig)
 
-// Desirable improvements to add:
-// - add rule to docs/detekt.md "default rule" values
-// - add entry in docs/rules.md (likely at the end)
+println("Adding to detekt ComposeRuleSetProvider...")
+val detektRuleSetProvider =
+    rootDir.resolve("rules/detekt/src/main/kotlin/io/nlopez/compose/rules/detekt/ComposeRuleSetProvider.kt")
+val detektRuleSetContent = detektRuleSetProvider.readText()
+val detektRuleEntry = """            RuleName("$ruleName") to { config: Config -> ${ruleName}Check(config) },"""
+// Insert before the closing parenthesis of the mapOf
+val updatedDetektRuleSetContent = detektRuleSetContent.replace(
+    """        ),
+    )""",
+    """$detektRuleEntry
+        ),
+    )"""
+)
+detektRuleSetProvider.writeText(updatedDetektRuleSetContent)
+
+println("Adding to ktlint ComposeRuleSetProvider...")
+val ktlintRuleSetProvider =
+    rootDir.resolve("rules/ktlint/src/main/kotlin/io/nlopez/compose/rules/ktlint/ComposeRuleSetProvider.kt")
+val ktlintRuleSetContent = ktlintRuleSetProvider.readText()
+val ktlintRuleEntry = """        RuleProvider { ${ruleName}Check() },"""
+// Insert before the closing parenthesis of the setOf
+val updatedKtlintRuleSetContent = ktlintRuleSetContent.replace(
+    """    )
+
+    private companion object""",
+    """$ktlintRuleEntry
+    )
+
+    private companion object"""
+)
+ktlintRuleSetProvider.writeText(updatedKtlintRuleSetContent)
+
+println()
+println("Done! Don't forget to:")
+println("  - Implement the rule logic in rules/common/src/main/kotlin/io/nlopez/compose/rules/${ruleName}.kt")
+println("  - Add tests in the generated test files")
+println("  - Add documentation entry in docs/rules.md")
+println("  - Update docs/detekt.md with the new rule's default configuration")
