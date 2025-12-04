@@ -135,7 +135,7 @@ More info: [Compose API guidelines](https://github.com/androidx/androidx/blob/an
 
 !!! info ""
 
-    :material-chevron-right-box: [compose:content-emitter-returning-values-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/MultipleContentEmitters.kt) ktlint :material-chevron-right-box: [compose:content-emitter-returning-values-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/MultipleContentEmitters.kt) detekt
+    :material-chevron-right-box: [compose:content-emitter-returning-values-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ContentEmitterReturningValues.kt) ktlint :material-chevron-right-box: [ContentEmitterReturningValues](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ContentEmitterReturningValues.kt) detekt
 
 > **Note**: To add your custom composables so they are used in this rule (things like your design system composables), you can add `composeEmitters` to this rule config in Detekt, or `compose_emitters` to your .editorconfig in ktlint.
 
@@ -314,7 +314,7 @@ fun SomeUI(modifier: Modifier = Modifier) {
 
 !!! info ""
 
-    :material-chevron-right-box: [compose:lambda-param-event-trailing](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ContentTrailingLambda.kt) ktlint :material-chevron-right-box: [LambdaParameterEventTrailing](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/LambdaParameterEventTrailing.kt) detekt
+    :material-chevron-right-box: [compose:lambda-param-event-trailing](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/LambdaParameterEventTrailing.kt) ktlint :material-chevron-right-box: [LambdaParameterEventTrailing](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/LambdaParameterEventTrailing.kt) detekt
 
 ### Naming CompositionLocals properly
 
@@ -324,7 +324,7 @@ More information: [Naming CompositionLocals](https://android.googlesource.com/pl
 
 !!! info ""
 
-    :material-chevron-right-box: [compose:compositionlocal-naming](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/composerules/CompositionLocalNaming.kt) ktlint :material-chevron-right-box: [CompositionLocalNaming](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/composerules/CompositionLocalNaming.kt) detekt
+    :material-chevron-right-box: [compose:compositionlocal-naming](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/CompositionLocalNaming.kt) ktlint :material-chevron-right-box: [CompositionLocalNaming](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/CompositionLocalNaming.kt) detekt
 
 ### Naming multipreview annotations properly
 
@@ -354,7 +354,7 @@ Custom Composable annotations (tagged with [`@ComposableTargetMarker`](https://d
 
 !!! info ""
 
-    :material-chevron-right-box: [compose:composable-annotation-naming-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ComposableAnnotationNaming.kt) ktlint :material-chevron-right-box: [ComposableAnnotationNaming](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ComposableAnnotationNaming.kt) detekt
+    :material-chevron-right-box: [compose:composable-annotation-naming](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ComposableAnnotationNaming.kt) ktlint :material-chevron-right-box: [ComposableAnnotationNaming](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ComposableAnnotationNaming.kt) detekt
 
 ### Ordering @Composable parameters properly
 
@@ -714,4 +714,4 @@ In case you want to change this, you can configure the `previewNamingStrategy` p
 
 !!! info ""
 
-    :material-chevron-right-box: [compose:preview-naming](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/PreviewNamign.kt) ktlint :material-chevron-right-box: [PreviewNaming](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/PreviewNaming.kt) detekt
+    :material-chevron-right-box: [compose:preview-naming](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/PreviewNaming.kt) ktlint :material-chevron-right-box: [PreviewNaming](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/PreviewNaming.kt) detekt
