@@ -7,6 +7,10 @@ on:
     tags:
       - v*
 
+concurrency:
+  group: gh-pages-deploy
+  cancel-in-progress: false
+
 jobs:
   deploy_docs:
     if: github.repository == 'mrmans0n/compose-rules'
@@ -29,6 +33,9 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Fetch gh-pages branch
+        run: git fetch origin gh-pages:gh-pages || true
 
       - name: Determine version
         id: version
