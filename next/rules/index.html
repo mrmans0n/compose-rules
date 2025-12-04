@@ -1365,6 +1365,15 @@
 <h2 id="state">State<a class="headerlink" href="#state" title="Permanent link">&para;</a></h2>
 <h3 id="hoist-all-the-things">Hoist all the things<a class="headerlink" href="#hoist-all-the-things" title="Permanent link">&para;</a></h3>
 <p>Compose is built upon the idea of <a href="https://developer.android.com/jetpack/compose/state#state-hoisting">unidirectional data flow</a>: data/state flows down, and events fire up. To achieve this, Compose advocates for <a href="https://developer.android.com/jetpack/compose/state#state-hoisting">hoisting state</a> upwards, making most composable functions stateless. This has many benefits, including easier testing.</p>
+<pre class="mermaid"><code>flowchart TB
+    subgraph Parent[Parent Composable]
+        S[State]
+    end
+    subgraph Child[Child Composable]
+        U[UI]
+    end
+    S --&gt;|state flows down| U
+    U --&gt;|events fire up| S</code></pre>
 <p>In practice, watch out for these common issues:</p>
 <ul>
 <li>Do not pass ViewModels (or objects from DI) down.</li>
@@ -1383,89 +1392,123 @@
 </div>
 <h3 id="use-mutablestateof-type-specific-variants-when-possible">Use mutableStateOf type-specific variants when possible<a class="headerlink" href="#use-mutablestateof-type-specific-variants-when-possible" title="Permanent link">&para;</a></h3>
 <p>Compose provides type-specific state variants that avoid autoboxing on JVM platforms, making them more memory efficient. Use these instead of <code>mutableStateOf</code> when working with primitives or primitive collections.</p>
+<p><strong>Primitives:</strong></p>
 <table>
 <thead>
 <tr>
-<th>Instead of</th>
-<th>Use</th>
+<th style="text-align: left;">Instead of</th>
+<th style="text-align: left;">Use</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>mutableStateOf&lt;Int&gt;</code></td>
-<td><code>mutableIntStateOf</code></td>
+<td style="text-align: left;"><code>mutableStateOf&lt;Int&gt;</code></td>
+<td style="text-align: left;"><code>mutableIntStateOf</code></td>
 </tr>
 <tr>
-<td><code>mutableStateOf&lt;Long&gt;</code></td>
-<td><code>mutableLongStateOf</code></td>
+<td style="text-align: left;"><code>mutableStateOf&lt;Long&gt;</code></td>
+<td style="text-align: left;"><code>mutableLongStateOf</code></td>
 </tr>
 <tr>
-<td><code>mutableStateOf&lt;Float&gt;</code></td>
-<td><code>mutableFloatStateOf</code></td>
+<td style="text-align: left;"><code>mutableStateOf&lt;Float&gt;</code></td>
+<td style="text-align: left;"><code>mutableFloatStateOf</code></td>
 </tr>
 <tr>
-<td><code>mutableStateOf&lt;Double&gt;</code></td>
-<td><code>mutableDoubleStateOf</code></td>
+<td style="text-align: left;"><code>mutableStateOf&lt;Double&gt;</code></td>
+<td style="text-align: left;"><code>mutableDoubleStateOf</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Primitive Lists:</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Instead of</th>
+<th style="text-align: left;">Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>mutableStateOf(List&lt;Int&gt;)</code></td>
+<td style="text-align: left;"><code>mutableIntListOf</code></td>
 </tr>
 <tr>
-<td><code>mutableStateOf(List&lt;Int&gt;)</code></td>
-<td><code>mutableIntListOf</code></td>
+<td style="text-align: left;"><code>mutableStateOf(List&lt;Long&gt;)</code></td>
+<td style="text-align: left;"><code>mutableLongListOf</code></td>
 </tr>
 <tr>
-<td><code>mutableStateOf(List&lt;Long&gt;)</code></td>
-<td><code>mutableLongListOf</code></td>
+<td style="text-align: left;"><code>mutableStateOf(List&lt;Float&gt;)</code></td>
+<td style="text-align: left;"><code>mutableFloatListOf</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Primitive Sets:</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Instead of</th>
+<th style="text-align: left;">Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>mutableStateOf(Set&lt;Int&gt;)</code></td>
+<td style="text-align: left;"><code>mutableIntSetOf</code></td>
 </tr>
 <tr>
-<td><code>mutableStateOf(List&lt;Float&gt;)</code></td>
-<td><code>mutableFloatListOf</code></td>
+<td style="text-align: left;"><code>mutableStateOf(Set&lt;Long&gt;)</code></td>
+<td style="text-align: left;"><code>mutableLongSetOf</code></td>
 </tr>
 <tr>
-<td><code>mutableStateOf(Set&lt;Int&gt;)</code></td>
-<td><code>mutableIntSetOf</code></td>
+<td style="text-align: left;"><code>mutableStateOf(Set&lt;Float&gt;)</code></td>
+<td style="text-align: left;"><code>mutableFloatSetOf</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Primitive Maps:</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Instead of</th>
+<th style="text-align: left;">Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>mutableStateOf(Map&lt;Int, Int&gt;)</code></td>
+<td style="text-align: left;"><code>mutableIntIntMapOf</code></td>
 </tr>
 <tr>
-<td><code>mutableStateOf(Set&lt;Long&gt;)</code></td>
-<td><code>mutableLongSetOf</code></td>
+<td style="text-align: left;"><code>mutableStateOf(Map&lt;Int, Long&gt;)</code></td>
+<td style="text-align: left;"><code>mutableIntLongMapOf</code></td>
 </tr>
 <tr>
-<td><code>mutableStateOf(Set&lt;Float&gt;)</code></td>
-<td><code>mutableFloatSetOf</code></td>
+<td style="text-align: left;"><code>mutableStateOf(Map&lt;Int, Float&gt;)</code></td>
+<td style="text-align: left;"><code>mutableIntFloatMapOf</code></td>
 </tr>
 <tr>
-<td><code>mutableStateOf(Map&lt;Int, Int&gt;)</code></td>
-<td><code>mutableIntIntMapOf</code></td>
+<td style="text-align: left;"><code>mutableStateOf(Map&lt;Long, Int&gt;)</code></td>
+<td style="text-align: left;"><code>mutableLongIntMapOf</code></td>
 </tr>
 <tr>
-<td><code>mutableStateOf(Map&lt;Int, Long&gt;)</code></td>
-<td><code>mutableIntLongMapOf</code></td>
+<td style="text-align: left;"><code>mutableStateOf(Map&lt;Long, Long&gt;)</code></td>
+<td style="text-align: left;"><code>mutableLongLongMapOf</code></td>
 </tr>
 <tr>
-<td><code>mutableStateOf(Map&lt;Int, Float&gt;)</code></td>
-<td><code>mutableIntFloatMapOf</code></td>
+<td style="text-align: left;"><code>mutableStateOf(Map&lt;Long, Float&gt;)</code></td>
+<td style="text-align: left;"><code>mutableLongFloatMapOf</code></td>
 </tr>
 <tr>
-<td><code>mutableStateOf(Map&lt;Long, Int&gt;)</code></td>
-<td><code>mutableLongIntMapOf</code></td>
+<td style="text-align: left;"><code>mutableStateOf(Map&lt;Float, Int&gt;)</code></td>
+<td style="text-align: left;"><code>mutableFloatIntMapOf</code></td>
 </tr>
 <tr>
-<td><code>mutableStateOf(Map&lt;Long, Long&gt;)</code></td>
-<td><code>mutableLongLongMapOf</code></td>
+<td style="text-align: left;"><code>mutableStateOf(Map&lt;Float, Long&gt;)</code></td>
+<td style="text-align: left;"><code>mutableFloatLongMapOf</code></td>
 </tr>
 <tr>
-<td><code>mutableStateOf(Map&lt;Long, Float&gt;)</code></td>
-<td><code>mutableLongFloatMapOf</code></td>
-</tr>
-<tr>
-<td><code>mutableStateOf(Map&lt;Float, Int&gt;)</code></td>
-<td><code>mutableFloatIntMapOf</code></td>
-</tr>
-<tr>
-<td><code>mutableStateOf(Map&lt;Float, Long&gt;)</code></td>
-<td><code>mutableFloatLongMapOf</code></td>
-</tr>
-<tr>
-<td><code>mutableStateOf(Map&lt;Float, Float&gt;)</code></td>
-<td><code>mutableFloatFloatMapOf</code></td>
+<td style="text-align: left;"><code>mutableStateOf(Map&lt;Float, Float&gt;)</code></td>
+<td style="text-align: left;"><code>mutableFloatFloatMapOf</code></td>
 </tr>
 </tbody>
 </table>
