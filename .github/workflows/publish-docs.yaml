@@ -16,24 +16,43 @@ jobs:
 
     steps:
       - uses: actions/checkout@v6
-
-      - name: Setup Python
-        uses: actions/setup-python@v6
         with:
-          python-version: '3.x'
+          fetch-depth: 0
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v4
 
       - name: Install dependencies
+        run: uv sync --frozen
+
+      - name: Configure Git
         run: |
-          python3 -m pip install --upgrade pip
-          python3 -m pip install mkdocs
-          python3 -m pip install mkdocs-material
-          python3 -m pip install mdx_truly_sane_lists
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Build site
-        run: mkdocs build
+      - name: Determine version
+        id: version
+        run: |
+          if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
+            # Extract version from tag (remove 'v' prefix)
+            VERSION="${GITHUB_REF#refs/tags/v}"
+            echo "version=$VERSION" >> $GITHUB_OUTPUT
+            echo "alias=latest" >> $GITHUB_OUTPUT
+            echo "is_stable=true" >> $GITHUB_OUTPUT
+          else
+            # Main branch = next/development version
+            echo "version=next" >> $GITHUB_OUTPUT
+            echo "alias=" >> $GITHUB_OUTPUT
+            echo "is_stable=false" >> $GITHUB_OUTPUT
+          fi
 
-      - name: Deploy docs
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./site
+      - name: Deploy documentation (stable version)
+        if: steps.version.outputs.is_stable == 'true'
+        run: |
+          uv run mike deploy --push --update-aliases ${{ steps.version.outputs.version }} ${{ steps.version.outputs.alias }}
+          uv run mike set-default --push latest
+
+      - name: Deploy documentation (development version)
+        if: steps.version.outputs.is_stable == 'false'
+        run: |
+          uv run mike deploy --push ${{ steps.version.outputs.version }}
