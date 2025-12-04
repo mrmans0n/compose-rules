@@ -4,6 +4,18 @@
 
 Compose is built upon the idea of [unidirectional data flow](https://developer.android.com/jetpack/compose/state#state-hoisting): data/state flows down, and events fire up. To achieve this, Compose advocates for [hoisting state](https://developer.android.com/jetpack/compose/state#state-hoisting) upwards, making most composable functions stateless. This has many benefits, including easier testing.
 
+```mermaid
+flowchart TB
+    subgraph Parent[Parent Composable]
+        S[State]
+    end
+    subgraph Child[Child Composable]
+        U[UI]
+    end
+    S -->|state flows down| U
+    U -->|events fire up| S
+```
+
 In practice, watch out for these common issues:
 
 - Do not pass ViewModels (or objects from DI) down.
@@ -30,18 +42,35 @@ Be careful when using `mutableStateOf` (or any of the other `State<T>` builders)
 
 Compose provides type-specific state variants that avoid autoboxing on JVM platforms, making them more memory efficient. Use these instead of `mutableStateOf` when working with primitives or primitive collections.
 
+**Primitives:**
+
 | Instead of | Use |
-|------------|-----|
+|:-----------|:----|
 | `mutableStateOf<Int>` | `mutableIntStateOf` |
 | `mutableStateOf<Long>` | `mutableLongStateOf` |
 | `mutableStateOf<Float>` | `mutableFloatStateOf` |
 | `mutableStateOf<Double>` | `mutableDoubleStateOf` |
+
+**Primitive Lists:**
+
+| Instead of | Use |
+|:-----------|:----|
 | `mutableStateOf(List<Int>)` | `mutableIntListOf` |
 | `mutableStateOf(List<Long>)` | `mutableLongListOf` |
 | `mutableStateOf(List<Float>)` | `mutableFloatListOf` |
+
+**Primitive Sets:**
+
+| Instead of | Use |
+|:-----------|:----|
 | `mutableStateOf(Set<Int>)` | `mutableIntSetOf` |
 | `mutableStateOf(Set<Long>)` | `mutableLongSetOf` |
 | `mutableStateOf(Set<Float>)` | `mutableFloatSetOf` |
+
+**Primitive Maps:**
+
+| Instead of | Use |
+|:-----------|:----|
 | `mutableStateOf(Map<Int, Int>)` | `mutableIntIntMapOf` |
 | `mutableStateOf(Map<Int, Long>)` | `mutableIntLongMapOf` |
 | `mutableStateOf(Map<Int, Float>)` | `mutableIntFloatMapOf` |
