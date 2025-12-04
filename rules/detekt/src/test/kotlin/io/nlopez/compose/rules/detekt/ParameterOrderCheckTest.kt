@@ -68,6 +68,54 @@ class ParameterOrderCheckTest {
     }
 
     @Test
+    fun `no errors when non-composable lambda with default value comes before required params - issue 416`() {
+        @Language("kotlin")
+        val code = """
+            @Composable
+            fun Foo(
+              onSelect: (Foo) -> Unit,
+              displayMapper: (Foo) -> String = { it.name },
+              title: String,
+            ) { }
+
+            @Composable
+            fun Bar(
+              onClick: () -> Unit,
+              formatter: (String) -> String = { it },
+              text: String,
+              count: Int,
+            ) { }
+
+            @Composable
+            fun Baz(
+              modifier: Modifier = Modifier,
+              onValueChange: (Int) -> Unit = {},
+              value: Int,
+            ) { }
+        """.trimIndent()
+        val errors = rule.lint(code)
+        assertThat(errors).isEmpty()
+    }
+
+    @Test
+    fun `error when composable lambda with default value comes before required params`() {
+        @Language("kotlin")
+        val code = """
+            @Composable
+            fun Foo(
+              onClick: () -> Unit,
+              content: @Composable () -> Unit = {},
+              title: String,
+            ) { }
+        """.trimIndent()
+        val errors = rule.lint(code)
+        assertThat(errors)
+            .hasStartSourceLocations(
+                SourceLocation(2, 5),
+            )
+    }
+
+    @Test
     fun `errors found when ordering is wrong`() {
         @Language("kotlin")
         val code = """
