@@ -10,16 +10,36 @@
             "schedule": ["* 0-3 1,15 * *"]
         },
         {
+            "description": "Keep kotlin version separate from kotlin-detekt and kotlin-ktlint",
+            "matchFileNames": [
+                "gradle/libs.versions.toml"
+            ],
+            "matchDepNames": [
+                "kotlin"
+            ],
+            "groupName": "kotlin"
+        },
+        {
             "description": "Group detekt and kotlin-detekt updates together",
-            "matchFileNames": ["gradle/libs.versions.toml"],
-            "matchDepNames": ["detekt", "kotlin-detekt"],
+            "matchFileNames": [
+                "gradle/libs.versions.toml"
+            ],
+            "matchDepNames": [
+                "detekt",
+                "kotlin-detekt"
+            ],
             "groupName": "detekt dependencies"
         },
         {
             "description": "Group ktlint and kotlin-ktlint updates together",
-            "matchFileNames": ["gradle/libs.versions.toml"],
-            "matchDepNames": ["ktlint", "kotlin-ktlint"],
-            "groupName": "detekt dependencies"
+            "matchFileNames": [
+                "gradle/libs.versions.toml"
+            ],
+            "matchDepNames": [
+                "ktlint",
+                "kotlin-ktlint"
+            ],
+            "groupName": "ktlint dependencies"
         }
     ]
 }
