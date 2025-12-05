@@ -8,7 +8,6 @@ import io.nlopez.compose.core.Emitter
 import io.nlopez.compose.core.report
 import io.nlopez.compose.core.util.argumentsUsingModifiers
 import io.nlopez.compose.core.util.findAllChildrenByClass
-import io.nlopez.compose.core.util.findDirectChildrenByClass
 import io.nlopez.compose.core.util.modifierParameters
 import io.nlopez.compose.core.util.obtainAllModifierNames
 import org.jetbrains.kotlin.psi.KtCallExpression

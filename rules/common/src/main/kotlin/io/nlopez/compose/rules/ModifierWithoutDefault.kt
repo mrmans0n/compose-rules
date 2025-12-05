@@ -16,7 +16,6 @@ import io.nlopez.compose.core.util.isOpen
 import io.nlopez.compose.core.util.isOverride
 import io.nlopez.compose.core.util.lastChildLeafOrSelf
 import org.jetbrains.kotlin.psi.KtFunction
-import org.jetbrains.kotlin.psi.KtParameter
 
 class ModifierWithoutDefault : ComposeKtVisitor {
 

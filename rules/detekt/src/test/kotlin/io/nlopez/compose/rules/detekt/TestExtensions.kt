@@ -4,7 +4,6 @@ package io.nlopez.compose.rules.detekt
 
 import dev.detekt.api.Finding
 import dev.detekt.api.SourceLocation
-import dev.detekt.api.TextLocation
 import org.assertj.core.api.AbstractListAssert
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.ObjectAssert

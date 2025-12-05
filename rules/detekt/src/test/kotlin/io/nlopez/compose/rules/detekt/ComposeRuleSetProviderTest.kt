@@ -10,7 +10,6 @@ import com.lemonappdev.konsist.api.Konsist
 import com.lemonappdev.konsist.api.ext.list.withAllParentsOf
 import com.lemonappdev.konsist.api.verify.assertTrue
 import dev.detekt.api.Config
-import dev.detekt.api.RuleName
 import io.nlopez.compose.core.ComposeKtVisitor
 import io.nlopez.compose.rules.DetektRule
 import org.assertj.core.api.AssertionsForInterfaceTypes.assertThat
