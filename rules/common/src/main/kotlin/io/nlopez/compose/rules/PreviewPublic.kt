@@ -7,12 +7,9 @@ import io.nlopez.compose.core.ComposeKtConfig
 import io.nlopez.compose.core.ComposeKtVisitor
 import io.nlopez.compose.core.Emitter
 import io.nlopez.compose.core.ifFix
-import io.nlopez.compose.core.util.findDirectFirstChildByClass
 import io.nlopez.compose.core.util.firstChildLeafOrSelf
 import io.nlopez.compose.core.util.isPreview
-import io.nlopez.compose.core.util.lastChildLeafOrSelf
 import org.jetbrains.kotlin.psi.KtFunction
-import org.jetbrains.kotlin.psi.KtModifierListOwner
 import org.jetbrains.kotlin.psi.psiUtil.isPublic
 
 class PreviewPublic : ComposeKtVisitor {

@@ -16,6 +16,7 @@ ij_kotlin_name_count_to_use_star_import_for_members = 2147483647
 ktlint_code_style = intellij_idea
 ktlint_function_naming_ignore_when_annotated_with = Composable
 ktlint_standard_discouraged-comment-location = disabled
+ktlint_standard_no-unused-imports = enabled
 
 [{*.gant,*.gradle,*.groovy,*.gy}]
 ij_groovy_keep_control_statement_in_one_line = false

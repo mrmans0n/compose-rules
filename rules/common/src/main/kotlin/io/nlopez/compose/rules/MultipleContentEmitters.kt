@@ -13,7 +13,6 @@ import io.nlopez.compose.core.util.hasReceiverType
 import io.nlopez.compose.core.util.isComposable
 import io.nlopez.compose.core.util.refineComposableToEmissionCountMapping
 import org.jetbrains.kotlin.psi.KtFile
-import org.jetbrains.kotlin.psi.KtFunction
 import org.jetbrains.kotlin.psi.KtNamedFunction
 
 class MultipleContentEmitters : ComposeKtVisitor {
