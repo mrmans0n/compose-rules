@@ -26,4 +26,5 @@ include(
     ":rules:common-ktlint",
     ":rules:detekt",
     ":rules:ktlint",
+    ":rules:functional-tests",
 )
