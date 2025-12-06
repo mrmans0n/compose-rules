@@ -6,7 +6,6 @@ on:
     paths:
       - 'docs/**'
       - 'mkdocs.yml'
-      - 'requirements.txt'
       - 'pyproject.toml'
 
 concurrency:
