@@ -31,8 +31,11 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v5
 
-      - name: Build
-        run: ./gradlew spotlessCheck assemble test
+      - name: Check formatting
+        run: ./gradlew spotlessCheck
+
+      - name: Build and unit test
+        run: ./gradlew assemble test
 
       - name: Upload test results
         if: always()
@@ -43,7 +46,41 @@ jobs:
             **/build/test-results/*
             **/build/reports/*
 
-  integration-tests:
+  functional-tests:
+    runs-on: ubuntu-latest
+    needs: [ build ]
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup JDK
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'zulu'
+          java-version: 24
+
+      - name: Copy CI gradle.properties
+        run: mkdir -p ~/.gradle ; cp .github/ci-gradle.properties ~/.gradle/gradle.properties
+
+      - uses: gradle/actions/setup-gradle@v5
+
+      - name: Publish to Maven Local
+        run: ./gradlew publishToMavenLocal
+
+      - name: Test
+        run: ./gradlew functionalTest
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: functional-test-results
+          path: |
+            **/build/test-results/*
+            **/build/reports/*
+
+  samples-tests:
     runs-on: ubuntu-latest
     needs: [ build ]
     timeout-minutes: 20
@@ -63,7 +100,7 @@ jobs:
       - uses: gradle/actions/setup-gradle@v5
 
       - name: Build rule artifacts
-        run: ./gradlew :rules:detekt:assemble :rules:ktlint:assemble
+        run: ./gradlew assemble
 
       - name: Test detekt sample
         run: ./scripts/test-detekt-sample.sh
@@ -96,7 +133,7 @@ jobs:
   deploy:
     if: github.event_name == 'push' && github.repository == 'mrmans0n/compose-rules'
     runs-on: ubuntu-latest
-    needs: [ build, verify-fat-jars ]
+    needs: [ build, samples-tests, functional-tests, verify-fat-jars ]
     timeout-minutes: 30
     env:
       TERM: dumb
