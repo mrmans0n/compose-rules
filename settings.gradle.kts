@@ -1,7 +1,7 @@
 // Copyright 2024 Nacho Lopez
 // SPDX-License-Identifier: Apache-2.0
 plugins {
-    id("com.gradle.develocity") version "4.2.2"
+    id("com.gradle.develocity") version "4.3"
 }
 
 dependencyResolutionManagement {
