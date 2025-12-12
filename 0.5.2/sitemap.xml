@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+         <loc>https://mrmans0n.github.io/compose-rules/0.5.2/</loc>
+         <lastmod>2025-12-12</lastmod>
+    </url>
+    <url>
+         <loc>https://mrmans0n.github.io/compose-rules/0.5.2/detekt/</loc>
+         <lastmod>2025-12-12</lastmod>
+    </url>
+    <url>
+         <loc>https://mrmans0n.github.io/compose-rules/0.5.2/ktlint/</loc>
+         <lastmod>2025-12-12</lastmod>
+    </url>
+    <url>
+         <loc>https://mrmans0n.github.io/compose-rules/0.5.2/rules/</loc>
+         <lastmod>2025-12-12</lastmod>
+    </url>
+</urlset>
