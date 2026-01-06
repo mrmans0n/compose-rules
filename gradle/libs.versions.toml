@@ -4,8 +4,8 @@ ktlint = "1.8.0"
 kotlin-ktlint = "2.2.21" # Update only when ktlint version updates
 detekt = "2.0.0-alpha.1"
 kotlin-detekt = "2.2.20" # Update only when detekt version updates
-junit = "5.14.1"
-junit-platform = "1.14.1"
+junit = "5.14.2"
+junit-platform = "1.14.2"
 
 # Compose BOM (for samples)
 compose-bom = "2025.12.01"
