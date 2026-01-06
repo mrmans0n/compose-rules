@@ -47,5 +47,5 @@ kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", versi
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 mavenPublish = "com.vanniktech.maven.publish:0.35.0"
 spotless = { id = "com.diffplug.spotless", version = "8.1.0" }
-shadowJar = { id = "com.gradleup.shadow", version = "9.3.0" }
+shadowJar = { id = "com.gradleup.shadow", version = "9.3.1" }
 detekt = { id = "dev.detekt", version.ref = "detekt" }
