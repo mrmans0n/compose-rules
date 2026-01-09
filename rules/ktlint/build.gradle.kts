@@ -38,5 +38,4 @@ dependencies {
     testImplementation(libs.assertj)
     testImplementation(libs.reflections)
     testImplementation(libs.konsist)
-    testImplementation(libs.kotlin.compiler.ktlint)
 }
