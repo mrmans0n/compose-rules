@@ -41,7 +41,7 @@ jobs:
           fi
 
           # Create the dependency matrix table
-          DEPENDENCY_TABLE=$(printf "## Dependency Matrix\n\n| version | kotlin version |\n| ------- | -------------- |\n| detekt %s | %s |\n| ktlint %s | %s |" "$DETEKT_VERSION" "$KOTLIN_DETEKT_VERSION" "$KTLINT_VERSION" "$KOTLIN_KTLINT_VERSION")
+          DEPENDENCY_TABLE=$(printf "## Dependency Matrix\n\n| linter | version | kotlin version |\n| ------ | ------- | -------------- |\n| detekt | %s | %s |\n| ktlint | %s | %s |" "$DETEKT_VERSION" "$KOTLIN_DETEKT_VERSION" "$KTLINT_VERSION" "$KOTLIN_KTLINT_VERSION")
 
           # Append to the release body
           NEW_BODY=$(printf "%s\n\n%s" "$CURRENT_BODY" "$DEPENDENCY_TABLE")

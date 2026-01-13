@@ -4,11 +4,11 @@ ktlint = "1.8.0"
 kotlin-ktlint = "2.2.21" # Update only when ktlint version updates
 detekt = "2.0.0-alpha.1"
 kotlin-detekt = "2.2.20" # Update only when detekt version updates
-junit = "5.14.1"
-junit-platform = "1.14.1"
+junit = "5.14.2"
+junit-platform = "1.14.2"
 
 # Compose BOM (for samples)
-compose-bom = "2025.12.00"
+compose-bom = "2025.12.01"
 
 [libraries]
 ktlint-core = { module = "com.pinterest.ktlint:ktlint-core", version.ref = "ktlint" }
@@ -47,5 +47,5 @@ kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", versi
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 mavenPublish = "com.vanniktech.maven.publish:0.35.0"
 spotless = { id = "com.diffplug.spotless", version = "8.1.0" }
-shadowJar = { id = "com.gradleup.shadow", version = "9.3.0" }
+shadowJar = { id = "com.gradleup.shadow", version = "9.3.1" }
 detekt = { id = "dev.detekt", version.ref = "detekt" }

@@ -6,7 +6,7 @@
 [![Rules for detekt](https://img.shields.io/maven-central/v/io.nlopez.compose.rules/detekt)](https://central.sonatype.com/search?q=g%3Aio.nlopez.compose.rules.detekt)
 [![Rules for ktlint](https://img.shields.io/maven-central/v/io.nlopez.compose.rules/ktlint)](https://central.sonatype.com/search?q=g%3Aio.nlopez.compose.rules.ktlint)
 
-> **Note**
+> [!NOTE]
 > This project started as a fork of [Twitter Jetpack Compose Rules](https://github.com/twitter/compose-rules) by the original rules maintainer, as the development on the original repository stopped. The development of the rules will continue here from now on. If you are migrating from that project, check out the [migration guide](https://mrmans0n.github.io/compose-rules/).
 
 ## Overview

@@ -56,10 +56,24 @@ val KtNamedFunction.isNested: Boolean
  *
  * Context receivers use the old syntax: `context(ColumnScope)`
  * Context parameters use the new syntax: `context(columnScope: ColumnScope)`
+ *
+ * This property is backward compatible with older Kotlin compiler versions that don't
+ * support the contextReceiverList API. In those versions, it falls back to checking
+ * the deprecated contextReceivers property (which only supports the old syntax).
  */
 val KtNamedFunction.hasAnyContextArguments: Boolean
-    get() {
+    get() = try {
         val contextReceiverList = contextReceiverList ?: return false
-        return contextReceiverList.contextReceivers().isNotEmpty() ||
+        contextReceiverList.contextReceivers().isNotEmpty() ||
             contextReceiverList.contextParameters().isNotEmpty()
+    } catch (_: NoSuchMethodError) {
+        // contextReceiverList is not available in older Kotlin compiler versions
+        // Fall back to the deprecated contextReceivers property
+        try {
+            @Suppress("DEPRECATION")
+            contextReceivers.isNotEmpty()
+        } catch (e: NoSuchMethodError) {
+            // If even contextReceivers is not available, assume no context arguments
+            false
+        }
     }
