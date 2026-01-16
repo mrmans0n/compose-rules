@@ -146,9 +146,11 @@ Compose:
     # previewNamingStrategy: suffix
   PreviewPublic:
     active: true
+  RememberContentMissing:
+    active: true
   RememberMissing:
     active: true
-  RememberContentMissing:
+  StateParam:
     active: true
   UnstableCollections:
     active: false # Opt-in, disabled by default. Turn on if you want to enforce this (e.g. you have strong skipping disabled)

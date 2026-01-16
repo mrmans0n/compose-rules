@@ -57,6 +57,8 @@ Compose:
     active: true
   RememberMissing:
     active: true
+  StateParam:
+    active: true
   UnstableCollections:
     active: false
   ViewModelForwarding:
