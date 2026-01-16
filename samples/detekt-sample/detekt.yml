@@ -87,9 +87,11 @@ Compose:
     active: false
   PreviewPublic:
     active: true
+  RememberContentMissing:
+    active: true
   RememberMissing:
     active: true
-  RememberContentMissing:
+  StateParam:
     active: true
   UnstableCollections:
     active: false

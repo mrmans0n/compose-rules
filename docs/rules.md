@@ -20,6 +20,7 @@ In practice, watch out for these common issues:
 
 - Do not pass ViewModels (or objects from DI) down.
 - Do not pass `MutableState<T>` instances down.
+- Do not pass `State<T>` instances down.
 - Do not pass inherently mutable types that cannot be observed.
 
 Instead, pass the relevant data to the function and use lambdas for callbacks.
@@ -114,6 +115,28 @@ More info: [Compose API guidelines](https://android.googlesource.com/platform/fr
 !!! info ""
 
     :material-chevron-right-box: [compose:mutable-state-param-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/MutableStateParameter.kt) ktlint :material-chevron-right-box: [MutableStateParam](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/MutableStateParameter.kt) detekt
+
+### Do not use State as a parameter
+
+Using `State<T>` as a parameter encourages passing state holders instead of values, which makes components harder to reason about and test.
+
+Instead, pass the snapshot state value and expose callbacks to report changes.
+
+```kotlin
+// ❌ Passing State down
+@Composable
+fun Counter(label: String, count: State<Int>) { /* ... */ }
+
+// ✅ Pass values and events instead
+@Composable
+fun Counter(label: String, count: Int, onCountChange: (Int) -> Unit) { /* ... */ }
+```
+
+More info: [Compose API guidelines](https://github.com/androidx/androidx/blob/androidx-main/compose/docs/compose-component-api-guidelines.md#statet-as-a-parameter)
+
+!!! info ""
+
+    :material-chevron-right-box: [compose:state-param-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/StateParameter.kt) ktlint :material-chevron-right-box: [StateParam](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/StateParameter.kt) detekt
 
 ### Be mindful of effect keys
 

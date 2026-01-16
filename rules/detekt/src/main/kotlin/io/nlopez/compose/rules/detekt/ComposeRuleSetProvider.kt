@@ -47,6 +47,7 @@ class ComposeRuleSetProvider : RuleSetProvider {
             RuleName("PreviewPublic") to { config: Config -> PreviewPublicCheck(config) },
             RuleName("RememberContentMissing") to { config: Config -> RememberContentMissingCheck(config) },
             RuleName("RememberMissing") to { config: Config -> RememberStateMissingCheck(config) },
+            RuleName("StateParam") to { config: Config -> StateParameterCheck(config) },
             RuleName("UnstableCollections") to { config: Config -> UnstableCollectionsCheck(config) },
             RuleName("ViewModelForwarding") to { config: Config -> ViewModelForwardingCheck(config) },
             RuleName("ViewModelInjection") to { config: Config -> ViewModelInjectionCheck(config) },
