@@ -485,6 +485,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#do-not-use-state-as-a-parameter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Do not use State as a parameter
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#be-mindful-of-effect-keys" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -971,6 +982,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#do-not-use-state-as-a-parameter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Do not use State as a parameter
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#be-mindful-of-effect-keys" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1378,6 +1400,7 @@
 <ul>
 <li>Do not pass ViewModels (or objects from DI) down.</li>
 <li>Do not pass <code>MutableState&lt;T&gt;</code> instances down.</li>
+<li>Do not pass <code>State&lt;T&gt;</code> instances down.</li>
 <li>Do not pass inherently mutable types that cannot be observed.</li>
 </ul>
 <p>Instead, pass the relevant data to the function and use lambdas for callbacks.</p>
@@ -1531,6 +1554,21 @@
 <p>More info: <a href="https://android.googlesource.com/platform/frameworks/support/+/androidx-main/compose/docs/compose-component-api-guidelines.md#mutablestate_t_as-a-parameter">Compose API guidelines</a></p>
 <div class="admonition info">
 <p><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14c1.11 0 2-.89 2-2V5a2 2 0 0 0-2-2M9.71 18l-1.42-1.41L12.88 12 8.29 7.41 9.71 6l6 6z"/></svg></span> <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/MutableStateParameter.kt">compose:mutable-state-param-check</a> ktlint <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14c1.11 0 2-.89 2-2V5a2 2 0 0 0-2-2M9.71 18l-1.42-1.41L12.88 12 8.29 7.41 9.71 6l6 6z"/></svg></span> <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/MutableStateParameter.kt">MutableStateParam</a> detekt</p>
+</div>
+<h3 id="do-not-use-state-as-a-parameter">Do not use State as a parameter<a class="headerlink" href="#do-not-use-state-as-a-parameter" title="Permanent link">&para;</a></h3>
+<p>Using <code>State&lt;T&gt;</code> as a parameter encourages passing state holders instead of values, which makes components harder to reason about and test.</p>
+<p>Instead, pass the snapshot state value and expose callbacks to report changes.</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// ❌ Passing State down</span>
+<span class="nd">@Composable</span>
+<span class="kd">fun</span><span class="w"> </span><span class="nf">Counter</span><span class="p">(</span><span class="n">label</span><span class="p">:</span><span class="w"> </span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">count</span><span class="p">:</span><span class="w"> </span><span class="n">State</span><span class="o">&lt;</span><span class="kt">Int</span><span class="o">&gt;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="cm">/* ... */</span><span class="w"> </span><span class="p">}</span>
+
+<span class="c1">// ✅ Pass values and events instead</span>
+<span class="nd">@Composable</span>
+<span class="kd">fun</span><span class="w"> </span><span class="nf">Counter</span><span class="p">(</span><span class="n">label</span><span class="p">:</span><span class="w"> </span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">count</span><span class="p">:</span><span class="w"> </span><span class="kt">Int</span><span class="p">,</span><span class="w"> </span><span class="n">onCountChange</span><span class="p">:</span><span class="w"> </span><span class="p">(</span><span class="kt">Int</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="kt">Unit</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="cm">/* ... */</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+<p>More info: <a href="https://github.com/androidx/androidx/blob/androidx-main/compose/docs/compose-component-api-guidelines.md#statet-as-a-parameter">Compose API guidelines</a></p>
+<div class="admonition info">
+<p><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14c1.11 0 2-.89 2-2V5a2 2 0 0 0-2-2M9.71 18l-1.42-1.41L12.88 12 8.29 7.41 9.71 6l6 6z"/></svg></span> <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/StateParameter.kt">compose:state-param-check</a> ktlint <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14c1.11 0 2-.89 2-2V5a2 2 0 0 0-2-2M9.71 18l-1.42-1.41L12.88 12 8.29 7.41 9.71 6l6 6z"/></svg></span> <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/StateParameter.kt">StateParam</a> detekt</p>
 </div>
 <h3 id="be-mindful-of-effect-keys">Be mindful of effect keys<a class="headerlink" href="#be-mindful-of-effect-keys" title="Permanent link">&para;</a></h3>
 <p>In Compose, effects like <code>LaunchedEffect</code>, <code>produceState</code>, and <code>DisposableEffect</code> use keys to control when they restart:</p>
