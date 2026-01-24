@@ -37,7 +37,7 @@ junit5 = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
 junit5-params = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "junit" }
 junit5-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit" }
 junit5-platform-launcher = { module = "org.junit.platform:junit-platform-launcher", version.ref = "junit-platform" }
-assertj = "org.assertj:assertj-core:3.27.6"
+assertj = "org.assertj:assertj-core:3.27.7"
 konsist = "com.lemonappdev:konsist:0.17.3"
 reflections = "org.reflections:reflections:0.10.2"
 
