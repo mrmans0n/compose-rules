@@ -2,8 +2,8 @@
 kotlin = "2.2.21" # Used for the code of the rules
 ktlint = "1.8.0"
 kotlin-ktlint = "2.2.21" # Update only when ktlint version updates
-detekt = "2.0.0-alpha.1"
-kotlin-detekt = "2.2.20" # Update only when detekt version updates
+detekt = "2.0.0-alpha.2"
+kotlin-detekt = "2.3.0" # Update only when detekt version updates
 junit = "5.14.2"
 junit-platform = "1.14.2"
 
