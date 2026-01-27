@@ -5,10 +5,11 @@ package io.nlopez.compose.rules.detekt
 import dev.detekt.api.Config
 import dev.detekt.api.RuleName
 import dev.detekt.api.RuleSet
+import dev.detekt.api.RuleSetId
 import dev.detekt.api.RuleSetProvider
 
 class ComposeRuleSetProvider : RuleSetProvider {
-    override val ruleSetId: RuleSet.Id = RuleSet.Id(CUSTOM_RULE_SET_ID)
+    override val ruleSetId: RuleSetId = RuleSetId(CUSTOM_RULE_SET_ID)
 
     override fun instance(): RuleSet = RuleSet(
         ruleSetId,
