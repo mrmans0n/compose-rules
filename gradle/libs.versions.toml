@@ -8,7 +8,7 @@ junit = "5.14.3"
 junit-platform = "1.14.3"
 
 # Compose BOM (for samples)
-compose-bom = "2026.02.00"
+compose-bom = "2026.02.01"
 
 [libraries]
 ktlint-core = { module = "com.pinterest.ktlint:ktlint-core", version.ref = "ktlint" }
