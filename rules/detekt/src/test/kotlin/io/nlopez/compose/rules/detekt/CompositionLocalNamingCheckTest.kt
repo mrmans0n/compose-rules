@@ -21,12 +21,14 @@ class CompositionLocalNamingCheckTest {
             """
                 val AppleLocal = staticCompositionLocalOf<String> { "Apple" }
                 val Plum: String = staticCompositionLocalOf { "Plum" }
+                private val Lemon = compositionLocalWithComputedDefaultOf { "Lemon" }
             """.trimIndent()
         val errors = rule.lint(code)
         assertThat(errors)
             .hasStartSourceLocations(
                 SourceLocation(1, 5),
                 SourceLocation(2, 5),
+                SourceLocation(3, 13),
             )
         for (error in errors) {
             assertThat(error).hasMessage(CompositionLocalNaming.CompositionLocalNeedsLocalPrefix)
@@ -40,6 +42,7 @@ class CompositionLocalNamingCheckTest {
             """
                 val LocalBanana = staticCompositionLocalOf<String> { "Banana" }
                 val LocalPotato = compositionLocalOf { "Potato" }
+                val LocalPeach = compositionLocalWithComputedDefaultOf { "Peach" }
             """.trimIndent()
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()

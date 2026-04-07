@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test
 class CompositionLocalAllowlistCheckTest {
 
     private val testConfig = TestConfig(
-        "allowedCompositionLocals" to listOf("LocalBanana", "LocalPotato"),
+        "allowedCompositionLocals" to listOf("LocalBanana", "LocalPotato", "LocalPeach"),
     )
     private val rule = CompositionLocalAllowlistCheck(testConfig)
 
@@ -26,6 +26,8 @@ class CompositionLocalAllowlistCheckTest {
                 internal val LocalPlum: String = staticCompositionLocalOf { "Plum" }
                 val LocalPrune = compositionLocalOf { "Prune" }
                 private val LocalKiwi: String = compositionLocalOf { "Kiwi" }
+                private val LocalLemon = compositionLocalWithComputedDefaultOf { "Lemon" }
+                private val LocalApricot: String = compositionLocalWithComputedDefaultOf { "Apricot" }
             """.trimIndent()
         val errors = rule.lint(code)
         assertThat(errors)
@@ -34,6 +36,8 @@ class CompositionLocalAllowlistCheckTest {
                 SourceLocation(2, 14),
                 SourceLocation(3, 5),
                 SourceLocation(4, 13),
+                SourceLocation(5, 13),
+                SourceLocation(6, 13),
             )
         for (error in errors) {
             assertThat(error).hasMessage(CompositionLocalAllowlist.CompositionLocalNotInAllowlist)
@@ -47,6 +51,7 @@ class CompositionLocalAllowlistCheckTest {
             """
                 val LocalBanana = staticCompositionLocalOf<String> { "Banana" }
                 val LocalPotato = compositionLocalOf { "Potato" }
+                val LocalPeach = compositionLocalWithComputedDefaultOf { "Peach" }
             """.trimIndent()
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
