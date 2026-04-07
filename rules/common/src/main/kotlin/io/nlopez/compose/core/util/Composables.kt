@@ -334,6 +334,7 @@ private val CompositionLocalReferenceExpressions by lazy {
     setOf(
         "staticCompositionLocalOf",
         "compositionLocalOf",
+        "compositionLocalWithComputedDefaultOf",
     )
 }
 
