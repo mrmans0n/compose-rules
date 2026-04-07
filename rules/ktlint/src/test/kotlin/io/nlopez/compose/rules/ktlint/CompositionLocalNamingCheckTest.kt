@@ -19,6 +19,7 @@ class CompositionLocalNamingCheckTest {
             """
                 val AppleLocal = staticCompositionLocalOf<String> { "Apple" }
                 val Plum: String = staticCompositionLocalOf { "Plum" }
+                private val Lemon = compositionLocalWithComputedDefaultOf { "Lemon" }
             """.trimIndent()
         ruleAssertThat(code)
             .hasLintViolationsWithoutAutoCorrect(
@@ -32,6 +33,11 @@ class CompositionLocalNamingCheckTest {
                     col = 5,
                     detail = CompositionLocalNaming.CompositionLocalNeedsLocalPrefix,
                 ),
+                LintViolation(
+                    line = 3,
+                    col = 13,
+                    detail = CompositionLocalNaming.CompositionLocalNeedsLocalPrefix,
+                ),
             )
     }
 
@@ -42,6 +48,7 @@ class CompositionLocalNamingCheckTest {
             """
                 val LocalBanana = staticCompositionLocalOf<String> { "Banana" }
                 val LocalPotato = compositionLocalOf { "Potato" }
+                val LocalPeach = compositionLocalWithComputedDefaultOf { "Peach" }
             """.trimIndent()
         ruleAssertThat(code).hasNoLintViolations()
     }

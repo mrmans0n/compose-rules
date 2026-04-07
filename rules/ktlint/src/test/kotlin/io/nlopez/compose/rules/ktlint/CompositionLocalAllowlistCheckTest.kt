@@ -21,6 +21,8 @@ class CompositionLocalAllowlistCheckTest {
                 internal val LocalPlum: String = staticCompositionLocalOf { "Plum" }
                 val LocalPrune = compositionLocalOf { "Prune" }
                 private val LocalKiwi: String = compositionLocalOf { "Kiwi" }
+                private val LocalLemon = compositionLocalWithComputedDefaultOf { "Lemon" }
+                private val LocalApricot: String = compositionLocalWithComputedDefaultOf { "Apricot" }
             """.trimIndent()
         allowlistRuleAssertThat(code)
             .hasLintViolationsWithoutAutoCorrect(
@@ -44,6 +46,16 @@ class CompositionLocalAllowlistCheckTest {
                     col = 13,
                     detail = CompositionLocalAllowlist.CompositionLocalNotInAllowlist,
                 ),
+                LintViolation(
+                    line = 5,
+                    col = 13,
+                    detail = CompositionLocalAllowlist.CompositionLocalNotInAllowlist,
+                ),
+                LintViolation(
+                    line = 6,
+                    col = 13,
+                    detail = CompositionLocalAllowlist.CompositionLocalNotInAllowlist,
+                ),
             )
     }
 
@@ -54,10 +66,11 @@ class CompositionLocalAllowlistCheckTest {
             """
                 val LocalBanana = staticCompositionLocalOf<String> { "Banana" }
                 val LocalPotato = compositionLocalOf { "Potato" }
+                val LocalPeach = compositionLocalWithComputedDefaultOf { "Peach" }
             """.trimIndent()
         allowlistRuleAssertThat(code)
             .withEditorConfigOverride(
-                compositionLocalAllowlistProperty to "LocalPotato,LocalBanana",
+                compositionLocalAllowlistProperty to "LocalPotato,LocalBanana,LocalPeach",
             )
             .hasNoLintViolations()
     }
