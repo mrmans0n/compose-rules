@@ -301,11 +301,13 @@ private val ComposableEmittersList by lazy {
         "DatePickerDialog",
         "DockedSearchBar",
         "ExposedDropdownMenuBox",
+        "HorizontalDivider",
         "InputField",
         "ModalBottomSheet",
         "PlainTooltip",
         "RichTooltip",
         "SearchBar",
+        "VerticalDivider",
         // Accompanist
         "BottomNavigation",
         "BottomNavigationContent",
