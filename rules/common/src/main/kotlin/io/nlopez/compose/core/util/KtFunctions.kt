@@ -58,22 +58,23 @@ val KtNamedFunction.isNested: Boolean
  * Context parameters use the new syntax: `context(columnScope: ColumnScope)`
  *
  * This property is backward compatible with older Kotlin compiler versions that don't
- * support the contextReceiverList API. In those versions, it falls back to checking
- * the deprecated contextReceivers property (which only supports the old syntax).
+ * support the contextParameters API.
  */
 val KtNamedFunction.hasAnyContextArguments: Boolean
-    get() = try {
-        val contextReceiverList = contextReceiverList ?: return false
-        contextReceiverList.contextReceivers().isNotEmpty() ||
-            contextReceiverList.contextParameters().isNotEmpty()
-    } catch (_: NoSuchMethodError) {
-        // contextReceiverList is not available in older Kotlin compiler versions
-        // Fall back to the deprecated contextReceivers property
-        try {
-            @Suppress("DEPRECATION")
-            contextReceivers.isNotEmpty()
-        } catch (e: NoSuchMethodError) {
-            // If even contextReceivers is not available, assume no context arguments
-            false
-        }
+    get() = contextReceivers.isNotEmpty() ||
+        contextParametersOrEmpty().isNotEmpty() ||
+        text.trimStart().startsWith("context(")
+
+private fun KtNamedFunction.contextParametersOrEmpty(): List<*> {
+    val method = javaClass.methods.firstOrNull { method ->
+        method.name == "getContextParameters" && method.parameterCount == 0
+    } ?: return emptyList<Any>()
+
+    return try {
+        method.invoke(this) as? List<*> ?: emptyList<Any>()
+    } catch (_: ReflectiveOperationException) {
+        emptyList<Any>()
+    } catch (_: LinkageError) {
+        emptyList<Any>()
     }
+}
