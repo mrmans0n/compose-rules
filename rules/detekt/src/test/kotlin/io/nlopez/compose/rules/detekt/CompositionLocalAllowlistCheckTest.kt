@@ -23,11 +23,11 @@ class CompositionLocalAllowlistCheckTest {
         val code =
             """
                 private val LocalApple = staticCompositionLocalOf<String> { "Apple" }
-                internal val LocalPlum: String = staticCompositionLocalOf { "Plum" }
+                internal val LocalPlum: ProvidableCompositionLocal<String> = staticCompositionLocalOf { "Plum" }
                 val LocalPrune = compositionLocalOf { "Prune" }
-                private val LocalKiwi: String = compositionLocalOf { "Kiwi" }
+                private val LocalKiwi: ProvidableCompositionLocal<String> = compositionLocalOf { "Kiwi" }
                 private val LocalLemon = compositionLocalWithComputedDefaultOf { "Lemon" }
-                private val LocalApricot: String = compositionLocalWithComputedDefaultOf { "Apricot" }
+                private val LocalApricot: ProvidableCompositionLocal<String> = compositionLocalWithComputedDefaultOf { "Apricot" }
             """.trimIndent()
         val errors = rule.lint(code)
         assertThat(errors)
