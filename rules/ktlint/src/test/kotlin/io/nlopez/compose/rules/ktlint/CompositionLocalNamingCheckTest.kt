@@ -18,7 +18,7 @@ class CompositionLocalNamingCheckTest {
         val code =
             """
                 val AppleLocal = staticCompositionLocalOf<String> { "Apple" }
-                val Plum: String = staticCompositionLocalOf { "Plum" }
+                val Plum: ProvidableCompositionLocal<String> = staticCompositionLocalOf { "Plum" }
                 private val Lemon = compositionLocalWithComputedDefaultOf { "Lemon" }
             """.trimIndent()
         ruleAssertThat(code)
