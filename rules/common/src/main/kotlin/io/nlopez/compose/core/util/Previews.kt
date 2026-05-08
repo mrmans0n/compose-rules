@@ -8,5 +8,11 @@ import org.jetbrains.kotlin.psi.KtAnnotationEntry
 val KtAnnotated.isPreview: Boolean
     get() = annotationEntries.any { it.isPreviewAnnotation }
 
+val KtAnnotated.hasPreviewWrapper: Boolean
+    get() = annotationEntries.any { it.isPreviewWrapperAnnotation }
+
 val KtAnnotationEntry.isPreviewAnnotation: Boolean
     get() = calleeExpression?.text?.contains("Preview") == true
+
+val KtAnnotationEntry.isPreviewWrapperAnnotation: Boolean
+    get() = calleeExpression?.text?.contains("PreviewWrapper") == true

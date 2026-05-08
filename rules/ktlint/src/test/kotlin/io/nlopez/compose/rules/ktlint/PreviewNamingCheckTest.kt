@@ -153,4 +153,27 @@ class PreviewNamingCheckTest {
             )
             .hasNoLintViolations()
     }
+
+    @Test
+    fun `passes for preview wrapper backed previews`() {
+        @Language("kotlin")
+        val code =
+            """
+            @Preview
+            @PreviewWrapper(CustomThemeWrapper::class)
+            @Composable
+            fun SomeFeatureListEmpty() { }
+
+            @Preview
+            @PreviewWrapperProvider(CustomThemeWrapper::class)
+            @Composable
+            fun SomeFeatureListLoaded() { }
+            """.trimIndent()
+        ruleAssertThat(code)
+            .withEditorConfigOverride(
+                composePreviewNamingEnabled to true,
+                composePreviewNamingStrategy to "suffix",
+            )
+            .hasNoLintViolations()
+    }
 }

@@ -115,4 +115,23 @@ class PreviewNamingCheckTest {
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }
+
+    @Test
+    fun `passes for preview wrapper backed previews`() {
+        @Language("kotlin")
+        val code =
+            """
+            @Preview
+            @PreviewWrapper(CustomThemeWrapper::class)
+            @Composable
+            fun SomeFeatureListEmpty() { }
+
+            @Preview
+            @PreviewWrapperProvider(CustomThemeWrapper::class)
+            @Composable
+            fun SomeFeatureListLoaded() { }
+            """.trimIndent()
+        val errors = rule.lint(code)
+        assertThat(errors).isEmpty()
+    }
 }
