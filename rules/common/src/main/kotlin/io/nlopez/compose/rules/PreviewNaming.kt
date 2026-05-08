@@ -6,6 +6,7 @@ import io.nlopez.compose.core.ComposeKtConfig
 import io.nlopez.compose.core.ComposeKtVisitor
 import io.nlopez.compose.core.Emitter
 import io.nlopez.compose.core.ifFix
+import io.nlopez.compose.core.util.hasPreviewWrapper
 import io.nlopez.compose.core.util.isPreview
 import org.jetbrains.kotlin.psi.KtFunction
 
@@ -13,7 +14,7 @@ class PreviewNaming : ComposeKtVisitor {
     override val isOptIn: Boolean = true
 
     override fun visitComposable(function: KtFunction, emitter: Emitter, config: ComposeKtConfig) {
-        if (!function.isPreview) return
+        if (!function.isPreview || function.hasPreviewWrapper) return
 
         val strategy = when (config.getString("previewNamingStrategy", "suffix")) {
             "suffix" -> PreviewNamingType.Suffix
