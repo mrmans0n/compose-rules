@@ -304,6 +304,8 @@ private val ComposableEmittersList by lazy {
         "HorizontalDivider",
         "InputField",
         "ModalBottomSheet",
+        "NavigationBar",
+        "NavigationBarItem",
         "PlainTooltip",
         "RichTooltip",
         "SearchBar",
