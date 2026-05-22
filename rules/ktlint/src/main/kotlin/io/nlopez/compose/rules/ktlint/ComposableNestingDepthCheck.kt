@@ -9,6 +9,10 @@ import io.nlopez.compose.rules.KtlintRule
 class ComposableNestingDepthCheck :
     KtlintRule(
         id = "compose:composable-nesting-depth-check",
-        editorConfigProperties = setOf(composableNestingDepthThreshold),
+        editorConfigProperties = setOf(
+            composableNestingDepthThreshold,
+            contentEmittersProperty,
+            contentEmittersDenylist,
+        ),
     ),
     ComposeKtVisitor by ComposableNestingDepth()

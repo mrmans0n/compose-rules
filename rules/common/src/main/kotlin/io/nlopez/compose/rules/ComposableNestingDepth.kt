@@ -13,6 +13,7 @@ import org.jetbrains.kotlin.psi.KtFunction
 import org.jetbrains.kotlin.psi.psiUtil.parents
 
 class ComposableNestingDepth : ComposeKtVisitor {
+    override val isOptIn: Boolean = true
 
     override fun visitComposable(function: KtFunction, emitter: Emitter, config: ComposeKtConfig) {
         val body = function.bodyBlockExpression ?: return

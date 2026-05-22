@@ -4,7 +4,7 @@ Compose:
   ComposableNaming:
     active: true
   ComposableNestingDepth:
-    active: true
+    active: false
   ComposableParamOrder:
     active: true
   CompositionLocalAllowlist:

@@ -280,55 +280,6 @@ This effectively ties the function to be called from a Column, but is still not 
 
 > **Note**: To add your custom composables so they are used in this rule (things like your design system composables), you can add `composeEmitters` to this rule config in Detekt, or `compose_emitters` to your .editorconfig in ktlint.
 
-### Avoid deeply nested composables
-
-Deeply nested content emitters inside a single `@Composable` make the function structure hard to scan and reason about. Extract inner sections into private `@Composable` functions so each function stays focused on one layout responsibility.
-
-```kotlin
-// ❌ Too deeply nested
-@Composable
-fun Foo() {
-    Box {
-        Box {
-            Box {
-                Box {
-                    Box {
-                        Text("hello")
-                    }
-                }
-            }
-        }
-    }
-}
-
-// ✅ Inner sections extracted to a private composable
-@Composable
-fun Foo() {
-    Box {
-        Box {
-            Box {
-                Bar()
-            }
-        }
-    }
-}
-
-@Composable
-private fun Bar() {
-    Box {
-        Box {
-            Text("hello")
-        }
-    }
-}
-```
-
-The threshold defaults to `3` (i.e., the deepest nested content emitter in a function may have at most 3 enclosing content emitters). It can be tuned via `composableNestingDepthThreshold` in Detekt or `compose_composable_nesting_depth_threshold` in your `.editorconfig` for ktlint.
-
-!!! info ""
-
-    :material-chevron-right-box: [compose:composable-nesting-depth-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ComposableNestingDepth.kt) ktlint :material-chevron-right-box: [ComposableNestingDepth](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ComposableNestingDepth.kt) detekt
-
 ### Slots for main content should be the trailing lambda
 
 Content slots (typically `content: @Composable () -> Unit` or nullable variants) should always be the last parameter so they can be written as a trailing lambda. This makes the UI flow more natural and easier to read.
@@ -829,3 +780,52 @@ By default, this rule requires `Preview` as a suffix. You can change this via th
 !!! info ""
 
     :material-chevron-right-box: [compose:preview-naming](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/PreviewNaming.kt) ktlint :material-chevron-right-box: [PreviewNaming](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/PreviewNaming.kt) detekt
+
+### Avoid deeply nested composables
+
+Deeply nested content emitters inside a single `@Composable` make the function structure hard to scan and reason about. Extract inner sections into private `@Composable` functions so each function stays focused on one layout responsibility.
+
+```kotlin
+// ❌ Too deeply nested
+@Composable
+fun Foo() {
+    Box {
+        Box {
+            Box {
+                Box {
+                    Box {
+                        Text("hello")
+                    }
+                }
+            }
+        }
+    }
+}
+
+// ✅ Inner sections extracted to a private composable
+@Composable
+fun Foo() {
+    Box {
+        Box {
+            Box {
+                Bar()
+            }
+        }
+    }
+}
+
+@Composable
+private fun Bar() {
+    Box {
+        Box {
+            Text("hello")
+        }
+    }
+}
+```
+
+The threshold defaults to `3` (i.e., the deepest nested content emitter in a function may have at most 3 enclosing content emitters). It can be tuned via `composableNestingDepthThreshold` in Detekt or `compose_composable_nesting_depth_threshold` in your `.editorconfig` for ktlint.
+
+!!! info ""
+
+    :material-chevron-right-box: [compose:composable-nesting-depth-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ComposableNestingDepth.kt) ktlint :material-chevron-right-box: [ComposableNestingDepth](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ComposableNestingDepth.kt) detekt

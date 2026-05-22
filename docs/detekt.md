@@ -44,7 +44,7 @@ Compose:
     # -- You can optionally disable the checks in this rule for regex matches against the composable name (e.g. molecule presenters)
     # allowedComposableFunctionNames: .*Presenter,.*MoleculePresenter
   ComposableNestingDepth:
-    active: true
+    active: false # Opt-in, disabled by default. Turn on if you want to enforce a maximum nesting depth in your composables.
     # -- Maximum nesting depth allowed for content emitters inside a single @Composable function. Defaults to 3.
     # composableNestingDepthThreshold: 3
   ComposableParamOrder:
