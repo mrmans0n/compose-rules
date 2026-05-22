@@ -13,6 +13,7 @@ class ComposeRuleSetProvider :
 
     override fun getRuleProviders(): Set<RuleProvider> = setOf(
         RuleProvider { ComposableAnnotationNamingCheck() },
+        RuleProvider { ComposableNestingDepthCheck() },
         RuleProvider { CompositionLocalAllowlistCheck() },
         RuleProvider { CompositionLocalNamingCheck() },
         RuleProvider { ContentEmitterReturningValuesCheck() },

@@ -43,6 +43,10 @@ Compose:
     active: true
     # -- You can optionally disable the checks in this rule for regex matches against the composable name (e.g. molecule presenters)
     # allowedComposableFunctionNames: .*Presenter,.*MoleculePresenter
+  ComposableNestingDepth:
+    active: true
+    # -- Maximum nesting depth allowed for content emitters inside a single @Composable function. Defaults to 3.
+    # composableNestingDepthThreshold: 3
   ComposableParamOrder:
     active: true
     # -- You can optionally have a list of types to be treated as lambdas (e.g. typedefs or fun interfaces not picked up automatically)
