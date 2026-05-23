@@ -120,7 +120,7 @@ class ComposableNestingDepthCheckTest {
                 }
             """.trimIndent()
         nestingRuleAssertThat(code)
-            .withEditorConfigOverride(composableNestingDepthThreshold to "1")
+            .withEditorConfigOverride(composableNestingDepthThreshold to 1)
             .hasLintViolationsWithoutAutoCorrect(
                 LintViolation(
                     line = 2,
@@ -149,7 +149,7 @@ class ComposableNestingDepthCheckTest {
                 }
             """.trimIndent()
         nestingRuleAssertThat(code)
-            .withEditorConfigOverride(composableNestingDepthThreshold to "10")
+            .withEditorConfigOverride(composableNestingDepthThreshold to 10)
             .hasNoLintViolations()
     }
 
