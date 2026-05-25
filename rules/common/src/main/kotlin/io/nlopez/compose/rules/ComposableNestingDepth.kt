@@ -9,7 +9,9 @@ import io.nlopez.compose.core.report
 import io.nlopez.compose.core.util.emitsContent
 import io.nlopez.compose.core.util.findAllChildrenByClass
 import org.jetbrains.kotlin.psi.KtCallExpression
+import org.jetbrains.kotlin.psi.KtClassOrObject
 import org.jetbrains.kotlin.psi.KtFunction
+import org.jetbrains.kotlin.psi.KtNamedFunction
 import org.jetbrains.kotlin.psi.psiUtil.parents
 
 class ComposableNestingDepth : ComposeKtVisitor {
@@ -19,9 +21,15 @@ class ComposableNestingDepth : ComposeKtVisitor {
         val body = function.bodyBlockExpression ?: return
         val threshold = config.getInt("composableNestingDepthThreshold", 3)
 
-        // For each content-emitting call in this function, count how many enclosing content-emitting
+        // Exclude calls that live inside a nested function or class dec, then
+        // For each content-emitting call in this function, count how many enclosing content-emitting,
         // calls it has (its nesting level). Top-level emitters have nesting 0.
         val deepest = body.findAllChildrenByClass<KtCallExpression>()
+            .filter { call ->
+                call.parents
+                    .takeWhile { it != body }
+                    .none { it is KtNamedFunction || it is KtClassOrObject }
+            }
             .filter { it.emitsContent(config) }
             .maxOfOrNull { call ->
                 call.parents
