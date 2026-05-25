@@ -172,4 +172,31 @@ class ComposableNestingDepthCheckTest {
             """.trimIndent()
         assertThat(rule.lint(code)).isEmpty()
     }
+
+    @Test
+    fun `does not count nesting inside a locally-declared composable toward the outer function`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun Outer() {
+                    @Composable
+                    fun Inner() {
+                        Box {
+                            Box {
+                                Box {
+                                    Box {
+                                        Text("hi")
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    Inner()
+                }
+            """.trimIndent()
+        // Outer's body only calls Inner() (not an emitter), so it must not be flagged.
+        // Inner itself has 4 nested Boxes around Text, so it should be flagged on its own.
+        assertThat(rule.lint(code)).hasStartSourceLocations(SourceLocation(4, 9))
+    }
 }
