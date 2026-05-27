@@ -68,4 +68,18 @@ class DefaultsVisibilityCheckTest {
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }
+
+    @Test
+    fun `passes when defaults object has reduced visibility but it's suppressed on the object`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Suppress("DefaultsVisibility")
+                internal object MyComposableDefaults
+                @Composable
+                fun MyComposable(someParam: Bleh = MyComposableDefaults.someParam) { }
+            """.trimIndent()
+        val errors = rule.lint(code)
+        assertThat(errors).isEmpty()
+    }
 }

@@ -16,6 +16,7 @@ import io.nlopez.compose.core.util.startOffsetFromName
 import org.jetbrains.kotlin.com.intellij.lang.ASTNode
 import org.jetbrains.kotlin.com.intellij.psi.PsiNameIdentifierOwner
 import org.jetbrains.kotlin.psi.KtClass
+import org.jetbrains.kotlin.psi.KtClassOrObject
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtFunction
 import org.jetbrains.kotlin.psi.psiUtil.startOffset
@@ -48,7 +49,13 @@ abstract class KtlintRule(id: String, editorConfigProperties: Set<EditorConfigPr
         when (val psi = node.psi) {
             is KtFile -> visitFile(psi, emit.toEmitter(), config)
 
-            is KtClass -> visitClass(psi, emit.toEmitter(), config)
+            is KtClassOrObject -> {
+                val emitter = emit.toEmitter()
+                visitClassOrObject(psi, emitter, config)
+                if (psi is KtClass) {
+                    visitClass(psi, emitter, config)
+                }
+            }
 
             is KtFunction -> {
                 val emitter = emit.toEmitter()

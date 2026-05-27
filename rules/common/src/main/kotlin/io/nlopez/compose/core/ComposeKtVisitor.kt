@@ -3,6 +3,7 @@
 package io.nlopez.compose.core
 
 import org.jetbrains.kotlin.psi.KtClass
+import org.jetbrains.kotlin.psi.KtClassOrObject
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtFunction
 
@@ -15,6 +16,8 @@ interface ComposeKtVisitor {
     fun visitComposable(function: KtFunction, emitter: Emitter, config: ComposeKtConfig) {}
 
     fun visitClass(clazz: KtClass, emitter: Emitter, config: ComposeKtConfig) {}
+
+    fun visitClassOrObject(clazz: KtClassOrObject, emitter: Emitter, config: ComposeKtConfig) {}
 
     fun visitFile(file: KtFile, emitter: Emitter, config: ComposeKtConfig) {}
 }
