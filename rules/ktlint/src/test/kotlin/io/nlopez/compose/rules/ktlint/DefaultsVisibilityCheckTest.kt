@@ -65,4 +65,31 @@ class DefaultsVisibilityCheckTest {
             """.trimIndent()
         modifierRuleAssertThat(code).hasNoLintViolations()
     }
+
+    @Test
+    fun `passes when defaults object has reduced visibility but it's suppressed on the object`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Suppress("ktlint:compose:defaults-visibility")
+                internal object MyComposableDefaults
+                @Composable
+                fun MyComposable(someParam: Bleh = MyComposableDefaults.someParam) { }
+            """.trimIndent()
+        modifierRuleAssertThat(code).hasNoLintViolations()
+    }
+
+    @Test
+    fun `passes when defaults object has reduced visibility but file is suppressed`() {
+        @Language("kotlin")
+        val code =
+            """
+                @file:Suppress("ktlint:compose:defaults-visibility")
+
+                internal object MyComposableDefaults
+                @Composable
+                fun MyComposable(someParam: Bleh = MyComposableDefaults.someParam) { }
+            """.trimIndent()
+        modifierRuleAssertThat(code).hasNoLintViolations()
+    }
 }

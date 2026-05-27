@@ -11,6 +11,7 @@ import io.nlopez.compose.core.Decision
 import io.nlopez.compose.core.Emitter
 import io.nlopez.compose.core.util.isComposable
 import org.jetbrains.kotlin.psi.KtClass
+import org.jetbrains.kotlin.psi.KtClassOrObject
 import org.jetbrains.kotlin.psi.KtElement
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtFunction
@@ -60,6 +61,11 @@ abstract class DetektRule(
     override fun visitClass(klass: KtClass) {
         super<Rule>.visitClass(klass)
         visitClass(klass, emitter, composeConfig)
+    }
+
+    override fun visitClassOrObject(classOrObject: KtClassOrObject) {
+        super<Rule>.visitClassOrObject(classOrObject)
+        visitClassOrObject(classOrObject, emitter, composeConfig)
     }
 
     override fun visitKtElement(element: KtElement) {
