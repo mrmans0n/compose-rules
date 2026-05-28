@@ -18,8 +18,9 @@ class ComposableNestingDepth : ComposeKtVisitor {
     override val isOptIn: Boolean = true
 
     override fun visitComposable(function: KtFunction, emitter: Emitter, config: ComposeKtConfig) {
-        val body = function.bodyBlockExpression ?: return
+        val body = function.bodyExpression ?: return
         val threshold = config.getInt("composableNestingDepthThreshold", 3)
+        val bodyBaseDepth = if ((body as? KtCallExpression)?.emitsContent(config) == true) 1 else 0
 
         // Exclude calls that live inside a nested function or class dec, then
         // For each content-emitting call in this function, count how many enclosing content-emitting,
@@ -32,7 +33,7 @@ class ComposableNestingDepth : ComposeKtVisitor {
             }
             .filter { it.emitsContent(config) }
             .maxOfOrNull { call ->
-                call.parents
+                bodyBaseDepth + call.parents
                     .takeWhile { it != body }
                     .filterIsInstance<KtCallExpression>()
                     .count { it.emitsContent(config) }

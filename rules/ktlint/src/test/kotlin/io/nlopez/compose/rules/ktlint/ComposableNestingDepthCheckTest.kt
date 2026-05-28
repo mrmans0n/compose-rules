@@ -216,4 +216,25 @@ class ComposableNestingDepthCheckTest {
             ),
         )
     }
+
+    @Test
+    fun `analyzes expression-bodied composables for nesting depth`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun TooDeep() = Box { Box { Box { Box { Text("x") } } } }
+                @Composable
+                fun WithinLimit() = Box { Box { Box { Text("x") } } }
+            """.trimIndent()
+        // TooDeep nests 4 emitters around Text (> threshold) and is flagged.
+        // WithinLimit nests 3 (== threshold) and is intentionally absent from the expected violations.
+        nestingRuleAssertThat(code).hasLintViolationsWithoutAutoCorrect(
+            LintViolation(
+                line = 2,
+                col = 5,
+                detail = ComposableNestingDepth.ComposableTooDeeplyNested,
+            ),
+        )
+    }
 }

@@ -199,4 +199,19 @@ class ComposableNestingDepthCheckTest {
         // Inner itself has 4 nested Boxes around Text, so it should be flagged on its own.
         assertThat(rule.lint(code)).hasStartSourceLocations(SourceLocation(4, 9))
     }
+
+    @Test
+    fun `analyzes expression-bodied composables for nesting depth`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun TooDeep() = Box { Box { Box { Box { Text("x") } } } }
+                @Composable
+                fun WithinLimit() = Box { Box { Box { Text("x") } } }
+            """.trimIndent()
+        // TooDeep nests 4 emitters around Text (> threshold) and is flagged.
+        // WithinLimit nests 3 (== threshold) and is intentionally absent from the expected locations.
+        assertThat(rule.lint(code)).hasStartSourceLocations(SourceLocation(2, 5))
+    }
 }
