@@ -826,6 +826,8 @@ private fun Bar() {
 
 The threshold defaults to `3` (i.e., the deepest nested content emitter in a function may have at most 3 enclosing content emitters). It can be tuned via `composableNestingDepthThreshold` in Detekt or `compose_composable_nesting_depth_threshold` in your `.editorconfig` for ktlint.
 
+Enabling: [ktlint](https://mrmans0n.github.io/compose-rules/ktlint/#enabling-and-configuring-the-nesting-depth-detector), [detekt](https://mrmans0n.github.io/compose-rules/detekt/#enabling-rules)
+
 !!! info ""
 
     :material-chevron-right-box: [compose:composable-nesting-depth-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ComposableNestingDepth.kt) ktlint :material-chevron-right-box: [ComposableNestingDepth](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ComposableNestingDepth.kt) detekt

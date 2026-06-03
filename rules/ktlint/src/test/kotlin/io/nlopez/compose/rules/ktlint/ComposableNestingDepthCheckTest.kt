@@ -13,6 +13,29 @@ class ComposableNestingDepthCheckTest {
     private val nestingRuleAssertThat = assertThatRule { ComposableNestingDepthCheck() }
 
     @Test
+    fun `disabled by default`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun TooDeep() {
+                    Box {
+                        Box {
+                            Box {
+                                Box {
+                                    Box {
+                                        Text("")
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            """.trimIndent()
+        nestingRuleAssertThat(code).hasNoLintViolations()
+    }
+
+    @Test
     fun `passes when there is no nesting`() {
         @Language("kotlin")
         val code =
@@ -22,7 +45,9 @@ class ComposableNestingDepthCheckTest {
                     Text("hello")
                 }
             """.trimIndent()
-        nestingRuleAssertThat(code).hasNoLintViolations()
+        nestingRuleAssertThat(code)
+            .withEditorConfigOverride(composableNestingDepthEnabled to true)
+            .hasNoLintViolations()
     }
 
     @Test
@@ -41,7 +66,9 @@ class ComposableNestingDepthCheckTest {
                     }
                 }
             """.trimIndent()
-        nestingRuleAssertThat(code).hasNoLintViolations()
+        nestingRuleAssertThat(code)
+            .withEditorConfigOverride(composableNestingDepthEnabled to true)
+            .hasNoLintViolations()
     }
 
     @Test
@@ -64,13 +91,15 @@ class ComposableNestingDepthCheckTest {
                     }
                 }
             """.trimIndent()
-        nestingRuleAssertThat(code).hasLintViolationsWithoutAutoCorrect(
-            LintViolation(
-                line = 2,
-                col = 5,
-                detail = ComposableNestingDepth.ComposableTooDeeplyNested,
-            ),
-        )
+        nestingRuleAssertThat(code)
+            .withEditorConfigOverride(composableNestingDepthEnabled to true)
+            .hasLintViolationsWithoutAutoCorrect(
+                LintViolation(
+                    line = 2,
+                    col = 5,
+                    detail = ComposableNestingDepth.ComposableTooDeeplyNested,
+                ),
+            )
     }
 
     @Test
@@ -91,18 +120,20 @@ class ComposableNestingDepthCheckTest {
                     Column { Row { Box { Box { Text("c") } } } }
                 }
             """.trimIndent()
-        nestingRuleAssertThat(code).hasLintViolationsWithoutAutoCorrect(
-            LintViolation(
-                line = 2,
-                col = 5,
-                detail = ComposableNestingDepth.ComposableTooDeeplyNested,
-            ),
-            LintViolation(
-                line = 10,
-                col = 5,
-                detail = ComposableNestingDepth.ComposableTooDeeplyNested,
-            ),
-        )
+        nestingRuleAssertThat(code)
+            .withEditorConfigOverride(composableNestingDepthEnabled to true)
+            .hasLintViolationsWithoutAutoCorrect(
+                LintViolation(
+                    line = 2,
+                    col = 5,
+                    detail = ComposableNestingDepth.ComposableTooDeeplyNested,
+                ),
+                LintViolation(
+                    line = 10,
+                    col = 5,
+                    detail = ComposableNestingDepth.ComposableTooDeeplyNested,
+                ),
+            )
     }
 
     @Test
@@ -120,7 +151,10 @@ class ComposableNestingDepthCheckTest {
                 }
             """.trimIndent()
         nestingRuleAssertThat(code)
-            .withEditorConfigOverride(composableNestingDepthThreshold to 1)
+            .withEditorConfigOverride(
+                composableNestingDepthEnabled to true,
+                composableNestingDepthThreshold to 1,
+            )
             .hasLintViolationsWithoutAutoCorrect(
                 LintViolation(
                     line = 2,
@@ -149,7 +183,10 @@ class ComposableNestingDepthCheckTest {
                 }
             """.trimIndent()
         nestingRuleAssertThat(code)
-            .withEditorConfigOverride(composableNestingDepthThreshold to 10)
+            .withEditorConfigOverride(
+                composableNestingDepthEnabled to true,
+                composableNestingDepthThreshold to 10,
+            )
             .hasNoLintViolations()
     }
 
@@ -171,7 +208,9 @@ class ComposableNestingDepthCheckTest {
                     }
                 }
             """.trimIndent()
-        nestingRuleAssertThat(code).hasNoLintViolations()
+        nestingRuleAssertThat(code)
+            .withEditorConfigOverride(composableNestingDepthEnabled to true)
+            .hasNoLintViolations()
     }
 
     @Test
@@ -181,7 +220,9 @@ class ComposableNestingDepthCheckTest {
             """
                 val Content: @Composable () -> Unit = { Text("hi") }
             """.trimIndent()
-        nestingRuleAssertThat(code).hasNoLintViolations()
+        nestingRuleAssertThat(code)
+            .withEditorConfigOverride(composableNestingDepthEnabled to true)
+            .hasNoLintViolations()
     }
 
     @Test
@@ -208,13 +249,15 @@ class ComposableNestingDepthCheckTest {
             """.trimIndent()
         // Outer's body only calls Inner() (not an emitter), so it must not be flagged.
         // Inner itself has 4 nested Boxes around Text, so it should be flagged on its own.
-        nestingRuleAssertThat(code).hasLintViolationsWithoutAutoCorrect(
-            LintViolation(
-                line = 4,
-                col = 9,
-                detail = ComposableNestingDepth.ComposableTooDeeplyNested,
-            ),
-        )
+        nestingRuleAssertThat(code)
+            .withEditorConfigOverride(composableNestingDepthEnabled to true)
+            .hasLintViolationsWithoutAutoCorrect(
+                LintViolation(
+                    line = 4,
+                    col = 9,
+                    detail = ComposableNestingDepth.ComposableTooDeeplyNested,
+                ),
+            )
     }
 
     @Test
@@ -229,12 +272,14 @@ class ComposableNestingDepthCheckTest {
             """.trimIndent()
         // TooDeep nests 4 emitters around Text (> threshold) and is flagged.
         // WithinLimit nests 3 (== threshold) and is intentionally absent from the expected violations.
-        nestingRuleAssertThat(code).hasLintViolationsWithoutAutoCorrect(
-            LintViolation(
-                line = 2,
-                col = 5,
-                detail = ComposableNestingDepth.ComposableTooDeeplyNested,
-            ),
-        )
+        nestingRuleAssertThat(code)
+            .withEditorConfigOverride(composableNestingDepthEnabled to true)
+            .hasLintViolationsWithoutAutoCorrect(
+                LintViolation(
+                    line = 2,
+                    col = 5,
+                    detail = ComposableNestingDepth.ComposableTooDeeplyNested,
+                ),
+            )
     }
 }

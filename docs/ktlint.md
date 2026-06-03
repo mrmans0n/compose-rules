@@ -190,12 +190,20 @@ The `content-trailing-lambda` rule identifies `@Composable` trailing lambdas aut
 compose_treat_as_composable_lambda = MyLambdaComposableType,MyOtherComposableLambdaType
 ```
 
-### Configure the maximum nesting depth for composables
+### Enabling and configuring the nesting depth detector
 
-The `composable-nesting-depth-check` rule flags `@Composable` functions whose content emitters are nested more deeply than a threshold. The default threshold is 3 enclosing content emitters. To tune it:
+The `composable-nesting-depth-check` rule flags `@Composable` functions whose content emitters are nested more deeply than a threshold. Disabled by default; enable it in your `.editorconfig` file:
 
 ```editorconfig
 [*.{kt,kts}]
+compose_composable_nesting_depth_enabled = true
+```
+
+The default threshold is 3 enclosing content emitters. To tune it:
+
+```editorconfig
+[*.{kt,kts}]
+compose_composable_nesting_depth_enabled = true
 compose_composable_nesting_depth_threshold = 4
 ```
 
