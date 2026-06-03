@@ -860,6 +860,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#avoid-deeply-nested-composables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Avoid deeply nested composables
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1351,6 +1362,17 @@
     <span class="md-ellipsis">
       
         Naming previews properly
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#avoid-deeply-nested-composables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Avoid deeply nested composables
       
     </span>
   </a>
@@ -2053,6 +2075,50 @@ Instead, apply the modifier only to the root <code>Column</code> and use fresh <
 </ul>
 <div class="admonition info">
 <p><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14c1.11 0 2-.89 2-2V5a2 2 0 0 0-2-2M9.71 18l-1.42-1.41L12.88 12 8.29 7.41 9.71 6l6 6z"/></svg></span> <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/PreviewNaming.kt">compose:preview-naming</a> ktlint <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14c1.11 0 2-.89 2-2V5a2 2 0 0 0-2-2M9.71 18l-1.42-1.41L12.88 12 8.29 7.41 9.71 6l6 6z"/></svg></span> <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/PreviewNaming.kt">PreviewNaming</a> detekt</p>
+</div>
+<h3 id="avoid-deeply-nested-composables">Avoid deeply nested composables<a class="headerlink" href="#avoid-deeply-nested-composables" title="Permanent link">&para;</a></h3>
+<p>Deeply nested content emitters inside a single <code>@Composable</code> make the function structure hard to scan and reason about. Extract inner sections into private <code>@Composable</code> functions so each function stays focused on one layout responsibility.</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// ❌ Too deeply nested</span>
+<span class="nd">@Composable</span>
+<span class="kd">fun</span><span class="w"> </span><span class="nf">Foo</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">Box</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">Box</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">Box</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">Box</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="n">Box</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                        </span><span class="n">Text</span><span class="p">(</span><span class="s">&quot;hello&quot;</span><span class="p">)</span>
+<span class="w">                    </span><span class="p">}</span>
+<span class="w">                </span><span class="p">}</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// ✅ Inner sections extracted to a private composable</span>
+<span class="nd">@Composable</span>
+<span class="kd">fun</span><span class="w"> </span><span class="nf">Foo</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">Box</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">Box</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">Box</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">Bar</span><span class="p">()</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nd">@Composable</span>
+<span class="kd">private</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">Bar</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">Box</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">Box</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">Text</span><span class="p">(</span><span class="s">&quot;hello&quot;</span><span class="p">)</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>The threshold defaults to <code>3</code> (i.e., the deepest nested content emitter in a function may have at most 3 enclosing content emitters). It can be tuned via <code>composableNestingDepthThreshold</code> in Detekt or <code>compose_composable_nesting_depth_threshold</code> in your <code>.editorconfig</code> for ktlint.</p>
+<p>Enabling: <a href="https://mrmans0n.github.io/compose-rules/ktlint/#enabling-and-configuring-the-nesting-depth-detector">ktlint</a>, <a href="https://mrmans0n.github.io/compose-rules/detekt/#enabling-rules">detekt</a></p>
+<div class="admonition info">
+<p><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14c1.11 0 2-.89 2-2V5a2 2 0 0 0-2-2M9.71 18l-1.42-1.41L12.88 12 8.29 7.41 9.71 6l6 6z"/></svg></span> <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ComposableNestingDepth.kt">compose:composable-nesting-depth-check</a> ktlint <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14c1.11 0 2-.89 2-2V5a2 2 0 0 0-2-2M9.71 18l-1.42-1.41L12.88 12 8.29 7.41 9.71 6l6 6z"/></svg></span> <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ComposableNestingDepth.kt">ComposableNestingDepth</a> detekt</p>
 </div>
 
 

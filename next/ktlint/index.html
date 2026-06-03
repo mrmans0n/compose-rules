@@ -570,6 +570,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#enabling-and-configuring-the-nesting-depth-detector" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enabling and configuring the nesting depth detector
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#enabling-the-material-2-detector" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -937,6 +948,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#enabling-and-configuring-the-nesting-depth-detector" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enabling and configuring the nesting depth detector
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#enabling-the-material-2-detector" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1192,6 +1214,16 @@ compose_treat_as_lambda = MyLambdaType,MyOtherLambdaType
 <p>The <code>content-trailing-lambda</code> rule identifies <code>@Composable</code> trailing lambdas automatically. For typedefs or functional interfaces that should be treated as composable lambdas:</p>
 <div class="highlight"><pre><span></span><code>[*.{kt,kts}]
 compose_treat_as_composable_lambda = MyLambdaComposableType,MyOtherComposableLambdaType
+</code></pre></div>
+<h3 id="enabling-and-configuring-the-nesting-depth-detector">Enabling and configuring the nesting depth detector<a class="headerlink" href="#enabling-and-configuring-the-nesting-depth-detector" title="Permanent link">&para;</a></h3>
+<p>The <code>composable-nesting-depth-check</code> rule flags <code>@Composable</code> functions whose content emitters are nested more deeply than a threshold. Disabled by default; enable it in your <code>.editorconfig</code> file:</p>
+<div class="highlight"><pre><span></span><code>[*.{kt,kts}]
+compose_composable_nesting_depth_enabled = true
+</code></pre></div>
+<p>The default threshold is 3 enclosing content emitters. To tune it:</p>
+<div class="highlight"><pre><span></span><code>[*.{kt,kts}]
+compose_composable_nesting_depth_enabled = true
+compose_composable_nesting_depth_threshold = 4
 </code></pre></div>
 <h3 id="enabling-the-material-2-detector">Enabling the Material 2 detector<a class="headerlink" href="#enabling-the-material-2-detector" title="Permanent link">&para;</a></h3>
 <p>The <code>material-two</code> rule flags Material 2 API usage. Disabled by default; enable it in your <code>.editorconfig</code> file:</p>
