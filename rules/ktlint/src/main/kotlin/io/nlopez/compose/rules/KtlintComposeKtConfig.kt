@@ -22,7 +22,13 @@ internal class KtlintComposeKtConfig(
     @Suppress("UNCHECKED_CAST")
     private fun <T : Any> getValueAsOrPut(key: String, value: () -> T?): T? = cache.getOrPut(key) { value() } as? T
 
-    override fun getInt(key: String, default: Int): Int = getValueAsOrPut(key) { find<String>(key)?.toInt() } ?: default
+    override fun getInt(key: String, default: Int): Int = getValueAsOrPut(key) {
+        when (val raw = find<Any>(key)) {
+            is Int -> raw
+            is String -> raw.toIntOrNull()
+            else -> null
+        }
+    } ?: default
 
     override fun getString(key: String, default: String?): String? = getValueAsOrPut(key) { find(key) } ?: default
 

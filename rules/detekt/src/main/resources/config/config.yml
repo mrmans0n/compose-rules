@@ -3,6 +3,8 @@ Compose:
     active: true
   ComposableNaming:
     active: true
+  ComposableNestingDepth:
+    active: false
   ComposableParamOrder:
     active: true
   CompositionLocalAllowlist:

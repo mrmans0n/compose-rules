@@ -16,6 +16,7 @@ class ComposeRuleSetProvider : RuleSetProvider {
         mapOf(
             RuleName("ComposableAnnotationNaming") to { config: Config -> ComposableAnnotationNamingCheck(config) },
             RuleName("ComposableNaming") to { config: Config -> NamingCheck(config) },
+            RuleName("ComposableNestingDepth") to { config: Config -> ComposableNestingDepthCheck(config) },
             RuleName("ComposableParamOrder") to { config: Config -> ParameterOrderCheck(config) },
             RuleName("CompositionLocalAllowlist") to { config: Config -> CompositionLocalAllowlistCheck(config) },
             RuleName("CompositionLocalNaming") to { config: Config -> CompositionLocalNamingCheck(config) },

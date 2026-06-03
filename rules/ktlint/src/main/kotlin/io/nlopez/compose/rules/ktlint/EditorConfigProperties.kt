@@ -331,3 +331,25 @@ val composePreviewNamingStrategy: EditorConfigProperty<String> =
             }
         },
     )
+
+val composableNestingDepthEnabled: EditorConfigProperty<Boolean> =
+    EditorConfigProperty(
+        type = PropertyType.LowerCasingPropertyType(
+            "compose_composable_nesting_depth_enabled",
+            "When enabled, @Composable functions that nest content emitters too deeply will be flagged.",
+            PropertyValueParser.BOOLEAN_VALUE_PARSER,
+            setOf(true.toString(), false.toString()),
+        ),
+        defaultValue = false,
+    )
+
+val composableNestingDepthThreshold: EditorConfigProperty<Int> =
+    EditorConfigProperty(
+        type = PropertyType.LowerCasingPropertyType(
+            "compose_composable_nesting_depth_threshold",
+            "Maximum nesting depth allowed for content emitters inside a single @Composable function.",
+            PropertyValueParser.POSITIVE_INT_VALUE_PARSER,
+            emptySet(),
+        ),
+        defaultValue = 3,
+    )

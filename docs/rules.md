@@ -780,3 +780,54 @@ By default, this rule requires `Preview` as a suffix. You can change this via th
 !!! info ""
 
     :material-chevron-right-box: [compose:preview-naming](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/PreviewNaming.kt) ktlint :material-chevron-right-box: [PreviewNaming](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/PreviewNaming.kt) detekt
+
+### Avoid deeply nested composables
+
+Deeply nested content emitters inside a single `@Composable` make the function structure hard to scan and reason about. Extract inner sections into private `@Composable` functions so each function stays focused on one layout responsibility.
+
+```kotlin
+// ❌ Too deeply nested
+@Composable
+fun Foo() {
+    Box {
+        Box {
+            Box {
+                Box {
+                    Box {
+                        Text("hello")
+                    }
+                }
+            }
+        }
+    }
+}
+
+// ✅ Inner sections extracted to a private composable
+@Composable
+fun Foo() {
+    Box {
+        Box {
+            Box {
+                Bar()
+            }
+        }
+    }
+}
+
+@Composable
+private fun Bar() {
+    Box {
+        Box {
+            Text("hello")
+        }
+    }
+}
+```
+
+The threshold defaults to `3` (i.e., the deepest nested content emitter in a function may have at most 3 enclosing content emitters). It can be tuned via `composableNestingDepthThreshold` in Detekt or `compose_composable_nesting_depth_threshold` in your `.editorconfig` for ktlint.
+
+Enabling: [ktlint](https://mrmans0n.github.io/compose-rules/ktlint/#enabling-and-configuring-the-nesting-depth-detector), [detekt](https://mrmans0n.github.io/compose-rules/detekt/#enabling-rules)
+
+!!! info ""
+
+    :material-chevron-right-box: [compose:composable-nesting-depth-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ComposableNestingDepth.kt) ktlint :material-chevron-right-box: [ComposableNestingDepth](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ComposableNestingDepth.kt) detekt
