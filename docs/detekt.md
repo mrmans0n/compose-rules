@@ -156,6 +156,8 @@ Compose:
     active: true
   RememberMissing:
     active: true
+  StaleRememberUpdatedStateInRemember:
+    active: true
   StateParam:
     active: true
   UnstableCollections:

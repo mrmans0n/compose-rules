@@ -38,6 +38,9 @@ google-services.json
 # MkDocs site
 site/
 
+# Local planning docs
+docs/superpowers/
+
 # Python virtual environment
 .venv/
 

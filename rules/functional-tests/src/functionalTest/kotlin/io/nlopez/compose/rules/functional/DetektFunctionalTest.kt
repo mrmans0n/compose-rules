@@ -106,6 +106,41 @@ class DetektFunctionalTest {
     }
 
     @Test
+    fun `Analysis API backed rules are detected via detekt`() {
+        setupDetektProject()
+
+        projectDir.writeFile(
+            "src/main/kotlin/com/example/StaleRememberUpdatedState.kt",
+            """
+            package com.example
+
+            import androidx.compose.runtime.Composable
+            import androidx.compose.runtime.getValue
+            import androidx.compose.runtime.remember
+            import androidx.compose.runtime.rememberUpdatedState
+
+            @Composable
+            fun StaleRememberUpdatedState(onDismiss: () -> Unit) {
+                val latestOnDismiss by rememberUpdatedState(onDismiss)
+                val callbacks = remember {
+                    DialogCallbacks(latestOnDismiss)
+                }
+                callbacks.hashCode()
+            }
+
+            private class DialogCallbacks(val onDismiss: () -> Unit)
+            """,
+        )
+
+        val result = createGradleRunner(
+            projectDir = projectDir,
+            arguments = listOf("detektMain"),
+        ).buildAndFail()
+
+        result.assertOutputContains("[StaleRememberUpdatedStateInRemember]")
+    }
+
+    @Test
     fun `clean code passes detekt checks`() {
         setupDetektProject()
 
