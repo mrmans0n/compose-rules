@@ -639,6 +639,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#do-not-eagerly-read-rememberupdatedstate-in-remember" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Do not eagerly read rememberUpdatedState in remember
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#make-dependencies-explicit" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1140,6 +1151,17 @@
     <span class="md-ellipsis">
       
         Movable content should be remembered
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#do-not-eagerly-read-rememberupdatedstate-in-remember" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Do not eagerly read rememberUpdatedState in remember
       
     </span>
   </a>
@@ -1874,6 +1896,39 @@ This effectively ties the function to be called from a Column, but is still not 
 <p>These need to persist across compositions; if detached from the composition, they are immediately recycled.</p>
 <div class="admonition info">
 <p><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14c1.11 0 2-.89 2-2V5a2 2 0 0 0-2-2M9.71 18l-1.42-1.41L12.88 12 8.29 7.41 9.71 6l6 6z"/></svg></span> <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/RememberContentMissing.kt">compose:remember-content-missing-check</a> ktlint <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14c1.11 0 2-.89 2-2V5a2 2 0 0 0-2-2M9.71 18l-1.42-1.41L12.88 12 8.29 7.41 9.71 6l6 6z"/></svg></span> <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/RememberContentMissing.kt">RememberContentMissing</a> detekt</p>
+</div>
+<h3 id="do-not-eagerly-read-rememberupdatedstate-in-remember">Do not eagerly read rememberUpdatedState in remember<a class="headerlink" href="#do-not-eagerly-read-rememberupdatedstate-in-remember" title="Permanent link">&para;</a></h3>
+<p><code>rememberUpdatedState</code> keeps a stable state object while updating its value across recompositions. If you read a delegated <code>rememberUpdatedState(...)</code> value directly inside a <code>remember { }</code>, <code>rememberSaveable { }</code>, or <code>retain { }</code> initializer, the remembered value captures only the value from the composition that created it. Later source changes update the <code>rememberUpdatedState</code>, but they do not re-run the initializer unless the <code>remember</code> call is keyed on that source value.</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// ❌ The Action keeps the first onDismiss value.</span>
+<span class="nd">@Composable</span>
+<span class="kd">fun</span><span class="w"> </span><span class="nf">DialogActions</span><span class="p">(</span><span class="n">onDismiss</span><span class="p">:</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="kt">Unit</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">latestOnDismiss</span><span class="w"> </span><span class="k">by</span><span class="w"> </span><span class="n">rememberUpdatedState</span><span class="p">(</span><span class="n">onDismiss</span><span class="p">)</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">dismissAction</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">remember</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">Action</span><span class="p">(</span><span class="n">onDismiss</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">latestOnDismiss</span><span class="p">)</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// ✅ Defer reading the latest value until the callback runs.</span>
+<span class="nd">@Composable</span>
+<span class="kd">fun</span><span class="w"> </span><span class="nf">DialogActions</span><span class="p">(</span><span class="n">onDismiss</span><span class="p">:</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="kt">Unit</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">latestOnDismiss</span><span class="w"> </span><span class="k">by</span><span class="w"> </span><span class="n">rememberUpdatedState</span><span class="p">(</span><span class="n">onDismiss</span><span class="p">)</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">dismissAction</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">remember</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="p">{</span><span class="w"> </span><span class="n">latestOnDismiss</span><span class="p">()</span><span class="w"> </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// ✅ Or key remember when eager recomputation is intended.</span>
+<span class="nd">@Composable</span>
+<span class="kd">fun</span><span class="w"> </span><span class="nf">DialogActions</span><span class="p">(</span><span class="n">onDismiss</span><span class="p">:</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="kt">Unit</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">latestOnDismiss</span><span class="w"> </span><span class="k">by</span><span class="w"> </span><span class="n">rememberUpdatedState</span><span class="p">(</span><span class="n">onDismiss</span><span class="p">)</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">dismissAction</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">remember</span><span class="p">(</span><span class="n">onDismiss</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">Action</span><span class="p">(</span><span class="n">onDismiss</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">latestOnDismiss</span><span class="p">)</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>This rule is detekt-only and uses detekt's analysis API.</p>
+<div class="admonition info">
+<p><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14c1.11 0 2-.89 2-2V5a2 2 0 0 0-2-2M9.71 18l-1.42-1.41L12.88 12 8.29 7.41 9.71 6l6 6z"/></svg></span> <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/detekt/src/main/kotlin/io/nlopez/compose/rules/detekt/StaleRememberUpdatedStateInRememberCheck.kt">StaleRememberUpdatedStateInRemember</a> detekt</p>
 </div>
 <h3 id="make-dependencies-explicit">Make dependencies explicit<a class="headerlink" href="#make-dependencies-explicit" title="Permanent link">&para;</a></h3>
 <h4 id="viewmodels">ViewModels<a class="headerlink" href="#viewmodels" title="Permanent link">&para;</a></h4>
