@@ -78,6 +78,8 @@ Compose:
     # treatAsComposableLambda: MyComposableLambdaType
   DefaultsVisibility:
     active: true
+  InvalidReadOnlyComposable:
+    active: true
   LambdaParameterEventTrailing:
     active: true
     # -- You can optionally add your own composables here

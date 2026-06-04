@@ -19,6 +19,8 @@ Compose:
     active: true
   DefaultsVisibility:
     active: true
+  InvalidReadOnlyComposable:
+    active: true
   LambdaParameterEventTrailing:
     active: true
   LambdaParameterInRestartableEffect:
