@@ -20,6 +20,7 @@ class ComposeRuleSetProvider : RuleSetProvider {
             RuleName("ComposableParamOrder") to { config: Config -> ParameterOrderCheck(config) },
             RuleName("CompositionLocalAllowlist") to { config: Config -> CompositionLocalAllowlistCheck(config) },
             RuleName("CompositionLocalNaming") to { config: Config -> CompositionLocalNamingCheck(config) },
+            RuleName("ConditionHoist") to { config: Config -> ConditionHoistCheck(config) },
             RuleName("ContentEmitterReturningValues") to
                 { config: Config -> ContentEmitterReturningValuesCheck(config) },
             RuleName("ContentSlotReused") to { config: Config -> ContentSlotReusedCheck(config) },

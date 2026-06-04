@@ -73,6 +73,15 @@ internal fun KtCallExpression.isResolvedInlineArgument(argumentExpression: KtExp
     }
 }.getOrDefault(false)
 
+internal fun KtCallExpression.hasExplicitArgumentMappedToAny(parameterNames: Set<String>): Boolean = runCatching {
+    analyze(this) {
+        val call = this@hasExplicitArgumentMappedToAny.resolveCall() as? KaFunctionCall<*> ?: return@analyze false
+        call.argumentMapping.values.any { parameter ->
+            parameter.symbol.name.asString() in parameterNames
+        }
+    }
+}.getOrDefault(false)
+
 private tailrec fun KtExpression.unwrapArgumentExpression(): KtExpression = when (this) {
     is KtAnnotatedExpression -> baseExpression?.unwrapArgumentExpression() ?: this
     is KtLabeledExpression -> baseExpression?.unwrapArgumentExpression() ?: this

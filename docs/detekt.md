@@ -60,6 +60,12 @@ Compose:
     # allowedCompositionLocals: LocalSomething,LocalSomethingElse
   CompositionLocalNaming:
     active: true
+  ConditionHoist:
+    active: true
+    # -- You can optionally add your own composables here that count as layouts/content emitters
+    # contentEmitters: MyLayout,MyOtherLayout
+    # -- You can optionally configure argument names that make a layout call too specific to hoist.
+    # ignoreCallsWithArgumentNames: modifier,contentAlignment,horizontalArrangement,verticalAlignment
   ContentEmitterReturningValues:
     active: true
     # -- You can optionally add your own composables here
