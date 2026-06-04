@@ -6,9 +6,11 @@ import org.jetbrains.kotlin.analysis.api.analyze
 import org.jetbrains.kotlin.analysis.api.components.resolveToCall
 import org.jetbrains.kotlin.analysis.api.components.resolveToSymbol
 import org.jetbrains.kotlin.analysis.api.resolution.KaVariableAccessCall
+import org.jetbrains.kotlin.analysis.api.symbols.KaPropertySymbol
 import org.jetbrains.kotlin.analysis.api.symbols.sourcePsiSafe
 import org.jetbrains.kotlin.analysis.api.symbols.symbol
 import org.jetbrains.kotlin.idea.references.mainReference
+import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtProperty
 import org.jetbrains.kotlin.psi.KtSimpleNameExpression
@@ -36,3 +38,27 @@ internal fun KtSimpleNameExpression.resolvedLocalImmutableProperty(): KtProperty
             ?.takeIf { property -> property.isLocal && !property.isVar }
     }
 }.getOrNull()
+
+internal fun KtSimpleNameExpression.isComposablePropertyRead(): Boolean = resolvedPropertyRead(
+    symbolPredicate = { property -> property.getter?.hasComposableAnnotation() == true },
+    sourcePredicate = { property -> property.getter?.isComposable() == true },
+)
+
+internal fun KtSimpleNameExpression.isReadOnlyComposablePropertyRead(): Boolean = resolvedPropertyRead(
+    symbolPredicate = { property -> property.getter?.hasReadOnlyComposableAnnotation() == true },
+    sourcePredicate = { property -> property.getter?.isReadOnlyComposable() == true },
+)
+
+private fun KtSimpleNameExpression.resolvedPropertyRead(
+    symbolPredicate: (KaPropertySymbol) -> Boolean,
+    sourcePredicate: (KtProperty) -> Boolean,
+): Boolean = runCatching {
+    if ((parent as? KtDotQualifiedExpression)?.receiverExpression == this) return@runCatching false
+
+    analyze(this) {
+        val property = ((resolveToCall() as? KaVariableAccessCall)?.signature?.symbol as? KaPropertySymbol)
+            ?: mainReference.resolveToSymbol() as? KaPropertySymbol
+            ?: return@analyze false
+        symbolPredicate(property) || property.sourcePsiSafe<KtProperty>()?.let(sourcePredicate) == true
+    }
+}.getOrDefault(false)

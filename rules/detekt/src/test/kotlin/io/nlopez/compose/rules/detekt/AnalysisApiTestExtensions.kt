@@ -57,6 +57,9 @@ private fun fakeComposeRuntime(): String = codeWithFakeCompose(
     )
     annotation class Composable
 
+    @Target(AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY_GETTER)
+    annotation class ReadOnlyComposable
+
     @Composable
     fun <T> remember(vararg keys: Any?, calculation: () -> T): T = calculation()
 

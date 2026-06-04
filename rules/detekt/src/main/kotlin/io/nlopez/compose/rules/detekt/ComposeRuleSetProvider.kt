@@ -25,6 +25,7 @@ class ComposeRuleSetProvider : RuleSetProvider {
             RuleName("ContentSlotReused") to { config: Config -> ContentSlotReusedCheck(config) },
             RuleName("ContentTrailingLambda") to { config: Config -> ContentTrailingLambdaCheck(config) },
             RuleName("DefaultsVisibility") to { config: Config -> DefaultsVisibilityCheck(config) },
+            RuleName("InvalidReadOnlyComposable") to { config: Config -> InvalidReadOnlyComposableCheck(config) },
             RuleName("LambdaParameterEventTrailing") to { config: Config -> LambdaParameterEventTrailingCheck(config) },
             RuleName("LambdaParameterInRestartableEffect") to { config: Config ->
                 LambdaParameterInRestartableEffectCheck(

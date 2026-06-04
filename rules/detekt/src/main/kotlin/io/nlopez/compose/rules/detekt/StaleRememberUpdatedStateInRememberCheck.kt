@@ -320,28 +320,12 @@ class StaleRememberUpdatedStateInRememberCheck(config: Config) :
     private fun KtDotQualifiedExpression.isStateValueReadOf(receiver: KtSimpleNameExpression): Boolean =
         receiverExpression == receiver && selectorExpression?.text == "value"
 
-    private fun KtLambdaExpression.isEagerScopeFunctionLambda(): Boolean {
-        val callExpression = generateSequence(parent) { element -> element.parent }
-            .filterIsInstance<KtCallExpression>()
-            .firstOrNull()
-
-        return callExpression?.isResolvedCallToAnyNamed(EagerScopeFunctions) == true
-    }
-
     internal companion object {
-        private val EagerScopeFunctions = setOf(
-            "kotlin.run",
-            "kotlin.with",
-            "kotlin.let",
-            "kotlin.also",
-            "kotlin.apply",
-            "kotlin.takeIf",
-            "kotlin.takeUnless",
-        )
-
         val StaleRememberUpdatedStateInRemember = """
             Reading a `rememberUpdatedState` value directly inside `remember { }`, `rememberSaveable { }`, or `retain { }` captures the initial value only.
             Key the call on the source value or defer the read in a lambda.
+
+            See https://mrmans0n.github.io/compose-rules/rules/#stale-rememberupdatedstate-in-remember for more information.
         """.trimIndent()
     }
 }
