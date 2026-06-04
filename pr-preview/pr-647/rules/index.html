@@ -1886,7 +1886,7 @@ This effectively ties the function to be called from a Column, but is still not 
 <span class="w">    </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-<p>Layouts with other composable siblings, composable <code>else</code> branches, slot lambdas with parameters, or explicitly configured layout arguments such as <code>modifier</code> are ignored.</p>
+<p>Layouts with other composable siblings, composable <code>else</code> branches, slot lambdas with parameters, or explicitly configured layout arguments such as <code>modifier</code> are ignored. The rule only checks known content emitters; add custom layout composables through <code>contentEmitters</code> in Detekt.</p>
 <p>This rule is detekt-only and uses detekt's analysis API.</p>
 <div class="admonition info">
 <p><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14c1.11 0 2-.89 2-2V5a2 2 0 0 0-2-2M9.71 18l-1.42-1.41L12.88 12 8.29 7.41 9.71 6l6 6z"/></svg></span> <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/detekt/src/main/kotlin/io/nlopez/compose/rules/detekt/ConditionHoistCheck.kt">ConditionHoist</a> detekt</p>
