@@ -91,6 +91,66 @@ private fun fakeComposeRuntime(): String = codeWithFakeCompose(
         val value: T
     }
 
+    interface MutableState<T> : State<T> {
+        override var value: T
+    }
+
+    interface IntState : State<Int> {
+        val intValue: Int
+        override val value: Int get() = intValue
+    }
+
+    interface MutableIntState : IntState, MutableState<Int> {
+        override var intValue: Int
+        override var value: Int
+            get() = intValue
+            set(value) {
+                intValue = value
+            }
+    }
+
+    interface LongState : State<Long> {
+        val longValue: Long
+        override val value: Long get() = longValue
+    }
+
+    interface MutableLongState : LongState, MutableState<Long> {
+        override var longValue: Long
+        override var value: Long
+            get() = longValue
+            set(value) {
+                longValue = value
+            }
+    }
+
+    interface FloatState : State<Float> {
+        val floatValue: Float
+        override val value: Float get() = floatValue
+    }
+
+    interface MutableFloatState : FloatState, MutableState<Float> {
+        override var floatValue: Float
+        override var value: Float
+            get() = floatValue
+            set(value) {
+                floatValue = value
+            }
+    }
+
+    interface DoubleState : State<Double> {
+        val doubleValue: Double
+        override val value: Double get() = doubleValue
+    }
+
+    interface MutableDoubleState : DoubleState, MutableState<Double> {
+        override var doubleValue: Double
+        override var value: Double
+            get() = doubleValue
+            set(value) {
+                doubleValue = value
+            }
+    }
+
     @Composable
     fun <T> rememberUpdatedState(newValue: T): State<T> = object : State<T> {
         override val value: T get() = newValue
@@ -98,6 +158,10 @@ private fun fakeComposeRuntime(): String = codeWithFakeCompose(
 
     @Composable
     operator fun <T> State<T>.getValue(thisRef: Any?, property: kotlin.reflect.KProperty<*>): T = value
+
+    operator fun <T> MutableState<T>.setValue(thisRef: Any?, property: kotlin.reflect.KProperty<*>, value: T) {
+        this.value = value
+    }
 
     open class CompositionLocal<T>(val current: T)
 

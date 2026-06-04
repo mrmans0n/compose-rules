@@ -164,6 +164,8 @@ Compose:
     active: true
   StateParam:
     active: true
+  UnnecessaryComposable:
+    active: true
   UnstableCollections:
     active: false # Opt-in, disabled by default. Turn on if you want to enforce this (e.g. you have strong skipping disabled)
   ViewModelForwarding:
