@@ -49,6 +49,11 @@ internal fun KtSimpleNameExpression.isReadOnlyComposablePropertyRead(): Boolean 
     sourcePredicate = { property -> property.getter?.isReadOnlyComposable() == true },
 )
 
+internal fun KtSimpleNameExpression.isPropertyReadWithExecutableAccess(): Boolean = resolvedPropertyRead(
+    symbolPredicate = { false },
+    sourcePredicate = { property -> property.getter?.bodyExpression != null || property.hasDelegate() },
+)
+
 private fun KtSimpleNameExpression.resolvedPropertyRead(
     symbolPredicate: (KaPropertySymbol) -> Boolean,
     sourcePredicate: (KtProperty) -> Boolean,

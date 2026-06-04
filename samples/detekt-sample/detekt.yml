@@ -59,6 +59,8 @@ Compose:
     active: true
   Material2:
     active: false
+  MissingReadOnlyComposable:
+    active: true
   ModifierClickableOrder:
     active: true
   ModifierComposed:
@@ -103,4 +105,3 @@ Compose:
     active: true
   ViewModelInjection:
     active: true
-

@@ -13,6 +13,8 @@ internal object ComposeFqNames {
         get() = runtime.child("Composable")
     val ReadOnlyComposable: FqName
         get() = runtime.child("ReadOnlyComposable")
+    val CompositionLocal: FqName
+        get() = runtime.child("CompositionLocal")
     val Remember: FqName
         get() = runtime.child("remember")
     val RememberUpdatedState: FqName

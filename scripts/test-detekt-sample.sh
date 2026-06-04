@@ -33,6 +33,7 @@ set -e
 EXPECTED_RULES=(
     "ComposableNaming"
     "ModifierMissing"
+    "MissingReadOnlyComposable"
     "MultipleEmitters"
     "MutableParams"
     "MutableStateAutoboxing"
@@ -91,4 +92,3 @@ fi
 echo ""
 echo "SUCCESS: All expected compose-rules violations were detected!"
 exit 0
-

@@ -523,6 +523,27 @@ This rule is detekt-only and uses detekt's analysis API.
 
     :material-chevron-right-box: [InvalidReadOnlyComposable](https://github.com/mrmans0n/compose-rules/blob/main/rules/detekt/src/main/kotlin/io/nlopez/compose/rules/detekt/InvalidReadOnlyComposableCheck.kt) detekt
 
+### Mark read-only composables as read-only
+
+If a composable function or property getter only calls other read-only composables or reads composition locals, it can be marked with `@ReadOnlyComposable`. This communicates the narrower contract to callers and lets other read-only composables use it safely.
+
+```kotlin
+// ❌ This only reads composition data, but callers cannot know it is read-only.
+@Composable
+fun currentDensity(): Density = LocalDensity.current
+
+// ✅ Mark read-only composables with both annotations.
+@ReadOnlyComposable
+@Composable
+fun currentDensity(): Density = LocalDensity.current
+```
+
+This rule is detekt-only and uses detekt's analysis API.
+
+!!! info ""
+
+    :material-chevron-right-box: [MissingReadOnlyComposable](https://github.com/mrmans0n/compose-rules/blob/main/rules/detekt/src/main/kotlin/io/nlopez/compose/rules/detekt/MissingReadOnlyComposableCheck.kt) detekt
+
 ### Do not eagerly read rememberUpdatedState in remember
 
 `rememberUpdatedState` keeps a stable state object while updating its value across recompositions. If you read a delegated `rememberUpdatedState(...)` value directly inside a `remember { }`, `rememberSaveable { }`, or `retain { }` initializer, the remembered value captures only the value from the composition that created it. Later source changes update the `rememberUpdatedState`, but they do not re-run the initializer unless the `remember` call is keyed on that source value.
