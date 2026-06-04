@@ -310,6 +310,40 @@ This effectively ties the function to be called from a Column, but is still not 
 
 > **Note**: To add your custom composables so they are used in this rule (things like your design system composables), you can add `composeEmitters` to this rule config in Detekt, or `compose_emitters` to your .editorconfig in ktlint.
 
+### Hoist single conditional layout content
+
+When a layout's only content is a conditional composable child, prefer hoisting the condition outside the layout. This keeps the conditional structure visible at the call site and avoids creating an otherwise empty layout when the condition is false.
+
+```kotlin
+// ❌ The Column exists only to wrap a conditional child.
+@Composable
+fun Content(showMessage: Boolean) {
+    Column {
+        if (showMessage) {
+            Text("Hello")
+        }
+    }
+}
+
+// ✅ Hoist the condition so the layout is only emitted when it has content.
+@Composable
+fun Content(showMessage: Boolean) {
+    if (showMessage) {
+        Column {
+            Text("Hello")
+        }
+    }
+}
+```
+
+Layouts with other composable siblings, composable `else` branches, slot lambdas with parameters, or explicitly configured layout arguments such as `modifier` are ignored. The rule only checks known content emitters; add custom layout composables through `contentEmitters` in Detekt.
+
+This rule is detekt-only and uses detekt's analysis API.
+
+!!! info ""
+
+    :material-chevron-right-box: [ConditionHoist](https://github.com/mrmans0n/compose-rules/blob/main/rules/detekt/src/main/kotlin/io/nlopez/compose/rules/detekt/ConditionHoistCheck.kt) detekt
+
 ### Slots for main content should be the trailing lambda
 
 Content slots (typically `content: @Composable () -> Unit` or nullable variants) should always be the last parameter so they can be written as a trailing lambda. This makes the UI flow more natural and easier to read.

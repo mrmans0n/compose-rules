@@ -11,6 +11,8 @@ Compose:
     active: true
   CompositionLocalNaming:
     active: true
+  ConditionHoist:
+    active: true
   ContentEmitterReturningValues:
     active: true
   ContentSlotReused:

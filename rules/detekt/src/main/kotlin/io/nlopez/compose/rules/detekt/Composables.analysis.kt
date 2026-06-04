@@ -9,6 +9,7 @@ import org.jetbrains.kotlin.analysis.api.components.functionType
 import org.jetbrains.kotlin.analysis.api.components.type
 import org.jetbrains.kotlin.analysis.api.symbols.markers.KaAnnotatedSymbol
 import org.jetbrains.kotlin.analysis.api.symbols.symbol
+import org.jetbrains.kotlin.analysis.api.types.KaFunctionType
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.psi.KtAnnotatedExpression
 import org.jetbrains.kotlin.psi.KtElement
@@ -54,6 +55,13 @@ internal fun KtLambdaExpression.isComposable(): Boolean =
                     this@isComposable.expectedType?.hasComposableAnnotation() == true
             }
         }.getOrDefault(false)
+
+internal fun KtLambdaExpression.hasFunctionTypeReceiver(): Boolean = runCatching {
+    analyze(this) {
+        (functionLiteral.functionType as? KaFunctionType)?.hasReceiver == true ||
+            (this@hasFunctionTypeReceiver.expectedType as? KaFunctionType)?.hasReceiver == true
+    }
+}.getOrDefault(false)
 
 internal fun KtNamedFunction.isReadOnlyComposable(): Boolean = runCatching {
     analyze(this) {
