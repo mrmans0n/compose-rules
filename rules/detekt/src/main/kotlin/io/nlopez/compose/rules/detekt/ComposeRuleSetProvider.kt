@@ -33,6 +33,7 @@ class ComposeRuleSetProvider : RuleSetProvider {
                 )
             },
             RuleName("Material2") to { config: Config -> Material2Check(config) },
+            RuleName("MissingReadOnlyComposable") to { config: Config -> MissingReadOnlyComposableCheck(config) },
             RuleName("ModifierClickableOrder") to { config: Config -> ModifierClickableOrderCheck(config) },
             RuleName("ModifierComposed") to { config: Config -> ModifierComposedCheck(config) },
             RuleName("ModifierMissing") to { config: Config -> ModifierMissingCheck(config) },

@@ -27,6 +27,8 @@ Compose:
     active: true
   Material2:
     active: false
+  MissingReadOnlyComposable:
+    active: true
   ModifierClickableOrder:
     active: true
   ModifierComposed:

@@ -98,5 +98,12 @@ private fun fakeComposeRuntime(): String = codeWithFakeCompose(
 
     @Composable
     operator fun <T> State<T>.getValue(thisRef: Any?, property: kotlin.reflect.KProperty<*>): T = value
+
+    open class CompositionLocal<T>(val current: T)
+
+    class ProvidableCompositionLocal<T>(current: T) : CompositionLocal<T>(current)
+
+    fun <T> compositionLocalOf(defaultFactory: () -> T): ProvidableCompositionLocal<T> =
+        ProvidableCompositionLocal(defaultFactory())
     """,
 )

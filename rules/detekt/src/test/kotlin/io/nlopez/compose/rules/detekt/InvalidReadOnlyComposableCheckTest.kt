@@ -263,6 +263,31 @@ class InvalidReadOnlyComposableCheckTest {
     }
 
     @Test
+    fun `reports non read only composable call inside labeled eager stdlib scope lambda`() {
+        @Language("kotlin")
+        val code = codeWithFakeCompose(
+            """
+            @Composable
+            fun EmitsContent() {
+            }
+
+            @ReadOnlyComposable
+            @Composable
+            fun Example(): Unit = run label@{
+                EmitsContent()
+            }
+            """,
+        )
+
+        val findings = rule.lintWithAnalysisApi(code)
+
+        assertThat(findings).hasSize(1)
+        assertThat(findings.single())
+            .hasStartSourceLocation(SourceLocation(11, 13))
+            .hasMessage(InvalidReadOnlyComposableCheck.InvalidReadOnlyComposable)
+    }
+
+    @Test
     fun `reports non read only composable call inside repeat lambda`() {
         @Language("kotlin")
         val code = codeWithFakeCompose(
