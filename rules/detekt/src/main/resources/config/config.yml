@@ -71,6 +71,8 @@ Compose:
     active: true
   UnstableCollections:
     active: false
+  VarsWithoutStateBacking:
+    active: true
   ViewModelForwarding:
     active: true
   ViewModelInjection:

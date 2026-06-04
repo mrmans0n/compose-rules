@@ -14,6 +14,9 @@ import org.jetbrains.kotlin.psi.KtValueArgument
 internal fun KtLambdaExpression.isEagerScopeFunctionLambda(): Boolean =
     parent.immediateLambdaArgumentCall()?.isEagerScopeFunctionCall(this) == true
 
+internal fun KtLambdaExpression.isEagerStdlibScopeFunctionLambda(): Boolean =
+    parent.immediateLambdaArgumentCall()?.isEagerScopeFunctionCall() == true
+
 private tailrec fun PsiElement?.immediateLambdaArgumentCall(): KtCallExpression? = when (this) {
     is KtLambdaArgument -> parent as? KtCallExpression
     is KtValueArgument -> parent?.parent as? KtCallExpression
