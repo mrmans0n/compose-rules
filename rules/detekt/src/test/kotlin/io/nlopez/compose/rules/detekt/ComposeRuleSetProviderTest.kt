@@ -10,6 +10,7 @@ import com.lemonappdev.konsist.api.Konsist
 import com.lemonappdev.konsist.api.ext.list.withAllParentsOf
 import com.lemonappdev.konsist.api.verify.assertTrue
 import dev.detekt.api.Config
+import dev.detekt.api.Rule
 import io.nlopez.compose.core.ComposeKtVisitor
 import io.nlopez.compose.rules.DetektRule
 import org.assertj.core.api.AssertionsForInterfaceTypes.assertThat
@@ -19,6 +20,7 @@ import org.reflections.Reflections
 import org.reflections.scanners.Scanners
 import org.reflections.util.ConfigurationBuilder
 import java.io.File
+import java.lang.reflect.Modifier
 import kotlin.jvm.java
 
 class ComposeRuleSetProviderTest {
@@ -29,7 +31,9 @@ class ComposeRuleSetProviderTest {
     @Test
     fun `ensure all rules in the package are represented in the ruleset`() {
         val reflections = Reflections(ruleSetProvider.javaClass.packageName)
-        val ruleClassesInPackage = reflections.getSubTypesOf(DetektRule::class.java)
+        val ruleClassesInPackage = reflections.getSubTypesOf(Rule::class.java)
+            .filterNot { Modifier.isAbstract(it.modifiers) }
+            .toSet()
         val ruleClassesInRuleSet = ruleSet.rules.values
             .map { it(Config.empty)::class.java }
             .toSet()
@@ -52,9 +56,10 @@ class ComposeRuleSetProviderTest {
         val rules = ruleSet.rules
             .asSequence()
             .map { (name, factory) ->
-                val rule = factory(Config.empty) as DetektRule
-                name.value to rule.isOptIn
+                val rule = factory(Config.empty)
+                name.value to ((rule as? DetektRule)?.isOptIn ?: false)
             }
+            .toList()
 
         val optIn = rules.associate { it }
 

@@ -31,6 +31,7 @@ dependencies {
     api(projects.rules.commonDetekt)
 
     testImplementation(libs.detekt.test)
+    testImplementation(libs.detekt.test.utils)
     testImplementation(libs.junit5)
     testImplementation(libs.junit5.params)
     testImplementation(libs.junit5.engine)

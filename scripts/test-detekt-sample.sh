@@ -21,23 +21,24 @@ else
     echo "Using existing JAR files (skipping build)..."
 fi
 
-echo "Running detekt check on sample project..."
+echo "Running detektMain check on sample project..."
 
 # Run detekt and capture output (expecting it to fail with violations)
 set +e
-OUTPUT=$("$ROOT_DIR/gradlew" -p "$SAMPLE_DIR" check 2>&1)
+OUTPUT=$("$ROOT_DIR/gradlew" -p "$SAMPLE_DIR" detektMain 2>&1)
 EXIT_CODE=$?
 set -e
 
 # Expected compose-rules violations (rule IDs that should appear in output)
 EXPECTED_RULES=(
-    "ModifierMissing"
-    "RememberMissing"
-    "MutableParams"
     "ComposableNaming"
-    "ParameterNaming"
+    "ModifierMissing"
     "MultipleEmitters"
+    "MutableParams"
     "MutableStateAutoboxing"
+    "ParameterNaming"
+    "RememberMissing"
+    "StaleRememberUpdatedStateInRemember"
 )
 
 echo ""

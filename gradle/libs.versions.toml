@@ -19,6 +19,7 @@ ktlint-test = { module = "com.pinterest.ktlint:ktlint-test", version.ref = "ktli
 
 detekt-core = { module = "dev.detekt:detekt-core", version.ref = "detekt" }
 detekt-test = { module = "dev.detekt:detekt-test", version.ref = "detekt" }
+detekt-test-utils = { module = "dev.detekt:detekt-test-utils", version.ref = "detekt" }
 detekt-psi-utils = { module = "dev.detekt:detekt-psi-utils", version.ref = "detekt" }
 
 kotlin-compiler = { module = "org.jetbrains.kotlin:kotlin-compiler", version.ref = "kotlin" }

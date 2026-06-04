@@ -499,6 +499,45 @@ These need to persist across compositions; if detached from the composition, the
 
     :material-chevron-right-box: [compose:remember-content-missing-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/RememberContentMissing.kt) ktlint :material-chevron-right-box: [RememberContentMissing](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/RememberContentMissing.kt) detekt
 
+### Do not eagerly read rememberUpdatedState in remember
+
+`rememberUpdatedState` keeps a stable state object while updating its value across recompositions. If you read a delegated `rememberUpdatedState(...)` value directly inside a `remember { }`, `rememberSaveable { }`, or `retain { }` initializer, the remembered value captures only the value from the composition that created it. Later source changes update the `rememberUpdatedState`, but they do not re-run the initializer unless the `remember` call is keyed on that source value.
+
+```kotlin
+// ❌ The Action keeps the first onDismiss value.
+@Composable
+fun DialogActions(onDismiss: () -> Unit) {
+    val latestOnDismiss by rememberUpdatedState(onDismiss)
+    val dismissAction = remember {
+        Action(onDismiss = latestOnDismiss)
+    }
+}
+
+// ✅ Defer reading the latest value until the callback runs.
+@Composable
+fun DialogActions(onDismiss: () -> Unit) {
+    val latestOnDismiss by rememberUpdatedState(onDismiss)
+    val dismissAction = remember {
+        { latestOnDismiss() }
+    }
+}
+
+// ✅ Or key remember when eager recomputation is intended.
+@Composable
+fun DialogActions(onDismiss: () -> Unit) {
+    val latestOnDismiss by rememberUpdatedState(onDismiss)
+    val dismissAction = remember(onDismiss) {
+        Action(onDismiss = latestOnDismiss)
+    }
+}
+```
+
+This rule is detekt-only and uses detekt's analysis API.
+
+!!! info ""
+
+    :material-chevron-right-box: [StaleRememberUpdatedStateInRemember](https://github.com/mrmans0n/compose-rules/blob/main/rules/detekt/src/main/kotlin/io/nlopez/compose/rules/detekt/StaleRememberUpdatedStateInRememberCheck.kt) detekt
+
 ### Make dependencies explicit
 
 #### ViewModels
