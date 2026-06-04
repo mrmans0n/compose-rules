@@ -6,13 +6,16 @@ import org.jetbrains.kotlin.analysis.api.analyze
 import org.jetbrains.kotlin.analysis.api.annotations.KaAnnotated
 import org.jetbrains.kotlin.analysis.api.components.expectedType
 import org.jetbrains.kotlin.analysis.api.components.functionType
+import org.jetbrains.kotlin.analysis.api.components.type
 import org.jetbrains.kotlin.analysis.api.symbols.markers.KaAnnotatedSymbol
 import org.jetbrains.kotlin.analysis.api.symbols.symbol
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.psi.KtElement
 import org.jetbrains.kotlin.psi.KtLambdaExpression
 import org.jetbrains.kotlin.psi.KtNamedFunction
+import org.jetbrains.kotlin.psi.KtParameter
 import org.jetbrains.kotlin.psi.KtPropertyAccessor
+import org.jetbrains.kotlin.psi.KtTypeReference
 import io.nlopez.compose.core.util.isComposable as hasComposableAnnotationText
 
 internal fun KtElement.isInsideComposableScope(): Boolean {
@@ -60,6 +63,15 @@ internal fun KtPropertyAccessor.isReadOnlyComposable(): Boolean = runCatching {
         this@isReadOnlyComposable.symbol.hasReadOnlyComposableAnnotation()
     }
 }.getOrDefault(false)
+
+internal fun KtParameter.hasComposableType(): Boolean = typeReference?.hasComposableType() == true
+
+internal fun KtTypeReference.hasComposableType(): Boolean = text.contains("@Composable") ||
+    runCatching {
+        analyze(this) {
+            type.hasComposableAnnotation()
+        }
+    }.getOrDefault(false)
 
 internal fun KaAnnotatedSymbol.hasComposableAnnotation(): Boolean =
     annotations.any { it.classId == ClassId.topLevel(ComposeFqNames.Composable) }

@@ -55,6 +55,7 @@ class ComposeRuleSetProvider : RuleSetProvider {
                 StaleRememberUpdatedStateInRememberCheck(config)
             },
             RuleName("StateParam") to { config: Config -> StateParameterCheck(config) },
+            RuleName("UnnecessaryComposable") to { config: Config -> UnnecessaryComposableCheck(config) },
             RuleName("UnstableCollections") to { config: Config -> UnstableCollectionsCheck(config) },
             RuleName("ViewModelForwarding") to { config: Config -> ViewModelForwardingCheck(config) },
             RuleName("ViewModelInjection") to { config: Config -> ViewModelInjectionCheck(config) },

@@ -544,6 +544,27 @@ This rule is detekt-only and uses detekt's analysis API.
 
     :material-chevron-right-box: [MissingReadOnlyComposable](https://github.com/mrmans0n/compose-rules/blob/main/rules/detekt/src/main/kotlin/io/nlopez/compose/rules/detekt/MissingReadOnlyComposableCheck.kt) detekt
 
+### Do not mark functions as composable when they don't need it
+
+`@Composable` changes where a function can be called from. If a function or property getter does not call composables, read composition locals, read Compose state, or otherwise use composition, it should be a regular Kotlin declaration instead.
+
+```kotlin
+// ❌ This does not use composition, so callers should not need a composable scope.
+@Composable
+fun formatLabel(name: String): String = name.trim()
+
+// ✅ Keep pure helpers as regular Kotlin functions.
+fun formatLabel(name: String): String = name.trim()
+```
+
+Functions that own a composable slot parameter are ignored, because they define a composable API even when the current body does not invoke the slot.
+
+This rule is detekt-only and uses detekt's analysis API.
+
+!!! info ""
+
+    :material-chevron-right-box: [UnnecessaryComposable](https://github.com/mrmans0n/compose-rules/blob/main/rules/detekt/src/main/kotlin/io/nlopez/compose/rules/detekt/UnnecessaryComposableCheck.kt) detekt
+
 ### Do not eagerly read rememberUpdatedState in remember
 
 `rememberUpdatedState` keeps a stable state object while updating its value across recompositions. If you read a delegated `rememberUpdatedState(...)` value directly inside a `remember { }`, `rememberSaveable { }`, or `retain { }` initializer, the remembered value captures only the value from the composition that created it. Later source changes update the `rememberUpdatedState`, but they do not re-run the initializer unless the `remember` call is keyed on that source value.

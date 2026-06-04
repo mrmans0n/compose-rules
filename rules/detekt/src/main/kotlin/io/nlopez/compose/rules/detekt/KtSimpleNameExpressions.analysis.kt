@@ -3,13 +3,17 @@
 package io.nlopez.compose.rules.detekt
 
 import org.jetbrains.kotlin.analysis.api.analyze
+import org.jetbrains.kotlin.analysis.api.components.expressionType
 import org.jetbrains.kotlin.analysis.api.components.resolveToCall
 import org.jetbrains.kotlin.analysis.api.components.resolveToSymbol
 import org.jetbrains.kotlin.analysis.api.resolution.KaVariableAccessCall
 import org.jetbrains.kotlin.analysis.api.symbols.KaPropertySymbol
 import org.jetbrains.kotlin.analysis.api.symbols.sourcePsiSafe
 import org.jetbrains.kotlin.analysis.api.symbols.symbol
+import org.jetbrains.kotlin.analysis.api.types.symbol
 import org.jetbrains.kotlin.idea.references.mainReference
+import org.jetbrains.kotlin.lexer.KtTokens
+import org.jetbrains.kotlin.psi.KtBinaryExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtProperty
@@ -54,6 +58,23 @@ internal fun KtSimpleNameExpression.isPropertyReadWithExecutableAccess(): Boolea
     sourcePredicate = { property -> property.getter?.bodyExpression != null || property.hasDelegate() },
 )
 
+internal fun KtSimpleNameExpression.isDelegatedComposeStateRead(): Boolean = runCatching {
+    if (isPlainAssignmentLeftHandSide()) return@runCatching false
+
+    analyze(this) {
+        val property = ((resolveToCall() as? KaVariableAccessCall)?.signature?.symbol as? KaPropertySymbol)
+            ?.sourcePsiSafe<KtProperty>()
+            ?: mainReference.resolveToSymbol()?.sourcePsiSafe<KtProperty>()
+            ?: return@analyze false
+        val delegateExpression = property.delegateExpression ?: return@analyze false
+        val delegateType = delegateExpression.expressionType ?: return@analyze false
+        delegateType.symbol?.classId?.asSingleFqName() in ComposeStateFqNames ||
+            delegateType.allSupertypes.any { supertype ->
+                supertype.symbol?.classId?.asSingleFqName() in ComposeStateFqNames
+            }
+    }
+}.getOrDefault(false)
+
 private fun KtSimpleNameExpression.resolvedPropertyRead(
     symbolPredicate: (KaPropertySymbol) -> Boolean,
     sourcePredicate: (KtProperty) -> Boolean,
@@ -67,3 +88,14 @@ private fun KtSimpleNameExpression.resolvedPropertyRead(
         symbolPredicate(property) || property.sourcePsiSafe<KtProperty>()?.let(sourcePredicate) == true
     }
 }.getOrDefault(false)
+
+private val ComposeStateFqNames = setOf(ComposeFqNames.State, ComposeFqNames.MutableState)
+
+private fun KtSimpleNameExpression.isPlainAssignmentLeftHandSide(): Boolean {
+    val assignedExpression = (parent as? KtDotQualifiedExpression)
+        ?.takeIf { expression -> expression.selectorExpression == this }
+        ?: this
+    return (assignedExpression.parent as? KtBinaryExpression)?.let { expression ->
+        expression.operationToken == KtTokens.EQ && expression.left == assignedExpression
+    } == true
+}
