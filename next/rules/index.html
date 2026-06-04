@@ -540,6 +540,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#hoist-single-conditional-layout-content" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hoist single conditional layout content
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#slots-for-main-content-should-be-the-trailing-lambda" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1096,6 +1107,17 @@
     <span class="md-ellipsis">
       
         Do not emit multiple pieces of content
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hoist-single-conditional-layout-content" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hoist single conditional layout content
       
     </span>
   </a>
@@ -1842,6 +1864,33 @@ This effectively ties the function to be called from a Column, but is still not 
 <blockquote>
 <p><strong>Note</strong>: To add your custom composables so they are used in this rule (things like your design system composables), you can add <code>composeEmitters</code> to this rule config in Detekt, or <code>compose_emitters</code> to your .editorconfig in ktlint.</p>
 </blockquote>
+<h3 id="hoist-single-conditional-layout-content">Hoist single conditional layout content<a class="headerlink" href="#hoist-single-conditional-layout-content" title="Permanent link">&para;</a></h3>
+<p>When a layout's only content is a conditional composable child, prefer hoisting the condition outside the layout. This keeps the conditional structure visible at the call site and avoids creating an otherwise empty layout when the condition is false.</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// ❌ The Column exists only to wrap a conditional child.</span>
+<span class="nd">@Composable</span>
+<span class="kd">fun</span><span class="w"> </span><span class="nf">Content</span><span class="p">(</span><span class="n">showMessage</span><span class="p">:</span><span class="w"> </span><span class="kt">Boolean</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">Column</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">showMessage</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">Text</span><span class="p">(</span><span class="s">&quot;Hello&quot;</span><span class="p">)</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// ✅ Hoist the condition so the layout is only emitted when it has content.</span>
+<span class="nd">@Composable</span>
+<span class="kd">fun</span><span class="w"> </span><span class="nf">Content</span><span class="p">(</span><span class="n">showMessage</span><span class="p">:</span><span class="w"> </span><span class="kt">Boolean</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">showMessage</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">Column</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">Text</span><span class="p">(</span><span class="s">&quot;Hello&quot;</span><span class="p">)</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>Layouts with other composable siblings, composable <code>else</code> branches, slot lambdas with parameters, or explicitly configured layout arguments such as <code>modifier</code> are ignored. The rule only checks known content emitters; add custom layout composables through <code>contentEmitters</code> in Detekt.</p>
+<p>This rule is detekt-only and uses detekt's analysis API.</p>
+<div class="admonition info">
+<p><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14c1.11 0 2-.89 2-2V5a2 2 0 0 0-2-2M9.71 18l-1.42-1.41L12.88 12 8.29 7.41 9.71 6l6 6z"/></svg></span> <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/detekt/src/main/kotlin/io/nlopez/compose/rules/detekt/ConditionHoistCheck.kt">ConditionHoist</a> detekt</p>
+</div>
 <h3 id="slots-for-main-content-should-be-the-trailing-lambda">Slots for main content should be the trailing lambda<a class="headerlink" href="#slots-for-main-content-should-be-the-trailing-lambda" title="Permanent link">&para;</a></h3>
 <p>Content slots (typically <code>content: @Composable () -&gt; Unit</code> or nullable variants) should always be the last parameter so they can be written as a trailing lambda. This makes the UI flow more natural and easier to read.</p>
 <div class="highlight"><pre><span></span><code><span class="c1">// ❌</span>
