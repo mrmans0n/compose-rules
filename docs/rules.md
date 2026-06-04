@@ -39,6 +39,36 @@ Be careful when using `mutableStateOf` (or any of the other `State<T>` builders)
 
     :material-chevron-right-box: [compose:remember-missing-check](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/RememberStateMissing.kt) ktlint :material-chevron-right-box: [RememberMissing](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/RememberStateMissing.kt) detekt
 
+### Back composable vars with State
+
+Local `var` properties in composable scopes are not observable by Compose unless they are backed by snapshot state. If a `var` changes without going through `State`, Compose cannot automatically recompose the UI that depends on it.
+
+```kotlin
+// ❌ This value can change without invalidating composition.
+@Composable
+fun Counter() {
+    var count = 0
+    Button(onClick = { count++ }) {
+        Text("$count")
+    }
+}
+
+// ✅ Back mutable local UI state with snapshot state.
+@Composable
+fun Counter() {
+    var count by remember { mutableStateOf(0) }
+    Button(onClick = { count++ }) {
+        Text("$count")
+    }
+}
+```
+
+This rule is detekt-only and uses detekt's analysis API.
+
+!!! info ""
+
+    :material-chevron-right-box: [VarsWithoutStateBacking](https://github.com/mrmans0n/compose-rules/blob/main/rules/detekt/src/main/kotlin/io/nlopez/compose/rules/detekt/VarsWithoutStateBackingCheck.kt) detekt
+
 ### Use mutableStateOf type-specific variants when possible
 
 Compose provides type-specific state variants that avoid autoboxing on JVM platforms, making them more memory efficient. Use these instead of `mutableStateOf` when working with primitives or primitive collections.

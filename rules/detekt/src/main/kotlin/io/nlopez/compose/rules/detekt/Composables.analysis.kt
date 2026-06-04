@@ -10,6 +10,7 @@ import org.jetbrains.kotlin.analysis.api.components.type
 import org.jetbrains.kotlin.analysis.api.symbols.markers.KaAnnotatedSymbol
 import org.jetbrains.kotlin.analysis.api.symbols.symbol
 import org.jetbrains.kotlin.name.ClassId
+import org.jetbrains.kotlin.psi.KtAnnotatedExpression
 import org.jetbrains.kotlin.psi.KtElement
 import org.jetbrains.kotlin.psi.KtLambdaExpression
 import org.jetbrains.kotlin.psi.KtNamedFunction
@@ -45,12 +46,14 @@ internal fun KtPropertyAccessor.isComposable(): Boolean = hasComposableAnnotatio
         }
     }.getOrDefault(false)
 
-private fun KtLambdaExpression.isComposable(): Boolean = runCatching {
-    analyze(this) {
-        functionLiteral.functionType.hasComposableAnnotation() ||
-            this@isComposable.expectedType?.hasComposableAnnotation() == true
-    }
-}.getOrDefault(false)
+internal fun KtLambdaExpression.isComposable(): Boolean =
+    (parent as? KtAnnotatedExpression)?.hasComposableAnnotationText == true ||
+        runCatching {
+            analyze(this) {
+                functionLiteral.functionType.hasComposableAnnotation() ||
+                    this@isComposable.expectedType?.hasComposableAnnotation() == true
+            }
+        }.getOrDefault(false)
 
 internal fun KtNamedFunction.isReadOnlyComposable(): Boolean = runCatching {
     analyze(this) {
