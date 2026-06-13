@@ -73,9 +73,10 @@ class ModifierClickableOrder : ComposeKtVisitor {
                                 // we flag them as well.
                                 val suspicious = sequenceOf(argumentExpression.then, argumentExpression.`else`)
                                     .filterNotNull()
-                                    // Branches can be a bare call (`clip(X)`) or a qualified call
-                                    // (`Modifier.clip(X)`), the latter being the more common form.
-                                    .mapNotNull { it.asShapeModifierCall() }
+                                    // A branch can be a bare call (`clip(X)`), a qualified call
+                                    // (`Modifier.clip(X)`), or a chain (`Modifier.clip(X).padding(Y)`),
+                                    // so we scan every call expression it contains.
+                                    .flatMap { it.findAllChildrenByClass<KtCallExpression>() }
                                     .any {
                                         it.isClipWithShape || it.isBackgroundWithShape ||
                                             it.isBorderWithShape || it.isShadowWithShape
@@ -135,14 +136,18 @@ class ModifierClickableOrder : ComposeKtVisitor {
             val namedClip = valueArguments.firstOrNull { it.getArgumentName()?.asName?.asString() == "clip" }
             if (namedClip != null) return namedClip.getArgumentExpression()?.text == "false"
             val positionalClip = valueArguments.getOrNull(2)?.takeUnless { it.isNamed() }
-            return positionalClip?.getArgumentExpression()?.text == "false"
+            if (positionalClip != null) return positionalClip.getArgumentExpression()?.text == "false"
+            // When `clip` is omitted it defaults to `elevation > 0.dp`, so a literal zero elevation
+            // is a no-op shadow that never clips and shouldn't be flagged.
+            return isZeroElevation
         }
 
-    private fun KtExpression.asShapeModifierCall(): KtCallExpression? = when (this) {
-        is KtCallExpression -> this
-        is KtDotQualifiedExpression -> selectorExpression as? KtCallExpression
-        else -> null
-    }
+    private val KtCallExpression.isZeroElevation: Boolean
+        get() {
+            val elevation = valueArguments.firstOrNull { it.getArgumentName()?.asName?.asString() == "elevation" }
+                ?: valueArguments.firstOrNull()?.takeUnless { it.isNamed() }
+            return elevation?.getArgumentExpression()?.text == "0.dp"
+        }
 
     private val KtValueArgument.isNamedShape: Boolean
         get() = isNamed() && name == "shape"
