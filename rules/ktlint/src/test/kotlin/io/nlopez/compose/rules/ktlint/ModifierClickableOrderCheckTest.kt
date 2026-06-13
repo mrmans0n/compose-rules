@@ -90,6 +90,62 @@ class ModifierClickableOrderCheckTest {
     }
 
     @Test
+    fun `errors when a clickable is before a shadow with shape`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun Something1(modifier: Modifier = Modifier) {
+                    Something2(
+                        modifier = Modifier.clickable { }.shadow(8.dp, RoundedCornerShape(8.dp))
+                    )
+                    Something3(
+                        modifier = modifier.clickable { }.shadow(elevation = 4.dp, shape = CircleShape)
+                    )
+                    Something4(
+                        modifier.clickable { }.then(if (x) shadow(8.dp, MyShape) else Modifier)
+                    )
+                }
+            """.trimIndent()
+        modifierRuleAssertThat(code).hasLintViolationsWithoutAutoCorrect(
+            LintViolation(
+                line = 4,
+                col = 29,
+                detail = ModifierClickableOrder.ModifierChainWithSuspiciousOrder,
+            ),
+            LintViolation(
+                line = 7,
+                col = 29,
+                detail = ModifierClickableOrder.ModifierChainWithSuspiciousOrder,
+            ),
+            LintViolation(
+                line = 10,
+                col = 18,
+                detail = ModifierClickableOrder.ModifierChainWithSuspiciousOrder,
+            ),
+        )
+    }
+
+    @Test
+    fun `passes when shadow comes before clickable or shadow does not clip`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun Something1() {
+                    Something2(
+                        modifier = Modifier.shadow(8.dp, RoundedCornerShape(8.dp)).clickable { }
+                    )
+                    Something3(
+                        modifier = Modifier.clickable { }.shadow(8.dp, MyShape, clip = false)
+                    )
+                }
+            """.trimIndent()
+
+        modifierRuleAssertThat(code).hasNoLintViolations()
+    }
+
+    @Test
     fun `passes with the correct order of modifiers`() {
         @Language("kotlin")
         val code =

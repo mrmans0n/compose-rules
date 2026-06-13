@@ -65,6 +65,56 @@ class ModifierClickableOrderCheckTest {
     }
 
     @Test
+    fun `errors when a clickable is before a shadow with shape`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun Something1(modifier: Modifier = Modifier) {
+                    Something2(
+                        modifier = Modifier.clickable { }.shadow(8.dp, RoundedCornerShape(8.dp))
+                    )
+                    Something3(
+                        modifier = modifier.clickable { }.shadow(elevation = 4.dp, shape = CircleShape)
+                    )
+                    Something4(
+                        modifier.clickable { }.then(if (x) shadow(8.dp, MyShape) else Modifier)
+                    )
+                }
+            """.trimIndent()
+
+        val errors = rule.lint(code)
+        assertThat(errors)
+            .hasStartSourceLocations(
+                SourceLocation(4, 29),
+                SourceLocation(7, 29),
+                SourceLocation(10, 18),
+            )
+
+        assertThat(errors[0]).hasMessage(ModifierClickableOrder.ModifierChainWithSuspiciousOrder)
+    }
+
+    @Test
+    fun `passes when shadow comes before clickable or shadow does not clip`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun Something1() {
+                    Something2(
+                        modifier = Modifier.shadow(8.dp, RoundedCornerShape(8.dp)).clickable { }
+                    )
+                    Something3(
+                        modifier = Modifier.clickable { }.shadow(8.dp, MyShape, clip = false)
+                    )
+                }
+            """.trimIndent()
+
+        val errors = rule.lint(code)
+        assertThat(errors).isEmpty()
+    }
+
+    @Test
     fun `passes with the correct order of modifiers`() {
         @Language("kotlin")
         val code =

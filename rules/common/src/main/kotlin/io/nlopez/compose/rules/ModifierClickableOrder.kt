@@ -62,6 +62,8 @@ class ModifierClickableOrder : ComposeKtVisitor {
 
                     currentSelector.isBackgroundWithShape -> shapeAlteringCandidate = true
 
+                    currentSelector.isShadowWithShape -> shapeAlteringCandidate = true
+
                     currentSelector.isThen -> {
                         val param = currentSelector.valueArguments.firstOrNull()
                         if (param != null) {
@@ -72,7 +74,10 @@ class ModifierClickableOrder : ComposeKtVisitor {
                                 val suspicious = sequenceOf(argumentExpression.then, argumentExpression.`else`)
                                     .filterNotNull()
                                     .filterIsInstance<KtCallExpression>()
-                                    .any { it.isClipWithShape || it.isBackgroundWithShape || it.isBorderWithShape }
+                                    .any {
+                                        it.isClipWithShape || it.isBackgroundWithShape ||
+                                            it.isBorderWithShape || it.isShadowWithShape
+                                    }
 
                                 if (suspicious) {
                                     shapeAlteringCandidate = true
@@ -114,6 +119,15 @@ class ModifierClickableOrder : ComposeKtVisitor {
 
     private val KtCallExpression.isBorderWithShape: Boolean
         get() = calleeExpression?.text == "border" && valueArguments.any { it.isNamedShape || it.referencesShape }
+
+    private val KtCallExpression.isShadowWithShape: Boolean
+        // `shadow` clips its content to the shape, unless clipping is explicitly disabled with `clip = false`.
+        get() = calleeExpression?.text == "shadow" &&
+            valueArguments.any { it.isNamedShape || it.referencesShape } &&
+            !valueArguments.any { it.isClipDisabled }
+
+    private val KtValueArgument.isClipDisabled: Boolean
+        get() = getArgumentName()?.asName?.asString() == "clip" && getArgumentExpression()?.text == "false"
 
     private val KtValueArgument.isNamedShape: Boolean
         get() = isNamed() && name == "shape"
