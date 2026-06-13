@@ -111,6 +111,9 @@ class ModifierClickableOrderCheckTest {
                     Something6(
                         modifier.clickable { }.then(if (x) Modifier.shadow(8.dp, MyShape).padding(4.dp) else Modifier)
                     )
+                    Something7(
+                        modifier = modifier.clickable { }.shadow(8.dp, shape)
+                    )
                 }
             """.trimIndent()
         modifierRuleAssertThat(code).hasLintViolationsWithoutAutoCorrect(
@@ -137,6 +140,11 @@ class ModifierClickableOrderCheckTest {
             LintViolation(
                 line = 16,
                 col = 18,
+                detail = ModifierClickableOrder.ModifierChainWithSuspiciousOrder,
+            ),
+            LintViolation(
+                line = 19,
+                col = 29,
                 detail = ModifierClickableOrder.ModifierChainWithSuspiciousOrder,
             ),
         )

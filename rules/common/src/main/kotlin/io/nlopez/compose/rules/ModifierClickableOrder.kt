@@ -126,8 +126,14 @@ class ModifierClickableOrder : ComposeKtVisitor {
     private val KtCallExpression.isShadowWithShape: Boolean
         // `shadow` clips its content to the shape, unless clipping is explicitly disabled via `clip = false`.
         get() = calleeExpression?.text == "shadow" &&
-            valueArguments.any { it.isNamedShape || it.referencesShape } &&
+            hasShadowShape &&
             !isShadowClipDisabled
+
+    private val KtCallExpression.hasShadowShape: Boolean
+        // In `shadow(elevation, shape, ...)` the shape can be named, a recognizable `*Shape` reference, or
+        // simply the second positional argument (e.g. a lower-case `shape` parameter passed through).
+        get() = valueArguments.any { it.isNamedShape || it.referencesShape } ||
+            valueArguments.getOrNull(1)?.isNamed() == false
 
     private val KtCallExpression.isShadowClipDisabled: Boolean
         get() {
