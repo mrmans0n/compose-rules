@@ -80,6 +80,9 @@ class ModifierClickableOrderCheckTest {
                     Something4(
                         modifier.clickable { }.then(if (x) shadow(8.dp, MyShape) else Modifier)
                     )
+                    Something5(
+                        modifier.clickable { }.then(if (x) Modifier.shadow(8.dp, MyShape) else Modifier)
+                    )
                 }
             """.trimIndent()
 
@@ -89,6 +92,7 @@ class ModifierClickableOrderCheckTest {
                 SourceLocation(4, 29),
                 SourceLocation(7, 29),
                 SourceLocation(10, 18),
+                SourceLocation(13, 18),
             )
 
         assertThat(errors[0]).hasMessage(ModifierClickableOrder.ModifierChainWithSuspiciousOrder)
@@ -106,6 +110,9 @@ class ModifierClickableOrderCheckTest {
                     )
                     Something3(
                         modifier = Modifier.clickable { }.shadow(8.dp, MyShape, clip = false)
+                    )
+                    Something4(
+                        modifier = Modifier.clickable { }.shadow(8.dp, MyShape, false)
                     )
                 }
             """.trimIndent()

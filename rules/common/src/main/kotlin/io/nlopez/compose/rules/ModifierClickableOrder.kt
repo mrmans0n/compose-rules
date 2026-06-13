@@ -73,7 +73,9 @@ class ModifierClickableOrder : ComposeKtVisitor {
                                 // we flag them as well.
                                 val suspicious = sequenceOf(argumentExpression.then, argumentExpression.`else`)
                                     .filterNotNull()
-                                    .filterIsInstance<KtCallExpression>()
+                                    // Branches can be a bare call (`clip(X)`) or a qualified call
+                                    // (`Modifier.clip(X)`), the latter being the more common form.
+                                    .mapNotNull { it.asShapeModifierCall() }
                                     .any {
                                         it.isClipWithShape || it.isBackgroundWithShape ||
                                             it.isBorderWithShape || it.isShadowWithShape
@@ -121,13 +123,26 @@ class ModifierClickableOrder : ComposeKtVisitor {
         get() = calleeExpression?.text == "border" && valueArguments.any { it.isNamedShape || it.referencesShape }
 
     private val KtCallExpression.isShadowWithShape: Boolean
-        // `shadow` clips its content to the shape, unless clipping is explicitly disabled with `clip = false`.
+        // `shadow` clips its content to the shape, unless clipping is explicitly disabled via `clip = false`.
         get() = calleeExpression?.text == "shadow" &&
             valueArguments.any { it.isNamedShape || it.referencesShape } &&
-            !valueArguments.any { it.isClipDisabled }
+            !isShadowClipDisabled
 
-    private val KtValueArgument.isClipDisabled: Boolean
-        get() = getArgumentName()?.asName?.asString() == "clip" && getArgumentExpression()?.text == "false"
+    private val KtCallExpression.isShadowClipDisabled: Boolean
+        get() {
+            // `clip` can be passed by name (`shadow(..., clip = false)`) or positionally as the
+            // third argument (`shadow(elevation, shape, false)`).
+            val namedClip = valueArguments.firstOrNull { it.getArgumentName()?.asName?.asString() == "clip" }
+            if (namedClip != null) return namedClip.getArgumentExpression()?.text == "false"
+            val positionalClip = valueArguments.getOrNull(2)?.takeUnless { it.isNamed() }
+            return positionalClip?.getArgumentExpression()?.text == "false"
+        }
+
+    private fun KtExpression.asShapeModifierCall(): KtCallExpression? = when (this) {
+        is KtCallExpression -> this
+        is KtDotQualifiedExpression -> selectorExpression as? KtCallExpression
+        else -> null
+    }
 
     private val KtValueArgument.isNamedShape: Boolean
         get() = isNamed() && name == "shape"
