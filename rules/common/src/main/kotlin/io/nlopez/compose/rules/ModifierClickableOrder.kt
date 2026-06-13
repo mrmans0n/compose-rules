@@ -75,8 +75,8 @@ class ModifierClickableOrder : ComposeKtVisitor {
                                     .filterNotNull()
                                     // A branch can be a bare call (`clip(X)`), a qualified call
                                     // (`Modifier.clip(X)`), or a chain (`Modifier.clip(X).padding(Y)`),
-                                    // so we scan every call expression it contains.
-                                    .flatMap { it.findAllChildrenByClass<KtCallExpression>() }
+                                    // so we walk the modifier chain it returns.
+                                    .flatMap { it.modifierChainCalls() }
                                     .any {
                                         it.isClipWithShape || it.isBackgroundWithShape ||
                                             it.isBorderWithShape || it.isShadowWithShape
@@ -148,6 +148,19 @@ class ModifierClickableOrder : ComposeKtVisitor {
                 ?: valueArguments.firstOrNull()?.takeUnless { it.isNamed() }
             return elevation?.getArgumentExpression()?.text == "0.dp"
         }
+
+    // Collects the call expressions that make up a modifier chain (e.g. `Modifier.clip(X).padding(Y)`),
+    // without descending into their arguments or nested blocks, so shape calls that aren't part of the
+    // returned modifier (e.g. inside a `run { ... }`) are ignored.
+    private fun KtExpression.modifierChainCalls(): Sequence<KtCallExpression> = when (this) {
+        is KtCallExpression -> sequenceOf(this)
+
+        is KtDotQualifiedExpression ->
+            receiverExpression.modifierChainCalls() +
+                ((selectorExpression as? KtCallExpression)?.let { sequenceOf(it) } ?: emptySequence())
+
+        else -> emptySequence()
+    }
 
     private val KtValueArgument.isNamedShape: Boolean
         get() = isNamed() && name == "shape"

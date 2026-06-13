@@ -124,6 +124,10 @@ class ModifierClickableOrderCheckTest {
                     Something6(
                         modifier = Modifier.clickable { }.shadow(elevation = 0.dp, shape = MyShape)
                     )
+                    Something7(
+                        modifier = Modifier.clickable { }
+                            .then(if (x) run { something(Modifier.clip(CircleShape)); Modifier } else Modifier)
+                    )
                 }
             """.trimIndent()
 
