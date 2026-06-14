@@ -1,6 +1,7 @@
 // Copyright 2024 Nacho Lopez
 // SPDX-License-Identifier: Apache-2.0
 import com.diffplug.gradle.spotless.SpotlessExtension
+import org.jetbrains.kotlin.gradle.dsl.JvmDefaultMode
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -49,10 +50,8 @@ allprojects {
             // Treat all Kotlin warnings as errors
             allWarningsAsErrors = true
             jvmTarget.set(JvmTarget.JVM_11)
-            freeCompilerArgs.addAll(
-                // Enable default methods in interfaces
-                "-Xjvm-default=all",
-            )
+            // Enable default methods in interfaces
+            jvmDefault.set(JvmDefaultMode.NO_COMPATIBILITY)
         }
     }
 
