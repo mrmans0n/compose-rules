@@ -8,7 +8,6 @@ import org.jetbrains.kotlin.analysis.api.KaExperimentalApi
 import org.jetbrains.kotlin.analysis.api.analyze
 import org.jetbrains.kotlin.analysis.api.components.expressionType
 import org.jetbrains.kotlin.analysis.api.components.resolveCall
-import org.jetbrains.kotlin.analysis.api.resolution.KaFunctionCall
 import org.jetbrains.kotlin.analysis.api.symbols.KaNamedFunctionSymbol
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtAnnotatedExpression
@@ -19,14 +18,14 @@ import org.jetbrains.kotlin.psi.KtParenthesizedExpression
 
 internal fun KtCallExpression.isResolvedCallToAnyOf(fqNames: Set<FqName>): Boolean = runCatching {
     analyze(this) {
-        val call = this@isResolvedCallToAnyOf.resolveCall() as? KaFunctionCall<*> ?: return@analyze false
+        val call = this@isResolvedCallToAnyOf.resolveCall() ?: return@analyze false
         call.signature.symbol.callableId?.asSingleFqName() in fqNames
     }
 }.getOrDefault(false)
 
 internal fun KtCallExpression.isComposableCall(): Boolean = runCatching {
     analyze(this) {
-        val call = this@isComposableCall.resolveCall() as? KaFunctionCall<*> ?: return@analyze false
+        val call = this@isComposableCall.resolveCall() ?: return@analyze false
         call.signature.symbol.hasComposableAnnotation() ||
             calleeExpression?.expressionType?.hasComposableAnnotation() == true
     }
@@ -34,7 +33,7 @@ internal fun KtCallExpression.isComposableCall(): Boolean = runCatching {
 
 internal fun KtCallExpression.isReadOnlyComposableCall(): Boolean = runCatching {
     analyze(this) {
-        val call = this@isReadOnlyComposableCall.resolveCall() as? KaFunctionCall<*> ?: return@analyze false
+        val call = this@isReadOnlyComposableCall.resolveCall() ?: return@analyze false
         call.signature.symbol.hasReadOnlyComposableAnnotation()
     }
 }.getOrDefault(false)
@@ -52,18 +51,18 @@ internal fun KtCallExpression.isMemoizingComposableCall(): Boolean = isResolvedC
 
 internal fun KtCallExpression.isResolvedCallToAnyNamed(fqNames: Set<String>): Boolean = runCatching {
     analyze(this) {
-        val call = this@isResolvedCallToAnyNamed.resolveCall() as? KaFunctionCall<*> ?: return@analyze false
+        val call = this@isResolvedCallToAnyNamed.resolveCall() ?: return@analyze false
         call.signature.symbol.callableId?.asSingleFqName()?.asString() in fqNames
     }
 }.getOrDefault(false)
 
 internal fun KtCallExpression.isResolvedInlineArgument(argumentExpression: KtExpression): Boolean = runCatching {
     analyze(this) {
-        val call = this@isResolvedInlineArgument.resolveCall() as? KaFunctionCall<*> ?: return@analyze false
-        val function = call.signature.symbol as? KaNamedFunctionSymbol ?: return@analyze false
-        if (!function.isInline) return@analyze false
+        val call = this@isResolvedInlineArgument.resolveCall() ?: return@analyze false
+        val function = call.signature.symbol
+        if (function !is KaNamedFunctionSymbol || !function.isInline) return@analyze false
 
-        val parameter = call.argumentMapping.entries
+        val parameter = call.valueArgumentMapping.entries
             .firstOrNull { (argument, _) -> argument.unwrapArgumentExpression() == argumentExpression }
             ?.value
             ?.symbol
@@ -75,8 +74,8 @@ internal fun KtCallExpression.isResolvedInlineArgument(argumentExpression: KtExp
 
 internal fun KtCallExpression.hasExplicitArgumentMappedToAny(parameterNames: Set<String>): Boolean = runCatching {
     analyze(this) {
-        val call = this@hasExplicitArgumentMappedToAny.resolveCall() as? KaFunctionCall<*> ?: return@analyze false
-        call.argumentMapping.values.any { parameter ->
+        val call = this@hasExplicitArgumentMappedToAny.resolveCall() ?: return@analyze false
+        call.valueArgumentMapping.values.any { parameter ->
             parameter.symbol.name.asString() in parameterNames
         }
     }

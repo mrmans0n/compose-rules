@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package io.nlopez.compose.rules
 
+import com.intellij.psi.PsiElement
 import dev.detekt.api.Config
 import dev.detekt.api.Entity
 import dev.detekt.api.Finding
@@ -28,14 +29,10 @@ abstract class DetektRule(
     private val composeConfig: DetektComposeKtConfig by lazy { DetektComposeKtConfig(config) }
 
     private val emitter: Emitter = Emitter { element, message, canBeAutoCorrected ->
-        // Create entity and finding using the detekt 2.0 API
-        @Suppress("UNCHECKED_CAST")
-        val psiElement = element as com.intellij.psi.PsiElement
-
         // Use Entity.atName() for named declarations to report at the name identifier location
-        val entity = when (psiElement) {
-            is KtNamedDeclaration -> Entity.atName(psiElement)
-            else -> Entity.from(psiElement)
+        val entity = when (element) {
+            is KtNamedDeclaration -> Entity.atName(element)
+            is PsiElement -> Entity.from(element)
         }
 
         val finding = Finding(
