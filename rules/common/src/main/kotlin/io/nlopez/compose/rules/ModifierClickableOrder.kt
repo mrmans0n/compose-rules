@@ -62,6 +62,8 @@ class ModifierClickableOrder : ComposeKtVisitor {
 
                     currentSelector.isBackgroundWithShape -> shapeAlteringCandidate = true
 
+                    currentSelector.isShadowWithShape -> shapeAlteringCandidate = true
+
                     currentSelector.isThen -> {
                         val param = currentSelector.valueArguments.firstOrNull()
                         if (param != null) {
@@ -71,8 +73,14 @@ class ModifierClickableOrder : ComposeKtVisitor {
                                 // we flag them as well.
                                 val suspicious = sequenceOf(argumentExpression.then, argumentExpression.`else`)
                                     .filterNotNull()
-                                    .filterIsInstance<KtCallExpression>()
-                                    .any { it.isClipWithShape || it.isBackgroundWithShape || it.isBorderWithShape }
+                                    // A branch can be a bare call (`clip(X)`), a qualified call
+                                    // (`Modifier.clip(X)`), or a chain (`Modifier.clip(X).padding(Y)`),
+                                    // so we walk the modifier chain it returns.
+                                    .flatMap { it.modifierChainCalls() }
+                                    .any {
+                                        it.isClipWithShape || it.isBackgroundWithShape ||
+                                            it.isBorderWithShape || it.isShadowWithShape
+                                    }
 
                                 if (suspicious) {
                                     shapeAlteringCandidate = true
@@ -114,6 +122,51 @@ class ModifierClickableOrder : ComposeKtVisitor {
 
     private val KtCallExpression.isBorderWithShape: Boolean
         get() = calleeExpression?.text == "border" && valueArguments.any { it.isNamedShape || it.referencesShape }
+
+    private val KtCallExpression.isShadowWithShape: Boolean
+        // `shadow` clips its content to the shape, unless clipping is explicitly disabled via `clip = false`.
+        get() = calleeExpression?.text == "shadow" &&
+            hasShadowShape &&
+            !isShadowClipDisabled
+
+    private val KtCallExpression.hasShadowShape: Boolean
+        // In `shadow(elevation, shape, ...)` the shape can be named, a recognizable `*Shape` reference, or
+        // simply the second positional argument (e.g. a lower-case `shape` parameter passed through).
+        get() = valueArguments.any { it.isNamedShape || it.referencesShape } ||
+            valueArguments.getOrNull(1)?.isNamed() == false
+
+    private val KtCallExpression.isShadowClipDisabled: Boolean
+        get() {
+            // `clip` can be passed by name (`shadow(..., clip = false)`) or positionally as the
+            // third argument (`shadow(elevation, shape, false)`).
+            val namedClip = valueArguments.firstOrNull { it.getArgumentName()?.asName?.asString() == "clip" }
+            if (namedClip != null) return namedClip.getArgumentExpression()?.text == "false"
+            val positionalClip = valueArguments.getOrNull(2)?.takeUnless { it.isNamed() }
+            if (positionalClip != null) return positionalClip.getArgumentExpression()?.text == "false"
+            // When `clip` is omitted it defaults to `elevation > 0.dp`, so a literal zero elevation
+            // is a no-op shadow that never clips and shouldn't be flagged.
+            return isZeroElevation
+        }
+
+    private val KtCallExpression.isZeroElevation: Boolean
+        get() {
+            val elevation = valueArguments.firstOrNull { it.getArgumentName()?.asName?.asString() == "elevation" }
+                ?: valueArguments.firstOrNull()?.takeUnless { it.isNamed() }
+            return elevation?.getArgumentExpression()?.text == "0.dp"
+        }
+
+    // Collects the call expressions that make up a modifier chain (e.g. `Modifier.clip(X).padding(Y)`),
+    // without descending into their arguments or nested blocks, so shape calls that aren't part of the
+    // returned modifier (e.g. inside a `run { ... }`) are ignored.
+    private fun KtExpression.modifierChainCalls(): Sequence<KtCallExpression> = when (this) {
+        is KtCallExpression -> sequenceOf(this)
+
+        is KtDotQualifiedExpression ->
+            receiverExpression.modifierChainCalls() +
+                ((selectorExpression as? KtCallExpression)?.let { sequenceOf(it) } ?: emptySequence())
+
+        else -> emptySequence()
+    }
 
     private val KtValueArgument.isNamedShape: Boolean
         get() = isNamed() && name == "shape"
