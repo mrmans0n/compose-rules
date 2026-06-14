@@ -34,17 +34,16 @@ jobs:
           RELEASE_ID="${{ steps.release_drafter.outputs.id }}"
           CURRENT_BODY=$(gh api repos/${{ github.repository }}/releases/$RELEASE_ID --jq '.body')
 
-          # Check if dependency matrix already exists
-          if echo "$CURRENT_BODY" | grep -q "## Dependency Matrix"; then
-            echo "Dependency matrix already exists, skipping update"
-            exit 0
-          fi
-
           # Create the dependency matrix table
           DEPENDENCY_TABLE=$(printf "## Dependency Matrix\n\n| linter | version | kotlin version |\n| ------ | ------- | -------------- |\n| detekt | %s | %s |\n| ktlint | %s | %s |" "$DETEKT_VERSION" "$KOTLIN_DETEKT_VERSION" "$KTLINT_VERSION" "$KOTLIN_KTLINT_VERSION")
 
-          # Append to the release body
-          NEW_BODY=$(printf "%s\n\n%s" "$CURRENT_BODY" "$DEPENDENCY_TABLE")
+          # Replace any existing dependency matrix, otherwise append it.
+          if echo "$CURRENT_BODY" | grep -q "^## Dependency Matrix"; then
+            BODY_WITHOUT_MATRIX=$(printf "%s\n" "$CURRENT_BODY" | sed '/^## Dependency Matrix$/,$d')
+            NEW_BODY=$(printf "%s\n\n%s" "$BODY_WITHOUT_MATRIX" "$DEPENDENCY_TABLE")
+          else
+            NEW_BODY=$(printf "%s\n\n%s" "$CURRENT_BODY" "$DEPENDENCY_TABLE")
+          fi
 
           # Update the draft release
           gh api repos/${{ github.repository }}/releases/$RELEASE_ID \
