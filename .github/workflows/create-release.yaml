@@ -34,16 +34,35 @@ jobs:
           RELEASE_ID="${{ steps.release_drafter.outputs.id }}"
           CURRENT_BODY=$(gh api repos/${{ github.repository }}/releases/$RELEASE_ID --jq '.body')
 
-          # Create the dependency matrix table
-          DEPENDENCY_TABLE=$(printf "## Dependency Matrix\n\n| linter | version | kotlin version |\n| ------ | ------- | -------------- |\n| detekt | %s | %s |\n| ktlint | %s | %s |" "$DETEKT_VERSION" "$KOTLIN_DETEKT_VERSION" "$KTLINT_VERSION" "$KOTLIN_KTLINT_VERSION")
+          MATRIX_START="<!-- compose-rules-dependency-matrix:start -->"
+          MATRIX_END="<!-- compose-rules-dependency-matrix:end -->"
 
-          # Replace any existing dependency matrix, otherwise append it.
-          if echo "$CURRENT_BODY" | grep -q "^## Dependency Matrix"; then
-            BODY_WITHOUT_MATRIX=$(printf "%s\n" "$CURRENT_BODY" | sed '/^## Dependency Matrix$/,$d')
-            NEW_BODY=$(printf "%s\n\n%s" "$BODY_WITHOUT_MATRIX" "$DEPENDENCY_TABLE")
-          else
-            NEW_BODY=$(printf "%s\n\n%s" "$CURRENT_BODY" "$DEPENDENCY_TABLE")
-          fi
+          # Create the dependency matrix table
+          DEPENDENCY_TABLE=$(printf "%s\n## Dependency Matrix\n\n| linter | version | kotlin version |\n| ------ | ------- | -------------- |\n| detekt | %s | %s |\n| ktlint | %s | %s |\n%s" "$MATRIX_START" "$DETEKT_VERSION" "$KOTLIN_DETEKT_VERSION" "$KTLINT_VERSION" "$KOTLIN_KTLINT_VERSION" "$MATRIX_END")
+
+          # Replace the generated matrix without dropping any manual release notes after it.
+          NEW_BODY=$(CURRENT_BODY="$CURRENT_BODY" DEPENDENCY_TABLE="$DEPENDENCY_TABLE" python3 - <<'PY'
+          import os
+          import re
+
+          body = os.environ["CURRENT_BODY"]
+          table = os.environ["DEPENDENCY_TABLE"]
+          start = "<!-- compose-rules-dependency-matrix:start -->"
+          end = "<!-- compose-rules-dependency-matrix:end -->"
+
+          marked_matrix = re.compile(f"{re.escape(start)}.*?{re.escape(end)}", re.DOTALL)
+          legacy_matrix = re.compile(r"\n*## Dependency Matrix\n\n(?:\|[^\n]*\|\n?)+")
+
+          if marked_matrix.search(body):
+              new_body = marked_matrix.sub(table, body, count=1)
+          elif legacy_matrix.search(body):
+              new_body = legacy_matrix.sub(f"\n\n{table}", body, count=1)
+          else:
+              new_body = f"{body.rstrip()}\n\n{table}"
+
+          print(new_body.strip())
+          PY
+          )
 
           # Update the draft release
           gh api repos/${{ github.repository }}/releases/$RELEASE_ID \
