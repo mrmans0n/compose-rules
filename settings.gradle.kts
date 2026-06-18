@@ -6,20 +6,6 @@ plugins {
 
 dependencyResolutionManagement {
     repositories {
-        exclusiveContent {
-            forRepository {
-                mavenCentral {
-                    metadataSources {
-                        mavenPom()
-                        artifact()
-                        ignoreGradleMetadataRedirection()
-                    }
-                }
-            }
-            filter {
-                includeGroup("dev.detekt")
-            }
-        }
         mavenCentral()
     }
 }
