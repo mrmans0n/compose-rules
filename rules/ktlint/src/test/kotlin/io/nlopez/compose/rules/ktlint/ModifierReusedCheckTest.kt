@@ -337,6 +337,29 @@ class ModifierReusedCheckTest {
     }
 
     @Test
+    fun `errors when outer modifier alias derived inside a shadow lambda is also reused`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun Something(modifier: Modifier) {
+                    val rootModifier = modifier
+                    Column(modifier = rootModifier) {
+                        Slot { modifier: Modifier ->
+                            val childModifier = rootModifier.padding(8.dp)
+                            Row(modifier = childModifier) {}
+                        }
+                    }
+                }
+            """.trimIndent()
+
+        modifierRuleAssertThat(code).hasLintViolationsWithoutAutoCorrect(
+            LintViolation(4, 5, ModifierReused.ModifierShouldBeUsedOnceOnly),
+            LintViolation(7, 13, ModifierReused.ModifierShouldBeUsedOnceOnly),
+        )
+    }
+
+    @Test
     fun `errors when modifier alias is reused even when combined with a shadowed modifier in then`() {
         @Language("kotlin")
         val code =

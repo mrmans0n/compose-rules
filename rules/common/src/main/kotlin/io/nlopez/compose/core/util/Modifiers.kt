@@ -26,19 +26,28 @@ fun KtBlockExpression.obtainAllModifierNames(initialName: String): List<String> 
         lastSize = tempModifierNames.size
         // Find usages in the current block (the original composable)
         tempModifierNames += findModifierManipulations { tempModifierNames.contains(it) }
-        // Find usages in child blocks, but skip any block inside a lambda that shadows a
-        // modifier name — aliases created there belong to the lambda's local modifier, not the
-        // outer composable's, so including them would cause false positives.
+        // Find usages in child blocks. For each child block, only search for aliases derived
+        // from outer modifier names that are not shadowed at that scope — shadowed names belong
+        // to the lambda's local modifier so aliases from them would cause false positives.
         tempModifierNames += findAllChildrenByClass<KtBlockExpression>()
-            .filter { block -> !block.isInsideShadowingLambda(tempModifierNames) }
-            .flatMap { block -> block.findModifierManipulations { tempModifierNames.contains(it) } }
+            .flatMap { block ->
+                val accessible = tempModifierNames - block.shadowedModifierNames(tempModifierNames)
+                if (accessible.isEmpty()) {
+                    emptyList()
+                } else {
+                    block.findModifierManipulations { it in accessible }
+                }
+            }
     }
     return tempModifierNames.toList()
 }
 
-private fun KtBlockExpression.isInsideShadowingLambda(modifierNames: Set<String>): Boolean =
+private fun KtBlockExpression.shadowedModifierNames(modifierNames: Set<String>): Set<String> =
     parents.filterIsInstance<KtFunctionLiteral>()
-        .any { literal -> literal.valueParameters.any { param -> param.name in modifierNames } }
+        .flatMap { literal ->
+            literal.valueParameters.mapNotNull { param -> param.name?.takeIf { it in modifierNames } }
+        }
+        .toSet()
 
 /**
  * Find references to modifier as a property in case they try to modify or reuse the modifier that way
