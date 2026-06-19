@@ -65,8 +65,11 @@ fun KtCallExpression.argumentsUsingModifiers(modifierNames: Set<String>): List<K
             is KtDotQualifiedExpression -> {
                 // On cases of multiple nested KtDotQualifiedExpressions (e.g. multiple chained methods)
                 // we need to iterate until we find the start of the chain
-                expression.rootExpression.text in modifierNames ||
-                    expression.hasModifierAsChainArgument(modifierNames)
+                val rootText = expression.rootExpression.text
+                rootText in modifierNames ||
+                    // Only scan chain arguments when the root is a known modifier type, to avoid
+                    // false positives from unrelated dot chains like PainterFactory.create(modifier)
+                    (rootText in ModifierNames && expression.hasModifierAsChainArgument(modifierNames))
             }
 
             else -> false

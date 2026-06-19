@@ -337,6 +337,21 @@ class ModifierReusedCheckTest {
     }
 
     @Test
+    fun `passes when modifier is used as an argument to a non-modifier factory function`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun Something(modifier: Modifier) {
+                    Column(modifier = modifier) {
+                        Icon(painter = PainterFactory.create(modifier))
+                    }
+                }
+            """.trimIndent()
+        modifierRuleAssertThat(code).hasNoLintViolations()
+    }
+
+    @Test
     fun `passes when modifiers are reused for mutually exclusive branches`() {
         @Language("kotlin")
         val code =
