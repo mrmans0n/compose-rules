@@ -582,6 +582,26 @@ class ModifierReusedCheckTest {
     }
 
     @Test
+    fun `passes when a shadowed then-chain in the same lambda block does not inflate the reuse count`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun Something(modifier: Modifier = Modifier) {
+                    val rootModifier = modifier
+                    Column {
+                        Slot { modifier: Modifier ->
+                            Row(modifier = Modifier.then(modifier)) {}
+                            Box(modifier = rootModifier) {}
+                        }
+                    }
+                }
+            """.trimIndent()
+        val errors = rule.lint(code)
+        assertThat(errors).isEmpty()
+    }
+
+    @Test
     fun `passes when the modifier is followed by an early return`() {
         @Language("kotlin")
         val code =

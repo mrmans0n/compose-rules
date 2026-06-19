@@ -46,6 +46,7 @@ class ModifierReused : ComposeKtVisitor {
                         fun Sequence<PsiElement>.modifierUsagesSet(): Set<KtCallExpression> =
                             filterIsInstance<KtCallExpression>()
                                 .filter { it.isUsingModifiers(modifierNames, typeNames) }
+                                .filterNot { it.isFullyShadowed(modifierNames, function, typeNames) }
                                 .toSet()
 
                         // To get an accurate count (and respecting if/when/whatever different branches)
