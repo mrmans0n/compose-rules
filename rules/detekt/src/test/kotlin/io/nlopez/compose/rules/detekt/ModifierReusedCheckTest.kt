@@ -376,29 +376,6 @@ class ModifierReusedCheckTest {
     }
 
     @Test
-    fun `errors when modifier is passed as an argument to a local-var-rooted then chain`() {
-        @Language("kotlin")
-        val code =
-            """
-                @Composable
-                fun Something(modifier: Modifier) {
-                    val base = Modifier.padding(8.dp)
-                    Row(modifier = base.then(modifier)) {}
-                    Column(modifier = modifier) {}
-                }
-            """.trimIndent()
-        val errors = rule.lint(code)
-        assertThat(errors)
-            .hasStartSourceLocations(
-                SourceLocation(4, 5),
-                SourceLocation(5, 5),
-            )
-        for (error in errors) {
-            assertThat(error).hasMessage(ModifierReused.ModifierShouldBeUsedOnceOnly)
-        }
-    }
-
-    @Test
     fun `passes when modifiers are reused for mutually exclusive branches`() {
         @Language("kotlin")
         val code =
@@ -540,25 +517,6 @@ class ModifierReusedCheckTest {
                 }
             """.trimIndent()
 
-        val errors = rule.lint(code)
-        assertThat(errors).isEmpty()
-    }
-
-    @Test
-    fun `passes when modifier appears in a local-var-rooted then chain inside a shadowing lambda`() {
-        @Language("kotlin")
-        val code =
-            """
-                @Composable
-                fun Something(modifier: Modifier) {
-                    Column(modifier = modifier) {
-                        Slot { modifier: Modifier ->
-                            val base = Modifier
-                            Row(modifier = base.then(modifier)) {}
-                        }
-                    }
-                }
-            """.trimIndent()
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }

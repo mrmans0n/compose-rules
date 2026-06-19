@@ -35,12 +35,12 @@ private fun KtDotQualifiedExpression.parameterNamesUsedIn(
 ): Set<String> = buildSet {
     val rootText = rootExpression.text
     if (rootText in parameterNames) add(rootText)
-    // Scan .then() arguments when the chain root is a modifier parameter/alias, a known
-    // Modifier type literal (including custom types), or a lowercase local variable (which may
-    // itself be a Modifier value). This mirrors the expanded check in argumentsUsingModifiers.
+    // Scan .then() arguments when the chain root is a modifier parameter/alias or a known
+    // Modifier type literal (including custom types). Arbitrary lowercase roots are excluded:
+    // without type resolution we cannot tell a local Modifier variable from any other local,
+    // and the heuristic produces false positives for non-Modifier chains like pipeline.then(modifier).
     val shouldScanThenArgs = rootText in parameterNames ||
-        rootText in modifierTypeNames ||
-        rootText.first().isLowerCase()
+        rootText in modifierTypeNames
     if (shouldScanThenArgs) {
         var current: KtDotQualifiedExpression? = this@parameterNamesUsedIn
         while (current != null) {
