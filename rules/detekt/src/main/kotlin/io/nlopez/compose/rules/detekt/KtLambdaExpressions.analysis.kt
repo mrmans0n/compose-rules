@@ -43,10 +43,6 @@ private val EagerStdlibScopeFunctions = setOf(
     "kotlin.takeIf",
     "kotlin.takeUnless",
     "kotlin.repeat",
-    "kotlin.text.buildString",
-    "kotlin.collections.buildList",
-    "kotlin.collections.buildSet",
-    "kotlin.collections.buildMap",
     "kotlin.collections.forEach",
     "kotlin.collections.forEachIndexed",
     "kotlin.collections.map",
@@ -106,4 +102,11 @@ private val EagerComposeScopeFunctions = setOf(
     "androidx.compose.ui.text.withStyle",
 )
 
-private val EagerScopeFunctions = EagerStdlibScopeFunctions + EagerComposeScopeFunctions
+private val EagerBuilderScopeFunctions = setOf(
+    "kotlin.text.buildString",
+    "kotlin.collections.buildList",
+    "kotlin.collections.buildSet",
+    "kotlin.collections.buildMap",
+)
+
+private val EagerScopeFunctions = EagerStdlibScopeFunctions + EagerBuilderScopeFunctions + EagerComposeScopeFunctions

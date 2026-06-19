@@ -198,6 +198,42 @@ class VarsWithoutStateBackingCheckTest {
     }
 
     @Test
+    fun `does not report local vars in stdlib builder lambdas`() {
+        @Language("kotlin")
+        val code = codeWithFakeCompose(
+            """
+            @Composable
+            fun BuildStringExample(): String = buildString {
+                var first = true
+                append(first)
+            }
+
+            @Composable
+            fun BuildListExample(): List<String> = buildList {
+                var item = "value"
+                add(item)
+            }
+
+            @Composable
+            fun BuildSetExample(): Set<String> = buildSet {
+                var item = "value"
+                add(item)
+            }
+
+            @Composable
+            fun BuildMapExample(): Map<String, String> = buildMap {
+                var key = "key"
+                put(key, "value")
+            }
+            """,
+        )
+
+        val findings = rule.lintWithAnalysisApi(code)
+
+        assertThat(findings).isEmpty()
+    }
+
+    @Test
     fun `does not report local vars in non-composable getters`() {
         @Language("kotlin")
         val code = codeWithFakeCompose(
