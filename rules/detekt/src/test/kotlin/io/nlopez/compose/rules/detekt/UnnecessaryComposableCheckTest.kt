@@ -458,6 +458,326 @@ class UnnecessaryComposableCheckTest {
     }
 
     @Test
+    fun `does not report composition use inside eager collection association`() {
+        @Language("kotlin")
+        val code = codeWithFakeCompose(
+            """
+            enum class Month {
+                January,
+            }
+
+            @Composable
+            fun Month.shortName(): String = LocalMonthName.current
+
+            val LocalMonthName = compositionLocalOf { "Jan" }
+
+            @Composable
+            fun Example(): Map<Month, String> = Month.entries.associateWith { month ->
+                month.shortName()
+            }
+            """,
+        )
+
+        val findings = rule.lintWithAnalysisApi(code)
+
+        assertThat(findings).isEmpty()
+    }
+
+    @Test
+    fun `does not report composition use inside eager sequence association`() {
+        @Language("kotlin")
+        val code = codeWithFakeCompose(
+            """
+            val LocalCount = compositionLocalOf { 0 }
+
+            @Composable
+            fun Example(items: Sequence<Int>): Map<Int, Int> = items.associateWith { item ->
+                item + LocalCount.current
+            }
+            """,
+        )
+
+        val findings = rule.lintWithAnalysisApi(code)
+
+        assertThat(findings).isEmpty()
+    }
+
+    @Test
+    fun `does not report composition use inside eager collection association variants`() {
+        @Language("kotlin")
+        val code = codeWithFakeCompose(
+            """
+            val LocalCount = compositionLocalOf { 0 }
+
+            @Composable
+            fun AssociateExample(items: List<Int>): Map<Int, Int> = items.associate { item ->
+                item to LocalCount.current
+            }
+
+            @Composable
+            fun AssociateByExample(items: List<Int>): Map<Int, Int> = items.associateBy { item ->
+                item + LocalCount.current
+            }
+
+            @Composable
+            fun GroupByExample(items: List<Int>): Map<Int, List<Int>> = items.groupBy { item ->
+                item + LocalCount.current
+            }
+            """,
+        )
+
+        val findings = rule.lintWithAnalysisApi(code)
+
+        assertThat(findings).isEmpty()
+    }
+
+    @Test
+    fun `does not report composition use inside eager collection transform variants`() {
+        @Language("kotlin")
+        val code = codeWithFakeCompose(
+            """
+            val LocalCount = compositionLocalOf { 0 }
+
+            @Composable
+            fun PartitionExample(items: List<Int>): Pair<List<Int>, List<Int>> = items.partition { item ->
+                item > LocalCount.current
+            }
+
+            @Composable
+            fun MapIndexedNotNullExample(items: List<Int>): List<Int> = items.mapIndexedNotNull { index, item ->
+                index + item + LocalCount.current
+            }
+
+            @Composable
+            fun ZipExample(items: List<Int>, other: List<Int>): List<Int> = items.zip(other) { left, right ->
+                left + right + LocalCount.current
+            }
+
+            @Composable
+            fun ChunkedExample(items: List<Int>): List<Int> = items.chunked(2) { chunk ->
+                chunk.sum() + LocalCount.current
+            }
+
+            @Composable
+            fun WindowedExample(items: List<Int>): List<Int> = items.windowed(2) { window ->
+                window.sum() + LocalCount.current
+            }
+            """,
+        )
+
+        val findings = rule.lintWithAnalysisApi(code)
+
+        assertThat(findings).isEmpty()
+    }
+
+    @Test
+    fun `does not report composition use inside eager sequence terminal operations`() {
+        @Language("kotlin")
+        val code = codeWithFakeCompose(
+            """
+            val LocalCount = compositionLocalOf { 0 }
+
+            @Composable
+            fun AssociateExample(items: Sequence<Int>): Map<Int, Int> = items.associate { item ->
+                item to LocalCount.current
+            }
+
+            @Composable
+            fun AssociateByExample(items: Sequence<Int>): Map<Int, Int> = items.associateBy { item ->
+                item + LocalCount.current
+            }
+
+            @Composable
+            fun GroupByExample(items: Sequence<Int>): Map<Int, List<Int>> = items.groupBy { item ->
+                item + LocalCount.current
+            }
+
+            @Composable
+            fun FoldExample(items: Sequence<Int>): Int = items.fold(0) { acc, item ->
+                acc + item + LocalCount.current
+            }
+            """,
+        )
+
+        val findings = rule.lintWithAnalysisApi(code)
+
+        assertThat(findings).isEmpty()
+    }
+
+    @Test
+    fun `reports composable function when composition use is inside lazy sequence transform`() {
+        @Language("kotlin")
+        val code = codeWithFakeCompose(
+            """
+            val LocalCount = compositionLocalOf { 0 }
+
+            @Composable
+            fun Example(items: Sequence<Int>): Sequence<Int> = items.map { item ->
+                item + LocalCount.current
+            }
+            """,
+        )
+
+        val findings = rule.lintWithAnalysisApi(code)
+
+        assertThat(findings).hasSize(1)
+        assertThat(findings.single())
+            .hasStartSourceLocation(SourceLocation(6, 9))
+            .hasMessage(UnnecessaryComposableCheck.UnnecessaryComposable)
+    }
+
+    @Test
+    fun `does not report composition use inside eager stdlib builders`() {
+        @Language("kotlin")
+        val code = codeWithFakeCompose(
+            """
+            val LocalText = compositionLocalOf { "text" }
+
+            @Composable
+            fun BuildStringExample(): String = buildString {
+                append(LocalText.current)
+            }
+
+            @Composable
+            fun BuildListExample(): List<String> = buildList {
+                add(LocalText.current)
+            }
+
+            @Composable
+            fun BuildSetExample(): Set<String> = buildSet {
+                add(LocalText.current)
+            }
+
+            @Composable
+            fun BuildMapExample(): Map<String, String> = buildMap {
+                put(LocalText.current, LocalText.current)
+            }
+            """,
+        )
+
+        val findings = rule.lintWithAnalysisApi(code)
+
+        assertThat(findings).isEmpty()
+    }
+
+    @Test
+    fun `does not report composition use inside eager builder lambda`() {
+        @Language("kotlin")
+        val code = codeWithFakeCompose(
+            """
+            import androidx.compose.ui.text.buildAnnotatedString
+            import androidx.compose.ui.text.AnnotatedString
+
+            val LocalText = compositionLocalOf { "text" }
+
+            @Composable
+            fun Example(): AnnotatedString = buildAnnotatedString {
+                append(LocalText.current)
+            }
+            """,
+        )
+
+        val findings = rule.lintWithAnalysisApi(
+            code,
+            """
+            package androidx.compose.ui.text
+
+            class AnnotatedString
+
+            class AnnotatedStringBuilder {
+                fun append(value: String) = Unit
+            }
+
+            fun buildAnnotatedString(builder: AnnotatedStringBuilder.() -> Unit): AnnotatedString {
+                AnnotatedStringBuilder().builder()
+                return AnnotatedString()
+            }
+            """.trimIndent(),
+        )
+
+        assertThat(findings).isEmpty()
+    }
+
+    @Test
+    fun `does not report composition use inside eager annotated string helper lambdas`() {
+        @Language("kotlin")
+        val code = codeWithFakeCompose(
+            """
+            import androidx.compose.ui.text.AnnotatedString
+            import androidx.compose.ui.text.LinkAnnotation
+            import androidx.compose.ui.text.SpanStyle
+            import androidx.compose.ui.text.buildAnnotatedString
+            import androidx.compose.ui.text.withAnnotation
+            import androidx.compose.ui.text.withLink
+            import androidx.compose.ui.text.withStyle
+
+            val LocalText = compositionLocalOf { "text" }
+
+            @Composable
+            fun StyleExample(style: SpanStyle): AnnotatedString = buildAnnotatedString {
+                withStyle(style) {
+                    append(LocalText.current)
+                }
+            }
+
+            @Composable
+            fun LinkExample(link: LinkAnnotation): AnnotatedString = buildAnnotatedString {
+                withLink(link) {
+                    append(LocalText.current)
+                }
+            }
+
+            @Composable
+            fun AnnotationExample(): AnnotatedString = buildAnnotatedString {
+                withAnnotation("tag", "annotation") {
+                    append(LocalText.current)
+                }
+            }
+            """,
+        )
+
+        val findings = rule.lintWithAnalysisApi(
+            code,
+            """
+            package androidx.compose.ui.text
+
+            class AnnotatedString
+
+            class LinkAnnotation
+
+            class SpanStyle
+
+            class AnnotatedStringBuilder {
+                fun append(value: String) = Unit
+            }
+
+            fun buildAnnotatedString(builder: AnnotatedStringBuilder.() -> Unit): AnnotatedString {
+                AnnotatedStringBuilder().builder()
+                return AnnotatedString()
+            }
+
+            fun AnnotatedStringBuilder.withStyle(style: SpanStyle, block: AnnotatedStringBuilder.() -> Unit) {
+                block()
+            }
+
+            fun AnnotatedStringBuilder.withLink(link: LinkAnnotation, block: AnnotatedStringBuilder.() -> Unit) {
+                block()
+            }
+
+            fun AnnotatedStringBuilder.withAnnotation(
+                tag: String,
+                annotation: String,
+                block: AnnotatedStringBuilder.() -> Unit,
+            ) {
+                block()
+            }
+            """.trimIndent(),
+        )
+
+        assertThat(findings).isEmpty()
+    }
+
+    @Test
     fun `does not report composition use inside indexed eager collection iteration`() {
         @Language("kotlin")
         val code = codeWithFakeCompose(

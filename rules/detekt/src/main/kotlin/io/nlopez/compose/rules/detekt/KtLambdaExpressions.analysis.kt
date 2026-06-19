@@ -15,7 +15,7 @@ internal fun KtLambdaExpression.isEagerScopeFunctionLambda(): Boolean =
     parent.immediateLambdaArgumentCall()?.isEagerScopeFunctionCall(this) == true
 
 internal fun KtLambdaExpression.isEagerStdlibScopeFunctionLambda(): Boolean =
-    parent.immediateLambdaArgumentCall()?.isEagerScopeFunctionCall() == true
+    parent.immediateLambdaArgumentCall()?.isEagerStdlibScopeFunctionCall() == true
 
 private tailrec fun PsiElement?.immediateLambdaArgumentCall(): KtCallExpression? = when (this) {
     is KtLambdaArgument -> parent as? KtCallExpression
@@ -31,7 +31,10 @@ internal fun KtCallExpression.isEagerScopeFunctionCall(lambdaExpression: KtLambd
 
 internal fun KtCallExpression.isEagerScopeFunctionCall(): Boolean = isResolvedCallToAnyNamed(EagerScopeFunctions)
 
-private val EagerScopeFunctions = setOf(
+private fun KtCallExpression.isEagerStdlibScopeFunctionCall(): Boolean =
+    isResolvedCallToAnyNamed(EagerStdlibScopeFunctions)
+
+private val EagerStdlibScopeFunctions = setOf(
     "kotlin.run",
     "kotlin.with",
     "kotlin.let",
@@ -45,10 +48,17 @@ private val EagerScopeFunctions = setOf(
     "kotlin.collections.map",
     "kotlin.collections.mapIndexed",
     "kotlin.collections.mapNotNull",
+    "kotlin.collections.mapIndexedNotNull",
+    "kotlin.collections.associate",
+    "kotlin.collections.associateBy",
+    "kotlin.collections.associateWith",
+    "kotlin.collections.groupBy",
+    "kotlin.collections.partition",
     "kotlin.collections.filter",
     "kotlin.collections.filterNot",
     "kotlin.collections.filterNotNull",
     "kotlin.collections.flatMap",
+    "kotlin.collections.flatMapIndexed",
     "kotlin.collections.fold",
     "kotlin.collections.foldIndexed",
     "kotlin.collections.reduce",
@@ -64,7 +74,39 @@ private val EagerScopeFunctions = setOf(
     "kotlin.collections.any",
     "kotlin.collections.all",
     "kotlin.collections.none",
+    "kotlin.collections.zip",
+    "kotlin.collections.windowed",
+    "kotlin.collections.chunked",
+    "kotlin.collections.joinToString",
     "kotlin.collections.count",
     "kotlin.collections.sumOf",
     "kotlin.sequences.forEach",
+    "kotlin.sequences.associate",
+    "kotlin.sequences.associateBy",
+    "kotlin.sequences.associateWith",
+    "kotlin.sequences.groupBy",
+    "kotlin.sequences.fold",
+    "kotlin.sequences.reduce",
+    "kotlin.sequences.reduceOrNull",
+    "kotlin.sequences.any",
+    "kotlin.sequences.all",
+    "kotlin.sequences.none",
+    "kotlin.sequences.count",
+    "kotlin.sequences.sumOf",
 )
+
+private val EagerComposeScopeFunctions = setOf(
+    "androidx.compose.ui.text.buildAnnotatedString",
+    "androidx.compose.ui.text.withAnnotation",
+    "androidx.compose.ui.text.withLink",
+    "androidx.compose.ui.text.withStyle",
+)
+
+private val EagerBuilderScopeFunctions = setOf(
+    "kotlin.text.buildString",
+    "kotlin.collections.buildList",
+    "kotlin.collections.buildSet",
+    "kotlin.collections.buildMap",
+)
+
+private val EagerScopeFunctions = EagerStdlibScopeFunctions + EagerBuilderScopeFunctions + EagerComposeScopeFunctions

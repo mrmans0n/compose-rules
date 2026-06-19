@@ -161,6 +161,79 @@ class VarsWithoutStateBackingCheckTest {
     }
 
     @Test
+    fun `does not report local vars in annotated string builder lambdas`() {
+        @Language("kotlin")
+        val code = codeWithFakeCompose(
+            """
+            import androidx.compose.ui.text.AnnotatedString
+            import androidx.compose.ui.text.buildAnnotatedString
+
+            @Composable
+            fun Example(): AnnotatedString = buildAnnotatedString {
+                var tag = "title"
+                append(tag)
+            }
+            """,
+        )
+
+        val findings = rule.lintWithAnalysisApi(
+            code,
+            """
+            package androidx.compose.ui.text
+
+            class AnnotatedString
+
+            class AnnotatedStringBuilder {
+                fun append(value: String) = Unit
+            }
+
+            fun buildAnnotatedString(builder: AnnotatedStringBuilder.() -> Unit): AnnotatedString {
+                AnnotatedStringBuilder().builder()
+                return AnnotatedString()
+            }
+            """.trimIndent(),
+        )
+
+        assertThat(findings).isEmpty()
+    }
+
+    @Test
+    fun `does not report local vars in stdlib builder lambdas`() {
+        @Language("kotlin")
+        val code = codeWithFakeCompose(
+            """
+            @Composable
+            fun BuildStringExample(): String = buildString {
+                var first = true
+                append(first)
+            }
+
+            @Composable
+            fun BuildListExample(): List<String> = buildList {
+                var item = "value"
+                add(item)
+            }
+
+            @Composable
+            fun BuildSetExample(): Set<String> = buildSet {
+                var item = "value"
+                add(item)
+            }
+
+            @Composable
+            fun BuildMapExample(): Map<String, String> = buildMap {
+                var key = "key"
+                put(key, "value")
+            }
+            """,
+        )
+
+        val findings = rule.lintWithAnalysisApi(code)
+
+        assertThat(findings).isEmpty()
+    }
+
+    @Test
     fun `does not report local vars in non-composable getters`() {
         @Language("kotlin")
         val code = codeWithFakeCompose(
