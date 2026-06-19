@@ -195,6 +195,31 @@ class ModifierNotUsedAtRootCheckTest {
     }
 
     @Test
+    fun `errors when outer modifier alias is in then arg and shadowed modifier is chain receiver`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun Something(modifier: Modifier = Modifier) {
+                    val rootModifier = modifier
+                    Column {
+                        Slot { modifier: Modifier ->
+                            Child(modifier = modifier.then(rootModifier))
+                        }
+                    }
+                }
+            """.trimIndent()
+        modifierRuleAssertThat(code)
+            .hasLintViolationsWithoutAutoCorrect(
+                LintViolation(
+                    line = 6,
+                    col = 19,
+                    detail = ComposableModifierShouldBeUsedAtTheTopMostPossiblePlace,
+                ),
+            )
+    }
+
+    @Test
     fun `errors when outer modifier alias is passed alongside a shadowed modifier in a multi-arg call`() {
         @Language("kotlin")
         val code =
