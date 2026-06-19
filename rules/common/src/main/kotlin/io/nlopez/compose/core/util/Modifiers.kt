@@ -8,7 +8,6 @@ import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtCallableDeclaration
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.KtFunction
-import org.jetbrains.kotlin.psi.KtFunctionLiteral
 import org.jetbrains.kotlin.psi.KtParameter
 import org.jetbrains.kotlin.psi.KtProperty
 import org.jetbrains.kotlin.psi.KtReferenceExpression
@@ -20,6 +19,7 @@ import org.jetbrains.kotlin.psi.psiUtil.parents
  *  Try to get all possible names by iterating on possible name reassignments until it's stable
  */
 fun KtBlockExpression.obtainAllModifierNames(initialName: String): List<String> {
+    val rootBlock = this
     var lastSize = 0
     val tempModifierNames = mutableSetOf(initialName)
     while (lastSize < tempModifierNames.size) {
@@ -28,10 +28,11 @@ fun KtBlockExpression.obtainAllModifierNames(initialName: String): List<String> 
         tempModifierNames += findModifierManipulations { tempModifierNames.contains(it) }
         // Find usages in child blocks. For each child block, only search for aliases derived
         // from outer modifier names that are not shadowed at that scope — shadowed names belong
-        // to the lambda's local modifier so aliases from them would cause false positives.
+        // to the lambda's or nested function's local modifier so aliases from them would cause
+        // false positives.
         tempModifierNames += findAllChildrenByClass<KtBlockExpression>()
             .flatMap { block ->
-                val accessible = tempModifierNames - block.shadowedModifierNames(tempModifierNames)
+                val accessible = tempModifierNames - block.shadowedModifierNames(tempModifierNames, rootBlock)
                 if (accessible.isEmpty()) {
                     emptyList()
                 } else {
@@ -42,23 +43,30 @@ fun KtBlockExpression.obtainAllModifierNames(initialName: String): List<String> 
     return tempModifierNames.toList()
 }
 
-private fun KtBlockExpression.shadowedModifierNames(modifierNames: Set<String>): Set<String> =
-    parents.filterIsInstance<KtFunctionLiteral>()
-        .flatMap { literal ->
-            literal.valueParameters.flatMap { param ->
-                when {
-                    param.name != null -> listOfNotNull(param.name.takeIf { it in modifierNames })
+// Returns the set of modifier names that are shadowed at this block's scope, stopping at
+// stopAt (the outer composable's body block) to avoid including the composable's own parameters.
+// Checks both lambda literals (KtFunctionLiteral) and named nested functions (KtNamedFunction)
+// via their common supertype KtFunction.
+private fun KtBlockExpression.shadowedModifierNames(
+    modifierNames: Set<String>,
+    stopAt: KtBlockExpression,
+): Set<String> = parents.takeWhile { it != stopAt }
+    .filterIsInstance<KtFunction>()
+    .flatMap { func ->
+        func.valueParameters.flatMap { param ->
+            when {
+                param.name != null -> listOfNotNull(param.name.takeIf { it in modifierNames })
 
-                    // Destructured parameters like (modifier, _) store names in the declaration.
-                    param.destructuringDeclaration != null ->
-                        param.destructuringDeclaration!!.entries
-                            .mapNotNull { it.name?.takeIf { it in modifierNames } }
+                // Destructured parameters like (modifier, _) store names in the declaration.
+                param.destructuringDeclaration != null ->
+                    param.destructuringDeclaration!!.entries
+                        .mapNotNull { it.name?.takeIf { it in modifierNames } }
 
-                    else -> emptyList()
-                }
+                else -> emptyList()
             }
         }
-        .toSet()
+    }
+    .toSet()
 
 /**
  * Find references to modifier as a property in case they try to modify or reuse the modifier that way

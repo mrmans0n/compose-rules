@@ -19,7 +19,6 @@ import io.nlopez.compose.core.util.rootExpression
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.KtFunction
-import org.jetbrains.kotlin.psi.KtFunctionLiteral
 import org.jetbrains.kotlin.psi.KtReferenceExpression
 import org.jetbrains.kotlin.psi.psiUtil.parents
 
@@ -72,9 +71,9 @@ class ModifierNotUsedAtRoot : ComposeKtVisitor {
 
     private fun KtCallExpression.shadowedModifierNamesUpTo(stopAt: KtFunction, modifiers: Set<String>): Set<String> =
         parents.takeWhile { it != stopAt }
-            .filterIsInstance<KtFunctionLiteral>()
-            .flatMap { literal ->
-                literal.valueParameters.flatMap { param ->
+            .filterIsInstance<KtFunction>()
+            .flatMap { func ->
+                func.valueParameters.flatMap { param ->
                     when {
                         param.name != null -> listOfNotNull(param.name.takeIf { it in modifiers })
 

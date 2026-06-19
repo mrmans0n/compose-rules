@@ -660,6 +660,41 @@ class ModifierReusedCheckTest {
     }
 
     @Test
+    fun `passes when modifier appears in a local-var-rooted then chain inside a shadowing lambda`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun Something(modifier: Modifier) {
+                    Column(modifier = modifier) {
+                        Slot { modifier: Modifier ->
+                            val base = Modifier
+                            Row(modifier = base.then(modifier)) {}
+                        }
+                    }
+                }
+            """.trimIndent()
+        modifierRuleAssertThat(code).hasNoLintViolations()
+    }
+
+    @Test
+    fun `passes when modifier is used only in a nested local function with its own modifier parameter`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun Something(modifier: Modifier = Modifier) {
+                    @Composable fun Local(modifier: Modifier) {
+                        val local = modifier.padding(8.dp)
+                        Row(modifier = Modifier.then(local)) {}
+                    }
+                    Column(modifier = modifier) {}
+                }
+            """.trimIndent()
+        modifierRuleAssertThat(code).hasNoLintViolations()
+    }
+
+    @Test
     fun `passes when the modifier is followed by an early return`() {
         @Language("kotlin")
         val code =
