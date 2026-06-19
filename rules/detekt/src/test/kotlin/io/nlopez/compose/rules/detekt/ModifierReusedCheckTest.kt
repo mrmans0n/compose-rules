@@ -293,6 +293,37 @@ class ModifierReusedCheckTest {
     }
 
     @Test
+    fun `errors when modifier is passed as an argument to Modifier dot then`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun Something(modifier: Modifier) {
+                    Row(modifier = Modifier.then(modifier)) {
+                        Column(modifier = modifier) {}
+                    }
+                }
+                @Composable
+                fun Something(modifier: Modifier) {
+                    Row(modifier = Modifier.fillMaxWidth().then(modifier)) {}
+                    Column(modifier = modifier) {}
+                }
+            """.trimIndent()
+
+        val errors = rule.lint(code)
+        assertThat(errors)
+            .hasStartSourceLocations(
+                SourceLocation(3, 5),
+                SourceLocation(4, 9),
+                SourceLocation(9, 5),
+                SourceLocation(10, 5),
+            )
+        for (error in errors) {
+            assertThat(error).hasMessage(ModifierReused.ModifierShouldBeUsedOnceOnly)
+        }
+    }
+
+    @Test
     fun `passes when the modifier parameter of a Composable is shadowed`() {
         @Language("kotlin")
         val code =
@@ -317,6 +348,12 @@ class ModifierReusedCheckTest {
                 fun Something(modifier: Modifier) {
                     Column(modifier) {
                         Bleh { modifier -> Potato(modifier) }
+                    }
+                }
+                @Composable
+                fun Something(modifier: Modifier) {
+                    Column(modifier = modifier) {
+                        Bleh { modifier: Modifier -> Row(modifier = Modifier.then(modifier)) }
                     }
                 }
             """.trimIndent()

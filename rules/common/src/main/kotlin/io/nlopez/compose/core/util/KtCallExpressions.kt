@@ -12,19 +12,42 @@ import org.jetbrains.kotlin.psi.KtReferenceExpression
 import org.jetbrains.kotlin.psi.psiUtil.parents
 
 fun KtCallExpression.parametersBeingUsedFrom(parameterNames: Set<String>): Set<String> =
-    valueArguments.mapNotNull { argument ->
+    valueArguments.flatMap { argument ->
         when (val expression = argument.getArgumentExpression()) {
             // if it's MyComposable(modifier) or similar
-            is KtReferenceExpression -> expression.text
+            is KtReferenceExpression -> listOfNotNull(expression.text.takeIf { it in parameterNames })
 
-            // if it's MyComposable(modifier.fillMaxWidth()) or similar
-            is KtDotQualifiedExpression -> expression.rootExpression.text
+            // if it's MyComposable(modifier.fillMaxWidth()) or similar,
+            // also handles MyComposable(Modifier.then(modifier)) and chained variants
+            is KtDotQualifiedExpression -> expression.parameterNamesUsedIn(parameterNames)
 
-            else -> null
+            else -> emptyList()
         }
+    }.toSet()
+
+private fun KtDotQualifiedExpression.parameterNamesUsedIn(parameterNames: Set<String>): Set<String> = buildSet {
+    if (rootExpression.text in parameterNames) add(rootExpression.text)
+    var current: KtDotQualifiedExpression? = this@parameterNamesUsedIn
+    while (current != null) {
+        val selector = current.selectorExpression as? KtCallExpression
+        if (selector != null) {
+            for (arg in selector.valueArguments) {
+                when (val expr = arg.getArgumentExpression()) {
+                    is KtReferenceExpression -> if (expr.text in parameterNames) add(expr.text)
+
+                    is KtDotQualifiedExpression -> if (expr.rootExpression.text in
+                        parameterNames
+                    ) {
+                        add(expr.rootExpression.text)
+                    }
+
+                    else -> {}
+                }
+            }
+        }
+        current = current.receiverExpression as? KtDotQualifiedExpression
     }
-        .filter { it in parameterNames }
-        .toSet()
+}
 
 private fun KtCallExpression.ancestorsParameterNamesSequence(stopAt: PsiElement) = parents.takeWhile { it != stopAt }
     .filterIsInstance<KtCallableDeclaration>()

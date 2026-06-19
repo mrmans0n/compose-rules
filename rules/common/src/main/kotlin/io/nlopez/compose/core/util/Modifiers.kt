@@ -60,16 +60,38 @@ fun KtCallExpression.argumentsUsingModifiers(modifierNames: Set<String>): List<K
                 expression.text in modifierNames
             }
 
-            // if it's MyComposable(modifier.fillMaxWidth()) or similar
+            // if it's MyComposable(modifier.fillMaxWidth()) or similar,
+            // also handles MyComposable(Modifier.then(modifier)) and chained variants
             is KtDotQualifiedExpression -> {
                 // On cases of multiple nested KtDotQualifiedExpressions (e.g. multiple chained methods)
                 // we need to iterate until we find the start of the chain
-                expression.rootExpression.text in modifierNames
+                expression.rootExpression.text in modifierNames ||
+                    expression.hasModifierAsChainArgument(modifierNames)
             }
 
             else -> false
         }
     }
+
+// Checks if a modifier name appears as a direct argument anywhere in a dot-qualified chain.
+// Handles patterns like Modifier.then(modifier) and Modifier.fillMaxWidth().then(modifier).
+private fun KtDotQualifiedExpression.hasModifierAsChainArgument(modifierNames: Set<String>): Boolean {
+    var current: KtDotQualifiedExpression? = this
+    while (current != null) {
+        val selector = current.selectorExpression as? KtCallExpression
+        if (selector != null) {
+            for (arg in selector.valueArguments) {
+                when (val expr = arg.getArgumentExpression()) {
+                    is KtReferenceExpression -> if (expr.text in modifierNames) return true
+                    is KtDotQualifiedExpression -> if (expr.rootExpression.text in modifierNames) return true
+                    else -> {}
+                }
+            }
+        }
+        current = current.receiverExpression as? KtDotQualifiedExpression
+    }
+    return false
+}
 
 private val ModifierNames by lazy {
     setOf(

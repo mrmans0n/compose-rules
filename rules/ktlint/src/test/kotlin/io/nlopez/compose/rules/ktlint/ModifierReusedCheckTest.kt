@@ -393,6 +393,48 @@ class ModifierReusedCheckTest {
     }
 
     @Test
+    fun `errors when modifier is passed as an argument to Modifier dot then`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun Something(modifier: Modifier) {
+                    Row(modifier = Modifier.then(modifier)) {
+                        Column(modifier = modifier) {}
+                    }
+                }
+                @Composable
+                fun Something(modifier: Modifier) {
+                    Row(modifier = Modifier.fillMaxWidth().then(modifier)) {}
+                    Column(modifier = modifier) {}
+                }
+            """.trimIndent()
+
+        modifierRuleAssertThat(code).hasLintViolationsWithoutAutoCorrect(
+            LintViolation(
+                line = 3,
+                col = 5,
+                detail = ModifierReused.ModifierShouldBeUsedOnceOnly,
+            ),
+            LintViolation(
+                line = 4,
+                col = 9,
+                detail = ModifierReused.ModifierShouldBeUsedOnceOnly,
+            ),
+            LintViolation(
+                line = 9,
+                col = 5,
+                detail = ModifierReused.ModifierShouldBeUsedOnceOnly,
+            ),
+            LintViolation(
+                line = 10,
+                col = 5,
+                detail = ModifierReused.ModifierShouldBeUsedOnceOnly,
+            ),
+        )
+    }
+
+    @Test
     fun `passes when the modifier parameter of a Composable is shadowed`() {
         @Language("kotlin")
         val code =
@@ -417,6 +459,12 @@ class ModifierReusedCheckTest {
                 fun Something(modifier: Modifier) {
                     Column(modifier) {
                         Bleh { modifier -> Potato(modifier) }
+                    }
+                }
+                @Composable
+                fun Something(modifier: Modifier) {
+                    Column(modifier = modifier) {
+                        Bleh { modifier: Modifier -> Row(modifier = Modifier.then(modifier)) }
                     }
                 }
             """.trimIndent()
