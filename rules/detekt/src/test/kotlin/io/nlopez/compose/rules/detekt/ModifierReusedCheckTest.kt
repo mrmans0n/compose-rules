@@ -360,20 +360,42 @@ class ModifierReusedCheckTest {
     }
 
     @Test
-    fun `passes when modifier is an argument to an unrelated dot then call`() {
+    fun `passes when modifier is an argument to an uppercase-rooted unrelated dot then call`() {
         @Language("kotlin")
         val code =
             """
                 @Composable
                 fun Something(modifier: Modifier) {
                     Column(modifier = modifier) {
-                        Child(model = somePipeline.then(modifier))
                         Child(model = SomePipeline.then(modifier))
                     }
                 }
             """.trimIndent()
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
+    }
+
+    @Test
+    fun `errors when modifier is passed as an argument to a local-var-rooted then chain`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun Something(modifier: Modifier) {
+                    val base = Modifier.padding(8.dp)
+                    Row(modifier = base.then(modifier)) {}
+                    Column(modifier = modifier) {}
+                }
+            """.trimIndent()
+        val errors = rule.lint(code)
+        assertThat(errors)
+            .hasStartSourceLocations(
+                SourceLocation(4, 5),
+                SourceLocation(5, 5),
+            )
+        for (error in errors) {
+            assertThat(error).hasMessage(ModifierReused.ModifierShouldBeUsedOnceOnly)
+        }
     }
 
     @Test

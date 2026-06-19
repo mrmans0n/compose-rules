@@ -204,6 +204,32 @@ class ModifierNotUsedAtRootCheckTest {
     }
 
     @Test
+    fun `errors when modifier is passed via a local-var-rooted then chain at a non-root level`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun Something(modifier: Modifier = Modifier) {
+                    Column {
+                        val base = Modifier.padding(8.dp)
+                        Row(modifier = base.then(modifier)) {}
+                    }
+                }
+            """.trimIndent()
+        modifierRuleAssertThat(code)
+            .withEditorConfigOverride(
+                contentEmittersProperty to "Potato,Banana",
+            )
+            .hasLintViolationsWithoutAutoCorrect(
+                LintViolation(
+                    line = 5,
+                    col = 13,
+                    detail = ComposableModifierShouldBeUsedAtTheTopMostPossiblePlace,
+                ),
+            )
+    }
+
+    @Test
     fun `errors when outer modifier alias is in then arg and shadowed modifier is chain receiver`() {
         @Language("kotlin")
         val code =

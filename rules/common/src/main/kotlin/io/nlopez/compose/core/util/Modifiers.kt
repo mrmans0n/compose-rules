@@ -100,11 +100,16 @@ fun KtCallExpression.argumentsUsingModifiers(
             // we need to iterate until we find the start of the chain
             val rootText = expression.rootExpression.text
             rootText in modifierNames ||
-                // Only scan .then() args when the chain root is a known Modifier type literal
-                // (Modifier, GlanceModifier, or a configured custom modifier type). Guarding
-                // against exact type names prevents false positives from unrelated chains like
-                // SomePipeline.then(modifier) where the receiver is not a Modifier at all.
-                (rootText in modifierTypeNames && expression.hasModifierAsChainArgument(modifierNames))
+                // Scan .then() args when the chain root is a known Modifier type name
+                // (Modifier, GlanceModifier, or a configured custom modifier type) OR when
+                // the root starts with a lowercase letter (a local variable that may itself
+                // be a Modifier value, e.g. `val base = Modifier.padding(...); base.then(modifier)`).
+                // Uppercase-only roots that are not known type names (e.g. SomePipeline) are
+                // excluded to avoid false positives from non-Modifier chains.
+                (
+                    (rootText in modifierTypeNames || rootText.first().isLowerCase()) &&
+                        expression.hasModifierAsChainArgument(modifierNames)
+                    )
         }
 
         else -> false
