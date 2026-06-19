@@ -332,6 +332,22 @@ class ModifierReusedCheckTest {
     }
 
     @Test
+    fun `passes when modifier is an argument to an unrelated dot then call`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun Something(modifier: Modifier) {
+                    Column(modifier = modifier) {
+                        Child(model = somePipeline.then(modifier))
+                    }
+                }
+            """.trimIndent()
+        val errors = rule.lint(code)
+        assertThat(errors).isEmpty()
+    }
+
+    @Test
     fun `passes when modifiers are reused for mutually exclusive branches`() {
         @Language("kotlin")
         val code =

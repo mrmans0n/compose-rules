@@ -65,8 +65,16 @@ fun KtCallExpression.argumentsUsingModifiers(modifierNames: Set<String>): List<K
             is KtDotQualifiedExpression -> {
                 // On cases of multiple nested KtDotQualifiedExpressions (e.g. multiple chained methods)
                 // we need to iterate until we find the start of the chain
-                expression.rootExpression.text in modifierNames ||
-                    expression.hasModifierAsChainArgument(modifierNames)
+                val rootText = expression.rootExpression.text
+                rootText in modifierNames ||
+                    // Only scan .then() args when the chain root is a modifier parameter/alias
+                    // (already handled above) or looks like a type literal (uppercase first letter —
+                    // Modifier, BananaModifier, etc.). Lowercase roots that aren't known modifier
+                    // parameters are unrelated chains like somePipeline.then(modifier).
+                    (
+                        rootText.firstOrNull()?.isUpperCase() == true &&
+                            expression.hasModifierAsChainArgument(modifierNames)
+                        )
             }
 
             else -> false
