@@ -41,7 +41,7 @@ class ModifierReused : ComposeKtVisitor {
                     .filter { it.isUsingModifiers(modifierNames, typeNames) }
                     // For those modifiers, we look at the parents and see if any of them is a function that has a param with
                     //  the same name.
-                    .filterNot { it.isFullyShadowed(modifierNames, function) }
+                    .filterNot { it.isFullyShadowed(modifierNames, function, typeNames) }
                     .map { callExpression ->
                         fun Sequence<PsiElement>.modifierUsagesSet(): Set<KtCallExpression> =
                             filterIsInstance<KtCallExpression>()

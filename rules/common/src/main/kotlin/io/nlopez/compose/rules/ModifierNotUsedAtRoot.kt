@@ -37,7 +37,7 @@ class ModifierNotUsedAtRoot : ComposeKtVisitor {
                 callExpression.argumentsUsingModifiers(modifiers, typeNames).firstOrNull()
                     ?.let { usage -> callExpression to usage }
             }
-            .filterNot { (callExpression, _) -> callExpression.isFullyShadowed(modifiers, function) }
+            .filterNot { (callExpression, _) -> callExpression.isFullyShadowed(modifiers, function, typeNames) }
             .filter { (callExpression, _) ->
                 // we'll need to traverse upwards to the composable root and check if there is any parent that
                 // emits content: if this is the case, the main modifier should be used there instead.

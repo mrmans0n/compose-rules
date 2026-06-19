@@ -11,27 +11,34 @@ import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.KtReferenceExpression
 import org.jetbrains.kotlin.psi.psiUtil.parents
 
-fun KtCallExpression.parametersBeingUsedFrom(parameterNames: Set<String>): Set<String> =
-    valueArguments.flatMap { argument ->
-        when (val expression = argument.getArgumentExpression()) {
-            // if it's MyComposable(modifier) or similar
-            is KtReferenceExpression -> listOfNotNull(expression.text.takeIf { it in parameterNames })
+private val DefaultModifierTypeNames = setOf("Modifier", "GlanceModifier")
 
-            // if it's MyComposable(modifier.fillMaxWidth()) or similar,
-            // also handles MyComposable(Modifier.then(modifier)) and chained variants
-            is KtDotQualifiedExpression -> expression.parameterNamesUsedIn(parameterNames)
+fun KtCallExpression.parametersBeingUsedFrom(
+    parameterNames: Set<String>,
+    modifierTypeNames: Set<String> = DefaultModifierTypeNames,
+): Set<String> = valueArguments.flatMap { argument ->
+    when (val expression = argument.getArgumentExpression()) {
+        // if it's MyComposable(modifier) or similar
+        is KtReferenceExpression -> listOfNotNull(expression.text.takeIf { it in parameterNames })
 
-            else -> emptyList()
-        }
-    }.toSet()
+        // if it's MyComposable(modifier.fillMaxWidth()) or similar,
+        // also handles MyComposable(Modifier.then(modifier)) and chained variants
+        is KtDotQualifiedExpression -> expression.parameterNamesUsedIn(parameterNames, modifierTypeNames)
 
-private fun KtDotQualifiedExpression.parameterNamesUsedIn(parameterNames: Set<String>): Set<String> = buildSet {
+        else -> emptyList()
+    }
+}.toSet()
+
+private fun KtDotQualifiedExpression.parameterNamesUsedIn(
+    parameterNames: Set<String>,
+    modifierTypeNames: Set<String>,
+): Set<String> = buildSet {
     val rootText = rootExpression.text
     if (rootText in parameterNames) add(rootText)
     // Scan .then() arguments when the chain root is a modifier parameter/alias or a known
-    // Modifier type literal. Unrelated chains (SomePipeline.then(modifier)) are filtered out
-    // earlier by argumentsUsingModifiers, but the guard here provides defense-in-depth.
-    val shouldScanThenArgs = rootText in parameterNames || rootText in setOf("Modifier", "GlanceModifier")
+    // Modifier type literal (including custom types). Unrelated chains are filtered out earlier
+    // by argumentsUsingModifiers, but the guard here provides defense-in-depth.
+    val shouldScanThenArgs = rootText in parameterNames || rootText in modifierTypeNames
     if (shouldScanThenArgs) {
         var current: KtDotQualifiedExpression? = this@parameterNamesUsedIn
         while (current != null) {
@@ -89,8 +96,12 @@ fun KtCallExpression.findShadowingRedeclarations(
     .filter { (name, _) -> name == parameterName }
     .mapSecond()
 
-fun KtCallExpression.isFullyShadowed(parameterNames: Set<String>, origin: PsiElement): Boolean {
-    val currentNames = parametersBeingUsedFrom(parameterNames)
+fun KtCallExpression.isFullyShadowed(
+    parameterNames: Set<String>,
+    origin: PsiElement,
+    modifierTypeNames: Set<String> = DefaultModifierTypeNames,
+): Boolean {
+    val currentNames = parametersBeingUsedFrom(parameterNames, modifierTypeNames)
     if (currentNames.isEmpty()) return false
 
     // Only skip this call if every modifier it uses comes from a shadow scope.
