@@ -45,6 +45,7 @@ private val EagerScopeFunctions = setOf(
     "kotlin.collections.map",
     "kotlin.collections.mapIndexed",
     "kotlin.collections.mapNotNull",
+    "kotlin.collections.associateWith",
     "kotlin.collections.filter",
     "kotlin.collections.filterNot",
     "kotlin.collections.filterNotNull",
@@ -67,4 +68,6 @@ private val EagerScopeFunctions = setOf(
     "kotlin.collections.count",
     "kotlin.collections.sumOf",
     "kotlin.sequences.forEach",
+    "kotlin.sequences.associateWith",
+    "androidx.compose.ui.text.buildAnnotatedString",
 )

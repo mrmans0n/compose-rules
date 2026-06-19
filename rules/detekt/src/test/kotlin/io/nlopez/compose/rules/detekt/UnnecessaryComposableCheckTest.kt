@@ -458,6 +458,70 @@ class UnnecessaryComposableCheckTest {
     }
 
     @Test
+    fun `does not report composition use inside eager collection association`() {
+        @Language("kotlin")
+        val code = codeWithFakeCompose(
+            """
+            enum class Month {
+                January,
+            }
+
+            @Composable
+            fun Month.shortName(): String = LocalMonthName.current
+
+            val LocalMonthName = compositionLocalOf { "Jan" }
+
+            @Composable
+            fun Example(): Map<Month, String> = Month.entries.associateWith { month ->
+                month.shortName()
+            }
+            """,
+        )
+
+        val findings = rule.lintWithAnalysisApi(code)
+
+        assertThat(findings).isEmpty()
+    }
+
+    @Test
+    fun `does not report composition use inside eager builder lambda`() {
+        @Language("kotlin")
+        val code = codeWithFakeCompose(
+            """
+            import androidx.compose.ui.text.buildAnnotatedString
+            import androidx.compose.ui.text.AnnotatedString
+
+            val LocalText = compositionLocalOf { "text" }
+
+            @Composable
+            fun Example(): AnnotatedString = buildAnnotatedString {
+                append(LocalText.current)
+            }
+            """,
+        )
+
+        val findings = rule.lintWithAnalysisApi(
+            code,
+            """
+            package androidx.compose.ui.text
+
+            class AnnotatedString
+
+            class AnnotatedStringBuilder {
+                fun append(value: String) = Unit
+            }
+
+            fun buildAnnotatedString(builder: AnnotatedStringBuilder.() -> Unit): AnnotatedString {
+                AnnotatedStringBuilder().builder()
+                return AnnotatedString()
+            }
+            """.trimIndent(),
+        )
+
+        assertThat(findings).isEmpty()
+    }
+
+    @Test
     fun `does not report composition use inside indexed eager collection iteration`() {
         @Language("kotlin")
         val code = codeWithFakeCompose(
