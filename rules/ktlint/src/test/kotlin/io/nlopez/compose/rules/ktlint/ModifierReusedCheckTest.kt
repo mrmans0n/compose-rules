@@ -588,6 +588,15 @@ class ModifierReusedCheckTest {
                         Bleh { modifier: Modifier -> Row(modifier = Modifier.then(modifier)) }
                     }
                 }
+                @Composable
+                fun Something(modifier: Modifier) {
+                    Row(modifier) {
+                        Slot { modifier: Modifier ->
+                            val local = modifier.padding(8.dp)
+                            Row(modifier = Modifier.then(local)) {}
+                        }
+                    }
+                }
             """.trimIndent()
 
         modifierRuleAssertThat(code).hasNoLintViolations()

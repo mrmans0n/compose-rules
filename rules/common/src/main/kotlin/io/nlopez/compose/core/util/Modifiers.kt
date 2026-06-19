@@ -8,11 +8,13 @@ import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtCallableDeclaration
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.KtFunction
+import org.jetbrains.kotlin.psi.KtFunctionLiteral
 import org.jetbrains.kotlin.psi.KtParameter
 import org.jetbrains.kotlin.psi.KtProperty
 import org.jetbrains.kotlin.psi.KtReferenceExpression
 import org.jetbrains.kotlin.psi.KtValueArgument
 import org.jetbrains.kotlin.psi.KtValueArgumentName
+import org.jetbrains.kotlin.psi.psiUtil.parents
 
 /**
  *  Try to get all possible names by iterating on possible name reassignments until it's stable
@@ -24,12 +26,19 @@ fun KtBlockExpression.obtainAllModifierNames(initialName: String): List<String> 
         lastSize = tempModifierNames.size
         // Find usages in the current block (the original composable)
         tempModifierNames += findModifierManipulations { tempModifierNames.contains(it) }
-        // Find usages in child composable blocks
+        // Find usages in child blocks, but skip any block inside a lambda that shadows a
+        // modifier name — aliases created there belong to the lambda's local modifier, not the
+        // outer composable's, so including them would cause false positives.
         tempModifierNames += findAllChildrenByClass<KtBlockExpression>()
+            .filter { block -> !block.isInsideShadowingLambda(tempModifierNames) }
             .flatMap { block -> block.findModifierManipulations { tempModifierNames.contains(it) } }
     }
     return tempModifierNames.toList()
 }
+
+private fun KtBlockExpression.isInsideShadowingLambda(modifierNames: Set<String>): Boolean =
+    parents.filterIsInstance<KtFunctionLiteral>()
+        .any { literal -> literal.valueParameters.any { param -> param.name in modifierNames } }
 
 /**
  * Find references to modifier as a property in case they try to modify or reuse the modifier that way
