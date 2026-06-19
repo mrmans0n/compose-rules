@@ -13,23 +13,60 @@ import org.jetbrains.kotlin.psi.KtProperty
 import org.jetbrains.kotlin.psi.KtReferenceExpression
 import org.jetbrains.kotlin.psi.KtValueArgument
 import org.jetbrains.kotlin.psi.KtValueArgumentName
+import org.jetbrains.kotlin.psi.psiUtil.parents
 
 /**
  *  Try to get all possible names by iterating on possible name reassignments until it's stable
  */
 fun KtBlockExpression.obtainAllModifierNames(initialName: String): List<String> {
+    val rootBlock = this
     var lastSize = 0
     val tempModifierNames = mutableSetOf(initialName)
     while (lastSize < tempModifierNames.size) {
         lastSize = tempModifierNames.size
         // Find usages in the current block (the original composable)
         tempModifierNames += findModifierManipulations { tempModifierNames.contains(it) }
-        // Find usages in child composable blocks
+        // Find usages in child blocks. For each child block, only search for aliases derived
+        // from outer modifier names that are not shadowed at that scope — shadowed names belong
+        // to the lambda's or nested function's local modifier so aliases from them would cause
+        // false positives.
         tempModifierNames += findAllChildrenByClass<KtBlockExpression>()
-            .flatMap { block -> block.findModifierManipulations { tempModifierNames.contains(it) } }
+            .flatMap { block ->
+                val accessible = tempModifierNames - block.shadowedModifierNames(tempModifierNames, rootBlock)
+                if (accessible.isEmpty()) {
+                    emptyList()
+                } else {
+                    block.findModifierManipulations { it in accessible }
+                }
+            }
     }
     return tempModifierNames.toList()
 }
+
+// Returns the set of modifier names that are shadowed at this block's scope, stopping at
+// stopAt (the outer composable's body block) to avoid including the composable's own parameters.
+// Checks both lambda literals (KtFunctionLiteral) and named nested functions (KtNamedFunction)
+// via their common supertype KtFunction.
+private fun KtBlockExpression.shadowedModifierNames(
+    modifierNames: Set<String>,
+    stopAt: KtBlockExpression,
+): Set<String> = parents.takeWhile { it != stopAt }
+    .filterIsInstance<KtFunction>()
+    .flatMap { func ->
+        func.valueParameters.flatMap { param ->
+            when {
+                param.name != null -> listOfNotNull(param.name.takeIf { it in modifierNames })
+
+                // Destructured parameters like (modifier, _) store names in the declaration.
+                param.destructuringDeclaration != null ->
+                    param.destructuringDeclaration!!.entries
+                        .mapNotNull { it.name?.takeIf { it in modifierNames } }
+
+                else -> emptyList()
+            }
+        }
+    }
+    .toSet()
 
 /**
  * Find references to modifier as a property in case they try to modify or reuse the modifier that way
@@ -49,27 +86,61 @@ private fun KtBlockExpression.findModifierManipulations(contains: (String) -> Bo
     }
     .mapNotNull { it.nameIdentifier?.text }
 
-fun KtCallExpression.isUsingModifiers(modifierNames: Set<String>): Boolean =
-    argumentsUsingModifiers(modifierNames).isNotEmpty()
+fun KtCallExpression.isUsingModifiers(
+    modifierNames: Set<String>,
+    modifierTypeNames: Set<String> = ModifierNames,
+): Boolean = argumentsUsingModifiers(modifierNames, modifierTypeNames).isNotEmpty()
 
-fun KtCallExpression.argumentsUsingModifiers(modifierNames: Set<String>): List<KtValueArgument> =
-    valueArguments.filter { argument ->
-        when (val expression = argument.getArgumentExpression()) {
-            // if it's MyComposable(modifier) or similar
-            is KtReferenceExpression -> {
-                expression.text in modifierNames
-            }
-
-            // if it's MyComposable(modifier.fillMaxWidth()) or similar
-            is KtDotQualifiedExpression -> {
-                // On cases of multiple nested KtDotQualifiedExpressions (e.g. multiple chained methods)
-                // we need to iterate until we find the start of the chain
-                expression.rootExpression.text in modifierNames
-            }
-
-            else -> false
+fun KtCallExpression.argumentsUsingModifiers(
+    modifierNames: Set<String>,
+    modifierTypeNames: Set<String> = ModifierNames,
+): List<KtValueArgument> = valueArguments.filter { argument ->
+    when (val expression = argument.getArgumentExpression()) {
+        // if it's MyComposable(modifier) or similar
+        is KtReferenceExpression -> {
+            expression.text in modifierNames
         }
+
+        // if it's MyComposable(modifier.fillMaxWidth()) or similar,
+        // also handles MyComposable(Modifier.then(modifier)) and chained variants
+        is KtDotQualifiedExpression -> {
+            // On cases of multiple nested KtDotQualifiedExpressions (e.g. multiple chained methods)
+            // we need to iterate until we find the start of the chain
+            val rootText = expression.rootExpression.text
+            rootText in modifierNames ||
+                // Scan .then() args when the chain root is a known Modifier type name
+                // (Modifier, GlanceModifier, or a configured custom modifier type).
+                // Lowercase-rooted chains are excluded: without type resolution there is no
+                // reliable way to know whether an arbitrary local variable is a Modifier,
+                // so checking a lowercase root would produce false positives for non-Modifier
+                // factory patterns like `pipeline.then(modifier)`.
+                (rootText in modifierTypeNames && expression.hasModifierAsChainArgument(modifierNames))
+        }
+
+        else -> false
     }
+}
+
+// Checks if a modifier name appears as a direct argument to a .then() call anywhere in a
+// dot-qualified chain. Restricting to .then() avoids false positives from unrelated chains like
+// PainterFactory.create(modifier) and automatically covers custom modifier types.
+private fun KtDotQualifiedExpression.hasModifierAsChainArgument(modifierNames: Set<String>): Boolean {
+    var current: KtDotQualifiedExpression? = this
+    while (current != null) {
+        val selector = current.selectorExpression as? KtCallExpression
+        if (selector?.calleeExpression?.text == "then") {
+            for (arg in selector.valueArguments) {
+                when (val expr = arg.getArgumentExpression()) {
+                    is KtReferenceExpression -> if (expr.text in modifierNames) return true
+                    is KtDotQualifiedExpression -> if (expr.rootExpression.text in modifierNames) return true
+                    else -> {}
+                }
+            }
+        }
+        current = current.receiverExpression as? KtDotQualifiedExpression
+    }
+    return false
+}
 
 private val ModifierNames by lazy {
     setOf(
@@ -78,11 +149,14 @@ private val ModifierNames by lazy {
     )
 }
 
+fun modifierTypeNames(config: ComposeKtConfig): Set<String> =
+    ModifierNames + config.getSet("customModifiers", emptySet())
+
 fun KtCallableDeclaration.isModifier(config: ComposeKtConfig): Boolean =
-    typeReference?.text in ModifierNames + config.getSet("customModifiers", emptySet())
+    typeReference?.text in modifierTypeNames(config)
 
 fun KtCallableDeclaration.isModifierReceiver(config: ComposeKtConfig): Boolean =
-    receiverTypeReference?.text in ModifierNames + config.getSet("customModifiers", emptySet())
+    receiverTypeReference?.text in modifierTypeNames(config)
 
 fun KtFunction.modifierParameter(config: ComposeKtConfig): KtParameter? {
     val modifiers = valueParameters.filter { it.isModifier(config) }

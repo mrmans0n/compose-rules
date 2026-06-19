@@ -11,20 +11,57 @@ import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.KtReferenceExpression
 import org.jetbrains.kotlin.psi.psiUtil.parents
 
-fun KtCallExpression.parametersBeingUsedFrom(parameterNames: Set<String>): Set<String> =
-    valueArguments.mapNotNull { argument ->
-        when (val expression = argument.getArgumentExpression()) {
-            // if it's MyComposable(modifier) or similar
-            is KtReferenceExpression -> expression.text
+private val DefaultModifierTypeNames = setOf("Modifier", "GlanceModifier")
 
-            // if it's MyComposable(modifier.fillMaxWidth()) or similar
-            is KtDotQualifiedExpression -> expression.rootExpression.text
+fun KtCallExpression.parametersBeingUsedFrom(
+    parameterNames: Set<String>,
+    modifierTypeNames: Set<String> = DefaultModifierTypeNames,
+): Set<String> = valueArguments.flatMap { argument ->
+    when (val expression = argument.getArgumentExpression()) {
+        // if it's MyComposable(modifier) or similar
+        is KtReferenceExpression -> listOfNotNull(expression.text.takeIf { it in parameterNames })
 
-            else -> null
+        // if it's MyComposable(modifier.fillMaxWidth()) or similar,
+        // also handles MyComposable(Modifier.then(modifier)) and chained variants
+        is KtDotQualifiedExpression -> expression.parameterNamesUsedIn(parameterNames, modifierTypeNames)
+
+        else -> emptyList()
+    }
+}.toSet()
+
+private fun KtDotQualifiedExpression.parameterNamesUsedIn(
+    parameterNames: Set<String>,
+    modifierTypeNames: Set<String>,
+): Set<String> = buildSet {
+    val rootText = rootExpression.text
+    if (rootText in parameterNames) add(rootText)
+    // Scan .then() arguments when the chain root is a modifier parameter/alias or a known
+    // Modifier type literal (including custom types). Arbitrary lowercase roots are excluded:
+    // without type resolution we cannot tell a local Modifier variable from any other local,
+    // and the heuristic produces false positives for non-Modifier chains like pipeline.then(modifier).
+    val shouldScanThenArgs = rootText in parameterNames ||
+        rootText in modifierTypeNames
+    if (shouldScanThenArgs) {
+        var current: KtDotQualifiedExpression? = this@parameterNamesUsedIn
+        while (current != null) {
+            val selector = current.selectorExpression as? KtCallExpression
+            if (selector?.calleeExpression?.text == "then") {
+                for (arg in selector.valueArguments) {
+                    when (val expr = arg.getArgumentExpression()) {
+                        is KtReferenceExpression -> if (expr.text in parameterNames) add(expr.text)
+
+                        is KtDotQualifiedExpression -> if (expr.rootExpression.text in parameterNames) {
+                            add(expr.rootExpression.text)
+                        }
+
+                        else -> {}
+                    }
+                }
+            }
+            current = current.receiverExpression as? KtDotQualifiedExpression
         }
     }
-        .filter { it in parameterNames }
-        .toSet()
+}
 
 private fun KtCallExpression.ancestorsParameterNamesSequence(stopAt: PsiElement) = parents.takeWhile { it != stopAt }
     .filterIsInstance<KtCallableDeclaration>()
@@ -61,10 +98,17 @@ fun KtCallExpression.findShadowingRedeclarations(
     .filter { (name, _) -> name == parameterName }
     .mapSecond()
 
-fun KtCallExpression.isAnyShadowed(parameterNames: Set<String>, origin: PsiElement): Boolean {
-    val currentNames = parametersBeingUsedFrom(parameterNames)
+fun KtCallExpression.isFullyShadowed(
+    parameterNames: Set<String>,
+    origin: PsiElement,
+    modifierTypeNames: Set<String> = DefaultModifierTypeNames,
+): Boolean {
+    val currentNames = parametersBeingUsedFrom(parameterNames, modifierTypeNames)
+    if (currentNames.isEmpty()) return false
 
-    // For those modifiers, we look at the parents and see if any of them is a function that has a param with
-    //  the same name.
-    return ancestorsParameterNamesSequence(stopAt = origin).any { it in currentNames }
+    // Only skip this call if every modifier it uses comes from a shadow scope.
+    // Using any { } here would incorrectly drop calls where one argument is a shadowed lambda-local
+    // modifier but another argument is a genuine outer-modifier alias.
+    val ancestorNames = ancestorsParameterNamesSequence(stopAt = origin).toSet()
+    return currentNames.all { it in ancestorNames }
 }

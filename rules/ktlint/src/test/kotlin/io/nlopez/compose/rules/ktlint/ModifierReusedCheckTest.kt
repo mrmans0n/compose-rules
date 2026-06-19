@@ -337,6 +337,149 @@ class ModifierReusedCheckTest {
     }
 
     @Test
+    fun `errors when outer modifier alias derived inside a shadow lambda is also reused`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun Something(modifier: Modifier) {
+                    val rootModifier = modifier
+                    Column(modifier = rootModifier) {
+                        Slot { modifier: Modifier ->
+                            val childModifier = rootModifier.padding(8.dp)
+                            Row(modifier = childModifier) {}
+                        }
+                    }
+                }
+            """.trimIndent()
+
+        modifierRuleAssertThat(code).hasLintViolationsWithoutAutoCorrect(
+            LintViolation(4, 5, ModifierReused.ModifierShouldBeUsedOnceOnly),
+            LintViolation(7, 13, ModifierReused.ModifierShouldBeUsedOnceOnly),
+        )
+    }
+
+    @Test
+    fun `errors when modifier alias is reused even when combined with a shadowed modifier in then`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun Something(modifier: Modifier) {
+                    val rootModifier = modifier
+                    Column(modifier = rootModifier) {
+                        Slot { modifier: Modifier ->
+                            Row(modifier = rootModifier.then(modifier)) {}
+                        }
+                    }
+                }
+            """.trimIndent()
+
+        modifierRuleAssertThat(code).hasLintViolationsWithoutAutoCorrect(
+            LintViolation(
+                line = 4,
+                col = 5,
+                detail = ModifierReused.ModifierShouldBeUsedOnceOnly,
+            ),
+            LintViolation(
+                line = 6,
+                col = 13,
+                detail = ModifierReused.ModifierShouldBeUsedOnceOnly,
+            ),
+        )
+    }
+
+    @Test
+    fun `errors when outer modifier alias is in then arg and shadowed modifier is chain receiver`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun Something(modifier: Modifier) {
+                    val rootModifier = modifier
+                    Column(modifier = rootModifier) {
+                        Slot { modifier: Modifier ->
+                            Row(modifier = modifier.then(rootModifier)) {}
+                        }
+                    }
+                }
+            """.trimIndent()
+
+        modifierRuleAssertThat(code).hasLintViolationsWithoutAutoCorrect(
+            LintViolation(
+                line = 4,
+                col = 5,
+                detail = ModifierReused.ModifierShouldBeUsedOnceOnly,
+            ),
+            LintViolation(
+                line = 6,
+                col = 13,
+                detail = ModifierReused.ModifierShouldBeUsedOnceOnly,
+            ),
+        )
+    }
+
+    @Test
+    fun `errors when outer modifier alias is passed alongside a shadowed modifier in a multi-arg call`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun Something(modifier: Modifier) {
+                    val rootModifier = modifier
+                    Column(modifier = rootModifier) {
+                        Slot { modifier: Modifier ->
+                            Child(modifier = rootModifier, extra = modifier)
+                        }
+                    }
+                }
+            """.trimIndent()
+
+        modifierRuleAssertThat(code).hasLintViolationsWithoutAutoCorrect(
+            LintViolation(
+                line = 4,
+                col = 5,
+                detail = ModifierReused.ModifierShouldBeUsedOnceOnly,
+            ),
+            LintViolation(
+                line = 6,
+                col = 13,
+                detail = ModifierReused.ModifierShouldBeUsedOnceOnly,
+            ),
+        )
+    }
+
+    @Test
+    fun `passes when modifier is used as an argument to a non-modifier factory function`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun Something(modifier: Modifier) {
+                    Column(modifier = modifier) {
+                        Icon(painter = PainterFactory.create(modifier))
+                    }
+                }
+            """.trimIndent()
+        modifierRuleAssertThat(code).hasNoLintViolations()
+    }
+
+    @Test
+    fun `passes when modifier is an argument to an uppercase-rooted unrelated dot then call`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun Something(modifier: Modifier) {
+                    Column(modifier = modifier) {
+                        Child(model = SomePipeline.then(modifier))
+                    }
+                }
+            """.trimIndent()
+        modifierRuleAssertThat(code).hasNoLintViolations()
+    }
+
+    @Test
     fun `passes when modifiers are reused for mutually exclusive branches`() {
         @Language("kotlin")
         val code =
@@ -393,6 +536,48 @@ class ModifierReusedCheckTest {
     }
 
     @Test
+    fun `errors when modifier is passed as an argument to Modifier dot then`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun Something(modifier: Modifier) {
+                    Row(modifier = Modifier.then(modifier)) {
+                        Column(modifier = modifier) {}
+                    }
+                }
+                @Composable
+                fun Something(modifier: Modifier) {
+                    Row(modifier = Modifier.fillMaxWidth().then(modifier)) {}
+                    Column(modifier = modifier) {}
+                }
+            """.trimIndent()
+
+        modifierRuleAssertThat(code).hasLintViolationsWithoutAutoCorrect(
+            LintViolation(
+                line = 3,
+                col = 5,
+                detail = ModifierReused.ModifierShouldBeUsedOnceOnly,
+            ),
+            LintViolation(
+                line = 4,
+                col = 9,
+                detail = ModifierReused.ModifierShouldBeUsedOnceOnly,
+            ),
+            LintViolation(
+                line = 9,
+                col = 5,
+                detail = ModifierReused.ModifierShouldBeUsedOnceOnly,
+            ),
+            LintViolation(
+                line = 10,
+                col = 5,
+                detail = ModifierReused.ModifierShouldBeUsedOnceOnly,
+            ),
+        )
+    }
+
+    @Test
     fun `passes when the modifier parameter of a Composable is shadowed`() {
         @Language("kotlin")
         val code =
@@ -419,8 +604,68 @@ class ModifierReusedCheckTest {
                         Bleh { modifier -> Potato(modifier) }
                     }
                 }
+                @Composable
+                fun Something(modifier: Modifier) {
+                    Column(modifier = modifier) {
+                        Bleh { modifier: Modifier -> Row(modifier = Modifier.then(modifier)) }
+                    }
+                }
+                @Composable
+                fun Something(modifier: Modifier) {
+                    Row(modifier) {
+                        Slot { modifier: Modifier ->
+                            val local = modifier.padding(8.dp)
+                            Row(modifier = Modifier.then(local)) {}
+                        }
+                    }
+                }
+                @Composable
+                fun Something(modifier: Modifier) {
+                    Row(modifier) {
+                        Slot { (modifier, _) ->
+                            val local = modifier.padding(8.dp)
+                            Row(modifier = Modifier.then(local)) {}
+                        }
+                    }
+                }
             """.trimIndent()
 
+        modifierRuleAssertThat(code).hasNoLintViolations()
+    }
+
+    @Test
+    fun `passes when modifier is used only in a nested local function with its own modifier parameter`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun Something(modifier: Modifier = Modifier) {
+                    @Composable fun Local(modifier: Modifier) {
+                        val local = modifier.padding(8.dp)
+                        Row(modifier = Modifier.then(local)) {}
+                    }
+                    Column(modifier = modifier) {}
+                }
+            """.trimIndent()
+        modifierRuleAssertThat(code).hasNoLintViolations()
+    }
+
+    @Test
+    fun `passes when a shadowed then-chain in the same lambda block does not inflate the reuse count`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun Something(modifier: Modifier = Modifier) {
+                    val rootModifier = modifier
+                    Column {
+                        Slot { modifier: Modifier ->
+                            Row(modifier = Modifier.then(modifier)) {}
+                            Box(modifier = rootModifier) {}
+                        }
+                    }
+                }
+            """.trimIndent()
         modifierRuleAssertThat(code).hasNoLintViolations()
     }
 

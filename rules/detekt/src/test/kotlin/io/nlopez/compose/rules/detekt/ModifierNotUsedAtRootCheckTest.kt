@@ -159,4 +159,77 @@ class ModifierNotUsedAtRootCheckTest {
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }
+
+    @Test
+    fun `passes when modifier is used via Modifier dot then inside a shadowing lambda`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun Something(modifier: Modifier = Modifier) {
+                    Column(modifier = modifier) {
+                        Slot { modifier: Modifier ->
+                            Row(modifier = Modifier.then(modifier)) {}
+                        }
+                    }
+                }
+                @Composable
+                fun Something(modifier: Modifier = Modifier) {
+                    Column(modifier = modifier) {
+                        Slot { (modifier, _) ->
+                            val local = modifier.padding(8.dp)
+                            Row(modifier = Modifier.then(local)) {}
+                        }
+                    }
+                }
+            """.trimIndent()
+        val errors = rule.lint(code)
+        assertThat(errors).isEmpty()
+    }
+
+    @Test
+    fun `errors when outer modifier alias is in then arg and shadowed modifier is chain receiver`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun Something(modifier: Modifier = Modifier) {
+                    val rootModifier = modifier
+                    Column {
+                        Slot { modifier: Modifier ->
+                            Child(modifier = modifier.then(rootModifier))
+                        }
+                    }
+                }
+            """.trimIndent()
+        val errors = rule.lint(code)
+        assertThat(errors)
+            .hasStartSourceLocations(SourceLocation(6, 19))
+        for (error in errors) {
+            assertThat(error).hasMessage(ComposableModifierShouldBeUsedAtTheTopMostPossiblePlace)
+        }
+    }
+
+    @Test
+    fun `errors when outer modifier alias is passed alongside a shadowed modifier in a multi-arg call`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun Something(modifier: Modifier = Modifier) {
+                    val rootModifier = modifier
+                    Column {
+                        Slot { modifier: Modifier ->
+                            Child(modifier = rootModifier, extra = modifier)
+                        }
+                    }
+                }
+            """.trimIndent()
+        val errors = rule.lint(code)
+        assertThat(errors)
+            .hasStartSourceLocations(SourceLocation(6, 19))
+        for (error in errors) {
+            assertThat(error).hasMessage(ComposableModifierShouldBeUsedAtTheTopMostPossiblePlace)
+        }
+    }
 }
