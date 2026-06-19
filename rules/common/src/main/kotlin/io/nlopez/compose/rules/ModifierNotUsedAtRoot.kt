@@ -9,6 +9,7 @@ import io.nlopez.compose.core.report
 import io.nlopez.compose.core.util.argumentsUsingModifiers
 import io.nlopez.compose.core.util.emitsContent
 import io.nlopez.compose.core.util.findAllChildrenByClass
+import io.nlopez.compose.core.util.isAnyShadowed
 import io.nlopez.compose.core.util.isInContentEmittersDenylist
 import io.nlopez.compose.core.util.mapSecond
 import io.nlopez.compose.core.util.modifierParameter
@@ -34,6 +35,7 @@ class ModifierNotUsedAtRoot : ComposeKtVisitor {
                 callExpression.argumentsUsingModifiers(modifiers).firstOrNull()
                     ?.let { usage -> callExpression to usage }
             }
+            .filterNot { (callExpression, _) -> callExpression.isAnyShadowed(modifiers, function) }
             .filter { (callExpression, _) ->
                 // we'll need to traverse upwards to the composable root and check if there is any parent that
                 // emits content: if this is the case, the main modifier should be used there instead.

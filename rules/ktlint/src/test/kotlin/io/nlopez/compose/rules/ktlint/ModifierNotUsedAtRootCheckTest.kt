@@ -176,4 +176,21 @@ class ModifierNotUsedAtRootCheckTest {
             )
             .hasNoLintViolations()
     }
+
+    @Test
+    fun `passes when modifier is used via Modifier dot then inside a shadowing lambda`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun Something(modifier: Modifier = Modifier) {
+                    Column(modifier = modifier) {
+                        Slot { modifier: Modifier ->
+                            Row(modifier = Modifier.then(modifier)) {}
+                        }
+                    }
+                }
+            """.trimIndent()
+        modifierRuleAssertThat(code).hasNoLintViolations()
+    }
 }
