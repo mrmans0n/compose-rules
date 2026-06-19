@@ -65,24 +65,22 @@ fun KtCallExpression.argumentsUsingModifiers(modifierNames: Set<String>): List<K
             is KtDotQualifiedExpression -> {
                 // On cases of multiple nested KtDotQualifiedExpressions (e.g. multiple chained methods)
                 // we need to iterate until we find the start of the chain
-                val rootText = expression.rootExpression.text
-                rootText in modifierNames ||
-                    // Only scan chain arguments when the root is a known modifier type, to avoid
-                    // false positives from unrelated dot chains like PainterFactory.create(modifier)
-                    (rootText in ModifierNames && expression.hasModifierAsChainArgument(modifierNames))
+                expression.rootExpression.text in modifierNames ||
+                    expression.hasModifierAsChainArgument(modifierNames)
             }
 
             else -> false
         }
     }
 
-// Checks if a modifier name appears as a direct argument anywhere in a dot-qualified chain.
-// Handles patterns like Modifier.then(modifier) and Modifier.fillMaxWidth().then(modifier).
+// Checks if a modifier name appears as a direct argument to a .then() call anywhere in a
+// dot-qualified chain. Restricting to .then() avoids false positives from unrelated chains like
+// PainterFactory.create(modifier) and automatically covers custom modifier types.
 private fun KtDotQualifiedExpression.hasModifierAsChainArgument(modifierNames: Set<String>): Boolean {
     var current: KtDotQualifiedExpression? = this
     while (current != null) {
         val selector = current.selectorExpression as? KtCallExpression
-        if (selector != null) {
+        if (selector?.calleeExpression?.text == "then") {
             for (arg in selector.valueArguments) {
                 when (val expr = arg.getArgumentExpression()) {
                     is KtReferenceExpression -> if (expr.text in modifierNames) return true

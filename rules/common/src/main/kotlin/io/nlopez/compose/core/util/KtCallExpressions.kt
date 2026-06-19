@@ -26,26 +26,36 @@ fun KtCallExpression.parametersBeingUsedFrom(parameterNames: Set<String>): Set<S
     }.toSet()
 
 private fun KtDotQualifiedExpression.parameterNamesUsedIn(parameterNames: Set<String>): Set<String> = buildSet {
-    if (rootExpression.text in parameterNames) add(rootExpression.text)
-    var current: KtDotQualifiedExpression? = this@parameterNamesUsedIn
-    while (current != null) {
-        val selector = current.selectorExpression as? KtCallExpression
-        if (selector != null) {
-            for (arg in selector.valueArguments) {
-                when (val expr = arg.getArgumentExpression()) {
-                    is KtReferenceExpression -> if (expr.text in parameterNames) add(expr.text)
+    val rootText = rootExpression.text
+    if (rootText in parameterNames) {
+        // Receiver is a modifier parameter — use only the root for shadowing checks. Don't also
+        // scan chain arguments, which may be a different (shadowed) modifier: e.g. in
+        // rootModifier.then(modifier) inside a lambda that shadows `modifier`, returning both
+        // names would cause isAnyShadowed to drop the call and hide the rootModifier reuse.
+        add(rootText)
+    } else {
+        // Root is not a parameter (e.g. the Modifier type itself); scan .then() arguments for
+        // patterns like Modifier.then(modifier).
+        var current: KtDotQualifiedExpression? = this@parameterNamesUsedIn
+        while (current != null) {
+            val selector = current.selectorExpression as? KtCallExpression
+            if (selector?.calleeExpression?.text == "then") {
+                for (arg in selector.valueArguments) {
+                    when (val expr = arg.getArgumentExpression()) {
+                        is KtReferenceExpression -> if (expr.text in parameterNames) add(expr.text)
 
-                    is KtDotQualifiedExpression -> if (expr.rootExpression.text in
-                        parameterNames
-                    ) {
-                        add(expr.rootExpression.text)
+                        is KtDotQualifiedExpression -> if (expr.rootExpression.text in
+                            parameterNames
+                        ) {
+                            add(expr.rootExpression.text)
+                        }
+
+                        else -> {}
                     }
-
-                    else -> {}
                 }
             }
+            current = current.receiverExpression as? KtDotQualifiedExpression
         }
-        current = current.receiverExpression as? KtDotQualifiedExpression
     }
 }
 
