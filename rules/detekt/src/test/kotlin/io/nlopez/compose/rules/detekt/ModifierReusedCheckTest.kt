@@ -262,6 +262,33 @@ class ModifierReusedCheckTest {
     }
 
     @Test
+    fun `errors when outer modifier alias is passed alongside a shadowed modifier in a multi-arg call`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun Something(modifier: Modifier) {
+                    val rootModifier = modifier
+                    Column(modifier = rootModifier) {
+                        Slot { modifier: Modifier ->
+                            Child(modifier = rootModifier, extra = modifier)
+                        }
+                    }
+                }
+            """.trimIndent()
+
+        val errors = rule.lint(code)
+        assertThat(errors)
+            .hasStartSourceLocations(
+                SourceLocation(4, 5),
+                SourceLocation(6, 13),
+            )
+        for (error in errors) {
+            assertThat(error).hasMessage(ModifierReused.ModifierShouldBeUsedOnceOnly)
+        }
+    }
+
+    @Test
     fun `passes when modifier is used as an argument to a non-modifier factory function`() {
         @Language("kotlin")
         val code =

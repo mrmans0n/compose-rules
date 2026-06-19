@@ -177,4 +177,27 @@ class ModifierNotUsedAtRootCheckTest {
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }
+
+    @Test
+    fun `errors when outer modifier alias is passed alongside a shadowed modifier in a multi-arg call`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun Something(modifier: Modifier = Modifier) {
+                    val rootModifier = modifier
+                    Column {
+                        Slot { modifier: Modifier ->
+                            Child(modifier = rootModifier, extra = modifier)
+                        }
+                    }
+                }
+            """.trimIndent()
+        val errors = rule.lint(code)
+        assertThat(errors)
+            .hasStartSourceLocations(SourceLocation(6, 19))
+        for (error in errors) {
+            assertThat(error).hasMessage(ComposableModifierShouldBeUsedAtTheTopMostPossiblePlace)
+        }
+    }
 }

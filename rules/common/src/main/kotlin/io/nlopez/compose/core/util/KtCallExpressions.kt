@@ -94,10 +94,13 @@ fun KtCallExpression.findShadowingRedeclarations(
     .filter { (name, _) -> name == parameterName }
     .mapSecond()
 
-fun KtCallExpression.isAnyShadowed(parameterNames: Set<String>, origin: PsiElement): Boolean {
+fun KtCallExpression.isFullyShadowed(parameterNames: Set<String>, origin: PsiElement): Boolean {
     val currentNames = parametersBeingUsedFrom(parameterNames)
+    if (currentNames.isEmpty()) return false
 
-    // For those modifiers, we look at the parents and see if any of them is a function that has a param with
-    //  the same name.
-    return ancestorsParameterNamesSequence(stopAt = origin).any { it in currentNames }
+    // Only skip this call if every modifier it uses comes from a shadow scope.
+    // Using any { } here would incorrectly drop calls where one argument is a shadowed lambda-local
+    // modifier but another argument is a genuine outer-modifier alias.
+    val ancestorNames = ancestorsParameterNamesSequence(stopAt = origin).toSet()
+    return currentNames.all { it in ancestorNames }
 }

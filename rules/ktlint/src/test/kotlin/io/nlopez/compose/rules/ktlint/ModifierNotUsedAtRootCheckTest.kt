@@ -193,4 +193,29 @@ class ModifierNotUsedAtRootCheckTest {
             """.trimIndent()
         modifierRuleAssertThat(code).hasNoLintViolations()
     }
+
+    @Test
+    fun `errors when outer modifier alias is passed alongside a shadowed modifier in a multi-arg call`() {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun Something(modifier: Modifier = Modifier) {
+                    val rootModifier = modifier
+                    Column {
+                        Slot { modifier: Modifier ->
+                            Child(modifier = rootModifier, extra = modifier)
+                        }
+                    }
+                }
+            """.trimIndent()
+        modifierRuleAssertThat(code)
+            .hasLintViolationsWithoutAutoCorrect(
+                LintViolation(
+                    line = 6,
+                    col = 19,
+                    detail = ComposableModifierShouldBeUsedAtTheTopMostPossiblePlace,
+                ),
+            )
+    }
 }

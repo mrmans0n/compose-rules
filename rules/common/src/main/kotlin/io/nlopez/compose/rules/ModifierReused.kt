@@ -8,7 +8,7 @@ import io.nlopez.compose.core.ComposeKtVisitor
 import io.nlopez.compose.core.Emitter
 import io.nlopez.compose.core.util.emitsContent
 import io.nlopez.compose.core.util.findAllChildrenByClass
-import io.nlopez.compose.core.util.isAnyShadowed
+import io.nlopez.compose.core.util.isFullyShadowed
 import io.nlopez.compose.core.util.isUsingModifiers
 import io.nlopez.compose.core.util.modifierParameters
 import io.nlopez.compose.core.util.obtainAllModifierNames
@@ -39,7 +39,7 @@ class ModifierReused : ComposeKtVisitor {
                     .filter { it.isUsingModifiers(modifierNames) }
                     // For those modifiers, we look at the parents and see if any of them is a function that has a param with
                     //  the same name.
-                    .filterNot { it.isAnyShadowed(modifierNames, function) }
+                    .filterNot { it.isFullyShadowed(modifierNames, function) }
                     .map { callExpression ->
                         fun Sequence<PsiElement>.modifierUsagesSet(): Set<KtCallExpression> =
                             filterIsInstance<KtCallExpression>()
