@@ -484,6 +484,25 @@ class UnnecessaryComposableCheckTest {
     }
 
     @Test
+    fun `does not report composition use inside eager sequence association`() {
+        @Language("kotlin")
+        val code = codeWithFakeCompose(
+            """
+            val LocalCount = compositionLocalOf { 0 }
+
+            @Composable
+            fun Example(items: Sequence<Int>): Map<Int, Int> = items.associateWith { item ->
+                item + LocalCount.current
+            }
+            """,
+        )
+
+        val findings = rule.lintWithAnalysisApi(code)
+
+        assertThat(findings).isEmpty()
+    }
+
+    @Test
     fun `does not report composition use inside eager builder lambda`() {
         @Language("kotlin")
         val code = codeWithFakeCompose(
