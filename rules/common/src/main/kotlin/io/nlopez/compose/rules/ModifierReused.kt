@@ -11,6 +11,7 @@ import io.nlopez.compose.core.util.findAllChildrenByClass
 import io.nlopez.compose.core.util.isFullyShadowed
 import io.nlopez.compose.core.util.isUsingModifiers
 import io.nlopez.compose.core.util.modifierParameters
+import io.nlopez.compose.core.util.modifierTypeNames
 import io.nlopez.compose.core.util.obtainAllModifierNames
 import io.nlopez.compose.core.util.walkBackwards
 import org.jetbrains.kotlin.psi.KtCallExpression
@@ -26,6 +27,7 @@ class ModifierReused : ComposeKtVisitor {
         val composableBlockExpression = function.bodyBlockExpression ?: return
         val initialModifierNames = function.modifierParameters(config).mapNotNull { it.name }.toSet()
         if (initialModifierNames.isEmpty()) return
+        val typeNames = modifierTypeNames(config)
 
         initialModifierNames
             .map {
@@ -36,14 +38,14 @@ class ModifierReused : ComposeKtVisitor {
                 // Find all composable-looking CALL_EXPRESSIONs that are using any of these modifier names
                 composableBlockExpression.findAllChildrenByClass<KtCallExpression>()
                     .filter { it.calleeExpression?.text?.first()?.isUpperCase() == true }
-                    .filter { it.isUsingModifiers(modifierNames) }
+                    .filter { it.isUsingModifiers(modifierNames, typeNames) }
                     // For those modifiers, we look at the parents and see if any of them is a function that has a param with
                     //  the same name.
                     .filterNot { it.isFullyShadowed(modifierNames, function) }
                     .map { callExpression ->
                         fun Sequence<PsiElement>.modifierUsagesSet(): Set<KtCallExpression> =
                             filterIsInstance<KtCallExpression>()
-                                .filter { it.isUsingModifiers(modifierNames) }
+                                .filter { it.isUsingModifiers(modifierNames, typeNames) }
                                 .toSet()
 
                         // To get an accurate count (and respecting if/when/whatever different branches)

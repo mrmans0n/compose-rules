@@ -450,6 +450,7 @@ class ModifierReusedCheckTest {
                 fun Something(modifier: Modifier) {
                     Column(modifier = modifier) {
                         Child(model = somePipeline.then(modifier))
+                        Child(model = SomePipeline.then(modifier))
                     }
                 }
             """.trimIndent()

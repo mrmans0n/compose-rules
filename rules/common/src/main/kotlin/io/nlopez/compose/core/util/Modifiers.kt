@@ -49,37 +49,38 @@ private fun KtBlockExpression.findModifierManipulations(contains: (String) -> Bo
     }
     .mapNotNull { it.nameIdentifier?.text }
 
-fun KtCallExpression.isUsingModifiers(modifierNames: Set<String>): Boolean =
-    argumentsUsingModifiers(modifierNames).isNotEmpty()
+fun KtCallExpression.isUsingModifiers(
+    modifierNames: Set<String>,
+    modifierTypeNames: Set<String> = ModifierNames,
+): Boolean = argumentsUsingModifiers(modifierNames, modifierTypeNames).isNotEmpty()
 
-fun KtCallExpression.argumentsUsingModifiers(modifierNames: Set<String>): List<KtValueArgument> =
-    valueArguments.filter { argument ->
-        when (val expression = argument.getArgumentExpression()) {
-            // if it's MyComposable(modifier) or similar
-            is KtReferenceExpression -> {
-                expression.text in modifierNames
-            }
-
-            // if it's MyComposable(modifier.fillMaxWidth()) or similar,
-            // also handles MyComposable(Modifier.then(modifier)) and chained variants
-            is KtDotQualifiedExpression -> {
-                // On cases of multiple nested KtDotQualifiedExpressions (e.g. multiple chained methods)
-                // we need to iterate until we find the start of the chain
-                val rootText = expression.rootExpression.text
-                rootText in modifierNames ||
-                    // Only scan .then() args when the chain root is a modifier parameter/alias
-                    // (already handled above) or looks like a type literal (uppercase first letter —
-                    // Modifier, BananaModifier, etc.). Lowercase roots that aren't known modifier
-                    // parameters are unrelated chains like somePipeline.then(modifier).
-                    (
-                        rootText.firstOrNull()?.isUpperCase() == true &&
-                            expression.hasModifierAsChainArgument(modifierNames)
-                        )
-            }
-
-            else -> false
+fun KtCallExpression.argumentsUsingModifiers(
+    modifierNames: Set<String>,
+    modifierTypeNames: Set<String> = ModifierNames,
+): List<KtValueArgument> = valueArguments.filter { argument ->
+    when (val expression = argument.getArgumentExpression()) {
+        // if it's MyComposable(modifier) or similar
+        is KtReferenceExpression -> {
+            expression.text in modifierNames
         }
+
+        // if it's MyComposable(modifier.fillMaxWidth()) or similar,
+        // also handles MyComposable(Modifier.then(modifier)) and chained variants
+        is KtDotQualifiedExpression -> {
+            // On cases of multiple nested KtDotQualifiedExpressions (e.g. multiple chained methods)
+            // we need to iterate until we find the start of the chain
+            val rootText = expression.rootExpression.text
+            rootText in modifierNames ||
+                // Only scan .then() args when the chain root is a known Modifier type literal
+                // (Modifier, GlanceModifier, or a configured custom modifier type). Guarding
+                // against exact type names prevents false positives from unrelated chains like
+                // SomePipeline.then(modifier) where the receiver is not a Modifier at all.
+                (rootText in modifierTypeNames && expression.hasModifierAsChainArgument(modifierNames))
+        }
+
+        else -> false
     }
+}
 
 // Checks if a modifier name appears as a direct argument to a .then() call anywhere in a
 // dot-qualified chain. Restricting to .then() avoids false positives from unrelated chains like
@@ -109,11 +110,14 @@ private val ModifierNames by lazy {
     )
 }
 
+fun modifierTypeNames(config: ComposeKtConfig): Set<String> =
+    ModifierNames + config.getSet("customModifiers", emptySet())
+
 fun KtCallableDeclaration.isModifier(config: ComposeKtConfig): Boolean =
-    typeReference?.text in ModifierNames + config.getSet("customModifiers", emptySet())
+    typeReference?.text in modifierTypeNames(config)
 
 fun KtCallableDeclaration.isModifierReceiver(config: ComposeKtConfig): Boolean =
-    receiverTypeReference?.text in ModifierNames + config.getSet("customModifiers", emptySet())
+    receiverTypeReference?.text in modifierTypeNames(config)
 
 fun KtFunction.modifierParameter(config: ComposeKtConfig): KtParameter? {
     val modifiers = valueParameters.filter { it.isModifier(config) }

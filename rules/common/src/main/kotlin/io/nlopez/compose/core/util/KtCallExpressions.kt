@@ -28,10 +28,10 @@ fun KtCallExpression.parametersBeingUsedFrom(parameterNames: Set<String>): Set<S
 private fun KtDotQualifiedExpression.parameterNamesUsedIn(parameterNames: Set<String>): Set<String> = buildSet {
     val rootText = rootExpression.text
     if (rootText in parameterNames) add(rootText)
-    // Scan .then() arguments when the chain root is a modifier parameter/alias or looks like a
-    // type literal (uppercase first letter). Lowercase roots that aren't known modifier parameters
-    // are unrelated chains (e.g. somePipeline.then(modifier)) — skip them to avoid false positives.
-    val shouldScanThenArgs = rootText in parameterNames || rootText.firstOrNull()?.isUpperCase() == true
+    // Scan .then() arguments when the chain root is a modifier parameter/alias or a known
+    // Modifier type literal. Unrelated chains (SomePipeline.then(modifier)) are filtered out
+    // earlier by argumentsUsingModifiers, but the guard here provides defense-in-depth.
+    val shouldScanThenArgs = rootText in parameterNames || rootText in setOf("Modifier", "GlanceModifier")
     if (shouldScanThenArgs) {
         var current: KtDotQualifiedExpression? = this@parameterNamesUsedIn
         while (current != null) {

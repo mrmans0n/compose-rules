@@ -13,6 +13,7 @@ import io.nlopez.compose.core.util.isFullyShadowed
 import io.nlopez.compose.core.util.isInContentEmittersDenylist
 import io.nlopez.compose.core.util.mapSecond
 import io.nlopez.compose.core.util.modifierParameter
+import io.nlopez.compose.core.util.modifierTypeNames
 import io.nlopez.compose.core.util.obtainAllModifierNames
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtFunction
@@ -28,11 +29,12 @@ class ModifierNotUsedAtRoot : ComposeKtVisitor {
         val code = function.bodyBlockExpression ?: return
 
         val modifiers = code.obtainAllModifierNames("modifier").toSet()
+        val typeNames = modifierTypeNames(config)
 
         val errors = code.findAllChildrenByClass<KtCallExpression>()
             .filter { it.calleeExpression?.text?.first()?.isUpperCase() == true }
             .mapNotNull { callExpression ->
-                callExpression.argumentsUsingModifiers(modifiers).firstOrNull()
+                callExpression.argumentsUsingModifiers(modifiers, typeNames).firstOrNull()
                     ?.let { usage -> callExpression to usage }
             }
             .filterNot { (callExpression, _) -> callExpression.isFullyShadowed(modifiers, function) }
