@@ -15,8 +15,12 @@ import io.nlopez.compose.core.util.mapSecond
 import io.nlopez.compose.core.util.modifierParameter
 import io.nlopez.compose.core.util.modifierTypeNames
 import io.nlopez.compose.core.util.obtainAllModifierNames
+import io.nlopez.compose.core.util.rootExpression
 import org.jetbrains.kotlin.psi.KtCallExpression
+import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.KtFunction
+import org.jetbrains.kotlin.psi.KtFunctionLiteral
+import org.jetbrains.kotlin.psi.KtReferenceExpression
 import org.jetbrains.kotlin.psi.psiUtil.parents
 
 class ModifierNotUsedAtRoot : ComposeKtVisitor {
@@ -34,8 +38,20 @@ class ModifierNotUsedAtRoot : ComposeKtVisitor {
         val errors = code.findAllChildrenByClass<KtCallExpression>()
             .filter { it.calleeExpression?.text?.first()?.isUpperCase() == true }
             .mapNotNull { callExpression ->
-                callExpression.argumentsUsingModifiers(modifiers, typeNames).firstOrNull()
-                    ?.let { usage -> callExpression to usage }
+                // When a call has multiple modifier-using arguments and the first belongs to a
+                // shadowed lambda parameter, firstOrNull() would report at the wrong location.
+                // Prefer the first argument whose modifier is not from a shadow scope.
+                val args = callExpression.argumentsUsingModifiers(modifiers, typeNames)
+                if (args.isEmpty()) return@mapNotNull null
+                val shadowedNames = callExpression.shadowedModifierNamesUpTo(function, modifiers)
+                val usage = args.firstOrNull { arg ->
+                    when (val expr = arg.getArgumentExpression()) {
+                        is KtReferenceExpression -> expr.text !in shadowedNames
+                        is KtDotQualifiedExpression -> expr.rootExpression.text !in shadowedNames
+                        else -> true
+                    }
+                } ?: args.first()
+                callExpression to usage
             }
             .filterNot { (callExpression, _) -> callExpression.isFullyShadowed(modifiers, function, typeNames) }
             .filter { (callExpression, _) ->
@@ -53,6 +69,24 @@ class ModifierNotUsedAtRoot : ComposeKtVisitor {
             emitter.report(valueArgument, ComposableModifierShouldBeUsedAtTheTopMostPossiblePlace)
         }
     }
+
+    private fun KtCallExpression.shadowedModifierNamesUpTo(stopAt: KtFunction, modifiers: Set<String>): Set<String> =
+        parents.takeWhile { it != stopAt }
+            .filterIsInstance<KtFunctionLiteral>()
+            .flatMap { literal ->
+                literal.valueParameters.flatMap { param ->
+                    when {
+                        param.name != null -> listOfNotNull(param.name.takeIf { it in modifiers })
+
+                        param.destructuringDeclaration != null ->
+                            param.destructuringDeclaration!!.entries
+                                .mapNotNull { it.name?.takeIf { it in modifiers } }
+
+                        else -> emptyList()
+                    }
+                }
+            }
+            .toSet()
 
     companion object {
         val ComposableModifierShouldBeUsedAtTheTopMostPossiblePlace = """

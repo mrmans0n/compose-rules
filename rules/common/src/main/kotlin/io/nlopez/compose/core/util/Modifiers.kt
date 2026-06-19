@@ -45,7 +45,18 @@ fun KtBlockExpression.obtainAllModifierNames(initialName: String): List<String> 
 private fun KtBlockExpression.shadowedModifierNames(modifierNames: Set<String>): Set<String> =
     parents.filterIsInstance<KtFunctionLiteral>()
         .flatMap { literal ->
-            literal.valueParameters.mapNotNull { param -> param.name?.takeIf { it in modifierNames } }
+            literal.valueParameters.flatMap { param ->
+                when {
+                    param.name != null -> listOfNotNull(param.name.takeIf { it in modifierNames })
+
+                    // Destructured parameters like (modifier, _) store names in the declaration.
+                    param.destructuringDeclaration != null ->
+                        param.destructuringDeclaration!!.entries
+                            .mapNotNull { it.name?.takeIf { it in modifierNames } }
+
+                    else -> emptyList()
+                }
+            }
         }
         .toSet()
 
