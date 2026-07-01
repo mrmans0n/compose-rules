@@ -372,15 +372,13 @@ class InvalidReadOnlyComposableCheckTest {
         @Language("kotlin")
         val code = codeWithFakeCompose(
             """
-            class Palette(val primary: Int)
-
-            val currentPalette: Palette
+            val currentValue: Pair<Int, Int>
                 @Composable
-                get() = Palette(primary = 42)
+                get() = 1 to 2
 
             @ReadOnlyComposable
             @Composable
-            fun Example(): Int = currentPalette.primary
+            fun Example(): Int = currentValue.first
             """,
         )
 
@@ -388,7 +386,7 @@ class InvalidReadOnlyComposableCheckTest {
 
         assertThat(findings).hasSize(1)
         assertThat(findings.single())
-            .hasStartSourceLocation(SourceLocation(12, 30))
+            .hasStartSourceLocation(SourceLocation(10, 30))
             .hasMessage(InvalidReadOnlyComposableCheck.InvalidReadOnlyComposable)
     }
 

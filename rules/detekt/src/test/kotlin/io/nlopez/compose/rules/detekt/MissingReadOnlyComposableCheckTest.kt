@@ -84,15 +84,13 @@ class MissingReadOnlyComposableCheckTest {
         @Language("kotlin")
         val code = codeWithFakeCompose(
             """
-            class Palette(val primary: Int)
-
-            val currentPalette: Palette
+            val currentValue: Pair<Int, Int>
                 @ReadOnlyComposable
                 @Composable
-                get() = Palette(primary = 42)
+                get() = 1 to 2
 
             @Composable
-            fun Example(): Int = currentPalette.primary
+            fun Example(): Int = currentValue.first
             """,
         )
 
@@ -100,7 +98,7 @@ class MissingReadOnlyComposableCheckTest {
 
         assertThat(findings).hasSize(1)
         assertThat(findings.single())
-            .hasStartSourceLocation(SourceLocation(11, 9))
+            .hasStartSourceLocation(SourceLocation(9, 9))
             .hasMessage(MissingReadOnlyComposableCheck.MissingReadOnlyComposable)
     }
 
@@ -109,14 +107,12 @@ class MissingReadOnlyComposableCheckTest {
         @Language("kotlin")
         val code = codeWithFakeCompose(
             """
-            class Palette(val primary: Int)
-
-            val currentPalette: Palette
+            val currentValue: Pair<Int, Int>
                 @Composable
-                get() = Palette(primary = 42)
+                get() = 1 to 2
 
             @Composable
-            fun Example(): Int = currentPalette.primary
+            fun Example(): Int = currentValue.first
             """,
         )
 

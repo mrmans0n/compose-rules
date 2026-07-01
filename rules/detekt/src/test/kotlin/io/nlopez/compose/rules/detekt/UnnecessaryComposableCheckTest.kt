@@ -951,18 +951,16 @@ class UnnecessaryComposableCheckTest {
         @Language("kotlin")
         val code = codeWithFakeCompose(
             """
-            class Palette(val primary: Int)
+            val LocalCount = compositionLocalOf { 0 }
 
-            val LocalPalette = compositionLocalOf { Palette(primary = 0) }
-
-            val CurrentPalette: Palette
+            val CurrentCount: Int
                 @Composable
-                get() = LocalPalette.current
+                get() = LocalCount.current
 
-            fun describe(value: Int): String = value.toString()
+            fun describe(value: String): String = value
 
             @Composable
-            fun Example(): String = describe(CurrentPalette.primary)
+            fun Example(): String = describe(CurrentCount.toString())
             """,
         )
 
