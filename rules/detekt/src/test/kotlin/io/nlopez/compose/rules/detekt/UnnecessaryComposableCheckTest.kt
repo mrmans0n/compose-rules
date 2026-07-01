@@ -945,4 +945,29 @@ class UnnecessaryComposableCheckTest {
             .hasStartSourceLocation(SourceLocation(6, 9))
             .hasMessage(UnnecessaryComposableCheck.UnnecessaryComposable)
     }
+
+    @Test
+    fun `does not report composable function that reads chained composable property`() {
+        @Language("kotlin")
+        val code = codeWithFakeCompose(
+            """
+            class Palette(val primary: Int)
+
+            val LocalPalette = compositionLocalOf { Palette(primary = 0) }
+
+            val CurrentPalette: Palette
+                @Composable
+                get() = LocalPalette.current
+
+            fun describe(value: Int): String = value.toString()
+
+            @Composable
+            fun Example(): String = describe(CurrentPalette.primary)
+            """,
+        )
+
+        val findings = rule.lintWithAnalysisApi(code)
+
+        assertThat(findings).isEmpty()
+    }
 }

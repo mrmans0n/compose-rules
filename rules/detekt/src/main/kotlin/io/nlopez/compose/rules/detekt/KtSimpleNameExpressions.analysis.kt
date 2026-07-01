@@ -79,8 +79,6 @@ private fun KtSimpleNameExpression.resolvedPropertyRead(
     symbolPredicate: (KaPropertySymbol) -> Boolean,
     sourcePredicate: (KtProperty) -> Boolean,
 ): Boolean = runCatching {
-    if ((parent as? KtDotQualifiedExpression)?.receiverExpression == this) return@runCatching false
-
     analyze(this) {
         val property = ((resolveToCall() as? KaVariableAccessCall)?.signature?.symbol as? KaPropertySymbol)
             ?: mainReference.resolveToSymbol() as? KaPropertySymbol
