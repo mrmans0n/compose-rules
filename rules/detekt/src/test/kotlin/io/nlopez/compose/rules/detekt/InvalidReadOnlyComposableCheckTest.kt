@@ -368,6 +368,29 @@ class InvalidReadOnlyComposableCheckTest {
     }
 
     @Test
+    fun `reports read only composable function that reads chained non read only composable property`() {
+        @Language("kotlin")
+        val code = codeWithFakeCompose(
+            """
+            val currentValue: Pair<Int, Int>
+                @Composable
+                get() = 1 to 2
+
+            @ReadOnlyComposable
+            @Composable
+            fun Example(): Int = currentValue.first
+            """,
+        )
+
+        val findings = rule.lintWithAnalysisApi(code)
+
+        assertThat(findings).hasSize(1)
+        assertThat(findings.single())
+            .hasStartSourceLocation(SourceLocation(10, 30))
+            .hasMessage(InvalidReadOnlyComposableCheck.InvalidReadOnlyComposable)
+    }
+
+    @Test
     fun `does not report non read only composable call inside custom deferred forEach lambda`() {
         @Language("kotlin")
         val code = codeWithFakeCompose(

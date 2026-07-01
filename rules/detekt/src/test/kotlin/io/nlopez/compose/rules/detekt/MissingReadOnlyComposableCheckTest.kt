@@ -80,6 +80,48 @@ class MissingReadOnlyComposableCheckTest {
     }
 
     @Test
+    fun `reports composable function that reads chained read only composable property`() {
+        @Language("kotlin")
+        val code = codeWithFakeCompose(
+            """
+            val currentValue: Pair<Int, Int>
+                @ReadOnlyComposable
+                @Composable
+                get() = 1 to 2
+
+            @Composable
+            fun Example(): Int = currentValue.first
+            """,
+        )
+
+        val findings = rule.lintWithAnalysisApi(code)
+
+        assertThat(findings).hasSize(1)
+        assertThat(findings.single())
+            .hasStartSourceLocation(SourceLocation(9, 9))
+            .hasMessage(MissingReadOnlyComposableCheck.MissingReadOnlyComposable)
+    }
+
+    @Test
+    fun `does not report composable function that reads chained non read only composable property`() {
+        @Language("kotlin")
+        val code = codeWithFakeCompose(
+            """
+            val currentValue: Pair<Int, Int>
+                @Composable
+                get() = 1 to 2
+
+            @Composable
+            fun Example(): Int = currentValue.first
+            """,
+        )
+
+        val findings = rule.lintWithAnalysisApi(code)
+
+        assertThat(findings).isEmpty()
+    }
+
+    @Test
     fun `reports composable function that only reads composition local current`() {
         @Language("kotlin")
         val code = codeWithFakeCompose(
