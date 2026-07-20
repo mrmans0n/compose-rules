@@ -6,10 +6,10 @@ import org.jetbrains.kotlin.KtNodeTypes
 import org.jetbrains.kotlin.psi.KtConstantExpression
 
 val KtConstantExpression.isInt: Boolean
-    get() = isIntegerConstant && !isLong
+    get() = isIntegerConstant && !isLong && !isUnsignedInteger
 
 val KtConstantExpression.isLong: Boolean
-    get() = isIntegerConstant && text.endsWith("L")
+    get() = isIntegerConstant && text.endsWith("L") && !isUnsignedInteger
 
 val KtConstantExpression.isDouble: Boolean
     get() = isFloatConstant && !isFloat
@@ -22,3 +22,6 @@ private val KtConstantExpression.isIntegerConstant: Boolean
 
 private val KtConstantExpression.isFloatConstant: Boolean
     get() = node.elementType == KtNodeTypes.FLOAT_CONSTANT
+
+private val KtConstantExpression.isUnsignedInteger: Boolean
+    get() = text.endsWith("U", ignoreCase = true) || text.endsWith("UL", ignoreCase = true)
