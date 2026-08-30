@@ -1,7 +1,7 @@
 #!/usr/bin/env kotlin
 
 @file:DependsOn("org.apache.velocity:velocity-engine-core:2.4.1")
-@file:DependsOn("org.yaml:snakeyaml:2.6")
+@file:DependsOn("org.yaml:snakeyaml:2.7")
 
 import org.apache.velocity.VelocityContext
 import org.apache.velocity.app.VelocityEngine
