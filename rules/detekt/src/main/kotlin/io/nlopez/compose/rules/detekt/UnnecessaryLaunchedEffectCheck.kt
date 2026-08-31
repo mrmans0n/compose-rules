@@ -362,13 +362,17 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
 
     private fun KtElement.isInsideInvokedLocalLambda(effectBody: KtExpression): Boolean =
         nearestDeferredLambda(effectBody)
-            ?.localLambdaProperty()
-            ?.isInvokedIn(effectBody) == true
+            ?.let { lambda ->
+                lambda.isDirectlyInvoked(effectBody) ||
+                    lambda.localLambdaProperty()?.isInvokedIn(effectBody) == true
+            } == true
 
     private fun KtElement.isInsideDirectlyInvokedLocalLambda(scope: KtExpression): Boolean =
         nearestDeferredLambda(scope)
-            ?.localLambdaProperty()
-            ?.isDirectlyInvokedIn(scope) == true
+            ?.let { lambda ->
+                lambda.isDirectlyInvoked(scope) ||
+                    lambda.localLambdaProperty()?.isDirectlyInvokedIn(scope) == true
+            } == true
 
     private fun KtElement.nearestDeferredLambda(scope: KtExpression): KtLambdaExpression? =
         parents.takeWhile { parent -> parent != scope }
@@ -379,6 +383,14 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
 
     private fun KtLambdaExpression.localLambdaProperty(): KtProperty? = getStrictParentOfType<KtProperty>()
         ?.takeIf { property -> property.initializer?.unwrapArgumentExpression() == this }
+
+    private fun KtLambdaExpression.isDirectlyInvoked(scope: KtElement): Boolean = parents
+        .takeWhile { parent -> parent != scope && parent !is KtProperty }
+        .filterIsInstance<KtCallExpression>()
+        .any { call ->
+            call.calleeExpression == this ||
+                parents.takeWhile { parent -> parent != call }.any { parent -> parent == call.calleeExpression }
+        }
 
     private fun KtCallableReferenceExpression.isDirectlyInvoked(scope: KtElement): Boolean = parents
         .takeWhile { parent -> parent != scope && parent !is KtProperty }

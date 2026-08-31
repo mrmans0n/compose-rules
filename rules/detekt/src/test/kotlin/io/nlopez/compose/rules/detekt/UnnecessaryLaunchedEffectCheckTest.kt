@@ -1540,6 +1540,35 @@ class UnnecessaryLaunchedEffectCheckTest {
     }
 
     @Test
+    fun `allows configured receiver calls through immediately invoked lambda literals`() {
+        val configuredRule = UnnecessaryLaunchedEffectCheck(
+            TestConfig(
+                "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
+            ),
+        )
+        val findings = configuredRule.lintWithAnalysisApi(
+            codeWithFakeCompose(
+                """
+                class FocusRequester {
+                    fun requestFocus() = Unit
+                }
+
+                @Composable
+                fun Example(focusRequester: FocusRequester) {
+                    LaunchedEffect(Unit) {
+                        ({
+                            focusRequester.requestFocus()
+                        })()
+                    }
+                }
+                """,
+            ),
+        )
+
+        assertThat(findings).isEmpty()
+    }
+
+    @Test
     fun `allows configured receiver calls through local lambda values invoked from local functions`() {
         val configuredRule = UnnecessaryLaunchedEffectCheck(
             TestConfig(
