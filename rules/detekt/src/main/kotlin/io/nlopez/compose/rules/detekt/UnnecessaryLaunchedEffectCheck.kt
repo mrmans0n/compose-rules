@@ -358,56 +358,87 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
         if (references.isEmpty()) return emptyList()
         return collectDescendantsOfType<KtCallExpression> { call -> call.isInCurrentFunctionBody(this) }
             .mapNotNull { call ->
-                references[call.referencedLocalFunctionReferenceProperty(this, references.keys)]
+                val property = call.referencedLocalFunctionReferenceProperty(this, references.keys)
+                    ?: return@mapNotNull null
+                val reference = references[property] ?: return@mapNotNull null
+                reference.function.takeIf {
+                    call.textOffset > reference.startOffset &&
+                        !hasAssignmentBetween(
+                            property = property,
+                            properties = references.keys,
+                            startOffset = reference.startOffset,
+                            endOffset = call.textOffset,
+                        )
+                }
             } +
             collectDescendantsOfType<KtNameReferenceExpression> { reference -> reference.isInCurrentFunctionBody(this) }
                 .mapNotNull { reference ->
                     val inlineCall = reference.getStrictParentOfType<KtCallExpression>()
                         ?.takeIf { call -> call.isResolvedInlineArgument(reference) }
-                    if (inlineCall == null) {
-                        null
-                    } else {
-                        references[reference.referencedTrackedLocalProperty(this, references.keys)]
+                    val property = reference.referencedTrackedLocalProperty(this, references.keys)
+                        ?: return@mapNotNull null
+                    val functionReference = references[property] ?: return@mapNotNull null
+                    functionReference.function.takeIf {
+                        inlineCall != null &&
+                            reference.textOffset > functionReference.startOffset &&
+                            !hasAssignmentBetween(
+                                property = property,
+                                properties = references.keys,
+                                startOffset = functionReference.startOffset,
+                                endOffset = reference.textOffset,
+                            )
                     }
                 }
     }
 
     private fun KtExpression.localFunctionReferenceProperties(
         localFunctions: Set<KtNamedFunction>,
-    ): Map<KtProperty, KtNamedFunction> {
-        val references = mutableMapOf<KtProperty, KtNamedFunction>()
+    ): Map<KtProperty, LocalFunctionReference> {
+        val references = mutableMapOf<KtProperty, LocalFunctionReference>()
         do {
             val previousSize = references.size
             collectDescendantsOfType<KtProperty> { property -> property.isInCurrentFunctionBody(this) }
                 .forEach { property ->
                     val initializer = property.initializer?.unwrapArgumentExpression()
-                    val function = when (initializer) {
-                        is KtCallableReferenceExpression -> initializer.resolvedLocalFunction(localFunctions)
+                    val reference = when (initializer) {
+                        is KtCallableReferenceExpression ->
+                            initializer.resolvedLocalFunction(localFunctions)
+                                ?.let { function -> LocalFunctionReference(function, property.textOffset) }
 
                         is KtNameReferenceExpression ->
                             references[initializer.referencedTrackedLocalProperty(this, references.keys)]
+                                ?.let { reference ->
+                                    LocalFunctionReference(reference.function, property.textOffset)
+                                }
 
                         else -> null
                     } ?: return@forEach
-                    references[property] = function
+                    references[property] = reference
                 }
             collectDescendantsOfType<KtBinaryExpression> { assignment -> assignment.isInCurrentFunctionBody(this) }
                 .forEach { assignment ->
                     val property = assignment.assignedLocalProperty(this) ?: return@forEach
                     val initializer = assignment.right?.unwrapArgumentExpression()
-                    val function = when (initializer) {
-                        is KtCallableReferenceExpression -> initializer.resolvedLocalFunction(localFunctions)
+                    val reference = when (initializer) {
+                        is KtCallableReferenceExpression ->
+                            initializer.resolvedLocalFunction(localFunctions)
+                                ?.let { function -> LocalFunctionReference(function, assignment.textOffset) }
 
                         is KtNameReferenceExpression ->
                             references[initializer.referencedTrackedLocalProperty(this, references.keys)]
+                                ?.let { reference ->
+                                    LocalFunctionReference(reference.function, assignment.textOffset)
+                                }
 
                         else -> null
                     } ?: return@forEach
-                    references[property] = function
+                    references[property] = reference
                 }
         } while (references.size != previousSize)
         return references
     }
+
+    private data class LocalFunctionReference(val function: KtNamedFunction, val startOffset: Int)
 
     private fun KtCallExpression.referencedLocalFunctionReferenceProperty(
         scope: KtExpression,
