@@ -242,7 +242,7 @@ SideEffect(screenId) {
 }
 ```
 
-Keyed `SideEffect` requires Compose Runtime 1.12.0 or later. The rule leaves `LaunchedEffect` alone if any call cannot be resolved, which avoids reporting code whose coroutine requirement is unknown.
+Keyed `SideEffect` requires Compose Runtime 1.12.0 or later, so this rule is opt-in. The rule leaves `LaunchedEffect` alone if any call cannot be resolved, which avoids reporting code whose coroutine requirement is unknown.
 
 Both effects wait for a successful composition, but `SideEffect` runs on the composition's apply dispatcher while `LaunchedEffect` launches a coroutine in the composition's context. Keep `LaunchedEffect` when a non-suspending API depends on that coroutine scheduling or lifecycle; configure its receiver type or fully qualified function name:
 

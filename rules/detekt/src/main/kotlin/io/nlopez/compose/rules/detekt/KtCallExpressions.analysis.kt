@@ -84,7 +84,7 @@ internal fun KtCallExpression.hasExplicitArgumentMappedToAny(parameterNames: Set
 
 internal fun KtCallExpression.lambdaArgumentMappedTo(parameterName: String): KtLambdaExpression? {
     val lambdaExpressions = valueArguments.mapNotNull { argument ->
-        argument.getArgumentExpression() as? KtLambdaExpression
+        argument.getArgumentExpression()?.unwrapArgumentExpression() as? KtLambdaExpression
     } + lambdaArguments.mapNotNull { argument -> argument.getLambdaExpression() }
     if (lambdaExpressions.isEmpty()) return null
 

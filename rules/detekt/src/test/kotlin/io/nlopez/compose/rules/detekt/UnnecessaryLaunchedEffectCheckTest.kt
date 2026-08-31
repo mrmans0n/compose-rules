@@ -194,12 +194,13 @@ class UnnecessaryLaunchedEffectCheckTest {
                 fun Example() {
                     LaunchedEffect(Unit, { update() })
                     LaunchedEffect(key1 = Unit, block = { update() })
+                    LaunchedEffect(Unit, block = ({ update() }))
                 }
                 """,
             ),
         )
 
-        assertThat(findings).hasSize(2)
+        assertThat(findings).hasSize(3)
     }
 
     @Test
