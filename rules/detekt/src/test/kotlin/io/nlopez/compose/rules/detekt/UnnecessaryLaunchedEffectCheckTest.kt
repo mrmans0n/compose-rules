@@ -207,6 +207,32 @@ class UnnecessaryLaunchedEffectCheckTest {
     }
 
     @Test
+    fun `allows deferred lambdas that call LaunchedEffect CoroutineScope extensions`() {
+        val findings = rule.lintWithAnalysisApi(
+            codeWithFakeCompose(
+                """
+                import kotlinx.coroutines.CoroutineScope
+
+                fun CoroutineScope.launch(block: suspend () -> Unit) = Unit
+                fun register(callback: () -> Unit) = Unit
+                fun update() = Unit
+
+                @Composable
+                fun Example() {
+                    LaunchedEffect(Unit) {
+                        register {
+                            launch { update() }
+                        }
+                    }
+                }
+                """,
+            ),
+        )
+
+        assertThat(findings).isEmpty()
+    }
+
+    @Test
     fun `reports non-trailing effect lambda arguments`() {
         val findings = rule.lintWithAnalysisApi(
             codeWithFakeCompose(

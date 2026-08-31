@@ -73,7 +73,11 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
                 candidate.canResolveToFunctionCall() &&
                     candidate.parents.takeWhile { parent -> parent != body }.any { parent -> parent is KtNamedFunction }
             }
-            .filterNot { candidate -> candidate.canResolveToFunctionCall() && candidate.isInsideDeferredLambda(body) }
+            .filterNot { candidate ->
+                candidate.canResolveToFunctionCall() &&
+                    candidate.isInsideDeferredLambda(body) &&
+                    !candidate.hasCoroutineScopeReceiver()
+            }
             .any { candidate ->
                 if (candidate.canResolveToFunctionCall()) {
                     candidate.isSuspendOrUnresolvedCall()
@@ -130,6 +134,19 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
             }
         }
     }.getOrDefault(true)
+
+    private fun KtElement.hasCoroutineScopeReceiver(): Boolean = runCatching {
+        analyze(this) {
+            when (val call = this@hasCoroutineScopeReceiver.resolveToCall()?.successfulCallOrNull<KaCall>()) {
+                is KaForLoopCall -> listOf(call.iteratorCall, call.hasNextCall, call.nextCall)
+                    .any { functionCall -> functionCall.hasCoroutineScopeReceiver() }
+
+                is KaFunctionCall<*> -> call.hasCoroutineScopeReceiver()
+
+                else -> false
+            }
+        }
+    }.getOrDefault(false)
 
     private fun KtExpression.usesCoroutineScope(): Boolean = runCatching {
         analyze(this) {
