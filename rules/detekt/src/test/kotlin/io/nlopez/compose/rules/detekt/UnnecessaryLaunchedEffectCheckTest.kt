@@ -2063,6 +2063,129 @@ class UnnecessaryLaunchedEffectCheckTest {
     }
 
     @Test
+    fun `allows initialized configured receiver references with unreachable overwrites`() {
+        val configuredRule = UnnecessaryLaunchedEffectCheck(
+            TestConfig(
+                "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
+            ),
+        )
+        val findings = configuredRule.lintWithAnalysisApi(
+            codeWithFakeCompose(
+                """
+                class FocusRequester {
+                    fun requestFocus() = Unit
+                }
+
+                @Composable
+                fun Example(focusRequester: FocusRequester) {
+                    LaunchedEffect(Unit) {
+                        var callback: () -> Unit = focusRequester::requestFocus
+                        val unused = { callback = {} }
+                        callback()
+                    }
+                }
+                """,
+            ),
+        )
+
+        assertThat(findings).isEmpty()
+    }
+
+    @Test
+    fun `allows configured receiver references invoked through local functions called after assignment`() {
+        val configuredRule = UnnecessaryLaunchedEffectCheck(
+            TestConfig(
+                "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
+            ),
+        )
+        val findings = configuredRule.lintWithAnalysisApi(
+            codeWithFakeCompose(
+                """
+                class FocusRequester {
+                    fun requestFocus() = Unit
+                }
+
+                @Composable
+                fun Example(focusRequester: FocusRequester) {
+                    LaunchedEffect(Unit) {
+                        var callback: () -> Unit = {}
+                        fun invoke() {
+                            callback()
+                        }
+                        callback = focusRequester::requestFocus
+                        invoke()
+                    }
+                }
+                """,
+            ),
+        )
+
+        assertThat(findings).isEmpty()
+    }
+
+    @Test
+    fun `reports configured receiver references invoked through local functions called before assignment`() {
+        val configuredRule = UnnecessaryLaunchedEffectCheck(
+            TestConfig(
+                "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
+            ),
+        )
+        val findings = configuredRule.lintWithAnalysisApi(
+            codeWithFakeCompose(
+                """
+                class FocusRequester {
+                    fun requestFocus() = Unit
+                }
+
+                @Composable
+                fun Example(focusRequester: FocusRequester) {
+                    LaunchedEffect(Unit) {
+                        var callback: () -> Unit = {}
+                        fun invoke() {
+                            callback()
+                        }
+                        invoke()
+                        callback = focusRequester::requestFocus
+                    }
+                }
+                """,
+            ),
+        )
+
+        assertThat(findings).hasSize(1)
+    }
+
+    @Test
+    fun `reports configured receiver references invoked through overwritten local aliases`() {
+        val configuredRule = UnnecessaryLaunchedEffectCheck(
+            TestConfig(
+                "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
+            ),
+        )
+        val findings = configuredRule.lintWithAnalysisApi(
+            codeWithFakeCompose(
+                """
+                class FocusRequester {
+                    fun requestFocus() = Unit
+                }
+
+                @Composable
+                fun Example(focusRequester: FocusRequester) {
+                    LaunchedEffect(Unit) {
+                        val callback: () -> Unit = focusRequester::requestFocus
+                        var alias: () -> Unit = callback
+                        alias = {}
+                        alias()
+                    }
+                }
+                """,
+            ),
+        )
+
+        assertThat(findings).hasSize(1)
+    }
+
+    @Test
     fun `reports initialized configured receiver references overwritten before local variable invocation`() {
         val configuredRule = UnnecessaryLaunchedEffectCheck(
             TestConfig(

@@ -514,12 +514,45 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
 
     private fun KtProperty.isInvokedAfter(startOffset: Int, effectBody: KtExpression): Boolean =
         effectBody.reachableInvocationScopes().any { scope ->
+            val scopeStartOffset = scope.executionStartOffset(
+                effectBody = effectBody,
+                property = this,
+                startOffset = startOffset,
+            ) ?: return@any false
             scope.hasDirectInvocationOfAfter(
                 properties = scope.localFunctionValueProperties(setOf(this)),
-                overwrittenProperty = this,
-                startOffset = startOffset,
+                startOffset = scopeStartOffset,
             )
         }
+
+    private fun KtExpression.executionStartOffset(
+        effectBody: KtExpression,
+        property: KtProperty,
+        startOffset: Int,
+    ): Int? {
+        if (this == effectBody) return startOffset
+        val function = getStrictParentOfType<KtNamedFunction>()
+            ?.takeIf { function -> function.bodyExpression == this }
+        if (function == null) {
+            return if (getStrictParentOfType<KtLambdaExpression>()?.bodyExpression == this) Int.MIN_VALUE else null
+        }
+        return if (function.isCalledAfter(effectBody, property, startOffset)) Int.MIN_VALUE else null
+    }
+
+    private fun KtNamedFunction.isCalledAfter(
+        effectBody: KtExpression,
+        property: KtProperty,
+        startOffset: Int,
+    ): Boolean = effectBody.collectDescendantsOfType<KtCallExpression> { call ->
+        call.isInCurrentFunctionBody(effectBody) &&
+            call.textOffset > startOffset &&
+            !effectBody.hasAssignmentBetween(
+                property = property,
+                properties = setOf(property),
+                startOffset = startOffset,
+                endOffset = call.textOffset,
+            )
+    }.any { call -> call.resolvedLocalFunction(setOf(this)) == this }
 
     private fun KtExpression.reachableInvocationScopes(includeLocalFunctions: Boolean = true): Set<KtExpression> {
         val scopes = (
@@ -551,7 +584,6 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
                                 if (
                                     scope.hasDirectInvocationOfAfter(
                                         properties = scope.localFunctionValueProperties(setOf(property)),
-                                        overwrittenProperty = property,
                                         startOffset = assignment.textOffset,
                                     )
                                 ) {
@@ -592,35 +624,54 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
             }
     }
 
-    private fun KtExpression.hasDirectInvocationOfAfter(
-        properties: Set<KtProperty>,
-        overwrittenProperty: KtProperty,
-        startOffset: Int,
-    ): Boolean {
+    private fun KtExpression.hasDirectInvocationOfAfter(properties: Set<KtProperty>, startOffset: Int): Boolean {
         val scope = this
         return scope.collectDescendantsOfType<KtCallExpression> { call ->
             call.isInCurrentFunctionBody(scope) &&
-                call.textOffset > startOffset &&
-                !scope.hasAssignmentBetween(overwrittenProperty, startOffset, call.textOffset)
-        }.any { call -> call.referencedLocalFunctionValueProperty(scope, properties) in properties } ||
+                call.textOffset > startOffset
+        }.any { call ->
+            val property = call.referencedLocalFunctionValueProperty(scope, properties)
+            property != null &&
+                property in properties &&
+                !scope.hasAssignmentBetween(
+                    property = property,
+                    properties = properties,
+                    startOffset = startOffset,
+                    endOffset = call.textOffset,
+                )
+        } ||
             scope.collectDescendantsOfType<KtNameReferenceExpression> { reference ->
                 reference.isInCurrentFunctionBody(scope) &&
-                    reference.textOffset > startOffset &&
-                    !scope.hasAssignmentBetween(overwrittenProperty, startOffset, reference.textOffset)
+                    reference.textOffset > startOffset
             }.any { reference ->
-                reference.referencedLocalProperty(scope, properties) in properties &&
+                val property = reference.referencedLocalProperty(scope, properties)
+                property != null &&
+                    property in properties &&
+                    !scope.hasAssignmentBetween(
+                        property = property,
+                        properties = properties,
+                        startOffset = startOffset,
+                        endOffset = reference.textOffset,
+                    ) &&
                     reference.getStrictParentOfType<KtCallExpression>()?.isResolvedInlineArgument(reference) == true
             }
     }
 
-    private fun KtExpression.hasAssignmentBetween(property: KtProperty, startOffset: Int, endOffset: Int): Boolean =
-        collectDescendantsOfType<KtBinaryExpression> { expression ->
-            expression.operationToken == KtTokens.EQ &&
-                expression.textOffset > startOffset &&
-                expression.textOffset < endOffset &&
-                (expression.left as? KtNameReferenceExpression)
-                    ?.referencedLocalProperty(this, setOf(property)) == property
-        }.isNotEmpty()
+    private fun KtExpression.hasAssignmentBetween(
+        property: KtProperty,
+        properties: Set<KtProperty>,
+        startOffset: Int,
+        endOffset: Int,
+    ): Boolean = collectDescendantsOfType<KtBinaryExpression> { expression ->
+        expression.operationToken == KtTokens.EQ &&
+            expression.isInCurrentFunctionBody(this) &&
+            expression.textOffset > startOffset &&
+            expression.textOffset < endOffset &&
+            (expression.left as? KtNameReferenceExpression)
+                ?.referencedLocalProperty(this, setOf(property)) == property &&
+            (expression.right?.unwrapArgumentExpression() as? KtNameReferenceExpression)
+                ?.referencedLocalProperty(this, properties) !in properties
+    }.isNotEmpty()
 
     private fun KtExpression.localFunctionValueProperties(seedProperties: Set<KtProperty>): Set<KtProperty> {
         val properties = seedProperties.toMutableSet()
