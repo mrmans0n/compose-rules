@@ -1877,6 +1877,69 @@ class UnnecessaryLaunchedEffectCheckTest {
     }
 
     @Test
+    fun `reports configured receiver references wrapped in local function values`() {
+        val configuredRule = UnnecessaryLaunchedEffectCheck(
+            TestConfig(
+                "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
+            ),
+        )
+        val findings = configuredRule.lintWithAnalysisApi(
+            codeWithFakeCompose(
+                """
+                class FocusRequester {
+                    fun requestFocus() = Unit
+                }
+
+                fun wrap(callback: () -> Unit): () -> Unit = {}
+
+                @Composable
+                fun Example(focusRequester: FocusRequester) {
+                    LaunchedEffect(Unit) {
+                        val callback = wrap(focusRequester::requestFocus)
+                        callback()
+                    }
+                }
+                """,
+            ),
+        )
+
+        assertThat(findings).hasSize(1)
+    }
+
+    @Test
+    fun `reports configured receiver references shadowed by local function values`() {
+        val configuredRule = UnnecessaryLaunchedEffectCheck(
+            TestConfig(
+                "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
+            ),
+        )
+        val findings = configuredRule.lintWithAnalysisApi(
+            codeWithFakeCompose(
+                """
+                class FocusRequester {
+                    fun requestFocus() = Unit
+                }
+
+                inline fun immediately(block: () -> Unit) = block()
+
+                @Composable
+                fun Example(focusRequester: FocusRequester) {
+                    LaunchedEffect(Unit) {
+                        val callback = focusRequester::requestFocus
+                        immediately {
+                            val callback = {}
+                            callback()
+                        }
+                    }
+                }
+                """,
+            ),
+        )
+
+        assertThat(findings).hasSize(1)
+    }
+
+    @Test
     fun `allows calls with configured names`() {
         val configuredRule = UnnecessaryLaunchedEffectCheck(
             TestConfig(

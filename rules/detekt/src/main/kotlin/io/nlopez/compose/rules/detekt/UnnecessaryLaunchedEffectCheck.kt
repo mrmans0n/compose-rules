@@ -419,53 +419,86 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
     private fun KtCallableReferenceExpression.isInvokedCallableReference(effectBody: KtExpression): Boolean {
         if (isInvokedIn(effectBody)) return true
         val property = getStrictParentOfType<KtProperty>()
-            ?.takeIf { property ->
-                property.initializer == this ||
-                    parents.takeWhile { parent -> parent != property }.any { parent -> parent == property.initializer }
-            }
+            ?.takeIf { property -> property.initializer?.unwrapArgumentExpression() == this }
             ?: return false
-        val propertyName = property.name ?: return false
-        return property.isInvokedIn(effectBody, propertyName)
+        return property.isInvokedIn(effectBody)
     }
 
-    private fun KtProperty.isInvokedIn(effectBody: KtExpression, propertyName: String = name ?: ""): Boolean {
-        if (propertyName.isEmpty()) return false
-        if (isDirectlyInvokedIn(effectBody, propertyName)) return true
+    private fun KtProperty.isInvokedIn(effectBody: KtExpression): Boolean {
+        val properties = effectBody.localFunctionValueProperties(setOf(this))
+        if (effectBody.hasDirectInvocationOf(properties)) return true
         return effectBody
             .collectDescendantsOfType<KtNamedFunction>()
             .filter { function -> function.isCalledFrom(effectBody) }
             .mapNotNull { function -> function.bodyExpression }
-            .any { scope -> isDirectlyInvokedIn(scope, propertyName) }
+            .any { scope -> scope.hasDirectInvocationOf(scope.localFunctionValueProperties(properties)) }
     }
 
-    private fun KtProperty.isDirectlyInvokedIn(scope: KtExpression, propertyName: String = name ?: ""): Boolean {
-        if (propertyName.isEmpty()) return false
-        val propertyNames = scope.localFunctionValueNames(propertyName)
+    private fun KtProperty.isDirectlyInvokedIn(scope: KtExpression): Boolean =
+        scope.hasDirectInvocationOf(scope.localFunctionValueProperties(setOf(this)))
+
+    private fun KtExpression.hasDirectInvocationOf(properties: Set<KtProperty>): Boolean {
+        val scope = this
         return scope.collectDescendantsOfType<KtCallExpression> { call ->
             call.isInCurrentFunctionBody(scope)
-        }.any { call -> call.referencedLocalFunctionValueName() in propertyNames } ||
+        }.any { call -> call.referencedLocalFunctionValueProperty(scope, properties) in properties } ||
             scope.collectDescendantsOfType<KtNameReferenceExpression> { reference ->
                 reference.isInCurrentFunctionBody(scope)
             }.any { reference ->
-                reference.getReferencedName() in propertyNames &&
+                reference.referencedLocalProperty(scope, properties) in properties &&
                     reference.getStrictParentOfType<KtCallExpression>()?.isResolvedInlineArgument(reference) == true
             }
     }
 
-    private fun KtExpression.localFunctionValueNames(propertyName: String): Set<String> {
-        val propertyNames = mutableSetOf(propertyName)
+    private fun KtExpression.localFunctionValueProperties(seedProperties: Set<KtProperty>): Set<KtProperty> {
+        val properties = seedProperties.toMutableSet()
         do {
-            val previousSize = propertyNames.size
+            val previousSize = properties.size
             collectDescendantsOfType<KtProperty> { property -> property.isInCurrentFunctionBody(this) }
                 .filter { property ->
                     (property.initializer?.unwrapArgumentExpression() as? KtNameReferenceExpression)
-                        ?.getReferencedName() in propertyNames
+                        ?.resolvedLocalProperty() in properties
                 }
-                .mapNotNull { property -> property.name }
-                .forEach { name -> propertyNames.add(name) }
-        } while (propertyNames.size != previousSize)
-        return propertyNames
+                .forEach { property -> properties.add(property) }
+        } while (properties.size != previousSize)
+        return properties
     }
+
+    private fun KtCallExpression.referencedLocalFunctionValueProperty(
+        scope: KtExpression,
+        properties: Set<KtProperty>,
+    ): KtProperty? = (
+        ((parent as? KtQualifiedExpression)?.receiverExpression as? KtNameReferenceExpression)
+            ?.takeIf {
+                (parent as? KtQualifiedExpression)?.selectorExpression == this &&
+                    (calleeExpression as? KtNameReferenceExpression)?.getReferencedName() == "invoke"
+            }
+            ?: calleeExpression as? KtNameReferenceExpression
+        )
+        ?.referencedLocalProperty(scope, properties)
+
+    private fun KtNameReferenceExpression.referencedLocalProperty(
+        scope: KtExpression,
+        properties: Set<KtProperty>,
+    ): KtProperty? = resolvedLocalProperty()
+        ?: scope.visibleLocalProperty(getReferencedName(), this)
+        ?: properties.singleOrNull { property -> property.name == getReferencedName() }
+
+    private fun KtExpression.visibleLocalProperty(name: String, reference: KtElement): KtProperty? =
+        collectDescendantsOfType<KtProperty> { property ->
+            property.isInCurrentFunctionBody(this) &&
+                property.name == name &&
+                property.textOffset < reference.textOffset
+        }.maxByOrNull { property -> property.textOffset }
+
+    private fun KtNameReferenceExpression.resolvedLocalProperty(): KtProperty? = runCatching {
+        analyze(this) {
+            val variableAccess = this@resolvedLocalProperty.resolveToCall() as? KaVariableAccessCall
+            val variableAccessProperty = variableAccess?.signature?.symbol as? KaPropertySymbol
+            variableAccessProperty?.sourcePsiSafe<KtProperty>()
+                ?: mainReference.resolveToSymbol()?.sourcePsiSafe<KtProperty>()
+        }
+    }.getOrNull()
 
     private fun KtCallExpression.resolvedLocalFunction(localFunctions: Set<KtNamedFunction>): KtNamedFunction? =
         runCatching {
