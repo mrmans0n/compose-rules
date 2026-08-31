@@ -526,6 +526,31 @@ class UnnecessaryLaunchedEffectCheckTest {
     }
 
     @Test
+    fun `reports this references in nested custom CoroutineScope receiver lambdas`() {
+        val findings = rule.lintWithAnalysisApi(
+            codeWithFakeCompose(
+                """
+                import kotlinx.coroutines.CoroutineScope
+
+                fun register(block: CoroutineScope.() -> Unit) = Unit
+                fun consume(scope: CoroutineScope) = Unit
+
+                @Composable
+                fun Example() {
+                    LaunchedEffect(Unit) {
+                        register {
+                            consume(this)
+                        }
+                    }
+                }
+                """,
+            ),
+        )
+
+        assertThat(findings).hasSize(1)
+    }
+
+    @Test
     fun `allows LaunchedEffect CoroutineScope calls inside nested non-scope receivers`() {
         val findings = rule.lintWithAnalysisApi(
             codeWithFakeCompose(
@@ -786,6 +811,36 @@ class UnnecessaryLaunchedEffectCheckTest {
     }
 
     @Test
+    fun `reports explicit CoroutineScope receivers in operator syntax`() {
+        val findings = rule.lintWithAnalysisApi(
+            codeWithFakeCompose(
+                """
+                import kotlinx.coroutines.CoroutineScope
+
+                operator fun CoroutineScope.plus(value: String) = Unit
+                operator fun CoroutineScope.get(index: Int) = Unit
+                operator fun CoroutineScope.unaryPlus() = Unit
+
+                @Composable
+                fun Example(scope: CoroutineScope) {
+                    LaunchedEffect("binary") {
+                        scope + "value"
+                    }
+                    LaunchedEffect("array") {
+                        scope[0]
+                    }
+                    LaunchedEffect("unary") {
+                        +scope
+                    }
+                }
+                """,
+            ),
+        )
+
+        assertThat(findings).hasSize(3)
+    }
+
+    @Test
     fun `allows delegated properties with suspend convention calls`() {
         val findings = rule.lintWithAnalysisApi(
             codeWithFakeCompose(
@@ -825,6 +880,25 @@ class UnnecessaryLaunchedEffectCheckTest {
                 fun Example() {
                     LaunchedEffect(Unit) {
                         val callback: () -> Unit = ::update
+                        callback()
+                    }
+                }
+                """,
+            ),
+        )
+
+        assertThat(findings).isEmpty()
+    }
+
+    @Test
+    fun `allows callable references bound to LaunchedEffect receiver supertypes`() {
+        val findings = rule.lintWithAnalysisApi(
+            codeWithFakeCompose(
+                """
+                @Composable
+                fun Example() {
+                    LaunchedEffect(Unit) {
+                        val callback: () -> String = ::toString
                         callback()
                     }
                 }
