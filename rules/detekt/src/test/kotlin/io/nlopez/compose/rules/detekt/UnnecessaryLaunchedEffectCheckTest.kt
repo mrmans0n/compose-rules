@@ -480,6 +480,40 @@ class UnnecessaryLaunchedEffectCheckTest {
     }
 
     @Test
+    fun `allows explicitly qualified context receiver calls inside local functions and deferred lambdas`() {
+        val findings = rule.lintWithAnalysisApi(
+            codeWithFakeCompose(
+                """
+                import kotlinx.coroutines.CoroutineScope
+
+                class Foo
+
+                context(CoroutineScope)
+                fun Foo.update() = Unit
+
+                fun register(callback: () -> Unit) = Unit
+
+                @Composable
+                fun Example(foo: Foo) {
+                    LaunchedEffect("local") {
+                        fun helper() {
+                            foo.update()
+                        }
+                    }
+                    LaunchedEffect("deferred") {
+                        register {
+                            foo.update()
+                        }
+                    }
+                }
+                """,
+            ),
+        )
+
+        assertThat(findings).isEmpty()
+    }
+
+    @Test
     fun `reports property reads on external CoroutineScope receivers`() {
         val findings = rule.lintWithAnalysisApi(
             codeWithFakeCompose(

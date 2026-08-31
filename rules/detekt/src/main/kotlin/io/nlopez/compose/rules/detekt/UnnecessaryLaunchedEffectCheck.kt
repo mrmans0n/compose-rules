@@ -171,21 +171,24 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
         }
     }.getOrDefault(true)
 
-    private fun KtElement.hasCoroutineScopeReceiver(effectBody: KtExpression): Boolean {
-        if (hasExplicitReceiver() || isInsideNestedExternalReceiverLambda(effectBody)) return false
-        return runCatching {
-            analyze(this) {
-                when (val call = this@hasCoroutineScopeReceiver.resolveToCall()?.successfulCallOrNull<KaCall>()) {
-                    is KaForLoopCall -> listOf(call.iteratorCall, call.hasNextCall, call.nextCall)
-                        .any { functionCall -> functionCall.hasCoroutineScopeReceiver() }
+    private fun KtElement.hasCoroutineScopeReceiver(effectBody: KtExpression): Boolean = runCatching {
+        analyze(this) {
+            val includeFunctionReceivers =
+                !hasExplicitReceiver() && !isInsideNestedExternalReceiverLambda(effectBody)
+            when (val call = this@hasCoroutineScopeReceiver.resolveToCall()?.successfulCallOrNull<KaCall>()) {
+                is KaForLoopCall -> listOf(call.iteratorCall, call.hasNextCall, call.nextCall)
+                    .any { functionCall ->
+                        functionCall.hasCoroutineScopeReceiver(includeFunctionReceivers = includeFunctionReceivers)
+                    }
 
-                    is KaFunctionCall<*> -> call.hasCoroutineScopeReceiver()
+                is KaFunctionCall<*> -> call.hasCoroutineScopeReceiver(
+                    includeFunctionReceivers = includeFunctionReceivers,
+                )
 
-                    else -> false
-                }
+                else -> false
             }
-        }.getOrDefault(false)
-    }
+        }
+    }.getOrDefault(false)
 
     private fun KtExpression.usesCoroutineScope(effectBody: KtExpression, effectCallName: String?): Boolean =
         runCatching {
