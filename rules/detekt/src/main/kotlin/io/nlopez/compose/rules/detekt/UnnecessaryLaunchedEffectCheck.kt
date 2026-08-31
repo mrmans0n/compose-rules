@@ -424,15 +424,38 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
         return property.isInvokedIn(effectBody)
     }
 
-    private fun KtProperty.isInvokedIn(effectBody: KtExpression): Boolean {
-        val properties = effectBody.localFunctionValueProperties(setOf(this))
-        if (effectBody.hasDirectInvocationOf(properties)) return true
-        return effectBody
-            .collectDescendantsOfType<KtNamedFunction>()
-            .filter { function -> function.isCalledFrom(effectBody) }
-            .mapNotNull { function -> function.bodyExpression }
-            .any { scope -> scope.hasDirectInvocationOf(scope.localFunctionValueProperties(properties)) }
+    private fun KtProperty.isInvokedIn(effectBody: KtExpression): Boolean =
+        effectBody.reachableInvocationScopes().any { scope ->
+            scope.hasDirectInvocationOf(scope.localFunctionValueProperties(setOf(this)))
+        }
+
+    private fun KtExpression.reachableInvocationScopes(): Set<KtExpression> {
+        val scopes = (
+            listOf(this) +
+                collectDescendantsOfType<KtNamedFunction>()
+                    .filter { function -> function.isCalledFrom(this) }
+                    .mapNotNull { function -> function.bodyExpression }
+            ).toMutableSet()
+        do {
+            val previousSize = scopes.size
+            scopes.toList()
+                .flatMap { scope ->
+                    scope.collectDescendantsOfType<KtProperty> { property ->
+                        property.isInCurrentFunctionBody(scope) && property.isDirectlyInvokedIn(scope)
+                    }
+                }
+                .mapNotNull { property -> property.functionValueBodyExpression() }
+                .forEach { body -> scopes.add(body) }
+        } while (scopes.size != previousSize)
+        return scopes
     }
+
+    private fun KtProperty.functionValueBodyExpression(): KtExpression? =
+        when (val initializer = initializer?.unwrapArgumentExpression()) {
+            is KtLambdaExpression -> initializer.bodyExpression
+            is KtNamedFunction -> initializer.bodyExpression
+            else -> null
+        }
 
     private fun KtProperty.isDirectlyInvokedIn(scope: KtExpression): Boolean =
         scope.hasDirectInvocationOf(scope.localFunctionValueProperties(setOf(this)))
@@ -568,10 +591,13 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
                 (functionLiteral.functionType as? KaFunctionType)?.receiverType,
                 (expectedType as? KaFunctionType)?.receiverType,
             ).any { type ->
-                type.symbol?.classId?.asSingleFqName() == KotlinFqNames.CoroutineScope ||
-                    type.allSupertypes.any { supertype ->
-                        supertype.symbol?.classId?.asSingleFqName() == KotlinFqNames.CoroutineScope
-                    }
+                !type.isMarkedNullable &&
+                    (
+                        type.symbol?.classId?.asSingleFqName() == KotlinFqNames.CoroutineScope ||
+                            type.allSupertypes.any { supertype ->
+                                supertype.symbol?.classId?.asSingleFqName() == KotlinFqNames.CoroutineScope
+                            }
+                        )
             }
         }
     }.getOrDefault(false)
@@ -579,10 +605,13 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
     private fun KtNamedFunction.hasCoroutineScopeReceiver(): Boolean = runCatching {
         analyze(this) {
             val receiverType = receiverTypeReference?.type ?: return@analyze false
-            receiverType.symbol?.classId?.asSingleFqName() == KotlinFqNames.CoroutineScope ||
-                receiverType.allSupertypes.any { supertype ->
-                    supertype.symbol?.classId?.asSingleFqName() == KotlinFqNames.CoroutineScope
-                }
+            !receiverType.isMarkedNullable &&
+                (
+                    receiverType.symbol?.classId?.asSingleFqName() == KotlinFqNames.CoroutineScope ||
+                        receiverType.allSupertypes.any { supertype ->
+                            supertype.symbol?.classId?.asSingleFqName() == KotlinFqNames.CoroutineScope
+                        }
+                    )
         }
     }.getOrDefault(false)
 

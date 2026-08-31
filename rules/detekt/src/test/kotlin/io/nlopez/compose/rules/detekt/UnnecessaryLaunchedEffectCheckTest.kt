@@ -688,6 +688,31 @@ class UnnecessaryLaunchedEffectCheckTest {
     }
 
     @Test
+    fun `allows effect scope receiver calls inside nullable CoroutineScope receiver lambdas`() {
+        val findings = rule.lintWithAnalysisApi(
+            codeWithFakeCompose(
+                """
+                import kotlinx.coroutines.CoroutineScope
+
+                fun register(block: (CoroutineScope?).() -> Unit) = Unit
+                fun CoroutineScope.update() = Unit
+
+                @Composable
+                fun Example() {
+                    LaunchedEffect(Unit) {
+                        register {
+                            update()
+                        }
+                    }
+                }
+                """,
+            ),
+        )
+
+        assertThat(findings).isEmpty()
+    }
+
+    @Test
     fun `reports labeled this references in nested custom CoroutineScope receiver lambdas`() {
         val findings = rule.lintWithAnalysisApi(
             codeWithFakeCompose(
@@ -1836,6 +1861,37 @@ class UnnecessaryLaunchedEffectCheckTest {
                         val callback = focusRequester::requestFocus
                         val alias = callback
                         alias()
+                    }
+                }
+                """,
+            ),
+        )
+
+        assertThat(findings).isEmpty()
+    }
+
+    @Test
+    fun `allows configured receiver references created inside invoked local lambda values`() {
+        val configuredRule = UnnecessaryLaunchedEffectCheck(
+            TestConfig(
+                "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
+            ),
+        )
+        val findings = configuredRule.lintWithAnalysisApi(
+            codeWithFakeCompose(
+                """
+                class FocusRequester {
+                    fun requestFocus() = Unit
+                }
+
+                @Composable
+                fun Example(focusRequester: FocusRequester) {
+                    LaunchedEffect(Unit) {
+                        val outer = {
+                            val inner = focusRequester::requestFocus
+                            inner()
+                        }
+                        outer()
                     }
                 }
                 """,
