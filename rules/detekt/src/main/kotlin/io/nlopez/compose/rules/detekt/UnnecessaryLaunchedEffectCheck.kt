@@ -19,6 +19,8 @@ import org.jetbrains.kotlin.analysis.api.components.resolveToSymbol
 import org.jetbrains.kotlin.analysis.api.resolution.KaCall
 import org.jetbrains.kotlin.analysis.api.resolution.KaForLoopCall
 import org.jetbrains.kotlin.analysis.api.resolution.KaFunctionCall
+import org.jetbrains.kotlin.analysis.api.resolution.KaSingleCall
+import org.jetbrains.kotlin.analysis.api.resolution.KaVariableAccessCall
 import org.jetbrains.kotlin.analysis.api.resolution.successfulCallOrNull
 import org.jetbrains.kotlin.analysis.api.resolution.symbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaNamedFunctionSymbol
@@ -136,6 +138,9 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
             ) {
                 return@analyze true
             }
+            val variableAccess = this@usesCoroutineScope.resolveToCall()
+                ?.successfulCallOrNull<KaVariableAccessCall>()
+            if (variableAccess?.hasCoroutineScopeReceiver() == true) return@analyze true
             val property = (this@usesCoroutineScope as? KtNameReferenceExpression)
                 ?.mainReference
                 ?.resolveToSymbol() as? KaPropertySymbol
@@ -165,10 +170,10 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
             receiverTypes.any { type -> type in allowedCallReceiverTypesSet }
     }
 
-    private fun KaFunctionCall<*>.hasCoroutineScopeReceiver(): Boolean = receiverTypes()
+    private fun KaSingleCall<*, *>.hasCoroutineScopeReceiver(): Boolean = receiverTypes()
         .any { type -> type.symbol?.classId?.asSingleFqName() == KotlinFqNames.CoroutineScope }
 
-    private fun KaFunctionCall<*>.receiverTypes() = listOfNotNull(dispatchReceiver?.type, extensionReceiver?.type) +
+    private fun KaSingleCall<*, *>.receiverTypes() = listOfNotNull(dispatchReceiver?.type, extensionReceiver?.type) +
         contextArguments.map { receiver -> receiver.type }
 
     private fun KaPropertySymbol.hasCoroutineScopeReceiver(): Boolean =
