@@ -13,6 +13,12 @@ internal object ComposeFqNames {
         get() = runtime.child("Composable")
     val ReadOnlyComposable: FqName
         get() = runtime.child("ReadOnlyComposable")
+    val NonRestartableComposable: FqName
+        get() = runtime.child("NonRestartableComposable")
+    val NonSkippableComposable: FqName
+        get() = runtime.child("NonSkippableComposable")
+    val ExplicitGroupsComposable: FqName
+        get() = runtime.child("ExplicitGroupsComposable")
     val CompositionLocal: FqName
         get() = runtime.child("CompositionLocal")
     val State: FqName
