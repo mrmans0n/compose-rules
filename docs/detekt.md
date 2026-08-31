@@ -177,6 +177,14 @@ Compose:
     active: true
   UnnecessaryComposable:
     active: true
+  UnnecessaryLaunchedEffect:
+    active: true
+    # -- Calls whose dispatch or extension receiver has one of these fully qualified types keep LaunchedEffect.
+    # allowedCallReceiverTypes:
+    #   - androidx.compose.ui.focus.FocusRequester
+    # -- Calls whose fully qualified name is listed here keep LaunchedEffect.
+    # allowedCallNames:
+    #   - androidx.compose.ui.focus.FocusRequester.requestFocus
   UnstableCollections:
     active: false # Opt-in, disabled by default. Turn on if you want to enforce this (e.g. you have strong skipping disabled)
   VarsWithoutStateBacking:

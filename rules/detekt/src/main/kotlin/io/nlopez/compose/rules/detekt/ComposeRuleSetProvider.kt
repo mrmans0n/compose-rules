@@ -60,6 +60,7 @@ class ComposeRuleSetProvider : RuleSetProvider {
             },
             RuleName("StateParam") to { config: Config -> StateParameterCheck(config) },
             RuleName("UnnecessaryComposable") to { config: Config -> UnnecessaryComposableCheck(config) },
+            RuleName("UnnecessaryLaunchedEffect") to { config: Config -> UnnecessaryLaunchedEffectCheck(config) },
             RuleName("UnstableCollections") to { config: Config -> UnstableCollectionsCheck(config) },
             RuleName("VarsWithoutStateBacking") to { config: Config -> VarsWithoutStateBackingCheck(config) },
             RuleName("ViewModelForwarding") to { config: Config -> ViewModelForwardingCheck(config) },

@@ -49,6 +49,10 @@ internal object ComposeFqNames {
         get() = runtimeSaveable.child("rememberSaveable")
     val Retain: FqName
         get() = runtimeRetain.child("retain")
+    val LaunchedEffect: FqName
+        get() = runtime.child("LaunchedEffect")
+    val SideEffect: FqName
+        get() = runtime.child("SideEffect")
 
     private fun FqName.child(name: String): FqName = FqName("${asString()}.$name")
 }
