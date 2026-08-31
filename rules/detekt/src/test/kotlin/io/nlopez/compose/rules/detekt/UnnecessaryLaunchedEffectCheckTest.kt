@@ -603,6 +603,31 @@ class UnnecessaryLaunchedEffectCheckTest {
     }
 
     @Test
+    fun `reports this references in local CoroutineScope receiver functions`() {
+        val findings = rule.lintWithAnalysisApi(
+            codeWithFakeCompose(
+                """
+                import kotlinx.coroutines.CoroutineScope
+
+                fun consume(scope: CoroutineScope) = Unit
+
+                @Composable
+                fun Example(scope: CoroutineScope) {
+                    LaunchedEffect(Unit) {
+                        fun CoroutineScope.helper() {
+                            consume(this)
+                        }
+                        scope.helper()
+                    }
+                }
+                """,
+            ),
+        )
+
+        assertThat(findings).hasSize(1)
+    }
+
+    @Test
     fun `allows LaunchedEffect CoroutineScope calls inside nested non-scope receivers`() {
         val findings = rule.lintWithAnalysisApi(
             codeWithFakeCompose(

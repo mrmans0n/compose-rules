@@ -18,6 +18,7 @@ import org.jetbrains.kotlin.analysis.api.components.expressionType
 import org.jetbrains.kotlin.analysis.api.components.functionType
 import org.jetbrains.kotlin.analysis.api.components.resolveToCall
 import org.jetbrains.kotlin.analysis.api.components.resolveToSymbol
+import org.jetbrains.kotlin.analysis.api.components.type
 import org.jetbrains.kotlin.analysis.api.resolution.KaCall
 import org.jetbrains.kotlin.analysis.api.resolution.KaForLoopCall
 import org.jetbrains.kotlin.analysis.api.resolution.KaFunctionCall
@@ -256,8 +257,13 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
 
     private fun KtElement.isInsideNestedExternalReceiverLambda(effectBody: KtExpression): Boolean = parents
         .takeWhile { parent -> parent != effectBody }
-        .filterIsInstance<KtLambdaExpression>()
-        .any { lambda -> lambda.hasCoroutineScopeReceiver() }
+        .any { parent ->
+            when (parent) {
+                is KtLambdaExpression -> parent.hasCoroutineScopeReceiver()
+                is KtNamedFunction -> parent.hasCoroutineScopeReceiver()
+                else -> false
+            }
+        }
 
     private fun KaForLoopCall.needsLaunchedEffect(): Boolean =
         listOf(iteratorCall, hasNextCall, nextCall).any { call -> call.needsLaunchedEffect() }
@@ -296,6 +302,12 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
                 (functionLiteral.functionType as? KaFunctionType)?.receiverType,
                 (expectedType as? KaFunctionType)?.receiverType,
             ).any { type -> type.symbol?.classId?.asSingleFqName() == KotlinFqNames.CoroutineScope }
+        }
+    }.getOrDefault(false)
+
+    private fun KtNamedFunction.hasCoroutineScopeReceiver(): Boolean = runCatching {
+        analyze(this) {
+            receiverTypeReference?.type?.symbol?.classId?.asSingleFqName() == KotlinFqNames.CoroutineScope
         }
     }.getOrDefault(false)
 
