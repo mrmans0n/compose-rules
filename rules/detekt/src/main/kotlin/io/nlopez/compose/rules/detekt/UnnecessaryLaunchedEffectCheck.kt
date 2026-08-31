@@ -268,12 +268,17 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
         val function = symbol as? KaNamedFunctionSymbol
         if (function?.isSuspend == true) return true
         if (isConfiguredCall()) return true
-        return (!hasExplicitReceiver && !hasNestedExternalReceiver && hasCoroutineScopeReceiver()) ||
-            hasConfiguredReceiverType()
+        val hasEffectCoroutineScopeReceiver =
+            !hasNestedExternalReceiver &&
+                hasCoroutineScopeReceiver(
+                    includeFunctionReceivers = !hasExplicitReceiver,
+                )
+        return hasEffectCoroutineScopeReceiver || hasConfiguredReceiverType()
     }
 
-    private fun KaSingleCall<*, *>.hasCoroutineScopeReceiver(): Boolean = receiverTypes()
-        .any { type -> type.symbol?.classId?.asSingleFqName() == KotlinFqNames.CoroutineScope }
+    private fun KaSingleCall<*, *>.hasCoroutineScopeReceiver(includeFunctionReceivers: Boolean = true): Boolean =
+        receiverTypes(includeFunctionReceivers)
+            .any { type -> type.symbol?.classId?.asSingleFqName() == KotlinFqNames.CoroutineScope }
 
     private fun KtElement.hasConfiguredCall(): Boolean = runCatching {
         analyze(this) {
@@ -300,8 +305,12 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
         .mapNotNull { type -> type.symbol?.classId?.asSingleFqName()?.asString() }
         .any { type -> type in allowedCallReceiverTypesSet }
 
-    private fun KaSingleCall<*, *>.receiverTypes() = listOfNotNull(dispatchReceiver?.type, extensionReceiver?.type) +
-        contextArguments.map { receiver -> receiver.type }
+    private fun KaSingleCall<*, *>.receiverTypes(includeFunctionReceivers: Boolean = true) =
+        if (includeFunctionReceivers) {
+            listOfNotNull(dispatchReceiver?.type, extensionReceiver?.type)
+        } else {
+            emptyList()
+        } + contextArguments.map { receiver -> receiver.type }
 
     private fun KaPropertySymbol.hasCoroutineScopeReceiver(): Boolean =
         receiverParameter?.returnType?.symbol?.classId?.asSingleFqName() == KotlinFqNames.CoroutineScope ||
