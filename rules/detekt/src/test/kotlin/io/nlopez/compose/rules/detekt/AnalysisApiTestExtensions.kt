@@ -29,7 +29,7 @@ internal fun <T> T.lintWithAnalysisApi(
         lintWithContext(
             environment = environment,
             content = content,
-            dependencyContents = arrayOf(fakeComposeRuntime(), *dependencyContents),
+            dependencyContents = arrayOf(fakeComposeRuntime(), fakeCoroutines(), *dependencyContents),
             allowCompilationErrors = allowCompilationErrors,
         )
     } finally {
@@ -49,6 +49,8 @@ internal fun codeWithFakeCompose(@Language("kotlin") code: String): String = """
 @Language("kotlin")
 private fun fakeComposeRuntime(): String = codeWithFakeCompose(
     """
+    import kotlinx.coroutines.CoroutineScope
+
     @Target(
         AnnotationTarget.FUNCTION,
         AnnotationTarget.TYPE,
@@ -86,6 +88,9 @@ private fun fakeComposeRuntime(): String = codeWithFakeCompose(
 
     @Composable
     fun <T> retain(calculation: () -> T): T = calculation()
+
+    @Composable
+    fun LaunchedEffect(key1: Any?, block: suspend CoroutineScope.() -> Unit) = Unit
 
     interface State<T> {
         val value: T
@@ -171,3 +176,10 @@ private fun fakeComposeRuntime(): String = codeWithFakeCompose(
         ProvidableCompositionLocal(defaultFactory())
     """,
 )
+
+@Language("kotlin")
+private fun fakeCoroutines(): String = """
+    package kotlinx.coroutines
+
+    interface CoroutineScope
+""".trimIndent()

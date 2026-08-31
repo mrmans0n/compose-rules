@@ -14,6 +14,7 @@ import org.jetbrains.kotlin.psi.KtAnnotatedExpression
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtLabeledExpression
+import org.jetbrains.kotlin.psi.KtLambdaExpression
 import org.jetbrains.kotlin.psi.KtParenthesizedExpression
 
 internal fun KtCallExpression.isResolvedCallToAnyOf(fqNames: Set<FqName>): Boolean = runCatching {
@@ -81,7 +82,28 @@ internal fun KtCallExpression.hasExplicitArgumentMappedToAny(parameterNames: Set
     }
 }.getOrDefault(false)
 
-private tailrec fun KtExpression.unwrapArgumentExpression(): KtExpression = when (this) {
+internal fun KtCallExpression.lambdaArgumentMappedTo(parameterName: String): KtLambdaExpression? {
+    val lambdaExpressions = valueArguments.mapNotNull { argument ->
+        argument.getArgumentExpression() as? KtLambdaExpression
+    } + lambdaArguments.mapNotNull { argument -> argument.getLambdaExpression() }
+    if (lambdaExpressions.isEmpty()) return null
+
+    return runCatching {
+        analyze(this) {
+            val call = this@lambdaArgumentMappedTo.resolveCall() ?: return@analyze null
+            lambdaExpressions.firstOrNull { lambdaExpression ->
+                call.valueArgumentMapping.entries
+                    .firstOrNull { (argument, _) -> argument.unwrapArgumentExpression() == lambdaExpression }
+                    ?.value
+                    ?.symbol
+                    ?.name
+                    ?.asString() == parameterName
+            }
+        }
+    }.getOrNull()
+}
+
+internal tailrec fun KtExpression.unwrapArgumentExpression(): KtExpression = when (this) {
     is KtAnnotatedExpression -> baseExpression?.unwrapArgumentExpression() ?: this
     is KtLabeledExpression -> baseExpression?.unwrapArgumentExpression() ?: this
     is KtParenthesizedExpression -> expression?.unwrapArgumentExpression() ?: this

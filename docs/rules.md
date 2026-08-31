@@ -226,6 +226,44 @@ More info: [Restarting effects](https://developer.android.com/jetpack/compose/si
 
     :material-chevron-right-box: [compose:lambda-param-in-effect](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/LambdaParameterInRestartableEffect.kt) ktlint :material-chevron-right-box: [LambdaParameterInRestartableEffect](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/LambdaParameterInRestartableEffect.kt) detekt
 
+### Avoid unnecessary LaunchedEffect
+
+`LaunchedEffect` creates a coroutine. When its block only calls non-suspending functions, keyed `SideEffect` preserves the key-based execution without launching one.
+
+```kotlin
+// ❌ No work in this block needs a coroutine.
+LaunchedEffect(screenId) {
+    analytics.trackScreen(screenId)
+}
+
+// ✅ Run once for each screenId after composition applies its changes.
+SideEffect(screenId) {
+    analytics.trackScreen(screenId)
+}
+```
+
+Keyed `SideEffect` requires Compose Runtime 1.12.0 or later. The rule leaves `LaunchedEffect` alone if any call cannot be resolved, which avoids reporting code whose coroutine requirement is unknown.
+
+Both effects wait for a successful composition, but `SideEffect` runs on the composition's apply dispatcher while `LaunchedEffect` launches a coroutine in the composition's context. Keep `LaunchedEffect` when a non-suspending API depends on that coroutine scheduling or lifecycle; configure its receiver type or fully qualified function name:
+
+```yaml
+Compose:
+  UnnecessaryLaunchedEffect:
+    active: true
+    allowedCallReceiverTypes:
+      - androidx.compose.ui.focus.FocusRequester
+    allowedCallNames:
+      - androidx.compose.ui.focus.FocusRequester.requestFocus
+```
+
+More info: [SideEffect API reference](https://developer.android.com/reference/kotlin/androidx/compose/runtime/SideEffect.composable)
+
+This rule is detekt-only and uses detekt's analysis API.
+
+!!! info ""
+
+    :material-chevron-right-box: [UnnecessaryLaunchedEffect](https://github.com/mrmans0n/compose-rules/blob/main/rules/detekt/src/main/kotlin/io/nlopez/compose/rules/detekt/UnnecessaryLaunchedEffectCheck.kt) detekt
+
 ### Do not emit content and return a result
 
 Composable functions should either emit layout content or return a value, but not both.
