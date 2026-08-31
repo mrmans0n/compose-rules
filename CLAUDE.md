@@ -20,7 +20,10 @@ This file provides guidance to Claude Code (claude.ai/code) and other AI assista
 ```
 rules/
 ├── common/              # Shared rule implementations
+├── common-detekt/       # Shared detekt rule implementations
+├── common-ktlint/       # Shared ktlint rule implementations
 ├── detekt/              # Detekt plugin
+├── functional-tests/    # Functional tests (Gradle TestKit)
 └── ktlint/              # ktlint plugin
 samples/                 # Sample projects for testing rules
 docs/                    # mkdocs documentation
