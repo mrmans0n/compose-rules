@@ -78,7 +78,8 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
                     candidate.parents.takeWhile { parent ->
                         parent != body
                     }.any { parent -> parent is KtNamedFunction } &&
-                    !candidate.hasCoroutineScopeReceiver(body)
+                    !candidate.hasCoroutineScopeReceiver(body) &&
+                    !candidate.hasConfiguredCall()
             }
             .filterNot { candidate ->
                 candidate.canResolveToFunctionCall() &&
@@ -227,10 +228,7 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
         .takeWhile { parent -> parent != effectBody }
         .filterIsInstance<KtLambdaExpression>()
         .any { lambda ->
-            lambda.getStrictParentOfType<KtCallExpression>()?.isResolvedCallToAnyNamed(
-                ExternalReceiverScopeFunctions,
-            ) ==
-                true
+            lambda.getStrictParentOfType<KtCallExpression>()?.hasCoroutineScopeReceiverScopeFunctionArgument() == true
         }
 
     private fun KaForLoopCall.needsLaunchedEffect(): Boolean =
@@ -242,16 +240,43 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
     ): Boolean {
         val function = symbol as? KaNamedFunctionSymbol
         if (function?.isSuspend == true) return true
-        val callableName = function?.callableId?.asSingleFqName()?.asString()
-        if (callableName != null && callableName in allowedCallNamesSet) return true
-        val receiverTypes = receiverTypes()
-            .mapNotNull { type -> type.symbol?.classId?.asSingleFqName()?.asString() }
+        if (isConfiguredCall()) return true
         return (!hasExplicitReceiver && !hasNestedExternalReceiver && hasCoroutineScopeReceiver()) ||
-            receiverTypes.any { type -> type in allowedCallReceiverTypesSet }
+            hasConfiguredReceiverType()
     }
 
     private fun KaSingleCall<*, *>.hasCoroutineScopeReceiver(): Boolean = receiverTypes()
         .any { type -> type.symbol?.classId?.asSingleFqName() == KotlinFqNames.CoroutineScope }
+
+    private fun KtElement.hasConfiguredCall(): Boolean = runCatching {
+        analyze(this) {
+            val call = this@hasConfiguredCall.resolveToCall()
+                ?.successfulCallOrNull<KaFunctionCall<*>>()
+                ?: return@analyze false
+            call.isConfiguredCall() || call.hasConfiguredReceiverType()
+        }
+    }.getOrDefault(false)
+
+    private fun KtCallExpression.hasCoroutineScopeReceiverScopeFunctionArgument(): Boolean {
+        if (!isResolvedCallToAnyNamed(ExternalReceiverScopeFunctions)) return false
+        val receiverExpression = valueArguments.firstOrNull()?.getArgumentExpression()
+            ?: (parent as? KtQualifiedExpression)?.receiverExpression
+            ?: return false
+        return receiverExpression.isCoroutineScopeExpression()
+    }
+
+    private fun KtExpression.isCoroutineScopeExpression(): Boolean = runCatching {
+        analyze(this) {
+            expressionType?.symbol?.classId?.asSingleFqName() == KotlinFqNames.CoroutineScope
+        }
+    }.getOrDefault(false)
+
+    private fun KaFunctionCall<*>.isConfiguredCall(): Boolean =
+        (symbol as? KaNamedFunctionSymbol)?.callableId?.asSingleFqName()?.asString() in allowedCallNamesSet
+
+    private fun KaSingleCall<*, *>.hasConfiguredReceiverType(): Boolean = receiverTypes()
+        .mapNotNull { type -> type.symbol?.classId?.asSingleFqName()?.asString() }
+        .any { type -> type in allowedCallReceiverTypesSet }
 
     private fun KaSingleCall<*, *>.receiverTypes() = listOfNotNull(dispatchReceiver?.type, extensionReceiver?.type) +
         contextArguments.map { receiver -> receiver.type }

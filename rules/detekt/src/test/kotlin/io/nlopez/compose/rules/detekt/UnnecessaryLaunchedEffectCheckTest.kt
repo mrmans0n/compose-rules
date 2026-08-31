@@ -455,6 +455,31 @@ class UnnecessaryLaunchedEffectCheckTest {
     }
 
     @Test
+    fun `allows LaunchedEffect CoroutineScope calls inside nested non-scope receivers`() {
+        val findings = rule.lintWithAnalysisApi(
+            codeWithFakeCompose(
+                """
+                import kotlinx.coroutines.CoroutineScope
+
+                fun CoroutineScope.launch(block: suspend () -> Unit) = Unit
+                fun update() = Unit
+
+                @Composable
+                fun Example() {
+                    LaunchedEffect(Unit) {
+                        with("value") {
+                            launch { update() }
+                        }
+                    }
+                }
+                """,
+            ),
+        )
+
+        assertThat(findings).isEmpty()
+    }
+
+    @Test
     fun `allows LaunchedEffect coroutineContext references`() {
         val findings = rule.lintWithAnalysisApi(
             codeWithFakeCompose(
@@ -747,6 +772,36 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                     LaunchedEffect(Unit) {
                         focusRequester.requestFocusSafely()
+                    }
+                }
+                """,
+            ),
+        )
+
+        assertThat(findings).isEmpty()
+    }
+
+    @Test
+    fun `allows configured receiver calls through local functions`() {
+        val configuredRule = UnnecessaryLaunchedEffectCheck(
+            TestConfig(
+                "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
+            ),
+        )
+        val findings = configuredRule.lintWithAnalysisApi(
+            codeWithFakeCompose(
+                """
+                class FocusRequester {
+                    fun requestFocus() = Unit
+                }
+
+                @Composable
+                fun Example(focusRequester: FocusRequester) {
+                    LaunchedEffect(Unit) {
+                        fun helper() {
+                            focusRequester.requestFocus()
+                        }
+                        helper()
                     }
                 }
                 """,
