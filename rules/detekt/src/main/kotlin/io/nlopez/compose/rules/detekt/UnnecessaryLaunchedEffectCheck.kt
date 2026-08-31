@@ -1,5 +1,7 @@
 // Copyright 2026 Nacho Lopez
 // SPDX-License-Identifier: Apache-2.0
+@file:OptIn(KaExperimentalApi::class)
+
 package io.nlopez.compose.rules.detekt
 
 import dev.detekt.api.Config
@@ -9,11 +11,13 @@ import dev.detekt.api.RequiresAnalysisApi
 import dev.detekt.api.Rule
 import dev.detekt.api.RuleName
 import dev.detekt.api.config
+import org.jetbrains.kotlin.analysis.api.KaExperimentalApi
 import org.jetbrains.kotlin.analysis.api.analyze
 import org.jetbrains.kotlin.analysis.api.components.expressionType
 import org.jetbrains.kotlin.analysis.api.components.resolveToCall
 import org.jetbrains.kotlin.analysis.api.components.resolveToSymbol
-import org.jetbrains.kotlin.analysis.api.resolution.KaCallableMemberCall
+import org.jetbrains.kotlin.analysis.api.resolution.KaCall
+import org.jetbrains.kotlin.analysis.api.resolution.KaForLoopCall
 import org.jetbrains.kotlin.analysis.api.resolution.KaFunctionCall
 import org.jetbrains.kotlin.analysis.api.resolution.successfulCallOrNull
 import org.jetbrains.kotlin.analysis.api.resolution.symbol
@@ -26,7 +30,10 @@ import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtArrayAccessExpression
 import org.jetbrains.kotlin.psi.KtBinaryExpression
 import org.jetbrains.kotlin.psi.KtCallExpression
+import org.jetbrains.kotlin.psi.KtDestructuringDeclarationEntry
+import org.jetbrains.kotlin.psi.KtElement
 import org.jetbrains.kotlin.psi.KtExpression
+import org.jetbrains.kotlin.psi.KtForExpression
 import org.jetbrains.kotlin.psi.KtLambdaExpression
 import org.jetbrains.kotlin.psi.KtNameReferenceExpression
 import org.jetbrains.kotlin.psi.KtNamedFunction
@@ -59,16 +66,17 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
 
         val body = expression.lambdaArgumentMappedTo("block")?.bodyExpression ?: return
         val requiresCoroutine = body
-            .collectDescendantsOfType<KtExpression> { candidate -> candidate.canRequireLaunchedEffect() }
+            .collectDescendantsOfType<KtElement> { candidate -> candidate.canRequireLaunchedEffect() }
             .filterNot { candidate ->
-                candidate.parents.takeWhile { parent -> parent != body }.any { parent -> parent is KtNamedFunction }
+                candidate.canResolveToFunctionCall() &&
+                    candidate.parents.takeWhile { parent -> parent != body }.any { parent -> parent is KtNamedFunction }
             }
-            .filterNot { candidate -> candidate.isInsideDeferredLambda(body) }
+            .filterNot { candidate -> candidate.canResolveToFunctionCall() && candidate.isInsideDeferredLambda(body) }
             .any { candidate ->
                 if (candidate.canResolveToFunctionCall()) {
                     candidate.isSuspendOrUnresolvedCall()
                 } else {
-                    candidate.usesCoroutineScope()
+                    (candidate as? KtExpression)?.usesCoroutineScope() == true
                 }
             }
 
@@ -82,9 +90,16 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
         }
     }
 
-    private fun KtExpression.canResolveToFunctionCall(): Boolean = when (this) {
+    private fun KtElement.canResolveToFunctionCall(): Boolean = when (this) {
         is KtBinaryExpression -> operationToken !in NonFunctionCallBinaryOperations
-        is KtCallExpression, is KtUnaryExpression, is KtArrayAccessExpression -> true
+
+        is KtCallExpression,
+        is KtUnaryExpression,
+        is KtArrayAccessExpression,
+        is KtDestructuringDeclarationEntry,
+        is KtForExpression,
+        -> true
+
         else -> false
     }
 
@@ -92,19 +107,22 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
         analyze(this) {
             findTopLevelCallables(ComposeFqNames.runtime, Name.identifier("SideEffect"))
                 .filterIsInstance<KaNamedFunctionSymbol>()
-                .any { function -> function.valueParameters.any { parameter -> parameter.name.asString().startsWith("key") } }
+                .any { function ->
+                    function.valueParameters.any { parameter -> parameter.name.asString().startsWith("key") }
+                }
         }
     }.getOrDefault(false)
 
-    private fun KtExpression.canRequireLaunchedEffect(): Boolean =
+    private fun KtElement.canRequireLaunchedEffect(): Boolean =
         canResolveToFunctionCall() || this is KtNameReferenceExpression || this is KtThisExpression
 
-    private fun KtExpression.isSuspendOrUnresolvedCall(): Boolean = runCatching {
+    private fun KtElement.isSuspendOrUnresolvedCall(): Boolean = runCatching {
         analyze(this) {
             val call = this@isSuspendOrUnresolvedCall.resolveToCall()
-                ?.successfulCallOrNull<KaCallableMemberCall<*, *>>()
+                ?.successfulCallOrNull<KaCall>()
                 ?: return@analyze true
             when (call) {
+                is KaForLoopCall -> call.needsLaunchedEffect()
                 is KaFunctionCall<*> -> call.needsLaunchedEffect()
                 else -> true
             }
@@ -126,12 +144,15 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
         }
     }.getOrDefault(false)
 
-    private fun KtExpression.isInsideDeferredLambda(effectBody: KtExpression): Boolean = parents
+    private fun KtElement.isInsideDeferredLambda(effectBody: KtExpression): Boolean = parents
         .takeWhile { parent -> parent != effectBody }
         .filterIsInstance<KtLambdaExpression>()
         .any { lambda ->
             lambda.getStrictParentOfType<KtCallExpression>()?.isResolvedInlineArgument(lambda) != true
         }
+
+    private fun KaForLoopCall.needsLaunchedEffect(): Boolean =
+        listOf(iteratorCall, hasNextCall, nextCall).any { call -> call.needsLaunchedEffect() }
 
     private fun KaFunctionCall<*>.needsLaunchedEffect(): Boolean {
         val function = symbol as? KaNamedFunctionSymbol

@@ -184,6 +184,29 @@ class UnnecessaryLaunchedEffectCheckTest {
     }
 
     @Test
+    fun `allows deferred lambdas that capture the LaunchedEffect CoroutineScope`() {
+        val findings = rule.lintWithAnalysisApi(
+            codeWithFakeCompose(
+                """
+                import kotlinx.coroutines.CoroutineScope
+
+                fun register(callback: () -> Unit) = Unit
+                fun consume(scope: CoroutineScope) = Unit
+
+                @Composable
+                fun Example() {
+                    LaunchedEffect(Unit) {
+                        register { consume(this) }
+                    }
+                }
+                """,
+            ),
+        )
+
+        assertThat(findings).isEmpty()
+    }
+
+    @Test
     fun `reports non-trailing effect lambda arguments`() {
         val findings = rule.lintWithAnalysisApi(
             codeWithFakeCompose(
@@ -284,6 +307,64 @@ class UnnecessaryLaunchedEffectCheckTest {
                 fun Example() {
                     LaunchedEffect(Unit) {
                         consume(isActive)
+                    }
+                }
+                """,
+            ),
+        )
+
+        assertThat(findings).isEmpty()
+    }
+
+    @Test
+    fun `allows local functions that capture the LaunchedEffect CoroutineScope`() {
+        val findings = rule.lintWithAnalysisApi(
+            codeWithFakeCompose(
+                """
+                import kotlinx.coroutines.CoroutineScope
+
+                fun consume(scope: CoroutineScope) = Unit
+
+                @Composable
+                fun Example() {
+                    LaunchedEffect(Unit) {
+                        fun helper() {
+                            consume(this)
+                        }
+                    }
+                }
+                """,
+            ),
+        )
+
+        assertThat(findings).isEmpty()
+    }
+
+    @Test
+    fun `allows implicit suspend convention calls`() {
+        val findings = rule.lintWithAnalysisApi(
+            codeWithFakeCompose(
+                """
+                class Result {
+                    suspend operator fun component1(): String = "value"
+                }
+
+                class Items {
+                    suspend operator fun iterator(): Iterator<Int> = listOf(1).iterator()
+                }
+
+                fun update(value: Any?) = Unit
+
+                @Composable
+                fun Example(result: Result, items: Items) {
+                    LaunchedEffect(Unit) {
+                        val (value) = result
+                        update(value)
+                    }
+                    LaunchedEffect(Unit) {
+                        for (item in items) {
+                            update(item)
+                        }
                     }
                 }
                 """,
