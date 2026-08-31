@@ -306,6 +306,7 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
             .filterIsInstance<KtNamedFunction>()
             .firstOrNull()
             ?: return false
+        if (localFunction.isInvokedFunctionValue(effectBody)) return false
         return !localFunction.isCalledFrom(effectBody)
     }
 
@@ -383,6 +384,11 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
 
     private fun KtLambdaExpression.localLambdaProperty(): KtProperty? = getStrictParentOfType<KtProperty>()
         ?.takeIf { property -> property.initializer?.unwrapArgumentExpression() == this }
+
+    private fun KtNamedFunction.isInvokedFunctionValue(effectBody: KtExpression): Boolean =
+        getStrictParentOfType<KtProperty>()
+            ?.takeIf { property -> property.initializer?.unwrapArgumentExpression() == this }
+            ?.isInvokedIn(effectBody) == true
 
     private fun KtLambdaExpression.isDirectlyInvoked(scope: KtElement): Boolean = parents
         .takeWhile { parent -> parent != scope && parent !is KtProperty }
