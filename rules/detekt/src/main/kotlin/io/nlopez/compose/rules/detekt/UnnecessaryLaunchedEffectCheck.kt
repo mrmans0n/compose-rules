@@ -39,6 +39,7 @@ import org.jetbrains.kotlin.psi.KtForExpression
 import org.jetbrains.kotlin.psi.KtLambdaExpression
 import org.jetbrains.kotlin.psi.KtNameReferenceExpression
 import org.jetbrains.kotlin.psi.KtNamedFunction
+import org.jetbrains.kotlin.psi.KtQualifiedExpression
 import org.jetbrains.kotlin.psi.KtThisExpression
 import org.jetbrains.kotlin.psi.KtUnaryExpression
 import org.jetbrains.kotlin.psi.psiUtil.collectDescendantsOfType
@@ -132,24 +133,27 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
                 ?: return@analyze true
             when (call) {
                 is KaForLoopCall -> call.needsLaunchedEffect()
-                is KaFunctionCall<*> -> call.needsLaunchedEffect()
+                is KaFunctionCall<*> -> call.needsLaunchedEffect(hasExplicitReceiver())
                 else -> true
             }
         }
     }.getOrDefault(true)
 
-    private fun KtElement.hasCoroutineScopeReceiver(): Boolean = runCatching {
-        analyze(this) {
-            when (val call = this@hasCoroutineScopeReceiver.resolveToCall()?.successfulCallOrNull<KaCall>()) {
-                is KaForLoopCall -> listOf(call.iteratorCall, call.hasNextCall, call.nextCall)
-                    .any { functionCall -> functionCall.hasCoroutineScopeReceiver() }
+    private fun KtElement.hasCoroutineScopeReceiver(): Boolean {
+        if (hasExplicitReceiver()) return false
+        return runCatching {
+            analyze(this) {
+                when (val call = this@hasCoroutineScopeReceiver.resolveToCall()?.successfulCallOrNull<KaCall>()) {
+                    is KaForLoopCall -> listOf(call.iteratorCall, call.hasNextCall, call.nextCall)
+                        .any { functionCall -> functionCall.hasCoroutineScopeReceiver() }
 
-                is KaFunctionCall<*> -> call.hasCoroutineScopeReceiver()
+                    is KaFunctionCall<*> -> call.hasCoroutineScopeReceiver()
 
-                else -> false
+                    else -> false
+                }
             }
-        }
-    }.getOrDefault(false)
+        }.getOrDefault(false)
+    }
 
     private fun KtExpression.usesCoroutineScope(): Boolean = runCatching {
         analyze(this) {
@@ -161,14 +165,17 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
             }
             val variableAccess = this@usesCoroutineScope.resolveToCall()
                 ?.successfulCallOrNull<KaVariableAccessCall>()
-            if (variableAccess?.hasCoroutineScopeReceiver() == true) return@analyze true
+            if (!hasExplicitReceiver() && variableAccess?.hasCoroutineScopeReceiver() == true) return@analyze true
             val property = (this@usesCoroutineScope as? KtNameReferenceExpression)
                 ?.mainReference
                 ?.resolveToSymbol() as? KaPropertySymbol
                 ?: return@analyze false
-            property.hasCoroutineScopeReceiver()
+            !hasExplicitReceiver() && property.hasCoroutineScopeReceiver()
         }
     }.getOrDefault(false)
+
+    private fun KtElement.hasExplicitReceiver(): Boolean =
+        (parent as? KtQualifiedExpression)?.selectorExpression == this
 
     private fun KtElement.isInsideDeferredLambda(effectBody: KtExpression): Boolean = parents
         .takeWhile { parent -> parent != effectBody }
@@ -180,14 +187,14 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
     private fun KaForLoopCall.needsLaunchedEffect(): Boolean =
         listOf(iteratorCall, hasNextCall, nextCall).any { call -> call.needsLaunchedEffect() }
 
-    private fun KaFunctionCall<*>.needsLaunchedEffect(): Boolean {
+    private fun KaFunctionCall<*>.needsLaunchedEffect(hasExplicitReceiver: Boolean = false): Boolean {
         val function = symbol as? KaNamedFunctionSymbol
         if (function?.isSuspend == true) return true
         val callableName = function?.callableId?.asSingleFqName()?.asString()
         if (callableName != null && callableName in allowedCallNamesSet) return true
         val receiverTypes = receiverTypes()
             .mapNotNull { type -> type.symbol?.classId?.asSingleFqName()?.asString() }
-        return hasCoroutineScopeReceiver() ||
+        return (!hasExplicitReceiver && hasCoroutineScopeReceiver()) ||
             receiverTypes.any { type -> type in allowedCallReceiverTypesSet }
     }
 

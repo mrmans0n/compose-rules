@@ -320,6 +320,51 @@ class UnnecessaryLaunchedEffectCheckTest {
     }
 
     @Test
+    fun `reports calls on external CoroutineScope receivers`() {
+        val findings = rule.lintWithAnalysisApi(
+            codeWithFakeCompose(
+                """
+                import kotlinx.coroutines.CoroutineScope
+
+                fun CoroutineScope.update() = Unit
+
+                @Composable
+                fun Example(scope: CoroutineScope) {
+                    LaunchedEffect(Unit) {
+                        scope.update()
+                    }
+                }
+                """,
+            ),
+        )
+
+        assertThat(findings).hasSize(1)
+    }
+
+    @Test
+    fun `reports property reads on external CoroutineScope receivers`() {
+        val findings = rule.lintWithAnalysisApi(
+            codeWithFakeCompose(
+                """
+                import kotlinx.coroutines.CoroutineScope
+
+                val CoroutineScope.ready: Boolean get() = true
+                fun consume(value: Boolean) = Unit
+
+                @Composable
+                fun Example(scope: CoroutineScope) {
+                    LaunchedEffect(Unit) {
+                        consume(scope.ready)
+                    }
+                }
+                """,
+            ),
+        )
+
+        assertThat(findings).hasSize(1)
+    }
+
+    @Test
     fun `allows LaunchedEffect coroutineContext references`() {
         val findings = rule.lintWithAnalysisApi(
             codeWithFakeCompose(
