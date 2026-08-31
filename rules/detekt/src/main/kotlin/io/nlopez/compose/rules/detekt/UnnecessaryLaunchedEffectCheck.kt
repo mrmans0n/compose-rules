@@ -232,7 +232,7 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
                     ?.resolveToSymbol() as? KaPropertySymbol
                 if (!hasExplicitReceiver() &&
                     !isInsideNestedExternalReceiverLambda(effectBody) &&
-                    property?.hasCoroutineScopeReceiver() == true
+                    (property?.hasCoroutineScopeReceiver() == true || property?.isCoroutineContext() == true)
                 ) {
                     return@analyze true
                 }
@@ -476,8 +476,19 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
         if (isInvokedIn(effectBody)) return true
         val property = getStrictParentOfType<KtProperty>()
             ?.takeIf { property -> property.initializer?.unwrapArgumentExpression() == this }
+            ?: assignedLocalProperty(effectBody)
             ?: return false
         return property.isInvokedIn(effectBody)
+    }
+
+    private fun KtCallableReferenceExpression.assignedLocalProperty(effectBody: KtExpression): KtProperty? {
+        val assignment = getStrictParentOfType<KtBinaryExpression>()
+            ?.takeIf { expression ->
+                expression.operationToken == KtTokens.EQ && expression.right?.unwrapArgumentExpression() == this
+            }
+            ?: return null
+        val reference = assignment.left as? KtNameReferenceExpression ?: return null
+        return reference.referencedLocalProperty(effectBody, emptySet())
     }
 
     private fun KtProperty.isInvokedIn(effectBody: KtExpression): Boolean =
@@ -699,6 +710,9 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
     private fun KaPropertySymbol.hasCoroutineScopeReceiver(): Boolean =
         receiverParameter?.returnType?.symbol?.classId?.asSingleFqName() == KotlinFqNames.CoroutineScope ||
             callableId?.classId?.asSingleFqName() == KotlinFqNames.CoroutineScope
+
+    private fun KaPropertySymbol.isCoroutineContext(): Boolean =
+        callableId?.asSingleFqName() == KotlinFqNames.CoroutineContext
 
     private fun KaNamedFunctionSymbol.hasCoroutineScopeReceiver(): Boolean =
         receiverParameter?.returnType?.symbol?.classId?.asSingleFqName() == KotlinFqNames.CoroutineScope ||

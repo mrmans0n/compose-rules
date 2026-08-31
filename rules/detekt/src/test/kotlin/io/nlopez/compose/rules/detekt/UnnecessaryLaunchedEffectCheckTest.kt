@@ -946,6 +946,26 @@ class UnnecessaryLaunchedEffectCheckTest {
     }
 
     @Test
+    fun `allows top-level suspend coroutineContext references`() {
+        val findings = rule.lintWithAnalysisApi(
+            codeWithFakeCompose(
+                """
+                import kotlin.coroutines.coroutineContext as currentCoroutineContext
+
+                @Composable
+                fun Example() {
+                    LaunchedEffect(Unit) {
+                        currentCoroutineContext
+                    }
+                }
+                """,
+            ),
+        )
+
+        assertThat(findings).isEmpty()
+    }
+
+    @Test
     fun `allows LaunchedEffect CoroutineScope extension property references`() {
         val findings = rule.lintWithAnalysisApi(
             codeWithFakeCompose(
@@ -1886,6 +1906,35 @@ class UnnecessaryLaunchedEffectCheckTest {
                         val callback = focusRequester::requestFocus
                         val alias = callback
                         alias()
+                    }
+                }
+                """,
+            ),
+        )
+
+        assertThat(findings).isEmpty()
+    }
+
+    @Test
+    fun `allows configured receiver references assigned to local variables`() {
+        val configuredRule = UnnecessaryLaunchedEffectCheck(
+            TestConfig(
+                "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
+            ),
+        )
+        val findings = configuredRule.lintWithAnalysisApi(
+            codeWithFakeCompose(
+                """
+                class FocusRequester {
+                    fun requestFocus() = Unit
+                }
+
+                @Composable
+                fun Example(focusRequester: FocusRequester) {
+                    LaunchedEffect(Unit) {
+                        var callback: () -> Unit = {}
+                        callback = focusRequester::requestFocus
+                        callback()
                     }
                 }
                 """,

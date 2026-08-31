@@ -6,4 +6,5 @@ import org.jetbrains.kotlin.name.FqName
 
 internal object KotlinFqNames {
     val CoroutineScope = FqName("kotlinx.coroutines.CoroutineScope")
+    val CoroutineContext = FqName("kotlin.coroutines.coroutineContext")
 }
