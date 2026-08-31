@@ -185,9 +185,10 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
                 }
                 val variableAccess = this@usesCoroutineScope.resolveToCall()
                     ?.successfulCallOrNull<KaVariableAccessCall>()
-                if (!hasExplicitReceiver() &&
-                    !isInsideNestedExternalReceiverLambda(effectBody) &&
-                    variableAccess?.hasCoroutineScopeReceiver() == true
+                if (!isInsideNestedExternalReceiverLambda(effectBody) &&
+                    variableAccess?.hasCoroutineScopeReceiver(
+                        includeFunctionReceivers = !hasExplicitReceiver(),
+                    ) == true
                 ) {
                     return@analyze true
                 }

@@ -479,6 +479,33 @@ class UnnecessaryLaunchedEffectCheckTest {
     }
 
     @Test
+    fun `allows explicitly qualified properties with LaunchedEffect CoroutineScope context receivers`() {
+        val findings = rule.lintWithAnalysisApi(
+            codeWithFakeCompose(
+                """
+                import kotlinx.coroutines.CoroutineScope
+
+                class Foo
+
+                context(CoroutineScope)
+                val Foo.ready: Boolean get() = true
+
+                fun consume(value: Boolean) = Unit
+
+                @Composable
+                fun Example(foo: Foo) {
+                    LaunchedEffect(Unit) {
+                        consume(foo.ready)
+                    }
+                }
+                """,
+            ),
+        )
+
+        assertThat(findings).isEmpty()
+    }
+
+    @Test
     fun `reports calls on nested external CoroutineScope implicit receivers`() {
         val findings = rule.lintWithAnalysisApi(
             codeWithFakeCompose(
