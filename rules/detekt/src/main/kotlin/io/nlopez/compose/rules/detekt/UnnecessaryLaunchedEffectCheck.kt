@@ -433,9 +433,18 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
 
     private fun KtProperty.isDirectlyInvokedIn(scope: KtExpression, propertyName: String = name ?: ""): Boolean =
         propertyName.isNotEmpty() &&
-            scope.collectDescendantsOfType<KtCallExpression> { call ->
-                call.isInCurrentFunctionBody(scope)
-            }.any { call -> call.referencedLocalFunctionValueName() == propertyName }
+            (
+                scope.collectDescendantsOfType<KtCallExpression> { call ->
+                    call.isInCurrentFunctionBody(scope)
+                }.any { call -> call.referencedLocalFunctionValueName() == propertyName } ||
+                    scope.collectDescendantsOfType<KtNameReferenceExpression> { reference ->
+                        reference.isInCurrentFunctionBody(scope)
+                    }.any { reference ->
+                        reference.getReferencedName() == propertyName &&
+                            reference.getStrictParentOfType<KtCallExpression>()?.isResolvedInlineArgument(reference) ==
+                            true
+                    }
+                )
 
     private fun KtCallExpression.resolvedLocalFunction(localFunctions: Set<KtNamedFunction>): KtNamedFunction? =
         runCatching {
