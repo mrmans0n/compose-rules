@@ -317,6 +317,29 @@ class UnnecessaryLaunchedEffectCheckTest {
     }
 
     @Test
+    fun `allows calls with a LaunchedEffect CoroutineScope context receiver`() {
+        val findings = rule.lintWithAnalysisApi(
+            codeWithFakeCompose(
+                """
+                import kotlinx.coroutines.CoroutineScope
+
+                context(CoroutineScope)
+                fun update() = Unit
+
+                @Composable
+                fun Example() {
+                    LaunchedEffect(Unit) {
+                        update()
+                    }
+                }
+                """,
+            ),
+        )
+
+        assertThat(findings).isEmpty()
+    }
+
+    @Test
     fun `allows local functions that capture the LaunchedEffect CoroutineScope`() {
         val findings = rule.lintWithAnalysisApi(
             codeWithFakeCompose(

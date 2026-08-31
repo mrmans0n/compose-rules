@@ -159,15 +159,17 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
         if (function?.isSuspend == true) return true
         val callableName = function?.callableId?.asSingleFqName()?.asString()
         if (callableName != null && callableName in allowedCallNamesSet) return true
-        val receiverTypes = listOfNotNull(dispatchReceiver?.type, extensionReceiver?.type)
+        val receiverTypes = receiverTypes()
             .mapNotNull { type -> type.symbol?.classId?.asSingleFqName()?.asString() }
         return hasCoroutineScopeReceiver() ||
             receiverTypes.any { type -> type in allowedCallReceiverTypesSet }
     }
 
-    private fun KaFunctionCall<*>.hasCoroutineScopeReceiver(): Boolean =
-        listOfNotNull(dispatchReceiver?.type, extensionReceiver?.type)
-            .any { type -> type.symbol?.classId?.asSingleFqName() == KotlinFqNames.CoroutineScope }
+    private fun KaFunctionCall<*>.hasCoroutineScopeReceiver(): Boolean = receiverTypes()
+        .any { type -> type.symbol?.classId?.asSingleFqName() == KotlinFqNames.CoroutineScope }
+
+    private fun KaFunctionCall<*>.receiverTypes() = listOfNotNull(dispatchReceiver?.type, extensionReceiver?.type) +
+        contextArguments.map { receiver -> receiver.type }
 
     private fun KaPropertySymbol.hasCoroutineScopeReceiver(): Boolean =
         receiverParameter?.returnType?.symbol?.classId?.asSingleFqName() == KotlinFqNames.CoroutineScope ||
