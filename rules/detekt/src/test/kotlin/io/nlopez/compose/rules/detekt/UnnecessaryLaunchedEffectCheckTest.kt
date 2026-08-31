@@ -386,6 +386,29 @@ class UnnecessaryLaunchedEffectCheckTest {
     }
 
     @Test
+    fun `allows aliased LaunchedEffect label CoroutineScope receiver references`() {
+        val findings = rule.lintWithAnalysisApi(
+            codeWithFakeCompose(
+                """
+                import com.example.compose.fake.LaunchedEffect as LE
+                import kotlinx.coroutines.CoroutineScope
+
+                fun consume(scope: CoroutineScope) = Unit
+
+                @Composable
+                fun Example() {
+                    LE(Unit) {
+                        consume(this@LE)
+                    }
+                }
+                """,
+            ),
+        )
+
+        assertThat(findings).isEmpty()
+    }
+
+    @Test
     fun `reports calls on external CoroutineScope receivers`() {
         val findings = rule.lintWithAnalysisApi(
             codeWithFakeCompose(
@@ -443,6 +466,54 @@ class UnnecessaryLaunchedEffectCheckTest {
                 fun Example(scope: CoroutineScope) {
                     LaunchedEffect(Unit) {
                         with(scope) {
+                            update()
+                        }
+                    }
+                }
+                """,
+            ),
+        )
+
+        assertThat(findings).hasSize(1)
+    }
+
+    @Test
+    fun `reports this references in nested external CoroutineScope implicit receivers`() {
+        val findings = rule.lintWithAnalysisApi(
+            codeWithFakeCompose(
+                """
+                import kotlinx.coroutines.CoroutineScope
+
+                fun consume(scope: CoroutineScope) = Unit
+
+                @Composable
+                fun Example(scope: CoroutineScope) {
+                    LaunchedEffect(Unit) {
+                        with(scope) {
+                            consume(this)
+                        }
+                    }
+                }
+                """,
+            ),
+        )
+
+        assertThat(findings).hasSize(1)
+    }
+
+    @Test
+    fun `reports calls on run external CoroutineScope implicit receivers`() {
+        val findings = rule.lintWithAnalysisApi(
+            codeWithFakeCompose(
+                """
+                import kotlinx.coroutines.CoroutineScope
+
+                fun CoroutineScope.update() = Unit
+
+                @Composable
+                fun Example(scope: CoroutineScope) {
+                    LaunchedEffect(Unit) {
+                        scope.run {
                             update()
                         }
                     }

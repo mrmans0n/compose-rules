@@ -25,6 +25,7 @@ import org.jetbrains.kotlin.analysis.api.resolution.successfulCallOrNull
 import org.jetbrains.kotlin.analysis.api.resolution.symbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaNamedFunctionSymbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaPropertySymbol
+import org.jetbrains.kotlin.analysis.api.symbols.KaVariableSymbol
 import org.jetbrains.kotlin.analysis.api.types.symbol
 import org.jetbrains.kotlin.idea.references.mainReference
 import org.jetbrains.kotlin.lexer.KtTokens
@@ -71,6 +72,7 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
         if (!expression.hasKeyedSideEffect()) return
 
         val body = expression.lambdaArgumentMappedTo("block")?.bodyExpression ?: return
+        val effectCallName = expression.calleeExpression?.text
         val requiresCoroutine = body
             .collectDescendantsOfType<KtElement> { candidate -> candidate.canRequireLaunchedEffect() }
             .filterNot { candidate ->
@@ -90,7 +92,7 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
                 if (candidate.canResolveToFunctionCall()) {
                     candidate.isSuspendOrUnresolvedCall(body)
                 } else {
-                    (candidate as? KtExpression)?.usesCoroutineScope(body) == true
+                    (candidate as? KtExpression)?.usesCoroutineScope(body, effectCallName) == true
                 }
             }
 
@@ -165,44 +167,49 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
         }.getOrDefault(false)
     }
 
-    private fun KtExpression.usesCoroutineScope(effectBody: KtExpression): Boolean = runCatching {
-        analyze(this) {
-            if (this@usesCoroutineScope is KtThisExpression &&
-                this@usesCoroutineScope.referencesEffectReceiver() &&
-                this@usesCoroutineScope.expressionType?.symbol?.classId?.asSingleFqName() ==
-                KotlinFqNames.CoroutineScope
-            ) {
-                return@analyze true
+    private fun KtExpression.usesCoroutineScope(effectBody: KtExpression, effectCallName: String?): Boolean =
+        runCatching {
+            analyze(this) {
+                if (this@usesCoroutineScope is KtThisExpression &&
+                    this@usesCoroutineScope.referencesEffectReceiver(effectCallName) &&
+                    (
+                        this@usesCoroutineScope.getLabelName() != null ||
+                            !isInsideNestedExternalReceiverLambda(effectBody)
+                        ) &&
+                    this@usesCoroutineScope.expressionType?.symbol?.classId?.asSingleFqName() ==
+                    KotlinFqNames.CoroutineScope
+                ) {
+                    return@analyze true
+                }
+                val variableAccess = this@usesCoroutineScope.resolveToCall()
+                    ?.successfulCallOrNull<KaVariableAccessCall>()
+                if (!hasExplicitReceiver() &&
+                    !isInsideNestedExternalReceiverLambda(effectBody) &&
+                    variableAccess?.hasCoroutineScopeReceiver() == true
+                ) {
+                    return@analyze true
+                }
+                val property = (this@usesCoroutineScope as? KtNameReferenceExpression)
+                    ?.mainReference
+                    ?.resolveToSymbol() as? KaPropertySymbol
+                if (!hasExplicitReceiver() &&
+                    !isInsideNestedExternalReceiverLambda(effectBody) &&
+                    property?.hasCoroutineScopeReceiver() == true
+                ) {
+                    return@analyze true
+                }
+                val function = (this@usesCoroutineScope as? KtNameReferenceExpression)
+                    ?.mainReference
+                    ?.resolveToSymbol() as? KaNamedFunctionSymbol
+                    ?: return@analyze false
+                !hasExplicitReceiver() && !isInsideNestedExternalReceiverLambda(effectBody) &&
+                    function.hasCoroutineScopeReceiver()
             }
-            val variableAccess = this@usesCoroutineScope.resolveToCall()
-                ?.successfulCallOrNull<KaVariableAccessCall>()
-            if (!hasExplicitReceiver() &&
-                !isInsideNestedExternalReceiverLambda(effectBody) &&
-                variableAccess?.hasCoroutineScopeReceiver() == true
-            ) {
-                return@analyze true
-            }
-            val property = (this@usesCoroutineScope as? KtNameReferenceExpression)
-                ?.mainReference
-                ?.resolveToSymbol() as? KaPropertySymbol
-            if (!hasExplicitReceiver() &&
-                !isInsideNestedExternalReceiverLambda(effectBody) &&
-                property?.hasCoroutineScopeReceiver() == true
-            ) {
-                return@analyze true
-            }
-            val function = (this@usesCoroutineScope as? KtNameReferenceExpression)
-                ?.mainReference
-                ?.resolveToSymbol() as? KaNamedFunctionSymbol
-                ?: return@analyze false
-            !hasExplicitReceiver() && !isInsideNestedExternalReceiverLambda(effectBody) &&
-                function.hasCoroutineScopeReceiver()
-        }
-    }.getOrDefault(false)
+        }.getOrDefault(false)
 
-    private fun KtThisExpression.referencesEffectReceiver(): Boolean {
+    private fun KtThisExpression.referencesEffectReceiver(effectCallName: String?): Boolean {
         val label = getLabelName() ?: return true
-        return label == "LaunchedEffect" ||
+        return label == effectCallName ||
             parents.filterIsInstance<KtLabeledExpression>().any { expression -> expression.getLabelName() == label }
     }
 
@@ -258,15 +265,39 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
     }.getOrDefault(false)
 
     private fun KtCallExpression.hasCoroutineScopeReceiverScopeFunctionArgument(): Boolean {
-        if (!isResolvedCallToAnyNamed(ExternalReceiverScopeFunctions)) return false
+        if (!isResolvedCallToAnyNamed(ExternalReceiverScopeFunctions) &&
+            calleeExpression?.text !in ExternalReceiverScopeFunctionNames
+        ) {
+            return false
+        }
         val receiverExpression = valueArguments.firstOrNull()?.getArgumentExpression()
-            ?: (parent as? KtQualifiedExpression)?.receiverExpression
+            ?: qualifiedReceiverExpression()
             ?: return false
+        if (hasCoroutineScopeCallReceiver()) return true
         return receiverExpression.isCoroutineScopeExpression()
     }
 
+    private fun KtCallExpression.hasCoroutineScopeCallReceiver(): Boolean = runCatching {
+        analyze(this) {
+            val call = this@hasCoroutineScopeCallReceiver.resolveToCall()
+                ?.successfulCallOrNull<KaFunctionCall<*>>()
+                ?: return@analyze false
+            call.hasCoroutineScopeReceiver()
+        }
+    }.getOrDefault(false)
+
+    private fun KtCallExpression.qualifiedReceiverExpression(): KtExpression? =
+        (parent as? KtQualifiedExpression)?.receiverExpression
+            ?: (parent?.parent as? KtQualifiedExpression)?.receiverExpression
+
     private fun KtExpression.isCoroutineScopeExpression(): Boolean = runCatching {
         analyze(this) {
+            val variable = (this@isCoroutineScopeExpression as? KtNameReferenceExpression)
+                ?.mainReference
+                ?.resolveToSymbol() as? KaVariableSymbol
+            if (variable?.returnType?.symbol?.classId?.asSingleFqName() == KotlinFqNames.CoroutineScope) {
+                return@analyze true
+            }
             expressionType?.symbol?.classId?.asSingleFqName() == KotlinFqNames.CoroutineScope
         }
     }.getOrDefault(false)
@@ -298,7 +329,8 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
             KtTokens.EQEQEQ,
             KtTokens.EXCLEQEQEQ,
         )
-        private val ExternalReceiverScopeFunctions = setOf("kotlin.with", "kotlin.apply")
+        private val ExternalReceiverScopeFunctions = setOf("kotlin.with", "kotlin.apply", "kotlin.run")
+        private val ExternalReceiverScopeFunctionNames = setOf("with", "apply", "run")
 
         val UnnecessaryLaunchedEffect = """
             LaunchedEffect is unnecessary when its body only calls non-suspending functions. Use keyed SideEffect instead.
