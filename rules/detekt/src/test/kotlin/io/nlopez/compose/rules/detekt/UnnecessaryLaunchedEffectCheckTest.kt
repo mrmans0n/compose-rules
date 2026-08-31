@@ -184,6 +184,30 @@ class UnnecessaryLaunchedEffectCheckTest {
     }
 
     @Test
+    fun `reports deferred suspend lambdas inside invoked local lambda values`() {
+        val findings = rule.lintWithAnalysisApi(
+            codeWithFakeCompose(
+                """
+                fun register(callback: suspend () -> Unit) = Unit
+                suspend fun fetch() = Unit
+
+                @Composable
+                fun Example() {
+                    LaunchedEffect(Unit) {
+                        val callback = {
+                            register { fetch() }
+                        }
+                        callback()
+                    }
+                }
+                """,
+            ),
+        )
+
+        assertThat(findings).hasSize(1)
+    }
+
+    @Test
     fun `allows deferred lambdas that capture the LaunchedEffect CoroutineScope`() {
         val findings = rule.lintWithAnalysisApi(
             codeWithFakeCompose(

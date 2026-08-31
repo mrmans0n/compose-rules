@@ -360,25 +360,25 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
     private fun KtElement.isReachableInCurrentFunctionBody(scope: KtElement): Boolean =
         isInCurrentFunctionBody(scope) || (scope is KtExpression && isInsideDirectlyInvokedLocalLambda(scope))
 
-    private fun KtElement.isInsideInvokedLocalLambda(effectBody: KtExpression): Boolean = parents
-        .takeWhile { parent -> parent != effectBody }
-        .filterIsInstance<KtLambdaExpression>()
-        .any { lambda ->
-            val property = lambda.getStrictParentOfType<KtProperty>()
-                ?.takeIf { property -> property.initializer?.unwrapArgumentExpression() == lambda }
-                ?: return@any false
-            property.isInvokedIn(effectBody)
-        }
+    private fun KtElement.isInsideInvokedLocalLambda(effectBody: KtExpression): Boolean =
+        nearestDeferredLambda(effectBody)
+            ?.localLambdaProperty()
+            ?.isInvokedIn(effectBody) == true
 
-    private fun KtElement.isInsideDirectlyInvokedLocalLambda(scope: KtExpression): Boolean = parents
-        .takeWhile { parent -> parent != scope }
-        .filterIsInstance<KtLambdaExpression>()
-        .any { lambda ->
-            val property = lambda.getStrictParentOfType<KtProperty>()
-                ?.takeIf { property -> property.initializer?.unwrapArgumentExpression() == lambda }
-                ?: return@any false
-            property.isDirectlyInvokedIn(scope)
-        }
+    private fun KtElement.isInsideDirectlyInvokedLocalLambda(scope: KtExpression): Boolean =
+        nearestDeferredLambda(scope)
+            ?.localLambdaProperty()
+            ?.isDirectlyInvokedIn(scope) == true
+
+    private fun KtElement.nearestDeferredLambda(scope: KtExpression): KtLambdaExpression? =
+        parents.takeWhile { parent -> parent != scope }
+            .filterIsInstance<KtLambdaExpression>()
+            .firstOrNull { lambda ->
+                lambda.getStrictParentOfType<KtCallExpression>()?.isResolvedInlineArgument(lambda) != true
+            }
+
+    private fun KtLambdaExpression.localLambdaProperty(): KtProperty? = getStrictParentOfType<KtProperty>()
+        ?.takeIf { property -> property.initializer?.unwrapArgumentExpression() == this }
 
     private fun KtCallableReferenceExpression.isDirectlyInvoked(scope: KtElement): Boolean = parents
         .takeWhile { parent -> parent != scope && parent !is KtProperty }
