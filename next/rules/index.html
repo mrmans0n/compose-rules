@@ -518,6 +518,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#avoid-unnecessary-launchedeffect" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Avoid unnecessary LaunchedEffect
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#do-not-emit-content-and-return-a-result" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1096,6 +1107,17 @@
     <span class="md-ellipsis">
       
         Be mindful of effect keys
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#avoid-unnecessary-launchedeffect" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Avoid unnecessary LaunchedEffect
       
     </span>
   </a>
@@ -1818,6 +1840,33 @@
 <p>More info: <a href="https://developer.android.com/jetpack/compose/side-effects#restarting-effects">Restarting effects</a> and <a href="https://developer.android.com/jetpack/compose/side-effects#rememberupdatedstate">rememberUpdatedState</a></p>
 <div class="admonition info">
 <p><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14c1.11 0 2-.89 2-2V5a2 2 0 0 0-2-2M9.71 18l-1.42-1.41L12.88 12 8.29 7.41 9.71 6l6 6z"/></svg></span> <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/LambdaParameterInRestartableEffect.kt">compose:lambda-param-in-effect</a> ktlint <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14c1.11 0 2-.89 2-2V5a2 2 0 0 0-2-2M9.71 18l-1.42-1.41L12.88 12 8.29 7.41 9.71 6l6 6z"/></svg></span> <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/LambdaParameterInRestartableEffect.kt">LambdaParameterInRestartableEffect</a> detekt</p>
+</div>
+<h3 id="avoid-unnecessary-launchedeffect">Avoid unnecessary LaunchedEffect<a class="headerlink" href="#avoid-unnecessary-launchedeffect" title="Permanent link">&para;</a></h3>
+<p><code>LaunchedEffect</code> creates a coroutine. When its block only calls non-suspending functions, keyed <code>SideEffect</code> preserves the key-based execution without launching one.</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// ❌ No work in this block needs a coroutine.</span>
+<span class="n">LaunchedEffect</span><span class="p">(</span><span class="n">screenId</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">analytics</span><span class="p">.</span><span class="na">trackScreen</span><span class="p">(</span><span class="n">screenId</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="c1">// ✅ Run once for each screenId after composition applies its changes.</span>
+<span class="n">SideEffect</span><span class="p">(</span><span class="n">screenId</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">analytics</span><span class="p">.</span><span class="na">trackScreen</span><span class="p">(</span><span class="n">screenId</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>Keyed <code>SideEffect</code> requires Compose Runtime 1.12.0 or later. The rule only reports when that keyed overload is available (Compose 1.12+), and leaves <code>LaunchedEffect</code> alone if any call cannot be resolved.</p>
+<p>Both effects wait for a successful composition, but <code>SideEffect</code> runs on the composition's apply dispatcher while <code>LaunchedEffect</code> launches a coroutine in the composition's context. Keep <code>LaunchedEffect</code> when a non-suspending API depends on that coroutine scheduling or lifecycle; configure its receiver type or fully qualified function name:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">Compose</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">UnnecessaryLaunchedEffect</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">active</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">    </span><span class="nt">allowedCallReceiverTypes</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">androidx.compose.ui.focus.FocusRequester</span>
+<span class="w">    </span><span class="nt">allowedCallNames</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">androidx.compose.ui.focus.FocusRequester.requestFocus</span>
+</code></pre></div>
+<p>More info: <a href="https://developer.android.com/reference/kotlin/androidx/compose/runtime/SideEffect.composable">SideEffect API reference</a></p>
+<p>This rule is detekt-only and uses detekt's analysis API.</p>
+<div class="admonition info">
+<p><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14c1.11 0 2-.89 2-2V5a2 2 0 0 0-2-2M9.71 18l-1.42-1.41L12.88 12 8.29 7.41 9.71 6l6 6z"/></svg></span> <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/detekt/src/main/kotlin/io/nlopez/compose/rules/detekt/UnnecessaryLaunchedEffectCheck.kt">UnnecessaryLaunchedEffect</a> detekt</p>
 </div>
 <h3 id="do-not-emit-content-and-return-a-result">Do not emit content and return a result<a class="headerlink" href="#do-not-emit-content-and-return-a-result" title="Permanent link">&para;</a></h3>
 <p>Composable functions should either emit layout content or return a value, but not both.</p>

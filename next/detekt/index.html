@@ -762,6 +762,14 @@
 <span class="w">    </span><span class="nt">active</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 <span class="w">  </span><span class="nt">UnnecessaryComposable</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">active</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">  </span><span class="nt">UnnecessaryLaunchedEffect</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">active</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">    </span><span class="c1"># -- Calls whose dispatch or extension receiver has one of these fully qualified types keep LaunchedEffect.</span>
+<span class="w">    </span><span class="c1"># allowedCallReceiverTypes:</span>
+<span class="w">    </span><span class="c1">#   - androidx.compose.ui.focus.FocusRequester</span>
+<span class="w">    </span><span class="c1"># -- Calls whose fully qualified name is listed here keep LaunchedEffect.</span>
+<span class="w">    </span><span class="c1"># allowedCallNames:</span>
+<span class="w">    </span><span class="c1">#   - androidx.compose.ui.focus.FocusRequester.requestFocus</span>
 <span class="w">  </span><span class="nt">UnstableCollections</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">active</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span><span class="w"> </span><span class="c1"># Opt-in, disabled by default. Turn on if you want to enforce this (e.g. you have strong skipping disabled)</span>
 <span class="w">  </span><span class="nt">VarsWithoutStateBacking</span><span class="p">:</span>
