@@ -39,6 +39,7 @@ import org.jetbrains.kotlin.psi.KtForExpression
 import org.jetbrains.kotlin.psi.KtLambdaExpression
 import org.jetbrains.kotlin.psi.KtNameReferenceExpression
 import org.jetbrains.kotlin.psi.KtNamedFunction
+import org.jetbrains.kotlin.psi.KtPropertyDelegate
 import org.jetbrains.kotlin.psi.KtQualifiedExpression
 import org.jetbrains.kotlin.psi.KtThisExpression
 import org.jetbrains.kotlin.psi.KtUnaryExpression
@@ -108,6 +109,7 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
         is KtArrayAccessExpression,
         is KtDestructuringDeclarationEntry,
         is KtForExpression,
+        is KtPropertyDelegate,
         -> true
 
         else -> false
@@ -158,6 +160,7 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
     private fun KtExpression.usesCoroutineScope(): Boolean = runCatching {
         analyze(this) {
             if (this@usesCoroutineScope is KtThisExpression &&
+                this@usesCoroutineScope.getLabelName() == null &&
                 this@usesCoroutineScope.expressionType?.symbol?.classId?.asSingleFqName() ==
                 KotlinFqNames.CoroutineScope
             ) {

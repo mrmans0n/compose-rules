@@ -320,6 +320,28 @@ class UnnecessaryLaunchedEffectCheckTest {
     }
 
     @Test
+    fun `reports labeled outer CoroutineScope receiver references`() {
+        val findings = rule.lintWithAnalysisApi(
+            codeWithFakeCompose(
+                """
+                import kotlinx.coroutines.CoroutineScope
+
+                fun consume(scope: CoroutineScope) = Unit
+
+                @Composable
+                fun CoroutineScope.Example() {
+                    LaunchedEffect(Unit) {
+                        consume(this@Example)
+                    }
+                }
+                """,
+            ),
+        )
+
+        assertThat(findings).hasSize(1)
+    }
+
+    @Test
     fun `reports calls on external CoroutineScope receivers`() {
         val findings = rule.lintWithAnalysisApi(
             codeWithFakeCompose(
@@ -532,6 +554,33 @@ class UnnecessaryLaunchedEffectCheckTest {
                         for (item in items) {
                             update(item)
                         }
+                    }
+                }
+                """,
+            ),
+        )
+
+        assertThat(findings).isEmpty()
+    }
+
+    @Test
+    fun `allows delegated properties with suspend convention calls`() {
+        val findings = rule.lintWithAnalysisApi(
+            codeWithFakeCompose(
+                """
+                import kotlin.reflect.KProperty
+
+                class Delegate {
+                    suspend operator fun getValue(thisRef: Any?, property: KProperty<*>): String = "value"
+                }
+
+                fun consume(value: String) = Unit
+
+                @Composable
+                fun Example() {
+                    LaunchedEffect(Unit) {
+                        val result by Delegate()
+                        consume(result)
                     }
                 }
                 """,
