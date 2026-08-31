@@ -391,6 +391,20 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
                     } ?: return@forEach
                     references[property] = function
                 }
+            collectDescendantsOfType<KtBinaryExpression> { assignment -> assignment.isInCurrentFunctionBody(this) }
+                .forEach { assignment ->
+                    val property = assignment.assignedLocalProperty(this) ?: return@forEach
+                    val initializer = assignment.right?.unwrapArgumentExpression()
+                    val function = when (initializer) {
+                        is KtCallableReferenceExpression -> initializer.resolvedLocalFunction(localFunctions)
+
+                        is KtNameReferenceExpression ->
+                            references[initializer.referencedTrackedLocalProperty(this, references.keys)]
+
+                        else -> null
+                    } ?: return@forEach
+                    references[property] = function
+                }
         } while (references.size != previousSize)
         return references
     }
@@ -446,7 +460,7 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
         ?.takeIf { property -> property.initializer?.unwrapArgumentExpression() == this }
 
     private fun KtLambdaExpression.isInvokedFunctionValue(effectBody: KtExpression): Boolean =
-        localLambdaProperty()?.isInvokedIn(effectBody) == true ||
+        localLambdaProperty()?.let { property -> property.isInvokedAfter(property.textOffset, effectBody) } == true ||
             assignedLocalProperty(effectBody)?.let { (property, assignment) ->
                 property.isInvokedAfter(assignment.textOffset, effectBody)
             } == true
@@ -454,7 +468,7 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
     private fun KtNamedFunction.isInvokedFunctionValue(effectBody: KtExpression): Boolean =
         getStrictParentOfType<KtProperty>()
             ?.takeIf { property -> property.initializer?.unwrapArgumentExpression() == this }
-            ?.isInvokedIn(effectBody) == true ||
+            ?.let { property -> property.isInvokedAfter(property.textOffset, effectBody) } == true ||
             assignedLocalProperty(effectBody)?.let { (property, assignment) ->
                 property.isInvokedAfter(assignment.textOffset, effectBody)
             } == true

@@ -2215,6 +2215,67 @@ class UnnecessaryLaunchedEffectCheckTest {
     }
 
     @Test
+    fun `allows configured local helper references assigned to local variables`() {
+        val configuredRule = UnnecessaryLaunchedEffectCheck(
+            TestConfig(
+                "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
+            ),
+        )
+        val findings = configuredRule.lintWithAnalysisApi(
+            codeWithFakeCompose(
+                """
+                class FocusRequester {
+                    fun requestFocus() = Unit
+                }
+
+                @Composable
+                fun Example(focusRequester: FocusRequester) {
+                    LaunchedEffect(Unit) {
+                        fun helper() {
+                            focusRequester.requestFocus()
+                        }
+                        var callback: () -> Unit = {}
+                        callback = ::helper
+                        callback()
+                    }
+                }
+                """,
+            ),
+        )
+
+        assertThat(findings).isEmpty()
+    }
+
+    @Test
+    fun `reports initialized configured receiver lambdas overwritten before local variable invocation`() {
+        val configuredRule = UnnecessaryLaunchedEffectCheck(
+            TestConfig(
+                "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
+            ),
+        )
+        val findings = configuredRule.lintWithAnalysisApi(
+            codeWithFakeCompose(
+                """
+                class FocusRequester {
+                    fun requestFocus() = Unit
+                }
+
+                @Composable
+                fun Example(focusRequester: FocusRequester) {
+                    LaunchedEffect(Unit) {
+                        var callback = { focusRequester.requestFocus() }
+                        callback = {}
+                        callback()
+                    }
+                }
+                """,
+            ),
+        )
+
+        assertThat(findings).hasSize(1)
+    }
+
+    @Test
     fun `allows configured local helpers inside lambdas assigned to local variables`() {
         val configuredRule = UnnecessaryLaunchedEffectCheck(
             TestConfig(
