@@ -422,7 +422,7 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
         nearestDeferredLambda(effectBody)
             ?.let { lambda ->
                 lambda.isDirectlyInvoked(effectBody) ||
-                    lambda.localLambdaProperty()?.isInvokedIn(effectBody) == true
+                    lambda.isInvokedFunctionValue(effectBody)
             } == true
 
     private fun KtElement.isInsideDirectlyInvokedLocalLambda(scope: KtExpression): Boolean =
@@ -442,10 +442,19 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
     private fun KtLambdaExpression.localLambdaProperty(): KtProperty? = getStrictParentOfType<KtProperty>()
         ?.takeIf { property -> property.initializer?.unwrapArgumentExpression() == this }
 
+    private fun KtLambdaExpression.isInvokedFunctionValue(effectBody: KtExpression): Boolean =
+        localLambdaProperty()?.isInvokedIn(effectBody) == true ||
+            assignedLocalProperty(effectBody)?.let { (property, assignment) ->
+                property.isInvokedAfter(assignment, effectBody)
+            } == true
+
     private fun KtNamedFunction.isInvokedFunctionValue(effectBody: KtExpression): Boolean =
         getStrictParentOfType<KtProperty>()
             ?.takeIf { property -> property.initializer?.unwrapArgumentExpression() == this }
-            ?.isInvokedIn(effectBody) == true
+            ?.isInvokedIn(effectBody) == true ||
+            assignedLocalProperty(effectBody)?.let { (property, assignment) ->
+                property.isInvokedAfter(assignment, effectBody)
+            } == true
 
     private fun KtNamedFunction.isInlineArgument(): Boolean =
         getStrictParentOfType<KtCallExpression>()?.isResolvedInlineArgument(this) == true
@@ -474,26 +483,33 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
 
     private fun KtCallableReferenceExpression.isInvokedCallableReference(effectBody: KtExpression): Boolean {
         if (isInvokedIn(effectBody)) return true
-        val property = getStrictParentOfType<KtProperty>()
+        val initializerProperty = getStrictParentOfType<KtProperty>()
             ?.takeIf { property -> property.initializer?.unwrapArgumentExpression() == this }
-            ?: assignedLocalProperty(effectBody)
+        if (initializerProperty != null) return initializerProperty.isInvokedIn(effectBody)
+        val (property, assignment) = assignedLocalProperty(effectBody)
             ?: return false
-        return property.isInvokedIn(effectBody)
+        return property.isInvokedAfter(assignment, effectBody)
     }
 
-    private fun KtCallableReferenceExpression.assignedLocalProperty(effectBody: KtExpression): KtProperty? {
+    private fun KtExpression.assignedLocalProperty(effectBody: KtExpression): Pair<KtProperty, KtBinaryExpression>? {
         val assignment = getStrictParentOfType<KtBinaryExpression>()
             ?.takeIf { expression ->
                 expression.operationToken == KtTokens.EQ && expression.right?.unwrapArgumentExpression() == this
             }
             ?: return null
         val reference = assignment.left as? KtNameReferenceExpression ?: return null
-        return reference.referencedLocalProperty(effectBody, emptySet())
+        val property = reference.referencedLocalProperty(effectBody, emptySet()) ?: return null
+        return property to assignment
     }
 
     private fun KtProperty.isInvokedIn(effectBody: KtExpression): Boolean =
         effectBody.reachableInvocationScopes().any { scope ->
             scope.hasDirectInvocationOf(scope.localFunctionValueProperties(setOf(this)))
+        }
+
+    private fun KtProperty.isInvokedAfter(assignment: KtBinaryExpression, effectBody: KtExpression): Boolean =
+        effectBody.reachableInvocationScopes().any { scope ->
+            scope.hasDirectInvocationOfAfter(scope.localFunctionValueProperties(setOf(this)), assignment)
         }
 
     private fun KtExpression.reachableInvocationScopes(): Set<KtExpression> {
@@ -539,6 +555,38 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
                     reference.getStrictParentOfType<KtCallExpression>()?.isResolvedInlineArgument(reference) == true
             }
     }
+
+    private fun KtExpression.hasDirectInvocationOfAfter(
+        properties: Set<KtProperty>,
+        assignment: KtBinaryExpression,
+    ): Boolean {
+        val scope = this
+        return scope.collectDescendantsOfType<KtCallExpression> { call ->
+            call.isInCurrentFunctionBody(scope) &&
+                call.textOffset > assignment.textOffset &&
+                !scope.hasAssignmentBetween(properties, assignment.textOffset, call.textOffset)
+        }.any { call -> call.referencedLocalFunctionValueProperty(scope, properties) in properties } ||
+            scope.collectDescendantsOfType<KtNameReferenceExpression> { reference ->
+                reference.isInCurrentFunctionBody(scope) &&
+                    reference.textOffset > assignment.textOffset &&
+                    !scope.hasAssignmentBetween(properties, assignment.textOffset, reference.textOffset)
+            }.any { reference ->
+                reference.referencedLocalProperty(scope, properties) in properties &&
+                    reference.getStrictParentOfType<KtCallExpression>()?.isResolvedInlineArgument(reference) == true
+            }
+    }
+
+    private fun KtExpression.hasAssignmentBetween(
+        properties: Set<KtProperty>,
+        startOffset: Int,
+        endOffset: Int,
+    ): Boolean = collectDescendantsOfType<KtBinaryExpression> { expression ->
+        expression.operationToken == KtTokens.EQ &&
+            expression.textOffset > startOffset &&
+            expression.textOffset < endOffset &&
+            (expression.left as? KtNameReferenceExpression)
+                ?.referencedLocalProperty(this, properties) in properties
+    }.isNotEmpty()
 
     private fun KtExpression.localFunctionValueProperties(seedProperties: Set<KtProperty>): Set<KtProperty> {
         val properties = seedProperties.toMutableSet()
