@@ -1516,6 +1516,39 @@ class UnnecessaryLaunchedEffectCheckTest {
     }
 
     @Test
+    fun `allows configured receiver calls through local lambda values invoked from local functions`() {
+        val configuredRule = UnnecessaryLaunchedEffectCheck(
+            TestConfig(
+                "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
+            ),
+        )
+        val findings = configuredRule.lintWithAnalysisApi(
+            codeWithFakeCompose(
+                """
+                class FocusRequester {
+                    fun requestFocus() = Unit
+                }
+
+                @Composable
+                fun Example(focusRequester: FocusRequester) {
+                    LaunchedEffect(Unit) {
+                        val callback = {
+                            focusRequester.requestFocus()
+                        }
+                        fun helper() {
+                            callback()
+                        }
+                        helper()
+                    }
+                }
+                """,
+            ),
+        )
+
+        assertThat(findings).isEmpty()
+    }
+
+    @Test
     fun `allows configured receiver calls through invoked bound function references`() {
         val configuredRule = UnnecessaryLaunchedEffectCheck(
             TestConfig(
@@ -1534,6 +1567,35 @@ class UnnecessaryLaunchedEffectCheckTest {
                     LaunchedEffect(Unit) {
                         val callback = focusRequester::requestFocus
                         callback()
+                    }
+                }
+                """,
+            ),
+        )
+
+        assertThat(findings).isEmpty()
+    }
+
+    @Test
+    fun `allows configured receiver references passed to inline calls`() {
+        val configuredRule = UnnecessaryLaunchedEffectCheck(
+            TestConfig(
+                "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
+            ),
+        )
+        val findings = configuredRule.lintWithAnalysisApi(
+            codeWithFakeCompose(
+                """
+                class FocusRequester {
+                    fun requestFocus() = Unit
+                }
+
+                inline fun immediately(block: () -> Unit) = block()
+
+                @Composable
+                fun Example(focusRequester: FocusRequester) {
+                    LaunchedEffect(Unit) {
+                        immediately(focusRequester::requestFocus)
                     }
                 }
                 """,

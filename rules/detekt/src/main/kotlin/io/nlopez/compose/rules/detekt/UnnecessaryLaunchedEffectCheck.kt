@@ -325,7 +325,7 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
         collectDescendantsOfType<KtCallExpression> { call -> call.isInCurrentFunctionBody(this) }
             .mapNotNull { call -> call.resolvedLocalFunction(localFunctions) } +
             collectDescendantsOfType<KtCallableReferenceExpression> { reference ->
-                reference.isInCurrentFunctionBody(this) && reference.isDirectlyInvoked(this)
+                reference.isInCurrentFunctionBody(this) && reference.isInvokedIn(this)
             }.mapNotNull { reference -> reference.resolvedLocalFunction(localFunctions) } +
             calledLocalFunctionReferences(localFunctions)
 
@@ -375,8 +375,11 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
                 parents.takeWhile { parent -> parent != call }.any { parent -> parent == call.calleeExpression }
         }
 
+    private fun KtCallableReferenceExpression.isInvokedIn(scope: KtElement): Boolean =
+        isDirectlyInvoked(scope) || getStrictParentOfType<KtCallExpression>()?.isResolvedInlineArgument(this) == true
+
     private fun KtCallableReferenceExpression.isInvokedCallableReference(effectBody: KtExpression): Boolean {
-        if (isDirectlyInvoked(effectBody)) return true
+        if (isInvokedIn(effectBody)) return true
         val property = getStrictParentOfType<KtProperty>()
             ?.takeIf { property ->
                 property.initializer == this ||
@@ -389,9 +392,17 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
 
     private fun KtProperty.isInvokedIn(effectBody: KtExpression, propertyName: String = name ?: ""): Boolean =
         propertyName.isNotEmpty() &&
-            effectBody.collectDescendantsOfType<KtCallExpression> { call ->
-                call.isInCurrentFunctionBody(effectBody)
-            }.any { call -> call.referencedLocalFunctionValueName() == propertyName }
+            (
+                listOf(effectBody) + effectBody
+                    .collectDescendantsOfType<KtNamedFunction>()
+                    .filter { function -> function.isCalledFrom(effectBody) }
+                    .mapNotNull { function -> function.bodyExpression }
+                )
+                .any { scope ->
+                    scope.collectDescendantsOfType<KtCallExpression> { call ->
+                        call.isInCurrentFunctionBody(scope)
+                    }.any { call -> call.referencedLocalFunctionValueName() == propertyName }
+                }
 
     private fun KtCallExpression.resolvedLocalFunction(localFunctions: Set<KtNamedFunction>): KtNamedFunction? =
         runCatching {
