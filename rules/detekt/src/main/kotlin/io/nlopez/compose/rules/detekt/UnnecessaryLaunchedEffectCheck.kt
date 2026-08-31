@@ -322,10 +322,10 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
     }
 
     private fun KtElement.calledLocalFunctions(localFunctions: Set<KtNamedFunction>): List<KtNamedFunction> =
-        collectDescendantsOfType<KtCallExpression> { call -> call.isInCurrentFunctionBody(this) }
+        collectDescendantsOfType<KtCallExpression> { call -> call.isReachableInCurrentFunctionBody(this) }
             .mapNotNull { call -> call.resolvedLocalFunction(localFunctions) } +
             collectDescendantsOfType<KtCallableReferenceExpression> { reference ->
-                reference.isInCurrentFunctionBody(this) && reference.isInvokedIn(this)
+                reference.isReachableInCurrentFunctionBody(this) && reference.isInvokedIn(this)
             }.mapNotNull { reference -> reference.resolvedLocalFunction(localFunctions) } +
             calledLocalFunctionReferences(localFunctions)
 
@@ -357,6 +357,9 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
         parents.takeWhile { parent -> parent != scope }.none { parent -> parent is KtNamedFunction } &&
             (scope !is KtExpression || !isInsideDeferredLambda(scope))
 
+    private fun KtElement.isReachableInCurrentFunctionBody(scope: KtElement): Boolean =
+        isInCurrentFunctionBody(scope) || (scope is KtExpression && isInsideDirectlyInvokedLocalLambda(scope))
+
     private fun KtElement.isInsideInvokedLocalLambda(effectBody: KtExpression): Boolean = parents
         .takeWhile { parent -> parent != effectBody }
         .filterIsInstance<KtLambdaExpression>()
@@ -365,6 +368,16 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
                 ?.takeIf { property -> property.initializer?.unwrapArgumentExpression() == lambda }
                 ?: return@any false
             property.isInvokedIn(effectBody)
+        }
+
+    private fun KtElement.isInsideDirectlyInvokedLocalLambda(scope: KtExpression): Boolean = parents
+        .takeWhile { parent -> parent != scope }
+        .filterIsInstance<KtLambdaExpression>()
+        .any { lambda ->
+            val property = lambda.getStrictParentOfType<KtProperty>()
+                ?.takeIf { property -> property.initializer?.unwrapArgumentExpression() == lambda }
+                ?: return@any false
+            property.isDirectlyInvokedIn(scope)
         }
 
     private fun KtCallableReferenceExpression.isDirectlyInvoked(scope: KtElement): Boolean = parents
@@ -390,19 +403,21 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
         return property.isInvokedIn(effectBody, propertyName)
     }
 
-    private fun KtProperty.isInvokedIn(effectBody: KtExpression, propertyName: String = name ?: ""): Boolean =
+    private fun KtProperty.isInvokedIn(effectBody: KtExpression, propertyName: String = name ?: ""): Boolean {
+        if (propertyName.isEmpty()) return false
+        if (isDirectlyInvokedIn(effectBody, propertyName)) return true
+        return effectBody
+            .collectDescendantsOfType<KtNamedFunction>()
+            .filter { function -> function.isCalledFrom(effectBody) }
+            .mapNotNull { function -> function.bodyExpression }
+            .any { scope -> isDirectlyInvokedIn(scope, propertyName) }
+    }
+
+    private fun KtProperty.isDirectlyInvokedIn(scope: KtExpression, propertyName: String = name ?: ""): Boolean =
         propertyName.isNotEmpty() &&
-            (
-                listOf(effectBody) + effectBody
-                    .collectDescendantsOfType<KtNamedFunction>()
-                    .filter { function -> function.isCalledFrom(effectBody) }
-                    .mapNotNull { function -> function.bodyExpression }
-                )
-                .any { scope ->
-                    scope.collectDescendantsOfType<KtCallExpression> { call ->
-                        call.isInCurrentFunctionBody(scope)
-                    }.any { call -> call.referencedLocalFunctionValueName() == propertyName }
-                }
+            scope.collectDescendantsOfType<KtCallExpression> { call ->
+                call.isInCurrentFunctionBody(scope)
+            }.any { call -> call.referencedLocalFunctionValueName() == propertyName }
 
     private fun KtCallExpression.resolvedLocalFunction(localFunctions: Set<KtNamedFunction>): KtNamedFunction? =
         runCatching {
