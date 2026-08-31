@@ -71,7 +71,10 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
             .collectDescendantsOfType<KtElement> { candidate -> candidate.canRequireLaunchedEffect() }
             .filterNot { candidate ->
                 candidate.canResolveToFunctionCall() &&
-                    candidate.parents.takeWhile { parent -> parent != body }.any { parent -> parent is KtNamedFunction }
+                    candidate.parents.takeWhile { parent ->
+                        parent != body
+                    }.any { parent -> parent is KtNamedFunction } &&
+                    !candidate.hasCoroutineScopeReceiver()
             }
             .filterNot { candidate ->
                 candidate.canResolveToFunctionCall() &&
@@ -150,7 +153,8 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
 
     private fun KtExpression.usesCoroutineScope(): Boolean = runCatching {
         analyze(this) {
-            if (this@usesCoroutineScope.expressionType?.symbol?.classId?.asSingleFqName() ==
+            if (this@usesCoroutineScope is KtThisExpression &&
+                this@usesCoroutineScope.expressionType?.symbol?.classId?.asSingleFqName() ==
                 KotlinFqNames.CoroutineScope
             ) {
                 return@analyze true
