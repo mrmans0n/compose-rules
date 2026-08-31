@@ -2279,6 +2279,39 @@ class UnnecessaryLaunchedEffectCheckTest {
     }
 
     @Test
+    fun `allows configured local helper references invoked before later reassignment`() {
+        val configuredRule = UnnecessaryLaunchedEffectCheck(
+            TestConfig(
+                "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
+            ),
+        )
+        val findings = configuredRule.lintWithAnalysisApi(
+            codeWithFakeCompose(
+                """
+                class FocusRequester {
+                    fun requestFocus() = Unit
+                }
+
+                @Composable
+                fun Example(focusRequester: FocusRequester) {
+                    LaunchedEffect(Unit) {
+                        fun first() {
+                            focusRequester.requestFocus()
+                        }
+                        fun second() = Unit
+                        var callback = ::first
+                        callback()
+                        callback = ::second
+                    }
+                }
+                """,
+            ),
+        )
+
+        assertThat(findings).isEmpty()
+    }
+
+    @Test
     fun `reports initialized configured receiver lambdas overwritten before local variable invocation`() {
         val configuredRule = UnnecessaryLaunchedEffectCheck(
             TestConfig(
@@ -2298,6 +2331,68 @@ class UnnecessaryLaunchedEffectCheckTest {
                         var callback = { focusRequester.requestFocus() }
                         callback = {}
                         callback()
+                    }
+                }
+                """,
+            ),
+        )
+
+        assertThat(findings).hasSize(1)
+    }
+
+    @Test
+    fun `reports configured local helper calls inside overwritten initializer lambdas`() {
+        val configuredRule = UnnecessaryLaunchedEffectCheck(
+            TestConfig(
+                "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
+            ),
+        )
+        val findings = configuredRule.lintWithAnalysisApi(
+            codeWithFakeCompose(
+                """
+                class FocusRequester {
+                    fun requestFocus() = Unit
+                }
+
+                @Composable
+                fun Example(focusRequester: FocusRequester) {
+                    LaunchedEffect(Unit) {
+                        fun helper() {
+                            focusRequester.requestFocus()
+                        }
+                        var callback = { helper() }
+                        callback = {}
+                        callback()
+                    }
+                }
+                """,
+            ),
+        )
+
+        assertThat(findings).hasSize(1)
+    }
+
+    @Test
+    fun `reports configured receiver callback aliases created before assignment`() {
+        val configuredRule = UnnecessaryLaunchedEffectCheck(
+            TestConfig(
+                "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
+            ),
+        )
+        val findings = configuredRule.lintWithAnalysisApi(
+            codeWithFakeCompose(
+                """
+                class FocusRequester {
+                    fun requestFocus() = Unit
+                }
+
+                @Composable
+                fun Example(focusRequester: FocusRequester) {
+                    LaunchedEffect(Unit) {
+                        var callback: () -> Unit = {}
+                        val alias = callback
+                        callback = focusRequester::requestFocus
+                        alias()
                     }
                 }
                 """,
