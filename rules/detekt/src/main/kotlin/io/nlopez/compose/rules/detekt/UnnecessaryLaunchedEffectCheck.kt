@@ -435,20 +435,34 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
             .any { scope -> isDirectlyInvokedIn(scope, propertyName) }
     }
 
-    private fun KtProperty.isDirectlyInvokedIn(scope: KtExpression, propertyName: String = name ?: ""): Boolean =
-        propertyName.isNotEmpty() &&
-            (
-                scope.collectDescendantsOfType<KtCallExpression> { call ->
-                    call.isInCurrentFunctionBody(scope)
-                }.any { call -> call.referencedLocalFunctionValueName() == propertyName } ||
-                    scope.collectDescendantsOfType<KtNameReferenceExpression> { reference ->
-                        reference.isInCurrentFunctionBody(scope)
-                    }.any { reference ->
-                        reference.getReferencedName() == propertyName &&
-                            reference.getStrictParentOfType<KtCallExpression>()?.isResolvedInlineArgument(reference) ==
-                            true
-                    }
-                )
+    private fun KtProperty.isDirectlyInvokedIn(scope: KtExpression, propertyName: String = name ?: ""): Boolean {
+        if (propertyName.isEmpty()) return false
+        val propertyNames = scope.localFunctionValueNames(propertyName)
+        return scope.collectDescendantsOfType<KtCallExpression> { call ->
+            call.isInCurrentFunctionBody(scope)
+        }.any { call -> call.referencedLocalFunctionValueName() in propertyNames } ||
+            scope.collectDescendantsOfType<KtNameReferenceExpression> { reference ->
+                reference.isInCurrentFunctionBody(scope)
+            }.any { reference ->
+                reference.getReferencedName() in propertyNames &&
+                    reference.getStrictParentOfType<KtCallExpression>()?.isResolvedInlineArgument(reference) == true
+            }
+    }
+
+    private fun KtExpression.localFunctionValueNames(propertyName: String): Set<String> {
+        val propertyNames = mutableSetOf(propertyName)
+        do {
+            val previousSize = propertyNames.size
+            collectDescendantsOfType<KtProperty> { property -> property.isInCurrentFunctionBody(this) }
+                .filter { property ->
+                    (property.initializer?.unwrapArgumentExpression() as? KtNameReferenceExpression)
+                        ?.getReferencedName() in propertyNames
+                }
+                .mapNotNull { property -> property.name }
+                .forEach { name -> propertyNames.add(name) }
+        } while (propertyNames.size != previousSize)
+        return propertyNames
+    }
 
     private fun KtCallExpression.resolvedLocalFunction(localFunctions: Set<KtNamedFunction>): KtNamedFunction? =
         runCatching {
