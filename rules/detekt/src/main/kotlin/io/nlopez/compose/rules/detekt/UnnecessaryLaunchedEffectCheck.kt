@@ -54,6 +54,7 @@ import org.jetbrains.kotlin.psi.KtPropertyDelegate
 import org.jetbrains.kotlin.psi.KtQualifiedExpression
 import org.jetbrains.kotlin.psi.KtThisExpression
 import org.jetbrains.kotlin.psi.KtUnaryExpression
+import org.jetbrains.kotlin.psi.KtValueArgument
 import org.jetbrains.kotlin.psi.psiUtil.collectDescendantsOfType
 import org.jetbrains.kotlin.psi.psiUtil.getStrictParentOfType
 import org.jetbrains.kotlin.psi.psiUtil.parents
@@ -401,17 +402,20 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
         .takeWhile { parent -> parent != scope && parent !is KtProperty }
         .filterIsInstance<KtCallExpression>()
         .any { call ->
-            call.calleeExpression == this ||
-                parents.takeWhile { parent -> parent != call }.any { parent -> parent == call.calleeExpression }
+            val parentsToCall = parents.takeWhile { parent -> parent != call }.toList()
+            call.calleeExpression == this || parentsToCall.occupiesCalleeOf(call)
         }
 
     private fun KtCallableReferenceExpression.isDirectlyInvoked(scope: KtElement): Boolean = parents
         .takeWhile { parent -> parent != scope && parent !is KtProperty }
         .filterIsInstance<KtCallExpression>()
         .any { call ->
-            call.calleeExpression == this ||
-                parents.takeWhile { parent -> parent != call }.any { parent -> parent == call.calleeExpression }
+            val parentsToCall = parents.takeWhile { parent -> parent != call }.toList()
+            call.calleeExpression == this || parentsToCall.occupiesCalleeOf(call)
         }
+
+    private fun List<*>.occupiesCalleeOf(call: KtCallExpression): Boolean =
+        none { parent -> parent is KtValueArgument } && any { parent -> parent == call.calleeExpression }
 
     private fun KtCallableReferenceExpression.isInvokedIn(scope: KtElement): Boolean =
         isDirectlyInvoked(scope) || getStrictParentOfType<KtCallExpression>()?.isResolvedInlineArgument(this) == true
