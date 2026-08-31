@@ -265,13 +265,15 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
     }.getOrDefault(false)
 
     private fun KtCallExpression.hasCoroutineScopeReceiverScopeFunctionArgument(): Boolean {
-        if (!isResolvedCallToAnyNamed(ExternalReceiverScopeFunctions) &&
-            calleeExpression?.text !in ExternalReceiverScopeFunctionNames
-        ) {
+        val isResolvedScopeFunction = isResolvedCallToAnyNamed(ExternalReceiverScopeFunctions)
+        if (!isResolvedScopeFunction && calleeExpression?.text !in ExternalReceiverScopeFunctionNames) {
             return false
         }
-        val receiverExpression = valueArguments.firstOrNull()?.getArgumentExpression()
-            ?: qualifiedReceiverExpression()
+        val receiverExpression = if (isResolvedScopeFunction) {
+            valueArguments.firstOrNull()?.getArgumentExpression() ?: qualifiedReceiverExpression()
+        } else {
+            qualifiedReceiverExpression()
+        }
             ?: return false
         if (hasCoroutineScopeCallReceiver()) return true
         return receiverExpression.isCoroutineScopeExpression()
