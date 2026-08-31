@@ -608,6 +608,29 @@ This rule is detekt-only and uses detekt's analysis API.
 
     :material-chevron-right-box: [MissingReadOnlyComposable](https://github.com/mrmans0n/compose-rules/blob/main/rules/detekt/src/main/kotlin/io/nlopez/compose/rules/detekt/MissingReadOnlyComposableCheck.kt) detekt
 
+### Mark pass-through composables as non-restartable
+
+A `Unit` composable that only forwards safe arguments to one other `Unit` composable may not need its own restart and skip boundary. Mark it with `@NonRestartableComposable` when that boundary adds no value.
+
+```kotlin
+// ❌ This wrapper only delegates.
+@Composable
+fun Avatar(name: String) = AvatarContent(name)
+
+// ✅ The wrapper does not create another restart boundary.
+@NonRestartableComposable
+@Composable
+fun Avatar(name: String) = AvatarContent(name)
+```
+
+The rule only reports direct single-call functions and property getters. It ignores calculated arguments or defaults, lambdas, non-concrete declarations, and composables with explicit group contracts.
+
+This rule is detekt-only and uses detekt's analysis API. `@NonRestartableComposable`, `@NonSkippableComposable`, and `@ExplicitGroupsComposable` have source retention, so their use on a composable from a compiled dependency cannot be observed; review those findings before applying the annotation.
+
+!!! info ""
+
+    :material-chevron-right-box: [MissingNonRestartableComposable](https://github.com/mrmans0n/compose-rules/blob/main/rules/detekt/src/main/kotlin/io/nlopez/compose/rules/detekt/MissingNonRestartableComposableCheck.kt) detekt
+
 ### Do not mark functions as composable when they don't need it
 
 `@Composable` changes where a function can be called from. If a function or property getter does not call composables, read composition locals, read Compose state, or otherwise use composition, it should be a regular Kotlin declaration instead.

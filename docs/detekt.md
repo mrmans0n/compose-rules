@@ -103,6 +103,8 @@ Compose:
     active: false # Opt-in, disabled by default. Turn on if you want to disallow Material 2 usages.
     # -- You can optionally allow parts of it, if you are in the middle of a migration.
     # allowedFromM2: icons.Icons,TopAppBar
+  MissingNonRestartableComposable:
+    active: true
   MissingReadOnlyComposable:
     active: true
   ModifierClickableOrder:
