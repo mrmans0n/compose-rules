@@ -577,6 +577,38 @@ class UnnecessaryLaunchedEffectCheckTest {
     }
 
     @Test
+    fun `allows implicit effect scope calls inside user run and apply lambdas without receivers`() {
+        val findings = rule.lintWithAnalysisApi(
+            codeWithFakeCompose(
+                """
+                import kotlinx.coroutines.CoroutineScope
+
+                fun CoroutineScope.run(block: () -> Unit) = block()
+                fun CoroutineScope.apply(block: () -> Unit) = block()
+                fun CoroutineScope.launch(block: suspend () -> Unit) = Unit
+                fun update() = Unit
+
+                @Composable
+                fun Example(scope: CoroutineScope) {
+                    LaunchedEffect(Unit) {
+                        scope.run {
+                            launch { update() }
+                        }
+                    }
+                    LaunchedEffect(Unit) {
+                        scope.apply {
+                            launch { update() }
+                        }
+                    }
+                }
+                """,
+            ),
+        )
+
+        assertThat(findings).isEmpty()
+    }
+
+    @Test
     fun `allows LaunchedEffect coroutineContext references`() {
         val findings = rule.lintWithAnalysisApi(
             codeWithFakeCompose(

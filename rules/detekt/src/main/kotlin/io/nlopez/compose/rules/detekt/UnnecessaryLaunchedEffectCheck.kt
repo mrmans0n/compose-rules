@@ -13,7 +13,9 @@ import dev.detekt.api.RuleName
 import dev.detekt.api.config
 import org.jetbrains.kotlin.analysis.api.KaExperimentalApi
 import org.jetbrains.kotlin.analysis.api.analyze
+import org.jetbrains.kotlin.analysis.api.components.expectedType
 import org.jetbrains.kotlin.analysis.api.components.expressionType
+import org.jetbrains.kotlin.analysis.api.components.functionType
 import org.jetbrains.kotlin.analysis.api.components.resolveToCall
 import org.jetbrains.kotlin.analysis.api.components.resolveToSymbol
 import org.jetbrains.kotlin.analysis.api.resolution.KaCall
@@ -25,7 +27,7 @@ import org.jetbrains.kotlin.analysis.api.resolution.successfulCallOrNull
 import org.jetbrains.kotlin.analysis.api.resolution.symbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaNamedFunctionSymbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaPropertySymbol
-import org.jetbrains.kotlin.analysis.api.symbols.KaVariableSymbol
+import org.jetbrains.kotlin.analysis.api.types.KaFunctionType
 import org.jetbrains.kotlin.analysis.api.types.symbol
 import org.jetbrains.kotlin.idea.references.mainReference
 import org.jetbrains.kotlin.lexer.KtTokens
@@ -235,7 +237,8 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
         .takeWhile { parent -> parent != effectBody }
         .filterIsInstance<KtLambdaExpression>()
         .any { lambda ->
-            lambda.getStrictParentOfType<KtCallExpression>()?.hasCoroutineScopeReceiverScopeFunctionArgument() == true
+            lambda.getStrictParentOfType<KtCallExpression>()?.hasCoroutineScopeReceiverScopeFunctionArgument(lambda) ==
+                true
         }
 
     private fun KaForLoopCall.needsLaunchedEffect(): Boolean =
@@ -264,43 +267,20 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
         }
     }.getOrDefault(false)
 
-    private fun KtCallExpression.hasCoroutineScopeReceiverScopeFunctionArgument(): Boolean {
+    private fun KtCallExpression.hasCoroutineScopeReceiverScopeFunctionArgument(lambda: KtLambdaExpression): Boolean {
         val isResolvedScopeFunction = isResolvedCallToAnyNamed(ExternalReceiverScopeFunctions)
         if (!isResolvedScopeFunction && calleeExpression?.text !in ExternalReceiverScopeFunctionNames) {
             return false
         }
-        val receiverExpression = if (isResolvedScopeFunction) {
-            valueArguments.firstOrNull()?.getArgumentExpression() ?: qualifiedReceiverExpression()
-        } else {
-            qualifiedReceiverExpression()
-        }
-            ?: return false
-        if (hasCoroutineScopeCallReceiver()) return true
-        return receiverExpression.isCoroutineScopeExpression()
+        return lambda.hasCoroutineScopeReceiver()
     }
 
-    private fun KtCallExpression.hasCoroutineScopeCallReceiver(): Boolean = runCatching {
+    private fun KtLambdaExpression.hasCoroutineScopeReceiver(): Boolean = runCatching {
         analyze(this) {
-            val call = this@hasCoroutineScopeCallReceiver.resolveToCall()
-                ?.successfulCallOrNull<KaFunctionCall<*>>()
-                ?: return@analyze false
-            call.hasCoroutineScopeReceiver()
-        }
-    }.getOrDefault(false)
-
-    private fun KtCallExpression.qualifiedReceiverExpression(): KtExpression? =
-        (parent as? KtQualifiedExpression)?.receiverExpression
-            ?: (parent?.parent as? KtQualifiedExpression)?.receiverExpression
-
-    private fun KtExpression.isCoroutineScopeExpression(): Boolean = runCatching {
-        analyze(this) {
-            val variable = (this@isCoroutineScopeExpression as? KtNameReferenceExpression)
-                ?.mainReference
-                ?.resolveToSymbol() as? KaVariableSymbol
-            if (variable?.returnType?.symbol?.classId?.asSingleFqName() == KotlinFqNames.CoroutineScope) {
-                return@analyze true
-            }
-            expressionType?.symbol?.classId?.asSingleFqName() == KotlinFqNames.CoroutineScope
+            listOfNotNull(
+                (functionLiteral.functionType as? KaFunctionType)?.receiverType,
+                (expectedType as? KaFunctionType)?.receiverType,
+            ).any { type -> type.symbol?.classId?.asSingleFqName() == KotlinFqNames.CoroutineScope }
         }
     }.getOrDefault(false)
 
