@@ -13,6 +13,7 @@ import dev.detekt.api.RuleName
 import dev.detekt.api.config
 import org.jetbrains.kotlin.analysis.api.KaExperimentalApi
 import org.jetbrains.kotlin.analysis.api.analyze
+import org.jetbrains.kotlin.analysis.api.components.allSupertypes
 import org.jetbrains.kotlin.analysis.api.components.expectedType
 import org.jetbrains.kotlin.analysis.api.components.expressionType
 import org.jetbrains.kotlin.analysis.api.components.functionType
@@ -101,6 +102,7 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
             .filterNot { candidate ->
                 candidate.canResolveToFunctionCall() &&
                     candidate.isInsideDeferredLambda(body) &&
+                    !candidate.isInsideInvokedLocalLambda(body) &&
                     !candidate.hasCoroutineScopeReceiver(body)
             }
             .any { candidate ->
@@ -331,7 +333,8 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
         val references = collectDescendantsOfType<KtProperty> { property -> property.isInCurrentFunctionBody(this) }
             .mapNotNull { property ->
                 val name = property.name ?: return@mapNotNull null
-                val reference = property.initializer as? KtCallableReferenceExpression ?: return@mapNotNull null
+                val reference = property.initializer?.unwrapArgumentExpression() as? KtCallableReferenceExpression
+                    ?: return@mapNotNull null
                 name to reference.resolvedLocalFunction(localFunctions)
             }.toMap()
         if (references.isEmpty()) return emptyList()
@@ -354,6 +357,16 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
         parents.takeWhile { parent -> parent != scope }.none { parent -> parent is KtNamedFunction } &&
             (scope !is KtExpression || !isInsideDeferredLambda(scope))
 
+    private fun KtElement.isInsideInvokedLocalLambda(effectBody: KtExpression): Boolean = parents
+        .takeWhile { parent -> parent != effectBody }
+        .filterIsInstance<KtLambdaExpression>()
+        .any { lambda ->
+            val property = lambda.getStrictParentOfType<KtProperty>()
+                ?.takeIf { property -> property.initializer?.unwrapArgumentExpression() == lambda }
+                ?: return@any false
+            property.isInvokedIn(effectBody)
+        }
+
     private fun KtCallableReferenceExpression.isDirectlyInvoked(scope: KtElement): Boolean = parents
         .takeWhile { parent -> parent != scope && parent !is KtProperty }
         .filterIsInstance<KtCallExpression>()
@@ -371,11 +384,14 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
             }
             ?: return false
         val propertyName = property.name ?: return false
-        return effectBody.collectDescendantsOfType<KtCallExpression> { call ->
-            call.isInCurrentFunctionBody(effectBody)
-        }
-            .any { call -> call.referencedLocalFunctionValueName() == propertyName }
+        return property.isInvokedIn(effectBody, propertyName)
     }
+
+    private fun KtProperty.isInvokedIn(effectBody: KtExpression, propertyName: String = name ?: ""): Boolean =
+        propertyName.isNotEmpty() &&
+            effectBody.collectDescendantsOfType<KtCallExpression> { call ->
+                call.isInCurrentFunctionBody(effectBody)
+            }.any { call -> call.referencedLocalFunctionValueName() == propertyName }
 
     private fun KtCallExpression.resolvedLocalFunction(localFunctions: Set<KtNamedFunction>): KtNamedFunction? =
         runCatching {
@@ -444,13 +460,22 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
             listOfNotNull(
                 (functionLiteral.functionType as? KaFunctionType)?.receiverType,
                 (expectedType as? KaFunctionType)?.receiverType,
-            ).any { type -> type.symbol?.classId?.asSingleFqName() == KotlinFqNames.CoroutineScope }
+            ).any { type ->
+                type.symbol?.classId?.asSingleFqName() == KotlinFqNames.CoroutineScope ||
+                    type.allSupertypes.any { supertype ->
+                        supertype.symbol?.classId?.asSingleFqName() == KotlinFqNames.CoroutineScope
+                    }
+            }
         }
     }.getOrDefault(false)
 
     private fun KtNamedFunction.hasCoroutineScopeReceiver(): Boolean = runCatching {
         analyze(this) {
-            receiverTypeReference?.type?.symbol?.classId?.asSingleFqName() == KotlinFqNames.CoroutineScope
+            val receiverType = receiverTypeReference?.type ?: return@analyze false
+            receiverType.symbol?.classId?.asSingleFqName() == KotlinFqNames.CoroutineScope ||
+                receiverType.allSupertypes.any { supertype ->
+                    supertype.symbol?.classId?.asSingleFqName() == KotlinFqNames.CoroutineScope
+                }
         }
     }.getOrDefault(false)
 

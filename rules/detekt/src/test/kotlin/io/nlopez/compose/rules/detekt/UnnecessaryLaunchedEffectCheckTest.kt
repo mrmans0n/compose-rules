@@ -603,6 +603,33 @@ class UnnecessaryLaunchedEffectCheckTest {
     }
 
     @Test
+    fun `reports calls in nested custom CoroutineScope subtype receiver lambdas`() {
+        val findings = rule.lintWithAnalysisApi(
+            codeWithFakeCompose(
+                """
+                import kotlinx.coroutines.CoroutineScope
+
+                interface MyScope : CoroutineScope
+
+                fun register(block: MyScope.() -> Unit) = Unit
+                fun CoroutineScope.update() = Unit
+
+                @Composable
+                fun Example() {
+                    LaunchedEffect(Unit) {
+                        register {
+                            update()
+                        }
+                    }
+                }
+                """,
+            ),
+        )
+
+        assertThat(findings).hasSize(1)
+    }
+
+    @Test
     fun `reports labeled this references in nested custom CoroutineScope receiver lambdas`() {
         val findings = rule.lintWithAnalysisApi(
             codeWithFakeCompose(
@@ -1308,6 +1335,13 @@ class UnnecessaryLaunchedEffectCheckTest {
                         val callback = ::helper
                         callback.invoke()
                     }
+                    LaunchedEffect("parenthesized") {
+                        fun helper() {
+                            focusRequester.requestFocus()
+                        }
+                        val callback = (::helper)
+                        callback()
+                    }
                 }
                 """,
             ),
@@ -1449,6 +1483,36 @@ class UnnecessaryLaunchedEffectCheckTest {
         )
 
         assertThat(findings).hasSize(1)
+    }
+
+    @Test
+    fun `allows configured receiver calls through invoked local lambda values`() {
+        val configuredRule = UnnecessaryLaunchedEffectCheck(
+            TestConfig(
+                "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
+            ),
+        )
+        val findings = configuredRule.lintWithAnalysisApi(
+            codeWithFakeCompose(
+                """
+                class FocusRequester {
+                    fun requestFocus() = Unit
+                }
+
+                @Composable
+                fun Example(focusRequester: FocusRequester) {
+                    LaunchedEffect(Unit) {
+                        val callback = {
+                            focusRequester.requestFocus()
+                        }
+                        callback()
+                    }
+                }
+                """,
+            ),
+        )
+
+        assertThat(findings).isEmpty()
     }
 
     @Test
