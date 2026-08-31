@@ -327,7 +327,7 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
         return this in reachableFunctions
     }
 
-    private fun KtElement.calledLocalFunctions(localFunctions: Set<KtNamedFunction>): List<KtNamedFunction> =
+    private fun KtExpression.calledLocalFunctions(localFunctions: Set<KtNamedFunction>): List<KtNamedFunction> =
         collectDescendantsOfType<KtCallExpression> { call -> call.isReachableInCurrentFunctionBody(this) }
             .mapNotNull { call -> call.resolvedLocalFunction(localFunctions) } +
             collectDescendantsOfType<KtCallableReferenceExpression> { reference ->
@@ -335,37 +335,68 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
             }.mapNotNull { reference -> reference.resolvedLocalFunction(localFunctions) } +
             calledLocalFunctionReferences(localFunctions)
 
-    private fun KtElement.calledLocalFunctionReferences(localFunctions: Set<KtNamedFunction>): List<KtNamedFunction> {
-        val references = mutableMapOf<String, KtNamedFunction>()
+    private fun KtExpression.calledLocalFunctionReferences(
+        localFunctions: Set<KtNamedFunction>,
+    ): List<KtNamedFunction> {
+        val references = localFunctionReferenceProperties(localFunctions)
+        if (references.isEmpty()) return emptyList()
+        return collectDescendantsOfType<KtCallExpression> { call -> call.isInCurrentFunctionBody(this) }
+            .mapNotNull { call ->
+                references[call.referencedLocalFunctionReferenceProperty(this, references.keys)]
+            } +
+            collectDescendantsOfType<KtNameReferenceExpression> { reference -> reference.isInCurrentFunctionBody(this) }
+                .mapNotNull { reference ->
+                    val inlineCall = reference.getStrictParentOfType<KtCallExpression>()
+                        ?.takeIf { call -> call.isResolvedInlineArgument(reference) }
+                    if (inlineCall == null) {
+                        null
+                    } else {
+                        references[reference.referencedTrackedLocalProperty(this, references.keys)]
+                    }
+                }
+    }
+
+    private fun KtExpression.localFunctionReferenceProperties(
+        localFunctions: Set<KtNamedFunction>,
+    ): Map<KtProperty, KtNamedFunction> {
+        val references = mutableMapOf<KtProperty, KtNamedFunction>()
         do {
             val previousSize = references.size
             collectDescendantsOfType<KtProperty> { property -> property.isInCurrentFunctionBody(this) }
                 .forEach { property ->
-                    val name = property.name ?: return@forEach
                     val initializer = property.initializer?.unwrapArgumentExpression()
                     val function = when (initializer) {
                         is KtCallableReferenceExpression -> initializer.resolvedLocalFunction(localFunctions)
-                        is KtNameReferenceExpression -> references[initializer.getReferencedName()]
+
+                        is KtNameReferenceExpression ->
+                            references[initializer.referencedTrackedLocalProperty(this, references.keys)]
+
                         else -> null
                     } ?: return@forEach
-                    references[name] = function
+                    references[property] = function
                 }
         } while (references.size != previousSize)
-        if (references.isEmpty()) return emptyList()
-        return collectDescendantsOfType<KtCallExpression> { call -> call.isInCurrentFunctionBody(this) }
-            .mapNotNull { call ->
-                references[call.referencedLocalFunctionValueName()]
-            }
+        return references
     }
 
-    private fun KtCallExpression.referencedLocalFunctionValueName(): String? =
+    private fun KtCallExpression.referencedLocalFunctionReferenceProperty(
+        scope: KtExpression,
+        properties: Set<KtProperty>,
+    ): KtProperty? = (
         ((parent as? KtQualifiedExpression)?.receiverExpression as? KtNameReferenceExpression)
             ?.takeIf {
                 (parent as? KtQualifiedExpression)?.selectorExpression == this &&
                     (calleeExpression as? KtNameReferenceExpression)?.getReferencedName() == "invoke"
             }
-            ?.getReferencedName()
-            ?: (calleeExpression as? KtNameReferenceExpression)?.getReferencedName()
+            ?: calleeExpression as? KtNameReferenceExpression
+        )
+        ?.referencedTrackedLocalProperty(scope, properties)
+
+    private fun KtNameReferenceExpression.referencedTrackedLocalProperty(
+        scope: KtExpression,
+        properties: Set<KtProperty>,
+    ): KtProperty? = resolvedLocalProperty()?.takeIf { property -> property in properties }
+        ?: scope.visibleLocalProperty(getReferencedName(), this)?.takeIf { property -> property in properties }
 
     private fun KtElement.isInCurrentFunctionBody(scope: KtElement): Boolean =
         parents.takeWhile { parent -> parent != scope }.none { parent -> parent is KtNamedFunction } &&
