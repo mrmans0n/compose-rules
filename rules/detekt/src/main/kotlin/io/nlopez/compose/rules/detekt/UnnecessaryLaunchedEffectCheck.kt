@@ -20,6 +20,7 @@ import org.jetbrains.kotlin.analysis.api.components.resolveToCall
 import org.jetbrains.kotlin.analysis.api.components.resolveToSymbol
 import org.jetbrains.kotlin.analysis.api.components.type
 import org.jetbrains.kotlin.analysis.api.resolution.KaCall
+import org.jetbrains.kotlin.analysis.api.resolution.KaDelegatedPropertyCall
 import org.jetbrains.kotlin.analysis.api.resolution.KaForLoopCall
 import org.jetbrains.kotlin.analysis.api.resolution.KaFunctionCall
 import org.jetbrains.kotlin.analysis.api.resolution.KaSingleCall
@@ -28,6 +29,7 @@ import org.jetbrains.kotlin.analysis.api.resolution.successfulCallOrNull
 import org.jetbrains.kotlin.analysis.api.resolution.symbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaNamedFunctionSymbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaPropertySymbol
+import org.jetbrains.kotlin.analysis.api.symbols.sourcePsiSafe
 import org.jetbrains.kotlin.analysis.api.types.KaFunctionType
 import org.jetbrains.kotlin.analysis.api.types.symbol
 import org.jetbrains.kotlin.idea.references.mainReference
@@ -79,6 +81,11 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
         val effectCallName = expression.calleeExpression?.text
         val requiresCoroutine = body
             .collectDescendantsOfType<KtElement> { candidate -> candidate.canRequireLaunchedEffect() }
+            .filterNot { candidate ->
+                candidate.canResolveToFunctionCall() &&
+                    candidate.isInsideUnusedLocalFunction(body) &&
+                    !candidate.hasCoroutineScopeReceiver(body)
+            }
             .filterNot { candidate ->
                 candidate.canResolveToFunctionCall() &&
                     candidate.parents.takeWhile { parent ->
@@ -143,6 +150,8 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
                 ?.successfulCallOrNull<KaCall>()
                 ?: return@analyze true
             when (call) {
+                is KaDelegatedPropertyCall -> call.needsLaunchedEffect(hasExplicitReceiver = hasExplicitReceiver())
+
                 is KaForLoopCall -> call.needsLaunchedEffect(hasExplicitReceiver = hasExplicitReceiver())
 
                 is KaFunctionCall<*> -> call.needsLaunchedEffect(
@@ -225,11 +234,12 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
 
     private fun KtThisExpression.referencesEffectReceiver(effectCallName: String?, effectBody: KtExpression): Boolean {
         val label = getLabelName() ?: return true
-        if (label == effectCallName) return true
         val effectLambda = effectBody.getStrictParentOfType<KtLambdaExpression>()
-        return parents.filterIsInstance<KtLabeledExpression>().any { expression ->
-            expression.getLabelName() == label && expression.baseExpression?.unwrapArgumentExpression() == effectLambda
-        }
+        val labeledExpression = parents
+            .filterIsInstance<KtLabeledExpression>()
+            .firstOrNull { expression -> expression.getLabelName() == label }
+            ?: return label == effectCallName
+        return labeledExpression.baseExpression?.unwrapArgumentExpression() == effectLambda
     }
 
     private fun KtElement.hasExplicitReceiver(): Boolean = when (this) {
@@ -242,6 +252,8 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
         is KtForExpression -> loopRange != null
 
         is KtDestructuringDeclarationEntry -> (parent as? KtDestructuringDeclaration)?.initializer != null
+
+        is KtPropertyDelegate -> expression != null
 
         else ->
             (parent as? KtQualifiedExpression)?.let { qualified ->
@@ -272,6 +284,32 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
                 else -> false
             }
         }
+
+    private fun KtElement.isInsideUnusedLocalFunction(effectBody: KtExpression): Boolean {
+        val localFunction = parents
+            .takeWhile { parent -> parent != effectBody }
+            .filterIsInstance<KtNamedFunction>()
+            .firstOrNull()
+            ?: return false
+        return !localFunction.isCalledFrom(effectBody)
+    }
+
+    private fun KtNamedFunction.isCalledFrom(effectBody: KtExpression): Boolean = runCatching {
+        analyze(this) {
+            effectBody.collectDescendantsOfType<KtCallExpression> { call ->
+                call.parents.none { parent -> parent == this@isCalledFrom }
+            }.any { call ->
+                call.resolveToCall()
+                    ?.successfulCallOrNull<KaFunctionCall<*>>()
+                    ?.symbol
+                    ?.sourcePsiSafe<KtNamedFunction>() == this@isCalledFrom
+            }
+        }
+    }.getOrDefault(true)
+
+    private fun KaDelegatedPropertyCall.needsLaunchedEffect(hasExplicitReceiver: Boolean): Boolean =
+        listOfNotNull(provideDelegateCall, valueGetterCall, valueSetterCall)
+            .any { call -> call.needsLaunchedEffect(hasExplicitReceiver = hasExplicitReceiver) }
 
     private fun KaForLoopCall.needsLaunchedEffect(hasExplicitReceiver: Boolean = false): Boolean =
         iteratorCall.needsLaunchedEffect(hasExplicitReceiver = hasExplicitReceiver) ||
