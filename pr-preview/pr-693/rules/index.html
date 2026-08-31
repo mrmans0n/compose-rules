@@ -694,6 +694,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#mark-pass-through-composables-as-non-restartable" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mark pass-through composables as non-restartable
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#do-not-mark-functions-as-composable-when-they-dont-need-it" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1272,6 +1283,17 @@
     <span class="md-ellipsis">
       
         Mark read-only composables as read-only
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mark-pass-through-composables-as-non-restartable" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mark pass-through composables as non-restartable
       
     </span>
   </a>
@@ -2139,6 +2161,22 @@ This effectively ties the function to be called from a Column, but is still not 
 <p>This rule is detekt-only and uses detekt's analysis API.</p>
 <div class="admonition info">
 <p><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14c1.11 0 2-.89 2-2V5a2 2 0 0 0-2-2M9.71 18l-1.42-1.41L12.88 12 8.29 7.41 9.71 6l6 6z"/></svg></span> <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/detekt/src/main/kotlin/io/nlopez/compose/rules/detekt/MissingReadOnlyComposableCheck.kt">MissingReadOnlyComposable</a> detekt</p>
+</div>
+<h3 id="mark-pass-through-composables-as-non-restartable">Mark pass-through composables as non-restartable<a class="headerlink" href="#mark-pass-through-composables-as-non-restartable" title="Permanent link">&para;</a></h3>
+<p>A <code>Unit</code> composable that only forwards safe arguments to one other <code>Unit</code> composable may not need its own restart and skip boundary. Mark it with <code>@NonRestartableComposable</code> when that boundary adds no value.</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// ❌ This wrapper only delegates.</span>
+<span class="nd">@Composable</span>
+<span class="kd">fun</span><span class="w"> </span><span class="nf">Avatar</span><span class="p">(</span><span class="n">name</span><span class="p">:</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AvatarContent</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+<span class="c1">// ✅ The wrapper does not create another restart boundary.</span>
+<span class="nd">@NonRestartableComposable</span>
+<span class="nd">@Composable</span>
+<span class="kd">fun</span><span class="w"> </span><span class="nf">Avatar</span><span class="p">(</span><span class="n">name</span><span class="p">:</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AvatarContent</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+</code></pre></div>
+<p>The rule only reports direct single-call functions and property getters. It ignores calculated arguments or defaults, lambdas, non-concrete declarations, and composables with explicit group contracts.</p>
+<p>This rule is detekt-only and uses detekt's analysis API. <code>@NonRestartableComposable</code>, <code>@NonSkippableComposable</code>, and <code>@ExplicitGroupsComposable</code> have source retention, so their use on a composable from a compiled dependency cannot be observed; review those findings before applying the annotation.</p>
+<div class="admonition info">
+<p><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14c1.11 0 2-.89 2-2V5a2 2 0 0 0-2-2M9.71 18l-1.42-1.41L12.88 12 8.29 7.41 9.71 6l6 6z"/></svg></span> <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/detekt/src/main/kotlin/io/nlopez/compose/rules/detekt/MissingNonRestartableComposableCheck.kt">MissingNonRestartableComposable</a> detekt</p>
 </div>
 <h3 id="do-not-mark-functions-as-composable-when-they-dont-need-it">Do not mark functions as composable when they don't need it<a class="headerlink" href="#do-not-mark-functions-as-composable-when-they-dont-need-it" title="Permanent link">&para;</a></h3>
 <p><code>@Composable</code> changes where a function can be called from. If a function or property getter does not call composables, read composition locals, read Compose state, or otherwise use composition, it should be a regular Kotlin declaration instead.</p>
