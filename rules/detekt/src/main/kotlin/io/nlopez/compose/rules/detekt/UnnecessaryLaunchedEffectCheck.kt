@@ -32,10 +32,12 @@ import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtArrayAccessExpression
 import org.jetbrains.kotlin.psi.KtBinaryExpression
 import org.jetbrains.kotlin.psi.KtCallExpression
+import org.jetbrains.kotlin.psi.KtCallableReferenceExpression
 import org.jetbrains.kotlin.psi.KtDestructuringDeclarationEntry
 import org.jetbrains.kotlin.psi.KtElement
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtForExpression
+import org.jetbrains.kotlin.psi.KtLabeledExpression
 import org.jetbrains.kotlin.psi.KtLambdaExpression
 import org.jetbrains.kotlin.psi.KtNameReferenceExpression
 import org.jetbrains.kotlin.psi.KtNamedFunction
@@ -160,7 +162,7 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
     private fun KtExpression.usesCoroutineScope(): Boolean = runCatching {
         analyze(this) {
             if (this@usesCoroutineScope is KtThisExpression &&
-                this@usesCoroutineScope.getLabelName() == null &&
+                this@usesCoroutineScope.referencesEffectReceiver() &&
                 this@usesCoroutineScope.expressionType?.symbol?.classId?.asSingleFqName() ==
                 KotlinFqNames.CoroutineScope
             ) {
@@ -172,13 +174,30 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
             val property = (this@usesCoroutineScope as? KtNameReferenceExpression)
                 ?.mainReference
                 ?.resolveToSymbol() as? KaPropertySymbol
+            if (!hasExplicitReceiver() && property?.hasCoroutineScopeReceiver() == true) return@analyze true
+            val function = (this@usesCoroutineScope as? KtNameReferenceExpression)
+                ?.mainReference
+                ?.resolveToSymbol() as? KaNamedFunctionSymbol
                 ?: return@analyze false
-            !hasExplicitReceiver() && property.hasCoroutineScopeReceiver()
+            !hasExplicitReceiver() && function.hasCoroutineScopeReceiver()
         }
     }.getOrDefault(false)
 
-    private fun KtElement.hasExplicitReceiver(): Boolean =
-        (parent as? KtQualifiedExpression)?.selectorExpression == this
+    private fun KtThisExpression.referencesEffectReceiver(): Boolean {
+        val label = getLabelName() ?: return true
+        return parents.filterIsInstance<KtLabeledExpression>().any { expression -> expression.getLabelName() == label }
+    }
+
+    private fun KtElement.hasExplicitReceiver(): Boolean = (parent as? KtQualifiedExpression)?.let { qualified ->
+        qualified.selectorExpression == this ||
+            qualified.selectorExpression == (this as? KtCallExpression)?.calleeExpression
+    } == true ||
+        (parent as? KtCallExpression)?.let { call ->
+            call.calleeExpression == this && (call.parent as? KtQualifiedExpression)?.selectorExpression == call
+        } == true ||
+        (parent as? KtCallableReferenceExpression)?.let { reference ->
+            reference.callableReference == this && reference.receiverExpression != null
+        } == true
 
     private fun KtElement.isInsideDeferredLambda(effectBody: KtExpression): Boolean = parents
         .takeWhile { parent -> parent != effectBody }
@@ -208,6 +227,10 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
         contextArguments.map { receiver -> receiver.type }
 
     private fun KaPropertySymbol.hasCoroutineScopeReceiver(): Boolean =
+        receiverParameter?.returnType?.symbol?.classId?.asSingleFqName() == KotlinFqNames.CoroutineScope ||
+            callableId?.classId?.asSingleFqName() == KotlinFqNames.CoroutineScope
+
+    private fun KaNamedFunctionSymbol.hasCoroutineScopeReceiver(): Boolean =
         receiverParameter?.returnType?.symbol?.classId?.asSingleFqName() == KotlinFqNames.CoroutineScope ||
             callableId?.classId?.asSingleFqName() == KotlinFqNames.CoroutineScope
 
