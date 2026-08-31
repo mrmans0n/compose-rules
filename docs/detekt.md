@@ -178,7 +178,7 @@ Compose:
   UnnecessaryComposable:
     active: true
   UnnecessaryLaunchedEffect:
-    active: false # Opt-in: requires Compose Runtime 1.12.0 or later.
+    active: true
     # -- Calls whose dispatch or extension receiver has one of these fully qualified types keep LaunchedEffect.
     # allowedCallReceiverTypes:
     #   - androidx.compose.ui.focus.FocusRequester

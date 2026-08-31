@@ -92,6 +92,12 @@ private fun fakeComposeRuntime(): String = codeWithFakeCompose(
     @Composable
     fun LaunchedEffect(key1: Any?, block: suspend CoroutineScope.() -> Unit) = Unit
 
+    @Composable
+    fun SideEffect(effect: () -> Unit) = Unit
+
+    @Composable
+    fun SideEffect(key1: Any?, effect: () -> Unit) = Unit
+
     interface State<T> {
         val value: T
     }

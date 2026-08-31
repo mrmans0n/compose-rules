@@ -22,6 +22,7 @@ import org.jetbrains.kotlin.analysis.api.symbols.KaPropertySymbol
 import org.jetbrains.kotlin.analysis.api.types.symbol
 import org.jetbrains.kotlin.idea.references.mainReference
 import org.jetbrains.kotlin.lexer.KtTokens
+import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtArrayAccessExpression
 import org.jetbrains.kotlin.psi.KtBinaryExpression
 import org.jetbrains.kotlin.psi.KtCallExpression
@@ -54,6 +55,7 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
     override fun visitCallExpression(expression: KtCallExpression) {
         super.visitCallExpression(expression)
         if (!expression.isResolvedCallToAnyOf(setOf(ComposeFqNames.LaunchedEffect))) return
+        if (!expression.hasKeyedSideEffect()) return
 
         val body = expression.lambdaArgumentMappedTo("block")?.bodyExpression ?: return
         val requiresCoroutine = body
@@ -85,6 +87,14 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
         is KtCallExpression, is KtUnaryExpression, is KtArrayAccessExpression -> true
         else -> false
     }
+
+    private fun KtCallExpression.hasKeyedSideEffect(): Boolean = runCatching {
+        analyze(this) {
+            findTopLevelCallables(ComposeFqNames.runtime, Name.identifier("SideEffect"))
+                .filterIsInstance<KaNamedFunctionSymbol>()
+                .any { function -> function.valueParameters.any { parameter -> parameter.name.asString().startsWith("key") } }
+        }
+    }.getOrDefault(false)
 
     private fun KtExpression.canRequireLaunchedEffect(): Boolean =
         canResolveToFunctionCall() || this is KtNameReferenceExpression || this is KtThisExpression
