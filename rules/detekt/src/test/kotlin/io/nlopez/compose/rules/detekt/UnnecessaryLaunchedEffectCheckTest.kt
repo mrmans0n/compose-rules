@@ -1021,6 +1021,35 @@ class UnnecessaryLaunchedEffectCheckTest {
     }
 
     @Test
+    fun `reports explicit CoroutineScope receivers in loop iterator protocol syntax`() {
+        val findings = rule.lintWithAnalysisApi(
+            codeWithFakeCompose(
+                """
+                import kotlinx.coroutines.CoroutineScope
+
+                class Items
+
+                operator fun Items.iterator(): CoroutineScope = TODO()
+                operator fun CoroutineScope.hasNext(): Boolean = false
+                operator fun CoroutineScope.next(): String = "value"
+                fun consume(value: String) = Unit
+
+                @Composable
+                fun Example(items: Items) {
+                    LaunchedEffect(Unit) {
+                        for (item in items) {
+                            consume(item)
+                        }
+                    }
+                }
+                """,
+            ),
+        )
+
+        assertThat(findings).hasSize(1)
+    }
+
+    @Test
     fun `reports explicit CoroutineScope receivers in destructuring syntax`() {
         val findings = rule.lintWithAnalysisApi(
             codeWithFakeCompose(
@@ -1271,6 +1300,13 @@ class UnnecessaryLaunchedEffectCheckTest {
                         }
                         val callback = ::helper
                         callback()
+                    }
+                    LaunchedEffect("invoke") {
+                        fun helper() {
+                            focusRequester.requestFocus()
+                        }
+                        val callback = ::helper
+                        callback.invoke()
                     }
                 }
                 """,

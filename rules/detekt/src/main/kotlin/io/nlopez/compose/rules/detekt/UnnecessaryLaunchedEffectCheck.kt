@@ -333,9 +333,18 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
         if (references.isEmpty()) return emptyList()
         return collectDescendantsOfType<KtCallExpression> { call -> call.isInCurrentFunctionBody(this) }
             .mapNotNull { call ->
-                references[(call.calleeExpression as? KtNameReferenceExpression)?.getReferencedName()]
+                references[call.referencedLocalFunctionValueName()]
             }
     }
+
+    private fun KtCallExpression.referencedLocalFunctionValueName(): String? =
+        ((parent as? KtQualifiedExpression)?.receiverExpression as? KtNameReferenceExpression)
+            ?.takeIf {
+                (parent as? KtQualifiedExpression)?.selectorExpression == this &&
+                    (calleeExpression as? KtNameReferenceExpression)?.getReferencedName() == "invoke"
+            }
+            ?.getReferencedName()
+            ?: (calleeExpression as? KtNameReferenceExpression)?.getReferencedName()
 
     private fun KtElement.isInCurrentFunctionBody(scope: KtElement): Boolean =
         parents.takeWhile { parent -> parent != scope }.none { parent -> parent is KtNamedFunction }
@@ -376,7 +385,7 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
 
     private fun KaForLoopCall.needsLaunchedEffect(hasExplicitReceiver: Boolean = false): Boolean =
         iteratorCall.needsLaunchedEffect(hasExplicitReceiver = hasExplicitReceiver) ||
-            listOf(hasNextCall, nextCall).any { call -> call.needsLaunchedEffect() }
+            listOf(hasNextCall, nextCall).any { call -> call.needsLaunchedEffect(hasExplicitReceiver = true) }
 
     private fun KaFunctionCall<*>.needsLaunchedEffect(
         hasExplicitReceiver: Boolean = false,
