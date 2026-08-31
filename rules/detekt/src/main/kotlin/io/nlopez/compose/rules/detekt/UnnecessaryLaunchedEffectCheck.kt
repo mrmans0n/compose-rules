@@ -104,7 +104,10 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
                 candidate.canResolveToFunctionCall() &&
                     candidate.isInsideDeferredLambda(body) &&
                     !candidate.isInsideInvokedLocalLambda(body) &&
-                    !candidate.hasCoroutineScopeReceiver(body)
+                    !candidate.hasCoroutineScopeReceiver(
+                        effectBody = body,
+                        includeNestedReceiverContextArguments = false,
+                    )
             }
             .any { candidate ->
                 if (candidate.canResolveToFunctionCall()) {
@@ -172,18 +175,28 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
         }
     }.getOrDefault(true)
 
-    private fun KtElement.hasCoroutineScopeReceiver(effectBody: KtExpression): Boolean = runCatching {
+    private fun KtElement.hasCoroutineScopeReceiver(
+        effectBody: KtExpression,
+        includeNestedReceiverContextArguments: Boolean = true,
+    ): Boolean = runCatching {
         analyze(this) {
+            val isInsideNestedExternalReceiver = isInsideNestedExternalReceiverLambda(effectBody)
             val includeFunctionReceivers =
-                !hasExplicitReceiver() && !isInsideNestedExternalReceiverLambda(effectBody)
+                !hasExplicitReceiver() && !isInsideNestedExternalReceiver
+            val includeContextArguments =
+                includeNestedReceiverContextArguments || !isInsideNestedExternalReceiver
             when (val call = this@hasCoroutineScopeReceiver.resolveToCall()?.successfulCallOrNull<KaCall>()) {
                 is KaForLoopCall -> listOf(call.iteratorCall, call.hasNextCall, call.nextCall)
                     .any { functionCall ->
-                        functionCall.hasCoroutineScopeReceiver(includeFunctionReceivers = includeFunctionReceivers)
+                        functionCall.hasCoroutineScopeReceiver(
+                            includeFunctionReceivers = includeFunctionReceivers,
+                            includeContextArguments = includeContextArguments,
+                        )
                     }
 
                 is KaFunctionCall<*> -> call.hasCoroutineScopeReceiver(
                     includeFunctionReceivers = includeFunctionReceivers,
+                    includeContextArguments = includeContextArguments,
                 )
 
                 else -> false
@@ -615,9 +628,14 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
         return hasEffectCoroutineScopeReceiver || hasConfiguredReceiverType()
     }
 
-    private fun KaSingleCall<*, *>.hasCoroutineScopeReceiver(includeFunctionReceivers: Boolean = true): Boolean =
-        receiverTypes(includeFunctionReceivers)
-            .any { type -> type.symbol?.classId?.asSingleFqName() == KotlinFqNames.CoroutineScope }
+    private fun KaSingleCall<*, *>.hasCoroutineScopeReceiver(
+        includeFunctionReceivers: Boolean = true,
+        includeContextArguments: Boolean = true,
+    ): Boolean = receiverTypes(
+        includeFunctionReceivers = includeFunctionReceivers,
+        includeContextArguments = includeContextArguments,
+    )
+        .any { type -> type.symbol?.classId?.asSingleFqName() == KotlinFqNames.CoroutineScope }
 
     private fun KtElement.hasConfiguredCall(): Boolean = runCatching {
         analyze(this) {
@@ -665,12 +683,18 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
         .mapNotNull { type -> type.symbol?.classId?.asSingleFqName()?.asString() }
         .any { type -> type in allowedCallReceiverTypesSet }
 
-    private fun KaSingleCall<*, *>.receiverTypes(includeFunctionReceivers: Boolean = true) =
-        if (includeFunctionReceivers) {
-            listOfNotNull(dispatchReceiver?.type, extensionReceiver?.type)
-        } else {
-            emptyList()
-        } + contextArguments.map { receiver -> receiver.type }
+    private fun KaSingleCall<*, *>.receiverTypes(
+        includeFunctionReceivers: Boolean = true,
+        includeContextArguments: Boolean = true,
+    ) = if (includeFunctionReceivers) {
+        listOfNotNull(dispatchReceiver?.type, extensionReceiver?.type)
+    } else {
+        emptyList()
+    } + if (includeContextArguments) {
+        contextArguments.map { receiver -> receiver.type }
+    } else {
+        emptyList()
+    }
 
     private fun KaPropertySymbol.hasCoroutineScopeReceiver(): Boolean =
         receiverParameter?.returnType?.symbol?.classId?.asSingleFqName() == KotlinFqNames.CoroutineScope ||

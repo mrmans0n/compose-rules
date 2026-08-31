@@ -184,6 +184,31 @@ class UnnecessaryLaunchedEffectCheckTest {
     }
 
     @Test
+    fun `reports deferred suspend CoroutineScope receiver lambdas with context receiver calls`() {
+        val findings = rule.lintWithAnalysisApi(
+            codeWithFakeCompose(
+                """
+                import kotlinx.coroutines.CoroutineScope
+
+                fun register(callback: suspend CoroutineScope.() -> Unit) = Unit
+
+                context(CoroutineScope)
+                suspend fun fetch() = Unit
+
+                @Composable
+                fun Example() {
+                    LaunchedEffect(Unit) {
+                        register { fetch() }
+                    }
+                }
+                """,
+            ),
+        )
+
+        assertThat(findings).hasSize(1)
+    }
+
+    @Test
     fun `reports deferred suspend lambdas inside invoked local lambda values`() {
         val findings = rule.lintWithAnalysisApi(
             codeWithFakeCompose(
