@@ -83,6 +83,9 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
         val requiresCoroutine = body
             .collectDescendantsOfType<KtElement> { candidate -> candidate.canRequireLaunchedEffect() }
             .filterNot { candidate ->
+                candidate is KtCallableReferenceExpression && !candidate.isInvokedCallableReference(body)
+            }
+            .filterNot { candidate ->
                 candidate.canResolveToFunctionCall() &&
                     candidate.isInsideUnusedLocalFunction(body) &&
                     !candidate.hasCoroutineScopeReceiver(body)
@@ -124,6 +127,7 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
         is KtCallExpression,
         is KtUnaryExpression,
         is KtArrayAccessExpression,
+        is KtCallableReferenceExpression,
         is KtDestructuringDeclarationEntry,
         is KtForExpression,
         is KtPropertyDelegate,
@@ -347,7 +351,8 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
             ?: (calleeExpression as? KtNameReferenceExpression)?.getReferencedName()
 
     private fun KtElement.isInCurrentFunctionBody(scope: KtElement): Boolean =
-        parents.takeWhile { parent -> parent != scope }.none { parent -> parent is KtNamedFunction }
+        parents.takeWhile { parent -> parent != scope }.none { parent -> parent is KtNamedFunction } &&
+            (scope !is KtExpression || !isInsideDeferredLambda(scope))
 
     private fun KtCallableReferenceExpression.isDirectlyInvoked(scope: KtElement): Boolean = parents
         .takeWhile { parent -> parent != scope && parent !is KtProperty }
@@ -356,6 +361,21 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
             call.calleeExpression == this ||
                 parents.takeWhile { parent -> parent != call }.any { parent -> parent == call.calleeExpression }
         }
+
+    private fun KtCallableReferenceExpression.isInvokedCallableReference(effectBody: KtExpression): Boolean {
+        if (isDirectlyInvoked(effectBody)) return true
+        val property = getStrictParentOfType<KtProperty>()
+            ?.takeIf { property ->
+                property.initializer == this ||
+                    parents.takeWhile { parent -> parent != property }.any { parent -> parent == property.initializer }
+            }
+            ?: return false
+        val propertyName = property.name ?: return false
+        return effectBody.collectDescendantsOfType<KtCallExpression> { call ->
+            call.isInCurrentFunctionBody(effectBody)
+        }
+            .any { call -> call.referencedLocalFunctionValueName() == propertyName }
+    }
 
     private fun KtCallExpression.resolvedLocalFunction(localFunctions: Set<KtNamedFunction>): KtNamedFunction? =
         runCatching {
