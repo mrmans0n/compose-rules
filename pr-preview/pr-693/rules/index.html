@@ -1853,7 +1853,7 @@
 <span class="w">    </span><span class="n">analytics</span><span class="p">.</span><span class="na">trackScreen</span><span class="p">(</span><span class="n">screenId</span><span class="p">)</span>
 <span class="p">}</span>
 </code></pre></div>
-<p>Keyed <code>SideEffect</code> requires Compose Runtime 1.12.0 or later. The rule leaves <code>LaunchedEffect</code> alone if any call cannot be resolved, which avoids reporting code whose coroutine requirement is unknown.</p>
+<p>Keyed <code>SideEffect</code> requires Compose Runtime 1.12.0 or later, so this rule is opt-in. The rule leaves <code>LaunchedEffect</code> alone if any call cannot be resolved, which avoids reporting code whose coroutine requirement is unknown.</p>
 <p>Both effects wait for a successful composition, but <code>SideEffect</code> runs on the composition's apply dispatcher while <code>LaunchedEffect</code> launches a coroutine in the composition's context. Keep <code>LaunchedEffect</code> when a non-suspending API depends on that coroutine scheduling or lifecycle; configure its receiver type or fully qualified function name:</p>
 <div class="highlight"><pre><span></span><code><span class="nt">Compose</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">UnnecessaryLaunchedEffect</span><span class="p">:</span>
