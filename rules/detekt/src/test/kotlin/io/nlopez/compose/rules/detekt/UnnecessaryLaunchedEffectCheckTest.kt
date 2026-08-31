@@ -1871,6 +1871,38 @@ class UnnecessaryLaunchedEffectCheckTest {
     }
 
     @Test
+    fun `allows configured local helper references invoked through local aliases`() {
+        val configuredRule = UnnecessaryLaunchedEffectCheck(
+            TestConfig(
+                "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
+            ),
+        )
+        val findings = configuredRule.lintWithAnalysisApi(
+            codeWithFakeCompose(
+                """
+                class FocusRequester {
+                    fun requestFocus() = Unit
+                }
+
+                @Composable
+                fun Example(focusRequester: FocusRequester) {
+                    LaunchedEffect(Unit) {
+                        fun helper() {
+                            focusRequester.requestFocus()
+                        }
+                        val callback = ::helper
+                        val alias = callback
+                        alias()
+                    }
+                }
+                """,
+            ),
+        )
+
+        assertThat(findings).isEmpty()
+    }
+
+    @Test
     fun `allows configured receiver references created inside invoked local lambda values`() {
         val configuredRule = UnnecessaryLaunchedEffectCheck(
             TestConfig(

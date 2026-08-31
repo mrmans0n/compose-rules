@@ -336,13 +336,21 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
             calledLocalFunctionReferences(localFunctions)
 
     private fun KtElement.calledLocalFunctionReferences(localFunctions: Set<KtNamedFunction>): List<KtNamedFunction> {
-        val references = collectDescendantsOfType<KtProperty> { property -> property.isInCurrentFunctionBody(this) }
-            .mapNotNull { property ->
-                val name = property.name ?: return@mapNotNull null
-                val reference = property.initializer?.unwrapArgumentExpression() as? KtCallableReferenceExpression
-                    ?: return@mapNotNull null
-                name to reference.resolvedLocalFunction(localFunctions)
-            }.toMap()
+        val references = mutableMapOf<String, KtNamedFunction>()
+        do {
+            val previousSize = references.size
+            collectDescendantsOfType<KtProperty> { property -> property.isInCurrentFunctionBody(this) }
+                .forEach { property ->
+                    val name = property.name ?: return@forEach
+                    val initializer = property.initializer?.unwrapArgumentExpression()
+                    val function = when (initializer) {
+                        is KtCallableReferenceExpression -> initializer.resolvedLocalFunction(localFunctions)
+                        is KtNameReferenceExpression -> references[initializer.getReferencedName()]
+                        else -> null
+                    } ?: return@forEach
+                    references[name] = function
+                }
+        } while (references.size != previousSize)
         if (references.isEmpty()) return emptyList()
         return collectDescendantsOfType<KtCallExpression> { call -> call.isInCurrentFunctionBody(this) }
             .mapNotNull { call ->
