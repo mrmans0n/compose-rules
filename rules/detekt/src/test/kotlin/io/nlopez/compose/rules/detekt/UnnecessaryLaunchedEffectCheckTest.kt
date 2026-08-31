@@ -653,6 +653,34 @@ class UnnecessaryLaunchedEffectCheckTest {
     }
 
     @Test
+    fun `reports shadowed implicit LaunchedEffect call site labels in nested custom CoroutineScope receiver lambdas`() {
+        val findings = rule.lintWithAnalysisApi(
+            codeWithFakeCompose(
+                """
+                import kotlinx.coroutines.CoroutineScope
+
+                object Other {
+                    fun LaunchedEffect(block: CoroutineScope.() -> Unit) = Unit
+                }
+
+                fun consume(scope: CoroutineScope) = Unit
+
+                @Composable
+                fun Example() {
+                    LaunchedEffect(Unit) {
+                        Other.LaunchedEffect {
+                            consume(this@LaunchedEffect)
+                        }
+                    }
+                }
+                """,
+            ),
+        )
+
+        assertThat(findings).hasSize(1)
+    }
+
+    @Test
     fun `reports this references in local CoroutineScope receiver functions`() {
         val findings = rule.lintWithAnalysisApi(
             codeWithFakeCompose(
@@ -1216,6 +1244,43 @@ class UnnecessaryLaunchedEffectCheckTest {
     }
 
     @Test
+    fun `allows configured receiver calls through local function references`() {
+        val configuredRule = UnnecessaryLaunchedEffectCheck(
+            TestConfig(
+                "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
+            ),
+        )
+        val findings = configuredRule.lintWithAnalysisApi(
+            codeWithFakeCompose(
+                """
+                class FocusRequester {
+                    fun requestFocus() = Unit
+                }
+
+                @Composable
+                fun Example(focusRequester: FocusRequester) {
+                    LaunchedEffect("direct") {
+                        fun helper() {
+                            focusRequester.requestFocus()
+                        }
+                        (::helper)()
+                    }
+                    LaunchedEffect("stored") {
+                        fun helper() {
+                            focusRequester.requestFocus()
+                        }
+                        val callback = ::helper
+                        callback()
+                    }
+                }
+                """,
+            ),
+        )
+
+        assertThat(findings).isEmpty()
+    }
+
+    @Test
     fun `reports configured receiver calls inside unused local functions`() {
         val configuredRule = UnnecessaryLaunchedEffectCheck(
             TestConfig(
@@ -1235,6 +1300,41 @@ class UnnecessaryLaunchedEffectCheckTest {
                 fun Example(focusRequester: FocusRequester) {
                     LaunchedEffect(Unit) {
                         fun unused() {
+                            focusRequester.requestFocus()
+                        }
+                        update()
+                    }
+                }
+                """,
+            ),
+        )
+
+        assertThat(findings).hasSize(1)
+    }
+
+    @Test
+    fun `reports configured receiver calls inside transitively unused local functions`() {
+        val configuredRule = UnnecessaryLaunchedEffectCheck(
+            TestConfig(
+                "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
+            ),
+        )
+        val findings = configuredRule.lintWithAnalysisApi(
+            codeWithFakeCompose(
+                """
+                class FocusRequester {
+                    fun requestFocus() = Unit
+                }
+
+                fun update() = Unit
+
+                @Composable
+                fun Example(focusRequester: FocusRequester) {
+                    LaunchedEffect(Unit) {
+                        fun unused() {
+                            helper()
+                        }
+                        fun helper() {
                             focusRequester.requestFocus()
                         }
                         update()

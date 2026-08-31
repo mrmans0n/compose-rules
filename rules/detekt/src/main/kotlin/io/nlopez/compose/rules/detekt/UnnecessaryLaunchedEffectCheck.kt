@@ -48,6 +48,7 @@ import org.jetbrains.kotlin.psi.KtLabeledExpression
 import org.jetbrains.kotlin.psi.KtLambdaExpression
 import org.jetbrains.kotlin.psi.KtNameReferenceExpression
 import org.jetbrains.kotlin.psi.KtNamedFunction
+import org.jetbrains.kotlin.psi.KtProperty
 import org.jetbrains.kotlin.psi.KtPropertyDelegate
 import org.jetbrains.kotlin.psi.KtQualifiedExpression
 import org.jetbrains.kotlin.psi.KtThisExpression
@@ -238,8 +239,16 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
         val labeledExpression = parents
             .filterIsInstance<KtLabeledExpression>()
             .firstOrNull { expression -> expression.getLabelName() == label }
-            ?: return label == effectCallName
-        return labeledExpression.baseExpression?.unwrapArgumentExpression() == effectLambda
+        if (labeledExpression != null) {
+            return labeledExpression.baseExpression?.unwrapArgumentExpression() == effectLambda
+        }
+        val callSiteLabel = parents
+            .filterIsInstance<KtLambdaExpression>()
+            .firstOrNull { lambda ->
+                lambda.getStrictParentOfType<KtCallExpression>()?.calleeExpression?.text == label
+            }
+        if (callSiteLabel != null) return callSiteLabel == effectLambda
+        return label == effectCallName
     }
 
     private fun KtElement.hasExplicitReceiver(): Boolean = when (this) {
@@ -294,18 +303,72 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
         return !localFunction.isCalledFrom(effectBody)
     }
 
-    private fun KtNamedFunction.isCalledFrom(effectBody: KtExpression): Boolean = runCatching {
-        analyze(this) {
-            effectBody.collectDescendantsOfType<KtCallExpression> { call ->
-                call.parents.none { parent -> parent == this@isCalledFrom }
-            }.any { call ->
-                call.resolveToCall()
+    private fun KtNamedFunction.isCalledFrom(effectBody: KtExpression): Boolean {
+        val localFunctions = effectBody.collectDescendantsOfType<KtNamedFunction>().toSet()
+        val reachableFunctions = mutableSetOf<KtNamedFunction>()
+        do {
+            val previousSize = reachableFunctions.size
+            (listOf(effectBody) + reachableFunctions.mapNotNull { function -> function.bodyExpression })
+                .flatMap { scope -> scope.calledLocalFunctions(localFunctions) }
+                .forEach { function -> reachableFunctions.add(function) }
+        } while (reachableFunctions.size != previousSize)
+        return this in reachableFunctions
+    }
+
+    private fun KtElement.calledLocalFunctions(localFunctions: Set<KtNamedFunction>): List<KtNamedFunction> =
+        collectDescendantsOfType<KtCallExpression> { call -> call.isInCurrentFunctionBody(this) }
+            .mapNotNull { call -> call.resolvedLocalFunction(localFunctions) } +
+            collectDescendantsOfType<KtCallableReferenceExpression> { reference ->
+                reference.isInCurrentFunctionBody(this) && reference.isDirectlyInvoked(this)
+            }.mapNotNull { reference -> reference.resolvedLocalFunction(localFunctions) } +
+            calledLocalFunctionReferences(localFunctions)
+
+    private fun KtElement.calledLocalFunctionReferences(localFunctions: Set<KtNamedFunction>): List<KtNamedFunction> {
+        val references = collectDescendantsOfType<KtProperty> { property -> property.isInCurrentFunctionBody(this) }
+            .mapNotNull { property ->
+                val name = property.name ?: return@mapNotNull null
+                val reference = property.initializer as? KtCallableReferenceExpression ?: return@mapNotNull null
+                name to reference.resolvedLocalFunction(localFunctions)
+            }.toMap()
+        if (references.isEmpty()) return emptyList()
+        return collectDescendantsOfType<KtCallExpression> { call -> call.isInCurrentFunctionBody(this) }
+            .mapNotNull { call ->
+                references[(call.calleeExpression as? KtNameReferenceExpression)?.getReferencedName()]
+            }
+    }
+
+    private fun KtElement.isInCurrentFunctionBody(scope: KtElement): Boolean =
+        parents.takeWhile { parent -> parent != scope }.none { parent -> parent is KtNamedFunction }
+
+    private fun KtCallableReferenceExpression.isDirectlyInvoked(scope: KtElement): Boolean = parents
+        .takeWhile { parent -> parent != scope && parent !is KtProperty }
+        .any { parent -> parent is KtCallExpression }
+
+    private fun KtCallExpression.resolvedLocalFunction(localFunctions: Set<KtNamedFunction>): KtNamedFunction? =
+        runCatching {
+            analyze(this) {
+                resolveToCall()
                     ?.successfulCallOrNull<KaFunctionCall<*>>()
                     ?.symbol
-                    ?.sourcePsiSafe<KtNamedFunction>() == this@isCalledFrom
+                    ?.sourcePsiSafe<KtNamedFunction>()
+                    ?.takeIf { function -> function in localFunctions }
             }
+        }.getOrNull()
+
+    private fun KtCallableReferenceExpression.resolvedLocalFunction(
+        localFunctions: Set<KtNamedFunction>,
+    ): KtNamedFunction? = runCatching {
+        analyze(this) {
+            (callableReference.mainReference.resolveToSymbol() as? KaNamedFunctionSymbol)
+                ?.sourcePsiSafe<KtNamedFunction>()
+                ?.takeIf { function -> function in localFunctions }
+                ?: resolveToCall()
+                    ?.successfulCallOrNull<KaFunctionCall<*>>()
+                    ?.symbol
+                    ?.sourcePsiSafe<KtNamedFunction>()
+                    ?.takeIf { function -> function in localFunctions }
         }
-    }.getOrDefault(true)
+    }.getOrNull()
 
     private fun KaDelegatedPropertyCall.needsLaunchedEffect(hasExplicitReceiver: Boolean): Boolean =
         listOfNotNull(provideDelegateCall, valueGetterCall, valueSetterCall)
