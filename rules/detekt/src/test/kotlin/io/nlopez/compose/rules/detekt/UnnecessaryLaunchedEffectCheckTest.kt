@@ -226,6 +226,73 @@ class UnnecessaryLaunchedEffectCheckTest {
     }
 
     @Test
+    fun `allows direct LaunchedEffect CoroutineScope receiver references`() {
+        val findings = rule.lintWithAnalysisApi(
+            codeWithFakeCompose(
+                """
+                import kotlinx.coroutines.CoroutineScope
+
+                fun consume(scope: CoroutineScope) = Unit
+
+                @Composable
+                fun Example() {
+                    LaunchedEffect(Unit) {
+                        consume(this)
+                    }
+                }
+                """,
+            ),
+        )
+
+        assertThat(findings).isEmpty()
+    }
+
+    @Test
+    fun `allows LaunchedEffect coroutineContext references`() {
+        val findings = rule.lintWithAnalysisApi(
+            codeWithFakeCompose(
+                """
+                import kotlinx.coroutines.CoroutineContext
+
+                fun consume(context: CoroutineContext) = Unit
+
+                @Composable
+                fun Example() {
+                    LaunchedEffect(Unit) {
+                        consume(coroutineContext)
+                    }
+                }
+                """,
+            ),
+        )
+
+        assertThat(findings).isEmpty()
+    }
+
+    @Test
+    fun `allows LaunchedEffect CoroutineScope extension property references`() {
+        val findings = rule.lintWithAnalysisApi(
+            codeWithFakeCompose(
+                """
+                import kotlinx.coroutines.CoroutineScope
+
+                fun consume(active: Boolean) = Unit
+                val CoroutineScope.isActive: Boolean get() = true
+
+                @Composable
+                fun Example() {
+                    LaunchedEffect(Unit) {
+                        consume(isActive)
+                    }
+                }
+                """,
+            ),
+        )
+
+        assertThat(findings).isEmpty()
+    }
+
+    @Test
     fun `does not report unresolved calls`() {
         val findings = rule.lintWithAnalysisApi(
             content = codeWithFakeCompose(

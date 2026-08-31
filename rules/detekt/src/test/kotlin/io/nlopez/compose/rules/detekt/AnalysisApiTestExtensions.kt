@@ -181,5 +181,9 @@ private fun fakeComposeRuntime(): String = codeWithFakeCompose(
 private fun fakeCoroutines(): String = """
     package kotlinx.coroutines
 
-    interface CoroutineScope
+    interface CoroutineContext
+
+    interface CoroutineScope {
+        val coroutineContext: CoroutineContext
+    }
 """.trimIndent()

@@ -10,20 +10,26 @@ import dev.detekt.api.Rule
 import dev.detekt.api.RuleName
 import dev.detekt.api.config
 import org.jetbrains.kotlin.analysis.api.analyze
+import org.jetbrains.kotlin.analysis.api.components.expressionType
 import org.jetbrains.kotlin.analysis.api.components.resolveToCall
+import org.jetbrains.kotlin.analysis.api.components.resolveToSymbol
 import org.jetbrains.kotlin.analysis.api.resolution.KaCallableMemberCall
 import org.jetbrains.kotlin.analysis.api.resolution.KaFunctionCall
 import org.jetbrains.kotlin.analysis.api.resolution.successfulCallOrNull
 import org.jetbrains.kotlin.analysis.api.resolution.symbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaNamedFunctionSymbol
+import org.jetbrains.kotlin.analysis.api.symbols.KaPropertySymbol
 import org.jetbrains.kotlin.analysis.api.types.symbol
+import org.jetbrains.kotlin.idea.references.mainReference
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.KtArrayAccessExpression
 import org.jetbrains.kotlin.psi.KtBinaryExpression
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtLambdaExpression
+import org.jetbrains.kotlin.psi.KtNameReferenceExpression
 import org.jetbrains.kotlin.psi.KtNamedFunction
+import org.jetbrains.kotlin.psi.KtThisExpression
 import org.jetbrains.kotlin.psi.KtUnaryExpression
 import org.jetbrains.kotlin.psi.psiUtil.collectDescendantsOfType
 import org.jetbrains.kotlin.psi.psiUtil.getStrictParentOfType
@@ -51,12 +57,18 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
 
         val body = expression.lambdaArgumentMappedTo("block")?.bodyExpression ?: return
         val requiresCoroutine = body
-            .collectDescendantsOfType<KtExpression> { candidate -> candidate.canResolveToFunctionCall() }
+            .collectDescendantsOfType<KtExpression> { candidate -> candidate.canRequireLaunchedEffect() }
             .filterNot { candidate ->
                 candidate.parents.takeWhile { parent -> parent != body }.any { parent -> parent is KtNamedFunction }
             }
             .filterNot { candidate -> candidate.isInsideDeferredLambda(body) }
-            .any { candidate -> candidate.isSuspendOrUnresolvedCall() }
+            .any { candidate ->
+                if (candidate.canResolveToFunctionCall()) {
+                    candidate.isSuspendOrUnresolvedCall()
+                } else {
+                    candidate.usesCoroutineScope()
+                }
+            }
 
         if (!requiresCoroutine) {
             report(
@@ -74,6 +86,9 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
         else -> false
     }
 
+    private fun KtExpression.canRequireLaunchedEffect(): Boolean =
+        canResolveToFunctionCall() || this is KtNameReferenceExpression || this is KtThisExpression
+
     private fun KtExpression.isSuspendOrUnresolvedCall(): Boolean = runCatching {
         analyze(this) {
             val call = this@isSuspendOrUnresolvedCall.resolveToCall()
@@ -85,6 +100,21 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
             }
         }
     }.getOrDefault(true)
+
+    private fun KtExpression.usesCoroutineScope(): Boolean = runCatching {
+        analyze(this) {
+            if (this@usesCoroutineScope.expressionType?.symbol?.classId?.asSingleFqName() ==
+                KotlinFqNames.CoroutineScope
+            ) {
+                return@analyze true
+            }
+            val property = (this@usesCoroutineScope as? KtNameReferenceExpression)
+                ?.mainReference
+                ?.resolveToSymbol() as? KaPropertySymbol
+                ?: return@analyze false
+            property.hasCoroutineScopeReceiver()
+        }
+    }.getOrDefault(false)
 
     private fun KtExpression.isInsideDeferredLambda(effectBody: KtExpression): Boolean = parents
         .takeWhile { parent -> parent != effectBody }
@@ -100,9 +130,17 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
         if (callableName != null && callableName in allowedCallNamesSet) return true
         val receiverTypes = listOfNotNull(dispatchReceiver?.type, extensionReceiver?.type)
             .mapNotNull { type -> type.symbol?.classId?.asSingleFqName()?.asString() }
-        return KotlinFqNames.CoroutineScope.asString() in receiverTypes ||
+        return hasCoroutineScopeReceiver() ||
             receiverTypes.any { type -> type in allowedCallReceiverTypesSet }
     }
+
+    private fun KaFunctionCall<*>.hasCoroutineScopeReceiver(): Boolean =
+        listOfNotNull(dispatchReceiver?.type, extensionReceiver?.type)
+            .any { type -> type.symbol?.classId?.asSingleFqName() == KotlinFqNames.CoroutineScope }
+
+    private fun KaPropertySymbol.hasCoroutineScopeReceiver(): Boolean =
+        receiverParameter?.returnType?.symbol?.classId?.asSingleFqName() == KotlinFqNames.CoroutineScope ||
+            callableId?.classId?.asSingleFqName() == KotlinFqNames.CoroutineScope
 
     internal companion object {
         private val NonFunctionCallBinaryOperations = setOf(
