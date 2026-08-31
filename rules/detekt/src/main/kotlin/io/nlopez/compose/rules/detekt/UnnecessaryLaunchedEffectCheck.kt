@@ -351,7 +351,11 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
 
     private fun KtCallableReferenceExpression.isDirectlyInvoked(scope: KtElement): Boolean = parents
         .takeWhile { parent -> parent != scope && parent !is KtProperty }
-        .any { parent -> parent is KtCallExpression }
+        .filterIsInstance<KtCallExpression>()
+        .any { call ->
+            call.calleeExpression == this ||
+                parents.takeWhile { parent -> parent != call }.any { parent -> parent == call.calleeExpression }
+        }
 
     private fun KtCallExpression.resolvedLocalFunction(localFunctions: Set<KtNamedFunction>): KtNamedFunction? =
         runCatching {

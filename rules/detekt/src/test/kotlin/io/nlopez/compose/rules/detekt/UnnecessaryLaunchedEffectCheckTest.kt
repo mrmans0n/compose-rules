@@ -1349,6 +1349,40 @@ class UnnecessaryLaunchedEffectCheckTest {
     }
 
     @Test
+    fun `reports configured receiver calls inside local function references passed as arguments`() {
+        val configuredRule = UnnecessaryLaunchedEffectCheck(
+            TestConfig(
+                "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
+            ),
+        )
+        val findings = configuredRule.lintWithAnalysisApi(
+            codeWithFakeCompose(
+                """
+                class FocusRequester {
+                    fun requestFocus() = Unit
+                }
+
+                fun register(callback: () -> Unit) = Unit
+                fun update() = Unit
+
+                @Composable
+                fun Example(focusRequester: FocusRequester) {
+                    LaunchedEffect(Unit) {
+                        fun helper() {
+                            focusRequester.requestFocus()
+                        }
+                        register(::helper)
+                        update()
+                    }
+                }
+                """,
+            ),
+        )
+
+        assertThat(findings).hasSize(1)
+    }
+
+    @Test
     fun `reports configured receiver calls inside transitively unused local functions`() {
         val configuredRule = UnnecessaryLaunchedEffectCheck(
             TestConfig(
