@@ -37,6 +37,7 @@ import org.jetbrains.kotlin.psi.KtArrayAccessExpression
 import org.jetbrains.kotlin.psi.KtBinaryExpression
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtCallableReferenceExpression
+import org.jetbrains.kotlin.psi.KtDestructuringDeclaration
 import org.jetbrains.kotlin.psi.KtDestructuringDeclarationEntry
 import org.jetbrains.kotlin.psi.KtElement
 import org.jetbrains.kotlin.psi.KtExpression
@@ -142,7 +143,7 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
                 ?.successfulCallOrNull<KaCall>()
                 ?: return@analyze true
             when (call) {
-                is KaForLoopCall -> call.needsLaunchedEffect()
+                is KaForLoopCall -> call.needsLaunchedEffect(hasExplicitReceiver = hasExplicitReceiver())
 
                 is KaFunctionCall<*> -> call.needsLaunchedEffect(
                     hasExplicitReceiver = hasExplicitReceiver(),
@@ -174,7 +175,7 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
         runCatching {
             analyze(this) {
                 if (this@usesCoroutineScope is KtThisExpression &&
-                    this@usesCoroutineScope.referencesEffectReceiver(effectCallName) &&
+                    this@usesCoroutineScope.referencesEffectReceiver(effectCallName, effectBody) &&
                     (
                         this@usesCoroutineScope.getLabelName() != null ||
                             !isInsideNestedExternalReceiverLambda(effectBody)
@@ -222,10 +223,13 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
             }
         }.getOrDefault(false)
 
-    private fun KtThisExpression.referencesEffectReceiver(effectCallName: String?): Boolean {
+    private fun KtThisExpression.referencesEffectReceiver(effectCallName: String?, effectBody: KtExpression): Boolean {
         val label = getLabelName() ?: return true
-        return label == effectCallName ||
-            parents.filterIsInstance<KtLabeledExpression>().any { expression -> expression.getLabelName() == label }
+        if (label == effectCallName) return true
+        val effectLambda = effectBody.getStrictParentOfType<KtLambdaExpression>()
+        return parents.filterIsInstance<KtLabeledExpression>().any { expression ->
+            expression.getLabelName() == label && expression.baseExpression?.unwrapArgumentExpression() == effectLambda
+        }
     }
 
     private fun KtElement.hasExplicitReceiver(): Boolean = when (this) {
@@ -234,6 +238,10 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
         is KtUnaryExpression -> baseExpression != null
 
         is KtArrayAccessExpression -> arrayExpression != null
+
+        is KtForExpression -> loopRange != null
+
+        is KtDestructuringDeclarationEntry -> (parent as? KtDestructuringDeclaration)?.initializer != null
 
         else ->
             (parent as? KtQualifiedExpression)?.let { qualified ->
@@ -265,8 +273,9 @@ class UnnecessaryLaunchedEffectCheck(config: Config) :
             }
         }
 
-    private fun KaForLoopCall.needsLaunchedEffect(): Boolean =
-        listOf(iteratorCall, hasNextCall, nextCall).any { call -> call.needsLaunchedEffect() }
+    private fun KaForLoopCall.needsLaunchedEffect(hasExplicitReceiver: Boolean = false): Boolean =
+        iteratorCall.needsLaunchedEffect(hasExplicitReceiver = hasExplicitReceiver) ||
+            listOf(hasNextCall, nextCall).any { call -> call.needsLaunchedEffect() }
 
     private fun KaFunctionCall<*>.needsLaunchedEffect(
         hasExplicitReceiver: Boolean = false,

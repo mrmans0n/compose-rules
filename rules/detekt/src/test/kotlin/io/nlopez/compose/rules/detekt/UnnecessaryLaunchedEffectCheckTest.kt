@@ -603,6 +603,31 @@ class UnnecessaryLaunchedEffectCheckTest {
     }
 
     @Test
+    fun `reports labeled this references in nested custom CoroutineScope receiver lambdas`() {
+        val findings = rule.lintWithAnalysisApi(
+            codeWithFakeCompose(
+                """
+                import kotlinx.coroutines.CoroutineScope
+
+                fun register(block: CoroutineScope.() -> Unit) = Unit
+                fun consume(scope: CoroutineScope) = Unit
+
+                @Composable
+                fun Example() {
+                    LaunchedEffect(Unit) {
+                        register nested@ {
+                            consume(this@nested)
+                        }
+                    }
+                }
+                """,
+            ),
+        )
+
+        assertThat(findings).hasSize(1)
+    }
+
+    @Test
     fun `reports this references in local CoroutineScope receiver functions`() {
         val findings = rule.lintWithAnalysisApi(
             codeWithFakeCompose(
@@ -915,6 +940,55 @@ class UnnecessaryLaunchedEffectCheckTest {
         )
 
         assertThat(findings).hasSize(3)
+    }
+
+    @Test
+    fun `reports explicit CoroutineScope receivers in loop syntax`() {
+        val findings = rule.lintWithAnalysisApi(
+            codeWithFakeCompose(
+                """
+                import kotlinx.coroutines.CoroutineScope
+
+                operator fun CoroutineScope.iterator(): Iterator<String> = listOf("value").iterator()
+                fun consume(value: String) = Unit
+
+                @Composable
+                fun Example(scope: CoroutineScope) {
+                    LaunchedEffect(Unit) {
+                        for (item in scope) {
+                            consume(item)
+                        }
+                    }
+                }
+                """,
+            ),
+        )
+
+        assertThat(findings).hasSize(1)
+    }
+
+    @Test
+    fun `reports explicit CoroutineScope receivers in destructuring syntax`() {
+        val findings = rule.lintWithAnalysisApi(
+            codeWithFakeCompose(
+                """
+                import kotlinx.coroutines.CoroutineScope
+
+                operator fun CoroutineScope.component1(): String = "value"
+                fun consume(value: String) = Unit
+
+                @Composable
+                fun Example(scope: CoroutineScope) {
+                    LaunchedEffect(Unit) {
+                        val (item) = scope
+                        consume(item)
+                    }
+                }
+                """,
+            ),
+        )
+
+        assertThat(findings).hasSize(1)
     }
 
     @Test
