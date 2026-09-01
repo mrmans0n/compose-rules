@@ -13,6 +13,7 @@ import dev.detekt.api.RuleName
 import io.nlopez.compose.core.util.definedInInterface
 import org.jetbrains.kotlin.analysis.api.KaExperimentalApi
 import org.jetbrains.kotlin.analysis.api.analyze
+import org.jetbrains.kotlin.analysis.api.annotations.KaAnnotation
 import org.jetbrains.kotlin.analysis.api.components.builtinTypes
 import org.jetbrains.kotlin.analysis.api.components.evaluate
 import org.jetbrains.kotlin.analysis.api.components.expressionType
@@ -59,12 +60,15 @@ class MissingNonRestartableComposableCheck(config: Config) :
 
     override val ruleName: RuleName = RuleName("MissingNonRestartableComposable")
 
+    private val ignoresPreviews = config.valueOrDefault("ignoresPreviews", true)
+
     override fun visitNamedFunction(function: KtNamedFunction) {
         super.visitNamedFunction(function)
         if (!function.isComposable()) return
         if (!function.returnsUnit()) return
         if (function.isLocal || function.definedInInterface) return
         if (function.hasIneligibleModifier()) return
+        if (ignoresPreviews && function.isPreview()) return
         if (function.hasIneligibleAnnotation()) return
         if (function.valueParameters.any { parameter ->
                 parameter.defaultValue?.isSafeValue(function.valueParameters) == false
@@ -137,6 +141,21 @@ class MissingNonRestartableComposableCheck(config: Config) :
         analyze(this) {
             val annotationClassIds = ineligibleAnnotationClassIds()
             symbol.annotations.any { annotation -> annotation.classId in annotationClassIds }
+        }
+    }.getOrDefault(false)
+
+    private fun KtNamedFunction.isPreview(): Boolean = runCatching {
+        analyze(this) {
+            fun KaAnnotation.isPreview(visitedClassIds: Set<ClassId> = emptySet()): Boolean {
+                val classId = classId ?: return false
+                if (classId == ClassId.topLevel(ComposeFqNames.Preview)) return true
+                if (classId in visitedClassIds) return false
+                return findClass(classId)?.annotations?.any { annotation ->
+                    annotation.isPreview(visitedClassIds + classId)
+                } == true
+            }
+
+            symbol.annotations.any { annotation -> annotation.isPreview() }
         }
     }.getOrDefault(false)
 

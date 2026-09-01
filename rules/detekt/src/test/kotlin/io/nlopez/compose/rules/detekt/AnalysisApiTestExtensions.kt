@@ -18,12 +18,14 @@ internal fun <T> T.lintWithAnalysisApi(
     val previousRuntime = ComposeFqNames.runtime
     val previousRuntimeSaveable = ComposeFqNames.runtimeSaveable
     val previousRuntimeRetain = ComposeFqNames.runtimeRetain
+    val previousToolingPreview = ComposeFqNames.toolingPreview
 
     return try {
         val fakeComposeFqName = FqName("com.example.compose.fake")
         ComposeFqNames.runtime = fakeComposeFqName
         ComposeFqNames.runtimeSaveable = fakeComposeFqName
         ComposeFqNames.runtimeRetain = fakeComposeFqName
+        ComposeFqNames.toolingPreview = fakeComposeFqName
 
         val environment = createEnvironment()
         lintWithContext(
@@ -36,6 +38,7 @@ internal fun <T> T.lintWithAnalysisApi(
         ComposeFqNames.runtime = previousRuntime
         ComposeFqNames.runtimeSaveable = previousRuntimeSaveable
         ComposeFqNames.runtimeRetain = previousRuntimeRetain
+        ComposeFqNames.toolingPreview = previousToolingPreview
     }
 }
 
