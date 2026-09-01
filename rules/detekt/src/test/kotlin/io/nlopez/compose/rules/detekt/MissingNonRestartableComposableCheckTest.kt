@@ -38,6 +38,34 @@ class MissingNonRestartableComposableCheckTest {
     }
 
     @Test
+    fun `does not report preview composables`() {
+        @Language("kotlin")
+        val code = codeWithFakeCompose(
+            """
+            annotation class Preview
+
+            @Preview
+            annotation class Variants
+
+            @Composable
+            fun Content() {}
+
+            @Preview
+            @Composable
+            fun DirectPreview() = Content()
+
+            @Variants
+            @Composable
+            fun CustomPreview() = Content()
+            """,
+        )
+
+        val findings = rule.lintWithAnalysisApi(code)
+
+        assertThat(findings).isEmpty()
+    }
+
+    @Test
     fun `does not report a wrapper around a value-returning composable`() {
         @Language("kotlin")
         val code = codeWithFakeCompose(

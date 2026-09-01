@@ -8,6 +8,7 @@ internal object ComposeFqNames {
     internal var runtime: FqName = FqName("androidx.compose.runtime")
     internal var runtimeSaveable: FqName = FqName("androidx.compose.runtime.saveable")
     internal var runtimeRetain: FqName = FqName("androidx.compose.runtime.retain")
+    internal var toolingPreview: FqName = FqName("androidx.compose.ui.tooling.preview")
 
     val Composable: FqName
         get() = runtime.child("Composable")
@@ -19,6 +20,8 @@ internal object ComposeFqNames {
         get() = runtime.child("NonSkippableComposable")
     val ExplicitGroupsComposable: FqName
         get() = runtime.child("ExplicitGroupsComposable")
+    val Preview: FqName
+        get() = toolingPreview.child("Preview")
     val CompositionLocal: FqName
         get() = runtime.child("CompositionLocal")
     val State: FqName
