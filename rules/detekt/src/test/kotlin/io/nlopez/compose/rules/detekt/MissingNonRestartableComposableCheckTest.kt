@@ -4,6 +4,7 @@ package io.nlopez.compose.rules.detekt
 
 import dev.detekt.api.Config
 import dev.detekt.api.RuleName
+import dev.detekt.test.TestConfig
 import org.assertj.core.api.Assertions.assertThat
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
@@ -35,6 +36,57 @@ class MissingNonRestartableComposableCheckTest {
         val findings = rule.lintWithAnalysisApi(code)
 
         assertThat(findings).hasSize(1).hasTextLocations("Wrapper")
+    }
+
+    @Test
+    fun `does not report preview composables`() {
+        @Language("kotlin")
+        val code = codeWithFakeCompose(
+            """
+            annotation class Preview
+
+            @Preview
+            annotation class Variants
+
+            @Composable
+            fun Content() {}
+
+            @Preview
+            @Composable
+            fun DirectPreview() = Content()
+
+            @Variants
+            @Composable
+            fun CustomPreview() = Content()
+            """,
+        )
+
+        val findings = rule.lintWithAnalysisApi(code)
+
+        assertThat(findings).isEmpty()
+    }
+
+    @Test
+    fun `reports previews when ignoresPreviews is false`() {
+        val rule = MissingNonRestartableComposableCheck(TestConfig("ignoresPreviews" to false))
+
+        @Language("kotlin")
+        val code = codeWithFakeCompose(
+            """
+            annotation class Preview
+
+            @Composable
+            fun Content() {}
+
+            @Preview
+            @Composable
+            fun PreviewContent() = Content()
+            """,
+        )
+
+        val findings = rule.lintWithAnalysisApi(code)
+
+        assertThat(findings).hasSize(1).hasTextLocations("PreviewContent")
     }
 
     @Test

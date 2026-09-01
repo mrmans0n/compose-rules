@@ -105,6 +105,8 @@ Compose:
     # allowedFromM2: icons.Icons,TopAppBar
   MissingNonRestartableComposable:
     active: true
+    # -- Ignore direct and custom @Preview composables (default: true)
+    # ignoresPreviews: true
   MissingReadOnlyComposable:
     active: true
   ModifierClickableOrder:
