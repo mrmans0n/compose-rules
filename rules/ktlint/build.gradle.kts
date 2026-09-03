@@ -31,6 +31,7 @@ dependencies {
     api(projects.rules.commonKtlint)
 
     testImplementation(libs.ktlint.test)
+    testImplementation(libs.ktlint.ruleset.standard)
     testImplementation(libs.junit5)
     testImplementation(libs.junit5.params)
     testImplementation(libs.junit5.engine)
