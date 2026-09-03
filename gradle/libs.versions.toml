@@ -16,6 +16,7 @@ ktlint-rule-engine-core = { module = "com.pinterest.ktlint:ktlint-rule-engine-co
 ktlint-rule-engine = { module = "com.pinterest.ktlint:ktlint-rule-engine", version.ref = "ktlint" }
 ktlint-cli-ruleset-core = { module = "com.pinterest.ktlint:ktlint-cli-ruleset-core", version.ref = "ktlint" }
 ktlint-test = { module = "com.pinterest.ktlint:ktlint-test", version.ref = "ktlint" }
+ktlint-ruleset-standard = { module = "com.pinterest.ktlint:ktlint-ruleset-standard", version.ref = "ktlint" }
 
 detekt-core = { module = "dev.detekt:detekt-core", version.ref = "detekt" }
 detekt-test = { module = "dev.detekt:detekt-test", version.ref = "detekt" }

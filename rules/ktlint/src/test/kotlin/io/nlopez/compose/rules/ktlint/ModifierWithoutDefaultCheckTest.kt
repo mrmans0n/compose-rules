@@ -2,9 +2,15 @@
 // SPDX-License-Identifier: Apache-2.0
 package io.nlopez.compose.rules.ktlint
 
+import com.pinterest.ktlint.rule.engine.api.Code
+import com.pinterest.ktlint.rule.engine.api.KtLintRuleEngine
+import com.pinterest.ktlint.rule.engine.core.api.AutocorrectDecision
+import com.pinterest.ktlint.rule.engine.core.api.RuleProvider
+import com.pinterest.ktlint.ruleset.standard.StandardRuleSetProvider
 import com.pinterest.ktlint.test.KtLintAssertThat.Companion.assertThatRule
 import com.pinterest.ktlint.test.LintViolation
 import io.nlopez.compose.rules.ModifierWithoutDefault
+import org.assertj.core.api.Assertions.assertThat
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
 
@@ -43,6 +49,63 @@ class ModifierWithoutDefaultCheckTest {
                 fun Something(modifier: Modifier = Modifier, modifier2: Modifier = Modifier) { }
                 """.trimIndent(),
             )
+    }
+
+    @Test
+    fun `the autocorrect supports annotated parameters in multiline parameter lists`() {
+        @Language("kotlin")
+        val composableCode = """
+                @Composable
+                fun Something(
+                    title: String,
+                    @Suppress("unused") modifier: Modifier,
+                ) { }
+        """.trimIndent()
+
+        modifierRuleAssertThat(composableCode)
+            .hasLintViolation(
+                line = 4,
+                col = 25,
+                detail = ModifierWithoutDefault.MissingModifierDefaultParam,
+            )
+            .isFormattedAs(
+                """
+                @Composable
+                fun Something(
+                    title: String,
+                    @Suppress("unused") modifier: Modifier = Modifier,
+                ) { }
+                """.trimIndent(),
+            )
+    }
+
+    @Test
+    fun `the autocorrect keeps the Modifier import when the parameter type is its only usage`() {
+        @Language("kotlin")
+        val code = """
+                package com.example.probe
+
+                import androidx.compose.foundation.layout.Box
+                import androidx.compose.runtime.Composable
+                import androidx.compose.ui.Modifier
+
+                @Composable
+                fun ProbeScreen(modifier: Modifier, title: String) {
+                    Box(modifier = modifier) { }
+                }
+        """.trimIndent()
+
+        val engine = KtLintRuleEngine(
+            ruleProviders = setOf(RuleProvider { ModifierWithoutDefaultCheck() }) +
+                StandardRuleSetProvider().getRuleProviders()
+                    .filter { it.createNewRuleInstance().ruleId.value == "standard:no-unused-imports" },
+        )
+
+        val formatted = engine.format(Code.fromSnippet(code)) { AutocorrectDecision.ALLOW_AUTOCORRECT }
+
+        assertThat(formatted)
+            .contains("fun ProbeScreen(modifier: Modifier = Modifier, title: String)")
+            .contains("import androidx.compose.ui.Modifier")
     }
 
     @Test
