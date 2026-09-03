@@ -4,10 +4,15 @@ package io.nlopez.compose.rules.detekt
 
 import dev.detekt.api.Config
 import dev.detekt.api.SourceLocation
+import dev.detekt.test.TestConfig
 import dev.detekt.test.lint
+import dev.detekt.test.utils.compileContentForTest
 import io.nlopez.compose.rules.ModifierWithoutDefault
 import io.nlopez.compose.rules.detekt.assertThat
+import org.assertj.core.api.Assertions.assertThat
 import org.intellij.lang.annotations.Language
+import org.jetbrains.kotlin.psi.KtParameter
+import org.jetbrains.kotlin.psi.psiUtil.collectDescendantsOfType
 import org.junit.jupiter.api.Test
 
 class ModifierWithoutDefaultCheckTest {
@@ -31,6 +36,31 @@ class ModifierWithoutDefaultCheckTest {
         )
         assertThat(errors[0]).hasMessage(ModifierWithoutDefault.MissingModifierDefaultParam)
         assertThat(errors[1]).hasMessage(ModifierWithoutDefault.MissingModifierDefaultParam)
+    }
+
+    @Test
+    fun `autocorrects by adding a default value that keeps the Modifier type reference intact`() {
+        @Language("kotlin")
+        val composableCode = """
+                @Composable
+                fun Something(modifier: Modifier, title: String) { }
+        """.trimIndent()
+
+        val file = compileContentForTest(composableCode)
+        ModifierWithoutDefaultCheck(TestConfig("autoCorrect" to true)).lint(file)
+
+        assertThat(file.text).isEqualTo(
+            """
+            @Composable
+            fun Something(modifier: Modifier = Modifier, title: String) { }
+            """.trimIndent(),
+        )
+
+        // The type reference has to survive the fix as a real reference, or rules that resolve references
+        // (such as unused import detection) would no longer see the Modifier import as used.
+        val modifierParameter = file.collectDescendantsOfType<KtParameter>().first()
+        assertThat(modifierParameter.typeReference?.text).isEqualTo("Modifier")
+        assertThat(modifierParameter.defaultValue?.text).isEqualTo("Modifier")
     }
 
     @Test
