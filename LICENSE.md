@@ -168,3 +168,5 @@ incurred by, or claims asserted against, such Contributor by reason of your
 accepting any such warranty or additional liability.
 
 _END OF TERMS AND CONDITIONS_
+
+SPDX-License-Identifier: Apache-2.0
