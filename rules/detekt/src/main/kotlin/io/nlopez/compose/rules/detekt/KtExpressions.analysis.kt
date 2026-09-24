@@ -6,8 +6,12 @@ import org.jetbrains.kotlin.analysis.api.analyze
 import org.jetbrains.kotlin.analysis.api.components.resolveToCall
 import org.jetbrains.kotlin.analysis.api.components.resolveToSymbol
 import org.jetbrains.kotlin.analysis.api.resolution.KaVariableAccessCall
+import org.jetbrains.kotlin.analysis.api.resolution.successfulFunctionCallOrNull
+import org.jetbrains.kotlin.analysis.api.resolution.symbol
+import org.jetbrains.kotlin.analysis.api.symbols.KaSymbolOrigin
 import org.jetbrains.kotlin.analysis.api.symbols.sourcePsiSafe
 import org.jetbrains.kotlin.idea.references.mainReference
+import org.jetbrains.kotlin.psi.KtBinaryExpression
 import org.jetbrains.kotlin.psi.KtElement
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtQualifiedExpression
@@ -52,6 +56,19 @@ internal fun KtExpression.isSameResolvedValueAs(other: KtExpression): Boolean = 
             val right = other.resolvedValueKey()
             left != null && right != null && left == right
         }
+    }
+}.getOrDefault(false)
+
+/**
+ * Whether the operator is built in, like `&&` or `?:`, or calls a non-composable library function or a generated member,
+ * like the `equals` of a data class.
+ */
+internal fun KtBinaryExpression.isBuiltInOrLibraryOperator(): Boolean = runCatching {
+    analyze(this) {
+        val symbol = this@isBuiltInOrLibraryOperator.resolveToCall()?.successfulFunctionCallOrNull()?.symbol
+            ?: return@analyze true
+        !symbol.hasComposableAnnotation() &&
+            (isDeclaredInLibrary(symbol) || symbol.origin == KaSymbolOrigin.SOURCE_MEMBER_GENERATED)
     }
 }.getOrDefault(false)
 

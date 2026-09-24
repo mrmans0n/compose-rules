@@ -18,6 +18,7 @@ import org.jetbrains.kotlin.psi.KtElement
 import org.jetbrains.kotlin.psi.KtLambdaExpression
 import org.jetbrains.kotlin.psi.KtNamedFunction
 import org.jetbrains.kotlin.psi.KtPropertyAccessor
+import org.jetbrains.kotlin.psi.KtPsiUtil
 import org.jetbrains.kotlin.psi.KtSimpleNameExpression
 import org.jetbrains.kotlin.psi.KtTreeVisitorVoid
 import org.jetbrains.kotlin.psi.KtUnaryExpression
@@ -86,7 +87,7 @@ class MissingReadOnlyComposableCheck(config: Config) :
                             hasNonReadOnlyComposableUsage = true
                             return
                         }
-                    } else if (!expression.isEagerScopeFunctionCall()) {
+                    } else if (!expression.isEagerScopeFunctionCall() && !expression.isLambdaLessLibraryCall()) {
                         hasNonReadOnlyComposableUsage = true
                         return
                     }
@@ -122,7 +123,15 @@ class MissingReadOnlyComposableCheck(config: Config) :
                 }
 
                 override fun visitBinaryExpression(expression: KtBinaryExpression) {
-                    hasNonReadOnlyComposableUsage = true
+                    val operationToken = expression.operationToken
+                    if (
+                        operationToken in KtTokens.ALL_ASSIGNMENTS ||
+                        (!expression.isIdentityOrNullCheck() && !expression.isBuiltInOrLibraryOperator())
+                    ) {
+                        hasNonReadOnlyComposableUsage = true
+                        return
+                    }
+                    super.visitBinaryExpression(expression)
                 }
 
                 override fun visitUnaryExpression(expression: KtUnaryExpression) {
@@ -165,6 +174,13 @@ class MissingReadOnlyComposableCheck(config: Config) :
 }
 
 private val IncrementOrDecrementOperators = setOf(KtTokens.PLUSPLUS, KtTokens.MINUSMINUS)
+
+/** Identity checks and comparisons with `null` never call `equals`. */
+private fun KtBinaryExpression.isIdentityOrNullCheck(): Boolean = when (operationToken) {
+    KtTokens.EQEQEQ, KtTokens.EXCLEQEQEQ -> true
+    KtTokens.EQEQ, KtTokens.EXCLEQ -> listOfNotNull(left, right).any { operand -> KtPsiUtil.isNullConstant(operand) }
+    else -> false
+}
 
 private data class ReadOnlyComposableUsage(
     val hasReadOnlyComposableUsage: Boolean,

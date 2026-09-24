@@ -100,6 +100,18 @@ private val EagerComposeScopeFunctions = setOf(
     "androidx.compose.ui.text.withAnnotation",
     "androidx.compose.ui.text.withLink",
     "androidx.compose.ui.text.withStyle",
+    "androidx.compose.ui.util.fastForEach",
+    "androidx.compose.ui.util.fastForEachIndexed",
+    "androidx.compose.ui.util.fastMap",
+    "androidx.compose.ui.util.fastMapNotNull",
+    "androidx.compose.ui.util.fastFilter",
+    "androidx.compose.ui.util.fastFirstOrNull",
+    "androidx.compose.ui.util.fastFold",
+    "androidx.compose.ui.util.fastFlatMap",
+    "androidx.compose.ui.util.fastAny",
+    "androidx.compose.ui.util.fastAll",
+    "androidx.compose.ui.util.fastSumBy",
+    "androidx.compose.ui.util.fastMaxOfOrNull",
 )
 
 private val EagerBuilderScopeFunctions = setOf(

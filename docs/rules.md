@@ -640,6 +640,8 @@ fun currentDensity(): Density = LocalDensity.current
 fun currentDensity(): Density = LocalDensity.current
 ```
 
+Library calls without a lambda, like `uppercase()` or `orEmpty()`, and library operators, like `+`, `!=` or `?:`, do not prevent the report. Calls and operators declared in your own module, and assignments, still do.
+
 This rule is detekt-only and uses detekt's analysis API.
 
 !!! info ""
