@@ -599,6 +599,68 @@ class MissingReadOnlyComposableCheckTest {
     }
 
     @Test
+    fun `reports read only usage with data class equality`() {
+        @Language("kotlin")
+        val code = codeWithFakeCompose(
+            """
+            $STRING_RESOURCE
+
+            data class Token(val id: Int)
+
+            @Composable
+            fun Example(token: Token, other: Token): String =
+                if (token == other) stringResource(1) else stringResource(2)
+            """,
+        )
+
+        assertSingleFinding(rule.lintWithAnalysisApi(code), SourceLocation(12, 9))
+    }
+
+    @Test
+    fun `reports read only usage with null and identity checks on type with custom equals`() {
+        @Language("kotlin")
+        val code = codeWithFakeCompose(
+            """
+            $STRING_RESOURCE
+
+            class Token(val id: Int) {
+                override fun equals(other: Any?): Boolean = other is Token && other.id == id
+
+                override fun hashCode(): Int = id
+            }
+
+            @Composable
+            fun Example(token: Token?, other: Token): String =
+                if (token != null && token !== other) stringResource(1) else stringResource(2)
+            """,
+        )
+
+        assertSingleFinding(rule.lintWithAnalysisApi(code), SourceLocation(16, 9))
+    }
+
+    @Test
+    fun `does not report read only usage with custom equals`() {
+        @Language("kotlin")
+        val code = codeWithFakeCompose(
+            """
+            $STRING_RESOURCE
+
+            class Token(val id: Int) {
+                override fun equals(other: Any?): Boolean = other is Token && other.id == id
+
+                override fun hashCode(): Int = id
+            }
+
+            @Composable
+            fun Example(token: Token, other: Token): String =
+                if (token == other) stringResource(1) else stringResource(2)
+            """,
+        )
+
+        assertThat(rule.lintWithAnalysisApi(code)).isEmpty()
+    }
+
+    @Test
     fun `reports read only usage inside fast collection helper lambda`() {
         @Language("kotlin")
         val code = codeWithFakeCompose(

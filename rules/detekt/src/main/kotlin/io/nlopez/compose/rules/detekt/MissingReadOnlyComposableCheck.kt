@@ -18,6 +18,7 @@ import org.jetbrains.kotlin.psi.KtElement
 import org.jetbrains.kotlin.psi.KtLambdaExpression
 import org.jetbrains.kotlin.psi.KtNamedFunction
 import org.jetbrains.kotlin.psi.KtPropertyAccessor
+import org.jetbrains.kotlin.psi.KtPsiUtil
 import org.jetbrains.kotlin.psi.KtSimpleNameExpression
 import org.jetbrains.kotlin.psi.KtTreeVisitorVoid
 import org.jetbrains.kotlin.psi.KtUnaryExpression
@@ -125,7 +126,7 @@ class MissingReadOnlyComposableCheck(config: Config) :
                     val operationToken = expression.operationToken
                     if (
                         operationToken in KtTokens.ALL_ASSIGNMENTS ||
-                        (operationToken !in EqualityOperators && !expression.isBuiltInOrLibraryOperator())
+                        (!expression.isIdentityOrNullCheck() && !expression.isBuiltInOrLibraryOperator())
                     ) {
                         hasNonReadOnlyComposableUsage = true
                         return
@@ -174,7 +175,12 @@ class MissingReadOnlyComposableCheck(config: Config) :
 
 private val IncrementOrDecrementOperators = setOf(KtTokens.PLUSPLUS, KtTokens.MINUSMINUS)
 
-private val EqualityOperators = setOf(KtTokens.EQEQ, KtTokens.EXCLEQ, KtTokens.EQEQEQ, KtTokens.EXCLEQEQEQ)
+/** Identity checks and comparisons with `null` never call `equals`. */
+private fun KtBinaryExpression.isIdentityOrNullCheck(): Boolean = when (operationToken) {
+    KtTokens.EQEQEQ, KtTokens.EXCLEQEQEQ -> true
+    KtTokens.EQEQ, KtTokens.EXCLEQ -> listOfNotNull(left, right).any { operand -> KtPsiUtil.isNullConstant(operand) }
+    else -> false
+}
 
 private data class ReadOnlyComposableUsage(
     val hasReadOnlyComposableUsage: Boolean,
