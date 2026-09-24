@@ -2158,6 +2158,7 @@ This effectively ties the function to be called from a Column, but is still not 
 <span class="nd">@Composable</span>
 <span class="kd">fun</span><span class="w"> </span><span class="nf">currentDensity</span><span class="p">():</span><span class="w"> </span><span class="n">Density</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">LocalDensity</span><span class="p">.</span><span class="na">current</span>
 </code></pre></div>
+<p>Library calls without a lambda, like <code>uppercase()</code> or <code>orEmpty()</code>, and library operators, like <code>+</code>, <code>!=</code> or <code>?:</code>, do not prevent the report. Calls and operators declared in your own module, and assignments, still do.</p>
 <p>This rule is detekt-only and uses detekt's analysis API.</p>
 <div class="admonition info">
 <p><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14c1.11 0 2-.89 2-2V5a2 2 0 0 0-2-2M9.71 18l-1.42-1.41L12.88 12 8.29 7.41 9.71 6l6 6z"/></svg></span> <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/detekt/src/main/kotlin/io/nlopez/compose/rules/detekt/MissingReadOnlyComposableCheck.kt">MissingReadOnlyComposable</a> detekt</p>
