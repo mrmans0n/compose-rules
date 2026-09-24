@@ -3,6 +3,7 @@
 package io.nlopez.compose.rules.detekt
 
 import dev.detekt.api.Config
+import dev.detekt.api.Finding
 import dev.detekt.api.SourceLocation
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
@@ -507,5 +508,43 @@ class MissingReadOnlyComposableCheckTest {
         val findings = rule.lintWithAnalysisApi(code)
 
         assertThat(findings).isEmpty()
+    }
+
+    @Test
+    fun `reports read only usage inside fast collection helper lambda`() {
+        @Language("kotlin")
+        val code = codeWithFakeCompose(
+            """
+            import androidx.compose.ui.util.fastMap
+
+            $STRING_RESOURCE
+
+            @Composable
+            fun Example(ids: List<Int>): String = ids.fastMap { stringResource(it) }.joinToString()
+            """,
+        )
+
+        assertSingleFinding(rule.lintWithAnalysisApi(code, FAKE_COMPOSE_UI_UTIL), SourceLocation(12, 9))
+    }
+
+    private fun assertSingleFinding(findings: List<Finding>, location: SourceLocation) {
+        assertThat(findings).hasSize(1)
+        assertThat(findings.single())
+            .hasStartSourceLocation(location)
+            .hasMessage(MissingReadOnlyComposableCheck.MissingReadOnlyComposable)
+    }
+
+    private companion object {
+        const val STRING_RESOURCE = """
+            @ReadOnlyComposable
+            @Composable
+            fun stringResource(id: Int, vararg formatArgs: Any): String = id.toString()
+        """
+
+        const val FAKE_COMPOSE_UI_UTIL = """
+            package androidx.compose.ui.util
+
+            inline fun <T, R> List<T>.fastMap(transform: (T) -> R): List<R> = map(transform)
+        """
     }
 }
