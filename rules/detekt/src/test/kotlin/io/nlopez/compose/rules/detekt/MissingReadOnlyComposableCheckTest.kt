@@ -511,6 +511,63 @@ class MissingReadOnlyComposableCheckTest {
     }
 
     @Test
+    fun `reports read only usage with library call on the result`() {
+        @Language("kotlin")
+        val code = codeWithFakeCompose(
+            """
+            $STRING_RESOURCE
+
+            @Composable
+            fun Example(): String = stringResource(1).uppercase()
+            """,
+        )
+
+        assertSingleFinding(rule.lintWithAnalysisApi(code), SourceLocation(10, 9))
+    }
+
+    @Test
+    fun `reports read only usage inside let with library call on the result`() {
+        @Language("kotlin")
+        val code = codeWithFakeCompose(
+            """
+            $STRING_RESOURCE
+
+            @Composable
+            fun Example(value: String?): String = value?.let { stringResource(1) }.orEmpty()
+            """,
+        )
+
+        assertSingleFinding(rule.lintWithAnalysisApi(code), SourceLocation(10, 9))
+    }
+
+    @Test
+    fun `reports read only usage inside annotated string builder`() {
+        @Language("kotlin")
+        val code = codeWithFakeCompose(
+            """
+            import androidx.compose.ui.text.AnnotatedString
+            import androidx.compose.ui.text.SpanStyle
+            import androidx.compose.ui.text.buildAnnotatedString
+            import androidx.compose.ui.text.withStyle
+
+            $STRING_RESOURCE
+
+            @Composable
+            fun Example(style: SpanStyle): AnnotatedString {
+                val text = stringResource(1)
+                return buildAnnotatedString {
+                    withStyle(style) {
+                        append(text)
+                    }
+                }
+            }
+            """,
+        )
+
+        assertSingleFinding(rule.lintWithAnalysisApi(code, FAKE_COMPOSE_UI_TEXT), SourceLocation(15, 9))
+    }
+
+    @Test
     fun `reports read only usage inside fast collection helper lambda`() {
         @Language("kotlin")
         val code = codeWithFakeCompose(
@@ -527,6 +584,114 @@ class MissingReadOnlyComposableCheckTest {
         assertSingleFinding(rule.lintWithAnalysisApi(code, FAKE_COMPOSE_UI_UTIL), SourceLocation(12, 9))
     }
 
+    @Test
+    fun `reports annotated string assembled from read only usages`() {
+        @Language("kotlin")
+        val code = codeWithFakeCompose(
+            """
+            import androidx.compose.ui.text.AnnotatedString
+            import androidx.compose.ui.text.buildAnnotatedString
+
+            $STRING_RESOURCE
+
+            class Price(val formattedValue: String)
+
+            class PriceInfo(val reference: Price?, val perUnit: Price?, val showReferencePrice: Boolean)
+
+            @Composable
+            fun Example(price: PriceInfo, savings: String?): AnnotatedString {
+                val referencePrice = stringResource(1, price.reference?.formattedValue.orEmpty())
+                val perUnit = price.perUnit?.formattedValue?.let { stringResource(2, it) }
+                return buildAnnotatedString {
+                    if (price.showReferencePrice) {
+                        append(referencePrice)
+                        append(", ")
+                    }
+                    savings?.let {
+                        append(it)
+                        append(", ")
+                    }
+                    perUnit?.let { append(it) }
+                }
+            }
+            """,
+        )
+
+        assertSingleFinding(rule.lintWithAnalysisApi(code, FAKE_COMPOSE_UI_TEXT), SourceLocation(17, 9))
+    }
+
+    @Test
+    fun `does not report read only usage with non read only composable call`() {
+        @Language("kotlin")
+        val code = codeWithFakeCompose(
+            """
+            $STRING_RESOURCE
+
+            @Composable
+            fun Text(text: String) {
+            }
+
+            @Composable
+            fun Example() {
+                Text(stringResource(1))
+            }
+            """,
+        )
+
+        assertThat(rule.lintWithAnalysisApi(code)).isEmpty()
+    }
+
+    @Test
+    fun `does not report read only usage with remember`() {
+        @Language("kotlin")
+        val code = codeWithFakeCompose(
+            """
+            $STRING_RESOURCE
+
+            @Composable
+            fun Example(): String {
+                val prefix = remember { "prefix" }
+                return prefix + stringResource(1)
+            }
+            """,
+        )
+
+        assertThat(rule.lintWithAnalysisApi(code)).isEmpty()
+    }
+
+    @Test
+    fun `does not report read only usage inside non inline library lambda`() {
+        @Language("kotlin")
+        val code = codeWithFakeCompose(
+            """
+            $STRING_RESOURCE
+
+            @Composable
+            fun Example(): Pair<String, Lazy<Int>> = stringResource(1) to lazy { 1 }
+            """,
+        )
+
+        assertThat(rule.lintWithAnalysisApi(code)).isEmpty()
+    }
+
+    @Test
+    fun `does not report read only usage with function type invocation`() {
+        @Language("kotlin")
+        val code = codeWithFakeCompose(
+            """
+            $STRING_RESOURCE
+
+            @Composable
+            fun Example(onRead: () -> Unit): String {
+                onRead()
+                return stringResource(1)
+            }
+            """,
+        )
+
+        assertThat(rule.lintWithAnalysisApi(code)).isEmpty()
+    }
+
     private fun assertSingleFinding(findings: List<Finding>, location: SourceLocation) {
         assertThat(findings).hasSize(1)
         assertThat(findings.single())
@@ -539,6 +704,23 @@ class MissingReadOnlyComposableCheckTest {
             @ReadOnlyComposable
             @Composable
             fun stringResource(id: Int, vararg formatArgs: Any): String = id.toString()
+        """
+
+        /** The builder is a library type, like the real `AnnotatedString.Builder`, so `append` resolves as library code. */
+        const val FAKE_COMPOSE_UI_TEXT = """
+            package androidx.compose.ui.text
+
+            class AnnotatedString(val text: String)
+
+            class SpanStyle
+
+            typealias AnnotatedStringBuilder = StringBuilder
+
+            inline fun buildAnnotatedString(builder: AnnotatedStringBuilder.() -> Unit): AnnotatedString =
+                AnnotatedString(StringBuilder().apply(builder).toString())
+
+            inline fun <R : Any> AnnotatedStringBuilder.withStyle(style: SpanStyle, block: AnnotatedStringBuilder.() -> R): R =
+                block()
         """
 
         const val FAKE_COMPOSE_UI_UTIL = """

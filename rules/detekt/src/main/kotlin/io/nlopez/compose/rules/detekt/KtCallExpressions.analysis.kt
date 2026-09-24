@@ -5,16 +5,23 @@
 package io.nlopez.compose.rules.detekt
 
 import org.jetbrains.kotlin.analysis.api.KaExperimentalApi
+import org.jetbrains.kotlin.analysis.api.KaSession
 import org.jetbrains.kotlin.analysis.api.analyze
 import org.jetbrains.kotlin.analysis.api.components.expressionType
+import org.jetbrains.kotlin.analysis.api.components.fakeOverrideOriginal
 import org.jetbrains.kotlin.analysis.api.components.resolveCall
+import org.jetbrains.kotlin.analysis.api.symbols.KaCallableSymbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaNamedFunctionSymbol
+import org.jetbrains.kotlin.analysis.api.symbols.KaSymbolOrigin
+import org.jetbrains.kotlin.analysis.api.types.KaFunctionType
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtAnnotatedExpression
 import org.jetbrains.kotlin.psi.KtCallExpression
+import org.jetbrains.kotlin.psi.KtCallableReferenceExpression
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtLabeledExpression
 import org.jetbrains.kotlin.psi.KtLambdaExpression
+import org.jetbrains.kotlin.psi.KtNamedFunction
 import org.jetbrains.kotlin.psi.KtParenthesizedExpression
 
 internal fun KtCallExpression.isResolvedCallToAnyOf(fqNames: Set<FqName>): Boolean = runCatching {
@@ -72,6 +79,33 @@ internal fun KtCallExpression.isResolvedInlineArgument(argumentExpression: KtExp
         !parameter.isNoinline && !parameter.isCrossinline
     }
 }.getOrDefault(false)
+
+/**
+ * Whether this is a call to a library function that gets no lambda, anonymous function or callable reference, so it
+ * cannot run code from the analyzed sources.
+ */
+internal fun KtCallExpression.isLambdaLessLibraryCall(): Boolean {
+    val hasFunctionArgument = lambdaArguments.isNotEmpty() ||
+        valueArguments.any { argument ->
+            when (argument.getArgumentExpression()?.unwrapArgumentExpression()) {
+                is KtLambdaExpression, is KtNamedFunction, is KtCallableReferenceExpression -> true
+                else -> false
+            }
+        }
+    if (hasFunctionArgument) return false
+
+    return runCatching {
+        analyze(this) {
+            val call = this@isLambdaLessLibraryCall.resolveCall() ?: return@analyze false
+            call.dispatchReceiver?.type !is KaFunctionType && isDeclaredInLibrary(call.signature.symbol)
+        }
+    }.getOrDefault(false)
+}
+
+internal fun KaSession.isDeclaredInLibrary(symbol: KaCallableSymbol): Boolean =
+    symbol.fakeOverrideOriginal.origin in LibraryOrigins
+
+private val LibraryOrigins = setOf(KaSymbolOrigin.LIBRARY, KaSymbolOrigin.JAVA_LIBRARY)
 
 internal fun KtCallExpression.hasExplicitArgumentMappedToAny(parameterNames: Set<String>): Boolean = runCatching {
     analyze(this) {

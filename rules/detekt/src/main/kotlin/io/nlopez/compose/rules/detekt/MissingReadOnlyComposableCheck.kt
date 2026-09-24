@@ -86,7 +86,7 @@ class MissingReadOnlyComposableCheck(config: Config) :
                             hasNonReadOnlyComposableUsage = true
                             return
                         }
-                    } else if (!expression.isEagerScopeFunctionCall()) {
+                    } else if (!expression.isEagerScopeFunctionCall() && !expression.isLambdaLessLibraryCall()) {
                         hasNonReadOnlyComposableUsage = true
                         return
                     }
