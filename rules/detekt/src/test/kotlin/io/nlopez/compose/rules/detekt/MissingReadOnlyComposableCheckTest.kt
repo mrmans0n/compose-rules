@@ -568,6 +568,37 @@ class MissingReadOnlyComposableCheckTest {
     }
 
     @Test
+    fun `reports read only usage with elvis operator`() {
+        @Language("kotlin")
+        val code = codeWithFakeCompose(
+            """
+            $STRING_RESOURCE
+
+            @Composable
+            fun Example(value: String?): String = value ?: stringResource(1)
+            """,
+        )
+
+        assertSingleFinding(rule.lintWithAnalysisApi(code), SourceLocation(10, 9))
+    }
+
+    @Test
+    fun `reports read only usage with library binary operators`() {
+        @Language("kotlin")
+        val code = codeWithFakeCompose(
+            """
+            $STRING_RESOURCE
+
+            @Composable
+            fun Example(count: Int, other: String?): String =
+                if (count > 0 && other != null) stringResource(1) + count else stringResource(2)
+            """,
+        )
+
+        assertSingleFinding(rule.lintWithAnalysisApi(code), SourceLocation(10, 9))
+    }
+
+    @Test
     fun `reports read only usage inside fast collection helper lambda`() {
         @Language("kotlin")
         val code = codeWithFakeCompose(
@@ -686,6 +717,45 @@ class MissingReadOnlyComposableCheckTest {
                 onRead()
                 return stringResource(1)
             }
+            """,
+        )
+
+        assertThat(rule.lintWithAnalysisApi(code)).isEmpty()
+    }
+
+    @Test
+    fun `does not report read only usage with local var mutation`() {
+        @Language("kotlin")
+        val code = codeWithFakeCompose(
+            """
+            $STRING_RESOURCE
+
+            @Composable
+            fun Example(): String {
+                var text = stringResource(1)
+                text = text.trim()
+                return text
+            }
+            """,
+        )
+
+        assertThat(rule.lintWithAnalysisApi(code)).isEmpty()
+    }
+
+    @Test
+    fun `does not report read only usage with non read only composable operator`() {
+        @Language("kotlin")
+        val code = codeWithFakeCompose(
+            """
+            $STRING_RESOURCE
+
+            class Label(val text: String)
+
+            @Composable
+            operator fun Label.plus(other: String): Label = Label(text + other)
+
+            @Composable
+            fun Example(label: Label): Label = label + stringResource(1)
             """,
         )
 

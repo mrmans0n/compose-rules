@@ -122,7 +122,15 @@ class MissingReadOnlyComposableCheck(config: Config) :
                 }
 
                 override fun visitBinaryExpression(expression: KtBinaryExpression) {
-                    hasNonReadOnlyComposableUsage = true
+                    val operationToken = expression.operationToken
+                    if (
+                        operationToken in KtTokens.ALL_ASSIGNMENTS ||
+                        (operationToken !in EqualityOperators && !expression.isBuiltInOrLibraryOperator())
+                    ) {
+                        hasNonReadOnlyComposableUsage = true
+                        return
+                    }
+                    super.visitBinaryExpression(expression)
                 }
 
                 override fun visitUnaryExpression(expression: KtUnaryExpression) {
@@ -165,6 +173,8 @@ class MissingReadOnlyComposableCheck(config: Config) :
 }
 
 private val IncrementOrDecrementOperators = setOf(KtTokens.PLUSPLUS, KtTokens.MINUSMINUS)
+
+private val EqualityOperators = setOf(KtTokens.EQEQ, KtTokens.EXCLEQ, KtTokens.EQEQEQ, KtTokens.EXCLEQEQEQ)
 
 private data class ReadOnlyComposableUsage(
     val hasReadOnlyComposableUsage: Boolean,
