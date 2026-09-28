@@ -11,8 +11,8 @@ This file provides guidance to Claude Code (claude.ai/code) and other AI assista
 ```bash
 ./gradlew build          # Build everything
 ./gradlew test           # Run all tests
-./gradlew ktfmtFormat    # Format code (ktfmt, Kotlin lang style)
-./gradlew ktfmtCheck     # Check formatting (used by CI)
+./gradlew spotlessApply  # Format code (Spotless + ktlint)
+./gradlew spotlessCheck  # Check formatting (used by CI)
 ```
 
 ## Project Structure
@@ -32,8 +32,8 @@ docs/                    # mkdocs documentation
 ## Code Quality
 
 - All new rules must have corresponding tests
-- Run `./gradlew ktfmtFormat` before committing
-- CI runs ktfmtCheck, build, and test
+- Run `./gradlew spotlessApply` before committing
+- CI runs spotlessCheck, build, and test
 
 ## Commit Style
 
