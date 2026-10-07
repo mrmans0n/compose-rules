@@ -10,6 +10,7 @@ import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.KtFunction
 import org.jetbrains.kotlin.psi.KtParameter
 import org.jetbrains.kotlin.psi.KtProperty
+import org.jetbrains.kotlin.psi.KtPsiUtil
 import org.jetbrains.kotlin.psi.KtReferenceExpression
 import org.jetbrains.kotlin.psi.KtValueArgument
 import org.jetbrains.kotlin.psi.KtValueArgumentName
@@ -95,7 +96,7 @@ fun KtCallExpression.argumentsUsingModifiers(
     modifierNames: Set<String>,
     modifierTypeNames: Set<String> = ModifierNames,
 ): List<KtValueArgument> = valueArguments.filter { argument ->
-    when (val expression = argument.getArgumentExpression()) {
+    when (val expression = KtPsiUtil.deparenthesize(argument.getArgumentExpression())) {
         // if it's MyComposable(modifier) or similar
         is KtReferenceExpression -> {
             expression.text in modifierNames
@@ -130,7 +131,7 @@ private fun KtDotQualifiedExpression.hasModifierAsChainArgument(modifierNames: S
         val selector = current.selectorExpression as? KtCallExpression
         if (selector?.calleeExpression?.text == "then") {
             for (arg in selector.valueArguments) {
-                when (val expr = arg.getArgumentExpression()) {
+                when (val expr = KtPsiUtil.deparenthesize(arg.getArgumentExpression())) {
                     is KtReferenceExpression -> if (expr.text in modifierNames) return true
                     is KtDotQualifiedExpression -> if (expr.rootExpression.text in modifierNames) return true
                     else -> {}

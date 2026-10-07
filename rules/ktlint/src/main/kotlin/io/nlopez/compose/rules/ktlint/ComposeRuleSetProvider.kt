@@ -29,6 +29,7 @@ class ComposeRuleSetProvider :
         RuleProvider { ModifierNamingCheck() },
         RuleProvider { ModifierNotUsedAtRootCheck() },
         RuleProvider { ModifierReusedCheck() },
+        RuleProvider { ModifierShouldBeForwardedToEveryBranchCheck() },
         RuleProvider { ModifierWithoutDefaultCheck() },
         RuleProvider { MultipleContentEmittersCheck() },
         RuleProvider { MutableParametersCheck() },

@@ -8,6 +8,7 @@ import org.jetbrains.kotlin.psi.KtCallableDeclaration
 import org.jetbrains.kotlin.psi.KtDeclarationWithInitializer
 import org.jetbrains.kotlin.psi.KtDestructuringDeclaration
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
+import org.jetbrains.kotlin.psi.KtPsiUtil
 import org.jetbrains.kotlin.psi.KtReferenceExpression
 import org.jetbrains.kotlin.psi.psiUtil.parents
 
@@ -17,7 +18,7 @@ fun KtCallExpression.parametersBeingUsedFrom(
     parameterNames: Set<String>,
     modifierTypeNames: Set<String> = DefaultModifierTypeNames,
 ): Set<String> = valueArguments.flatMap { argument ->
-    when (val expression = argument.getArgumentExpression()) {
+    when (val expression = KtPsiUtil.deparenthesize(argument.getArgumentExpression())) {
         // if it's MyComposable(modifier) or similar
         is KtReferenceExpression -> listOfNotNull(expression.text.takeIf { it in parameterNames })
 
@@ -47,7 +48,7 @@ private fun KtDotQualifiedExpression.parameterNamesUsedIn(
             val selector = current.selectorExpression as? KtCallExpression
             if (selector?.calleeExpression?.text == "then") {
                 for (arg in selector.valueArguments) {
-                    when (val expr = arg.getArgumentExpression()) {
+                    when (val expr = KtPsiUtil.deparenthesize(arg.getArgumentExpression())) {
                         is KtReferenceExpression -> if (expr.text in parameterNames) add(expr.text)
 
                         is KtDotQualifiedExpression -> if (expr.rootExpression.text in parameterNames) {

@@ -7,10 +7,30 @@ import com.pinterest.ktlint.test.LintViolation
 import io.nlopez.compose.rules.ModifierReused
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 
 class ModifierReusedCheckTest {
 
     private val modifierRuleAssertThat = assertThatRule { ModifierReusedCheck() }
+
+    @ParameterizedTest
+    @ValueSource(strings = ["((modifier))", "(modifier.padding())", "Modifier.then((modifier))"])
+    fun `passes when a parenthesized modifier belongs to a lambda`(argument: String) {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun Content(modifier: Modifier) {
+                    Column(modifier = modifier) {
+                        Slot { modifier: Modifier ->
+                            Row(modifier = $argument) {}
+                        }
+                    }
+                }
+            """.trimIndent()
+        modifierRuleAssertThat(code).hasNoLintViolations()
+    }
 
     @Test
     fun `errors when the modifier parameter of a Composable is used more than once by siblings or parent-children`() {

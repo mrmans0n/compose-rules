@@ -861,6 +861,27 @@ More info: [Compose Component API Guidelines](https://github.com/androidx/androi
 
     :material-chevron-right-box: [compose:modifier-not-used-at-root](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierNotUsedAtRoot.kt) ktlint :material-chevron-right-box: [ModifierNotUsedAtRoot](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierNotUsedAtRoot.kt) detekt
 
+### Forward modifiers to every applicable branch
+
+For a root-level `if` or `when`, if one branch forwards the modifier parameter, forward it to every branch whose composable accepts a modifier. Mutually exclusive branches do not reuse the modifier.
+
+```kotlin
+@Composable
+fun Content(loading: Boolean, modifier: Modifier = Modifier) {
+    if (loading) {
+        LoadingContent() // Pass modifier here too, if LoadingContent accepts one.
+    } else {
+        LoadedContent(modifier)
+    }
+}
+```
+
+Calls that do not accept a modifier are exempt.
+
+!!! info ""
+
+    :material-chevron-right-box: [compose:modifier-should-be-forwarded-to-every-branch](https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierShouldBeForwardedToEveryBranch.kt) ktlint :material-chevron-right-box: [ModifierShouldBeForwardedToEveryBranch](https://github.com/mrmans0n/compose-rules/blob/main/rules/detekt/src/main/kotlin/io/nlopez/compose/rules/detekt/ModifierShouldBeForwardedToEveryBranchCheck.kt) detekt
+
 ### Don't re-use modifiers
 
 A modifier parameter should only be used by a single layout node. Reusing it across multiple composables at different levels causes unexpected behavior.

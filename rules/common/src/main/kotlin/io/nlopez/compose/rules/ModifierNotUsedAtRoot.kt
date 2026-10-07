@@ -19,6 +19,7 @@ import io.nlopez.compose.core.util.rootExpression
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.KtFunction
+import org.jetbrains.kotlin.psi.KtPsiUtil
 import org.jetbrains.kotlin.psi.KtReferenceExpression
 import org.jetbrains.kotlin.psi.psiUtil.parents
 
@@ -44,7 +45,7 @@ class ModifierNotUsedAtRoot : ComposeKtVisitor {
                 if (args.isEmpty()) return@mapNotNull null
                 val shadowedNames = callExpression.shadowedModifierNamesUpTo(function, modifiers)
                 val usage = args.firstOrNull { arg ->
-                    when (val expr = arg.getArgumentExpression()) {
+                    when (val expr = KtPsiUtil.deparenthesize(arg.getArgumentExpression())) {
                         is KtReferenceExpression -> expr.text !in shadowedNames
                         is KtDotQualifiedExpression -> expr.rootExpression.text !in shadowedNames
                         else -> true
