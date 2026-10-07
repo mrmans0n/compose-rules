@@ -12,15 +12,16 @@ import org.junit.jupiter.params.provider.ValueSource
 class ModifierShouldBeForwardedToEveryBranchCheckTest {
     private val modifierRuleAssertThat = assertThatRule { ModifierShouldBeForwardedToEveryBranchCheck() }
 
-    @Test
-    fun `reports a modifier omitted from a root when branch`() {
+    @ParameterizedTest
+    @ValueSource(strings = ["modifier", "((modifier))", "(modifier.padding())", "Modifier.then((modifier))"])
+    fun `reports a modifier omitted from a root when branch`(forwarded: String) {
         @Language("kotlin")
         val code =
             """
                 @Composable
                 fun Content(state: Int, modifier: Modifier = Modifier) {
                     when (state) {
-                        0 -> LoadedContent(modifier)
+                        0 -> LoadedContent($forwarded)
                         else -> LoadingContent()
                     }
                 }

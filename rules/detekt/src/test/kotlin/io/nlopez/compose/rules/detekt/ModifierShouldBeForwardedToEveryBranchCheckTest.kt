@@ -15,6 +15,9 @@ class ModifierShouldBeForwardedToEveryBranchCheckTest {
     @ParameterizedTest
     @ValueSource(
         strings = [
+            "if (state == 0) LoadedContent(modifier) else LoadingContent(androidx.compose.ui.Modifier)",
+            "if (state == 0) LoadedContent(modifier) else LoadingContent(Modifier.Companion)",
+            "if (state == 0) LoadedContent(modifier) else LoadingContent(androidx.compose.ui.Modifier.padding())",
             "when (state) { 0 -> LoadedContent(modifier); else -> LoadingContent() }",
             "if (state == 0) LoadedContent(modifier.then(Modifier)) else LoadingContent()",
             "if (state == 0) LoadedContent(Modifier.then(modifier)) else LoadingContent()",
@@ -113,6 +116,30 @@ class ModifierShouldBeForwardedToEveryBranchCheckTest {
             branchRuntime,
         )
         assertThat(findings).isEmpty()
+    }
+
+    @ParameterizedTest
+    @ValueSource(
+        strings = [
+            "if (state == 0) slot(modifier) else LoadingContent()",
+            "if (state == 0) LoadedContent(modifier) else slot(Modifier)",
+        ],
+    )
+    fun `reports missing forwarding for modifier accepting slots`(body: String) {
+        val findings = rule.lintWithAnalysisApi(
+            codeWithFakeCompose(
+                """
+                import androidx.compose.ui.Modifier
+                @Composable
+                fun Content(state: Int, modifier: Modifier, slot: @Composable (Modifier) -> Unit) {
+                    $body
+                }
+                """,
+            ),
+            modifierRuntime,
+            branchRuntime,
+        )
+        assertThat(findings).hasSize(1)
     }
 
     private fun content(body: String): String = codeWithFakeCompose(

@@ -12,6 +12,7 @@ import io.nlopez.compose.rules.DetektRule
 import io.nlopez.compose.rules.ModifierShouldBeForwardedToEveryBranch
 import org.jetbrains.kotlin.analysis.api.KaExperimentalApi
 import org.jetbrains.kotlin.analysis.api.analyze
+import org.jetbrains.kotlin.analysis.api.components.expressionType
 import org.jetbrains.kotlin.analysis.api.components.resolveCall
 import org.jetbrains.kotlin.analysis.api.components.resolveToSymbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaClassLikeSymbol
@@ -80,26 +81,32 @@ private fun resolvedBranchForwarding(
             }
 
             is KtDotQualifiedExpression -> {
-                val chainCall = (argument.selectorExpression as? KtCallExpression)?.resolveCall()
-                val symbol = chainCall?.signature?.symbol
-                val receiverClassId =
-                    (symbol?.receiverParameter?.returnType?.fullyExpandedType as? KaClassType)?.classId
-                if ((chainCall?.signature?.returnType?.fullyExpandedType as? KaClassType)?.classId != modifierClassId ||
-                    (receiverClassId != modifierClassId && symbol?.callableId?.classId != modifierClassId)
-                ) {
-                    null
+                val selector = argument.selectorExpression
+                if (selector is KtNameReferenceExpression) {
+                    forwarding(selector)
                 } else {
-                    val receiver = forwarding(argument.receiverExpression)
-                    // then can carry the enclosing modifier through its argument even with a fresh receiver.
-                    val appended = if (symbol.callableId?.callableName?.asString() == "then") {
-                        chainCall.valueArgumentMapping.keys.singleOrNull()?.let { forwarding(it) }
+                    val chainCall = (argument.selectorExpression as? KtCallExpression)?.resolveCall()
+                    val symbol = chainCall?.signature?.symbol
+                    val receiverClassId =
+                        (symbol?.receiverParameter?.returnType?.fullyExpandedType as? KaClassType)?.classId
+                    if ((chainCall?.signature?.returnType?.fullyExpandedType as? KaClassType)?.classId !=
+                        modifierClassId ||
+                        (receiverClassId != modifierClassId && symbol?.callableId?.classId != modifierClassId)
+                    ) {
+                        null
                     } else {
-                        false
-                    }
-                    when {
-                        receiver == true || appended == true -> true
-                        receiver == false && appended == false -> false
-                        else -> null
+                        val receiver = forwarding(argument.receiverExpression)
+                        // then can carry the enclosing modifier through its argument even with a fresh receiver.
+                        val appended = if (symbol.callableId?.callableName?.asString() == "then") {
+                            chainCall.valueArgumentMapping.keys.singleOrNull()?.let { forwarding(it) }
+                        } else {
+                            false
+                        }
+                        when {
+                            receiver == true || appended == true -> true
+                            receiver == false && appended == false -> false
+                            else -> null
+                        }
                     }
                 }
             }
@@ -111,7 +118,11 @@ private fun resolvedBranchForwarding(
         calls.mapNotNull { call ->
             val resolved = call.resolveCall() ?: return@mapNotNull null
             val target = resolved.signature.symbol
-            if (!target.hasComposableAnnotation() || target.hasReadOnlyComposableAnnotation()) return@mapNotNull null
+            val isComposable = target.hasComposableAnnotation() ||
+                call.calleeExpression?.expressionType?.hasComposableAnnotation() == true
+            if (!isComposable || target.hasReadOnlyComposableAnnotation()) {
+                return@mapNotNull null
+            }
             val targetReturnType = resolved.signature.returnType.fullyExpandedType
             if (targetReturnType.isMarkedNullable ||
                 (targetReturnType as? KaClassType)?.classId != StandardClassIds.Unit
