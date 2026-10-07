@@ -44,6 +44,9 @@ class ComposeRuleSetProvider : RuleSetProvider {
             RuleName("ModifierNaming") to { config: Config -> ModifierNamingCheck(config) },
             RuleName("ModifierNotUsedAtRoot") to { config: Config -> ModifierNotUsedAtRootCheck(config) },
             RuleName("ModifierReused") to { config: Config -> ModifierReusedCheck(config) },
+            RuleName("ModifierShouldBeForwardedToEveryBranch") to { config: Config ->
+                ModifierShouldBeForwardedToEveryBranchCheck(config)
+            },
             RuleName("ModifierWithoutDefault") to { config: Config -> ModifierWithoutDefaultCheck(config) },
             RuleName("MultipleEmitters") to { config: Config -> MultipleContentEmittersCheck(config) },
             RuleName("MutableParams") to { config: Config -> MutableParametersCheck(config) },

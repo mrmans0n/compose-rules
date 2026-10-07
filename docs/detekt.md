@@ -140,6 +140,11 @@ Compose:
     active: true
     # -- You can optionally add your own Modifier types
     # customModifiers: BananaModifier,PotatoModifier
+  ModifierShouldBeForwardedToEveryBranch:
+    active: true
+    # -- Requires analysis-enabled execution
+    # -- You can optionally add your own Modifier types
+    # customModifiers: BananaModifier,PotatoModifier
   ModifierWithoutDefault:
     active: true
   MultipleEmitters:
