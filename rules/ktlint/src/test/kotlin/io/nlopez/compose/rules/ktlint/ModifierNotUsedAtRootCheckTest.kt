@@ -7,10 +7,30 @@ import com.pinterest.ktlint.test.LintViolation
 import io.nlopez.compose.rules.ModifierNotUsedAtRoot.Companion.ComposableModifierShouldBeUsedAtTheTopMostPossiblePlace
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 
 class ModifierNotUsedAtRootCheckTest {
 
     private val modifierRuleAssertThat = assertThatRule { ModifierNotUsedAtRootCheck() }
+
+    @ParameterizedTest
+    @ValueSource(strings = ["((modifier))", "(modifier.padding())", "Modifier.then((modifier))"])
+    fun `passes when a parenthesized modifier belongs to a lambda`(argument: String) {
+        @Language("kotlin")
+        val code =
+            """
+                @Composable
+                fun Content(modifier: Modifier) {
+                    Column(modifier = modifier) {
+                        Slot { modifier: Modifier ->
+                            Row(modifier = $argument) {}
+                        }
+                    }
+                }
+            """.trimIndent()
+        modifierRuleAssertThat(code).hasNoLintViolations()
+    }
 
     @Test
     fun `error out when modifier is used in too deep in the hierarchy`() {
