@@ -827,6 +827,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#forward-modifiers-to-every-applicable-branch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Forward modifiers to every applicable branch
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#dont-re-use-modifiers" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1416,6 +1427,17 @@
     <span class="md-ellipsis">
       
         Modifiers should be used at the top-most layout of the component
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#forward-modifiers-to-every-applicable-branch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Forward modifiers to every applicable branch
       
     </span>
   </a>
@@ -2321,6 +2343,21 @@ The entire area, including the clipped area and the clipped background, responds
 <p>More info: <a href="https://github.com/androidx/androidx/blob/androidx-main/compose/docs/compose-component-api-guidelines.md#modifier-parameter">Compose Component API Guidelines</a></p>
 <div class="admonition info">
 <p><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14c1.11 0 2-.89 2-2V5a2 2 0 0 0-2-2M9.71 18l-1.42-1.41L12.88 12 8.29 7.41 9.71 6l6 6z"/></svg></span> <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierNotUsedAtRoot.kt">compose:modifier-not-used-at-root</a> ktlint <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14c1.11 0 2-.89 2-2V5a2 2 0 0 0-2-2M9.71 18l-1.42-1.41L12.88 12 8.29 7.41 9.71 6l6 6z"/></svg></span> <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierNotUsedAtRoot.kt">ModifierNotUsedAtRoot</a> detekt</p>
+</div>
+<h3 id="forward-modifiers-to-every-applicable-branch">Forward modifiers to every applicable branch<a class="headerlink" href="#forward-modifiers-to-every-applicable-branch" title="Permanent link">&para;</a></h3>
+<p>For a root-level <code>if</code> or <code>when</code>, if one branch forwards the modifier parameter, forward it to every branch whose composable accepts a modifier. Mutually exclusive branches do not reuse the modifier.</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@Composable</span>
+<span class="kd">fun</span><span class="w"> </span><span class="nf">Content</span><span class="p">(</span><span class="n">loading</span><span class="p">:</span><span class="w"> </span><span class="kt">Boolean</span><span class="p">,</span><span class="w"> </span><span class="n">modifier</span><span class="p">:</span><span class="w"> </span><span class="n">Modifier</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Modifier</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">loading</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">LoadingContent</span><span class="p">()</span><span class="w"> </span><span class="c1">// Pass modifier here too, if LoadingContent accepts one.</span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">LoadedContent</span><span class="p">(</span><span class="n">modifier</span><span class="p">)</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>Calls that do not accept a modifier are exempt.</p>
+<div class="admonition info">
+<p><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14c1.11 0 2-.89 2-2V5a2 2 0 0 0-2-2M9.71 18l-1.42-1.41L12.88 12 8.29 7.41 9.71 6l6 6z"/></svg></span> <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/common/src/main/kotlin/io/nlopez/compose/rules/ModifierShouldBeForwardedToEveryBranch.kt">compose:modifier-should-be-forwarded-to-every-branch</a> ktlint <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14c1.11 0 2-.89 2-2V5a2 2 0 0 0-2-2M9.71 18l-1.42-1.41L12.88 12 8.29 7.41 9.71 6l6 6z"/></svg></span> <a href="https://github.com/mrmans0n/compose-rules/blob/main/rules/detekt/src/main/kotlin/io/nlopez/compose/rules/detekt/ModifierShouldBeForwardedToEveryBranchCheck.kt">ModifierShouldBeForwardedToEveryBranch</a> detekt</p>
 </div>
 <h3 id="dont-re-use-modifiers">Don't re-use modifiers<a class="headerlink" href="#dont-re-use-modifiers" title="Permanent link">&para;</a></h3>
 <p>A modifier parameter should only be used by a single layout node. Reusing it across multiple composables at different levels causes unexpected behavior.</p>
