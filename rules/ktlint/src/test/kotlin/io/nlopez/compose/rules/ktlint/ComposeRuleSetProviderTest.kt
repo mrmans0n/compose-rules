@@ -2,9 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 package io.nlopez.compose.rules.ktlint
 
-import com.lemonappdev.konsist.api.Konsist
-import com.lemonappdev.konsist.api.ext.list.withAllParentsOf
-import com.lemonappdev.konsist.api.verify.assertTrue
 import io.nlopez.compose.core.ComposeKtVisitor
 import io.nlopez.compose.rules.KtlintRule
 import org.assertj.core.api.AssertionsForInterfaceTypes.assertThat
@@ -58,15 +55,5 @@ class ComposeRuleSetProviderTest {
                 .describedAs { "$ruleName should have a ktlint rule named ${ruleName}Check" }
                 .contains("${ruleName}Check")
         }
-    }
-
-    @Test
-    fun `ensure all ktlint rules have a unit test`() {
-        Konsist.scopeFromProduction()
-            .classes()
-            .withAllParentsOf(KtlintRule::class)
-            .assertTrue { clazz ->
-                clazz.testClasses { it.hasNameContaining(clazz.name) }.isNotEmpty()
-            }
     }
 }

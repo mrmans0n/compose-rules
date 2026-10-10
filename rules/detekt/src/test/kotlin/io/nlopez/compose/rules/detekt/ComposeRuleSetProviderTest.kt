@@ -6,15 +6,11 @@ import com.charleskorn.kaml.Yaml
 import com.charleskorn.kaml.YamlMap
 import com.charleskorn.kaml.YamlScalar
 import com.charleskorn.kaml.yamlMap
-import com.lemonappdev.konsist.api.Konsist
-import com.lemonappdev.konsist.api.ext.list.withAllParentsOf
-import com.lemonappdev.konsist.api.verify.assertTrue
 import dev.detekt.api.Config
 import dev.detekt.api.Rule
 import io.nlopez.compose.core.ComposeKtVisitor
 import io.nlopez.compose.rules.DetektRule
 import org.assertj.core.api.AssertionsForInterfaceTypes.assertThat
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.reflections.Reflections
 import org.reflections.scanners.Scanners
@@ -148,16 +144,5 @@ class ComposeRuleSetProviderTest {
                 .describedAs { "$ruleName should have a detekt rule named ${ruleName}Check" }
                 .contains("${ruleName}Check")
         }
-    }
-
-    @Test
-    @Disabled("Konsist has compatibility issues with the non-embeddable Kotlin compiler used in detekt 2.0")
-    fun `ensure all detekt rules have a unit test`() {
-        Konsist.scopeFromProduction()
-            .classes()
-            .withAllParentsOf(DetektRule::class)
-            .assertTrue { clazz ->
-                clazz.testClasses { it.hasNameContaining(clazz.name) }.isNotEmpty()
-            }
     }
 }

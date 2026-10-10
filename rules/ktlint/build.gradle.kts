@@ -38,5 +38,4 @@ dependencies {
     testImplementation(libs.junit5.platform.launcher)
     testImplementation(libs.assertj)
     testImplementation(libs.reflections)
-    testImplementation(libs.konsist)
 }

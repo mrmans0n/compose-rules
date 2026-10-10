@@ -1,18 +1,15 @@
-// Copyright 2024 Nacho Lopez
+// Copyright 2026 Nacho Lopez
 // SPDX-License-Identifier: Apache-2.0
-package io.nlopez.compose.rules.detekt
+package io.nlopez.compose.rules.ktlint
 
-import dev.detekt.api.Config
-import dev.detekt.api.SourceLocation
-import dev.detekt.test.lint
+import com.pinterest.ktlint.test.KtLintAssertThat
+import com.pinterest.ktlint.test.LintViolation
 import io.nlopez.compose.rules.LambdaParameterEventTrailing
-import io.nlopez.compose.rules.detekt.assertThat
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
 
 class LambdaParameterEventTrailingCheckTest {
-
-    private val rule = LambdaParameterEventTrailingCheck(Config.empty)
+    private val ruleAssertThat = KtLintAssertThat.assertThatRule { LambdaParameterEventTrailingCheck() }
 
     @Test
     fun `error out when detecting a lambda being as trailing`() {
@@ -24,14 +21,13 @@ class LambdaParameterEventTrailingCheckTest {
                     Text("Hello")
                 }
             """.trimIndent()
-        val errors = rule.lint(code)
-        assertThat(errors)
-            .hasStartSourceLocations(
-                SourceLocation(2, 46),
-            )
-        for (error in errors) {
-            assertThat(error).hasMessage(LambdaParameterEventTrailing.EventLambdaIsTrailingLambda)
-        }
+        ruleAssertThat(code).hasLintViolationsWithoutAutoCorrect(
+            LintViolation(
+                line = 2,
+                col = 46,
+                detail = LambdaParameterEventTrailing.EventLambdaIsTrailingLambda,
+            ),
+        )
     }
 
     @Test
@@ -44,8 +40,7 @@ class LambdaParameterEventTrailingCheckTest {
                     Text("Hello")
                 }
             """.trimIndent()
-        val errors = rule.lint(code)
-        assertThat(errors).isEmpty()
+        ruleAssertThat(code).hasNoLintViolations()
     }
 
     @Test
@@ -58,8 +53,7 @@ class LambdaParameterEventTrailingCheckTest {
                     Text("Hello")
                 }
             """.trimIndent()
-        val errors = rule.lint(code)
-        assertThat(errors).isEmpty()
+        ruleAssertThat(code).hasNoLintViolations()
     }
 
     @Test
@@ -70,7 +64,6 @@ class LambdaParameterEventTrailingCheckTest {
                 @Composable
                 fun something(modifier: Modifier = Modifier, onClick: () -> Unit) {}
             """.trimIndent()
-        val errors = rule.lint(code)
-        assertThat(errors).isEmpty()
+        ruleAssertThat(code).hasNoLintViolations()
     }
 }
