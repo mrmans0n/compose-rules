@@ -62,7 +62,7 @@ class LambdaParameterEventTrailingCheckTest {
         val code =
             """
                 @Composable
-                fun something(onClick: () -> Unit) {}
+                fun something(modifier: Modifier = Modifier, onClick: () -> Unit) {}
             """.trimIndent()
         ruleAssertThat(code).hasNoLintViolations()
     }
