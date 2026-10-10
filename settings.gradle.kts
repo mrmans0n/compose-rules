@@ -41,4 +41,5 @@ include(
     ":rules:detekt",
     ":rules:ktlint",
     ":rules:functional-tests",
+    ":rules:konsist-tests",
 )
