@@ -116,6 +116,40 @@ class ParameterOrderCheckTest {
     }
 
     @Test
+    fun `error when modifier is misplaced after defaulted lambdas - issue 724`() {
+        @Language("kotlin")
+        val code = """
+            @Composable
+            fun Foo(
+              state: String,
+              onConfirmClose: () -> Unit = {},
+              onDismissConfirmation: () -> Unit = {},
+              modifier: Modifier = Modifier,
+            ) { }
+
+            @Composable
+            fun Bar(
+              onConfirm: () -> Unit = {},
+              modifier: Modifier = Modifier,
+            ) { }
+
+            @Composable
+            fun Baz(
+              onValueChange: (Int) -> Unit = {},
+              modifier: Modifier = Modifier,
+              value: Int,
+            ) { }
+        """.trimIndent()
+        val errors = rule.lint(code)
+        assertThat(errors)
+            .hasStartSourceLocations(
+                SourceLocation(2, 5),
+                SourceLocation(10, 5),
+                SourceLocation(16, 5),
+            )
+    }
+
+    @Test
     fun `errors found when ordering is wrong`() {
         @Language("kotlin")
         val code = """

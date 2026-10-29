@@ -65,10 +65,16 @@ class ParameterOrder : ComposeKtVisitor {
 
             // Special case: If the proper order would move a NON-COMPOSABLE lambda with a default value to the
             // last position (making it a trailing lambda) and there's no existing trailing lambda, we should be
-            // lenient. This avoids forcing non-composable lambdas with defaults to become trailing lambdas, which
-            // is undesirable in Compose. However, composable lambdas (like content slots) are perfectly fine as
-            // trailing lambdas, so we should still report those.
+            // lenient when the author intentionally placed non-default (required) parameter(s) at the end to
+            // prevent the lambda from becoming a trailing lambda (issue #416).
+            // We ensure that:
+            // 1. The composable does not already have a trailing lambda (!hasTrailingFunction)
+            // 2. The composable's current last parameter is a required parameter without default
+            // 3. The parameters with defaults are already in proper order among themselves (e.g. modifier first)
+            // 4. Moving to properOrder would indeed push a defaulted non-composable lambda to the trailing position
             val shouldBeLenient = !hasTrailingFunction &&
+                function.valueParameters.lastOrNull()?.hasDefaultValue() == false &&
+                withDefaults == sortedWithDefaults &&
                 properOrder.lastOrNull()?.let { lastParam ->
                     val typeRef = lastParam.typeReference
                     lastParam.hasDefaultValue() &&
