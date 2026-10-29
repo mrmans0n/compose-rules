@@ -115,6 +115,59 @@ class ParameterOrderCheckTest {
     }
 
     @Test
+    fun `error when modifier is misplaced after defaulted lambdas - issue 724`() {
+        @Language("kotlin")
+        val code = """
+            @Composable
+            fun Foo(
+              state: String,
+              onConfirmClose: () -> Unit = {},
+              onDismissConfirmation: () -> Unit = {},
+              modifier: Modifier = Modifier,
+            ) { }
+
+            @Composable
+            fun Bar(
+              onConfirm: () -> Unit = {},
+              modifier: Modifier = Modifier,
+            ) { }
+
+            @Composable
+            fun Baz(
+              onValueChange: (Int) -> Unit = {},
+              modifier: Modifier = Modifier,
+              value: Int,
+            ) { }
+        """.trimIndent()
+        orderingRuleAssertThat(code).hasLintViolationsWithoutAutoCorrect(
+            LintViolation(
+                line = 2,
+                col = 5,
+                detail = ParameterOrder.createErrorMessage(
+                    currentOrder = "state: String, onConfirmClose: () -> Unit = {}, onDismissConfirmation: () -> Unit = {}, modifier: Modifier = Modifier",
+                    properOrder = "state: String, modifier: Modifier = Modifier, onConfirmClose: () -> Unit = {}, onDismissConfirmation: () -> Unit = {}",
+                ),
+            ),
+            LintViolation(
+                line = 10,
+                col = 5,
+                detail = ParameterOrder.createErrorMessage(
+                    currentOrder = "onConfirm: () -> Unit = {}, modifier: Modifier = Modifier",
+                    properOrder = "modifier: Modifier = Modifier, onConfirm: () -> Unit = {}",
+                ),
+            ),
+            LintViolation(
+                line = 16,
+                col = 5,
+                detail = ParameterOrder.createErrorMessage(
+                    currentOrder = "onValueChange: (Int) -> Unit = {}, modifier: Modifier = Modifier, value: Int",
+                    properOrder = "value: Int, modifier: Modifier = Modifier, onValueChange: (Int) -> Unit = {}",
+                ),
+            ),
+        )
+    }
+
+    @Test
     fun `errors found when ordering is wrong`() {
         @Language("kotlin")
         val code = """
