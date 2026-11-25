@@ -5,6 +5,7 @@ package io.nlopez.compose.rules
 import io.nlopez.compose.core.ComposeKtConfig
 import io.nlopez.compose.core.ComposeKtVisitor
 import io.nlopez.compose.core.Emitter
+import io.nlopez.compose.core.report
 import io.nlopez.compose.core.util.findAllChildrenByClass
 import io.nlopez.compose.core.util.isRemembered
 import org.jetbrains.kotlin.psi.KtCallExpression
@@ -22,7 +23,7 @@ class RememberStateMissing : ComposeKtVisitor {
             // If it wasn't, we show the error
             .forEach { callExpression ->
                 val errorMessage = MethodsAndErrorsThatNeedRemembering[callExpression.calleeExpression!!.text].orEmpty()
-                emitter.report(callExpression, errorMessage, false)
+                emitter.report(callExpression, errorMessage)
             }
     }
 

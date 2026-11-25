@@ -5,7 +5,6 @@ package io.nlopez.compose.rules
 import io.nlopez.compose.core.ComposeKtConfig
 import io.nlopez.compose.core.ComposeKtVisitor
 import io.nlopez.compose.core.Emitter
-import io.nlopez.compose.core.ifFix
 import io.nlopez.compose.core.util.definedInInterface
 import io.nlopez.compose.core.util.isAbstract
 import io.nlopez.compose.core.util.isActual
@@ -34,7 +33,7 @@ class ModifierWithoutDefault : ComposeKtVisitor {
         function.valueParameters.filter { it.isModifier(config) }
             .filterNot { it.hasDefaultValue() }
             .forEach { modifierParameter ->
-                emitter.report(modifierParameter, MissingModifierDefaultParam, true).ifFix {
+                emitter.report(modifierParameter, MissingModifierDefaultParam) {
                     // This error is easily auto fixable, we just inject ` = Modifier` to the param. It needs to
                     // be a re-parsed parameter and not a text patch of the last leaf: that leaf is the identifier
                     // of the `Modifier` type reference, so patching it would leave behind an unresolvable

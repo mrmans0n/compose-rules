@@ -21,17 +21,15 @@ else
     echo "Using existing JAR files (skipping build)..."
 fi
 
-echo "Running spotless check on sample project..."
+echo "Running ktlint check on sample project..."
 
-# Run spotless and capture output (expecting it to fail with violations)
+# Run ktlint and capture output (expecting it to fail with violations)
 set +e
-OUTPUT=$("$ROOT_DIR/gradlew" -p "$SAMPLE_DIR" spotlessKotlinCheck 2>&1)
+OUTPUT=$("$ROOT_DIR/gradlew" -p "$SAMPLE_DIR" ktlintCheck 2>&1)
 EXIT_CODE=$?
 set -e
 
 # Expected compose-rules violations (rule IDs that should appear in output)
-# Note: Spotless only reports one error per file, so we check for the rules
-# that should be triggered based on our separate violation files
 EXPECTED_RULES=(
     "compose:modifier-missing-check"
     "compose:multiple-emitters-check"
@@ -83,7 +81,7 @@ fi
 # Also verify the build actually failed (not a false positive from a passing build)
 if [[ $EXIT_CODE -eq 0 ]]; then
     echo ""
-    echo "ERROR: The spotless check passed unexpectedly!"
+    echo "ERROR: The ktlint check passed unexpectedly!"
     echo "The sample project should fail with compose-rules violations."
     exit 1
 fi

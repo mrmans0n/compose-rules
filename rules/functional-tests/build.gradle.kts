@@ -29,10 +29,6 @@ dependencies {
 
     functionalTestRuntimeOnly(libs.junit5.engine)
     functionalTestRuntimeOnly(libs.junit5.platform.launcher)
-
-    // Include the actual rule projects to access their JARs
-    functionalTestImplementation(projects.rules.detekt)
-    functionalTestImplementation(projects.rules.ktlint)
 }
 
 // Read versions from files

@@ -2,19 +2,16 @@
 // SPDX-License-Identifier: Apache-2.0
 package io.nlopez.compose.rules
 
-import com.pinterest.ktlint.rule.engine.core.api.AutocorrectDecision
-import com.pinterest.ktlint.rule.engine.core.api.Rule
-import com.pinterest.ktlint.rule.engine.core.api.RuleAutocorrectApproveHandler
-import com.pinterest.ktlint.rule.engine.core.api.RuleId
-import com.pinterest.ktlint.rule.engine.core.api.editorconfig.EditorConfig
-import com.pinterest.ktlint.rule.engine.core.api.editorconfig.EditorConfigProperty
+import com.intellij.lang.ASTNode
+import com.intellij.psi.PsiNameIdentifierOwner
+import io.github.ktlint.core.rule.engine.core.api.RuleId
+import io.github.ktlint.core.rule.engine.core.api.RuleV2
+import io.github.ktlint.core.rule.engine.core.api.editorconfig.EditorConfig
+import io.github.ktlint.core.rule.engine.core.api.editorconfig.EditorConfigProperty
 import io.nlopez.compose.core.ComposeKtVisitor
-import io.nlopez.compose.core.Decision
 import io.nlopez.compose.core.Emitter
 import io.nlopez.compose.core.util.isComposable
 import io.nlopez.compose.core.util.startOffsetFromName
-import org.jetbrains.kotlin.com.intellij.lang.ASTNode
-import org.jetbrains.kotlin.com.intellij.psi.PsiNameIdentifierOwner
 import org.jetbrains.kotlin.psi.KtClass
 import org.jetbrains.kotlin.psi.KtClassOrObject
 import org.jetbrains.kotlin.psi.KtFile
@@ -22,7 +19,7 @@ import org.jetbrains.kotlin.psi.KtFunction
 import org.jetbrains.kotlin.psi.psiUtil.startOffset
 
 abstract class KtlintRule(id: String, editorConfigProperties: Set<EditorConfigProperty<*>> = emptySet()) :
-    Rule(
+    RuleV2(
         ruleId = RuleId(id),
         about = About(
             maintainer = "Compose Rules",
@@ -31,8 +28,7 @@ abstract class KtlintRule(id: String, editorConfigProperties: Set<EditorConfigPr
         ),
         usesEditorConfigProperties = editorConfigProperties,
     ),
-    ComposeKtVisitor,
-    RuleAutocorrectApproveHandler {
+    ComposeKtVisitor {
 
     private lateinit var properties: EditorConfig
 
@@ -42,15 +38,11 @@ abstract class KtlintRule(id: String, editorConfigProperties: Set<EditorConfigPr
 
     private val config: KtlintComposeKtConfig by lazy { KtlintComposeKtConfig(properties, usesEditorConfigProperties) }
 
-    override fun beforeVisitChildNodes(
-        node: ASTNode,
-        emit: (offset: Int, errorMessage: String, canBeAutoCorrected: Boolean) -> AutocorrectDecision,
-    ) {
+    override fun beforeVisitChildNodes(node: ASTNode) {
         when (val psi = node.psi) {
-            is KtFile -> visitFile(psi, emit.toEmitter(), config)
+            is KtFile -> visitFile(psi, emitter, config)
 
             is KtClassOrObject -> {
-                val emitter = emit.toEmitter()
                 visitClassOrObject(psi, emitter, config)
                 if (psi is KtClass) {
                     visitClass(psi, emitter, config)
@@ -58,7 +50,6 @@ abstract class KtlintRule(id: String, editorConfigProperties: Set<EditorConfigPr
             }
 
             is KtFunction -> {
-                val emitter = emit.toEmitter()
                 visitFunction(psi, emitter, config)
                 if (psi.isComposable) {
                     visitComposable(psi, emitter, config)
@@ -67,16 +58,16 @@ abstract class KtlintRule(id: String, editorConfigProperties: Set<EditorConfigPr
         }
     }
 
-    private fun ((Int, String, Boolean) -> AutocorrectDecision).toEmitter() =
-        Emitter { element, errorMessage, canBeAutoCorrected ->
-            val offset = if (element is PsiNameIdentifierOwner) {
-                element.startOffsetFromName
-            } else {
-                element.startOffset
-            }
-            when (invoke(offset, errorMessage, canBeAutoCorrected)) {
-                AutocorrectDecision.ALLOW_AUTOCORRECT -> Decision.Fix
-                AutocorrectDecision.NO_AUTOCORRECT -> Decision.Ignore
-            }
+    private val emitter = Emitter { element, errorMessage, autoCorrect ->
+        val offset = if (element is PsiNameIdentifierOwner) {
+            element.startOffsetFromName
+        } else {
+            element.startOffset
         }
+        if (autoCorrect == null) {
+            emit(offset, errorMessage)
+        } else {
+            emit(offset, errorMessage, autoCorrect)
+        }
+    }
 }

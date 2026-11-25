@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 package io.nlopez.compose.rules.ktlint
 
-import com.pinterest.ktlint.test.KtLintAssertThat.Companion.assertThatRule
-import com.pinterest.ktlint.test.LintViolation
+import io.github.ktlint.core.test.KtLintAssertThat.Companion.assertThatRule
+import io.github.ktlint.core.test.LintViolation
 import io.nlopez.compose.rules.PreviewNaming
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
@@ -13,13 +13,13 @@ class PreviewNamingCheckTest {
     private val ruleAssertThat = assertThatRule { PreviewNamingCheck() }
 
     @Test
-    fun `fails (suffix)`() {
+    fun `adds the suffix without removing required identifier quotes`() {
         @Language("kotlin")
         val code =
             """
             @Preview
             @Composable
-            fun A() { }
+            fun `Screen example`() { }
             """.trimIndent()
 
         ruleAssertThat(code)
@@ -38,7 +38,7 @@ class PreviewNamingCheckTest {
                 """
                 @Preview
                 @Composable
-                fun APreview() { }
+                fun `Screen examplePreview`() { }
                 """.trimIndent(),
             )
     }

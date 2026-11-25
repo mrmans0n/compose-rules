@@ -2,13 +2,14 @@
 // SPDX-License-Identifier: Apache-2.0
 package io.nlopez.compose.rules
 
+import com.intellij.psi.impl.source.tree.LeafPsiElement
 import io.nlopez.compose.core.ComposeKtConfig
 import io.nlopez.compose.core.ComposeKtVisitor
 import io.nlopez.compose.core.Emitter
-import io.nlopez.compose.core.ifFix
 import io.nlopez.compose.core.util.hasPreviewWrapper
 import io.nlopez.compose.core.util.isPreview
 import org.jetbrains.kotlin.psi.KtFunction
+import org.jetbrains.kotlin.psi.psiUtil.quoteIfNeeded
 
 class PreviewNaming : ComposeKtVisitor {
     override val isOptIn: Boolean = true
@@ -29,29 +30,34 @@ class PreviewNaming : ComposeKtVisitor {
         when (strategy) {
             PreviewNamingType.Suffix -> {
                 if (!name.endsWith("Preview")) {
-                    emitter.report(function, PreviewDoesNotEndWithPreview, true).ifFix {
-                        function.setName("${name}Preview")
+                    emitter.report(function, PreviewDoesNotEndWithPreview) {
+                        function.renamePreview("${name}Preview")
                     }
                 }
             }
 
             PreviewNamingType.Prefix -> {
                 if (!name.startsWith("Preview")) {
-                    emitter.report(function, PreviewDoesNotStartWithPreview, true).ifFix {
-                        function.setName("Preview$name")
+                    emitter.report(function, PreviewDoesNotStartWithPreview) {
+                        function.renamePreview("Preview$name")
                     }
                 }
             }
 
             PreviewNamingType.Anywhere -> {
                 if (!name.contains("Preview")) {
-                    emitter.report(function, PreviewDoesNotContainPreview, true).ifFix {
+                    emitter.report(function, PreviewDoesNotContainPreview) {
                         // If anywhere is fine, we'll just add it as suffix \_(ツ)_/
-                        function.setName("${name}Preview")
+                        function.renamePreview("${name}Preview")
                     }
                 }
             }
         }
+    }
+
+    private fun KtFunction.renamePreview(name: String) {
+        // Replace the identifier directly because standalone ktlint does not register IntelliJ's tree-copy handler.
+        (nameIdentifier?.node as? LeafPsiElement)?.rawReplaceWithText(name.quoteIfNeeded())
     }
 
     private enum class PreviewNamingType {

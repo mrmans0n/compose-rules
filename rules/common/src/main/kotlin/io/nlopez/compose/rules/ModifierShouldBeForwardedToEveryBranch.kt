@@ -5,6 +5,7 @@ package io.nlopez.compose.rules
 import io.nlopez.compose.core.ComposeKtConfig
 import io.nlopez.compose.core.ComposeKtVisitor
 import io.nlopez.compose.core.Emitter
+import io.nlopez.compose.core.report
 import io.nlopez.compose.core.util.argumentsUsingModifiers
 import io.nlopez.compose.core.util.hasAnyContextArguments
 import io.nlopez.compose.core.util.isAnnotatedWith
@@ -44,7 +45,7 @@ class ModifierShouldBeForwardedToEveryBranch(
         val forwarding = resolveForwarding(namedFunction, root.branchCalls(), config)
         if (true !in forwarding.values) return
         forwarding.filterValues { !it }.keys.forEach { call ->
-            emitter.report(call, MissingBranchModifier, false)
+            emitter.report(call, MissingBranchModifier)
         }
     }
 

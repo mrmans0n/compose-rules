@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 package io.nlopez.compose.rules
 
-import com.pinterest.ktlint.rule.engine.core.api.editorconfig.EditorConfig
-import com.pinterest.ktlint.rule.engine.core.api.editorconfig.EditorConfigProperty
+import io.github.ktlint.core.rule.engine.core.api.editorconfig.EditorConfig
+import io.github.ktlint.core.rule.engine.core.api.editorconfig.EditorConfigProperty
 import io.nlopez.compose.core.ComposeKtConfig
 import io.nlopez.compose.core.util.toSnakeCase
 

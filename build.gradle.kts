@@ -16,7 +16,7 @@ allprojects {
 
     pluginManager.apply(libs.plugins.spotless.get().pluginId)
     configure<SpotlessExtension> {
-        val ktlintVersion = libs.versions.ktlint.get()
+        val ktlintVersion = libs.versions.spotless.ktlint.get()
         kotlin {
             target("**/*.kt")
             targetExclude("**/samples/**/*.kt")
