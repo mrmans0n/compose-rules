@@ -30,18 +30,18 @@ jobs:
           - name: Add artifact version to ENV
             run: echo "VERSION=$(./gradlew -q printVersion)" >> $GITHUB_ENV
 
-          - name: Build the ruleset jars for CLI usage
+          - name: Build the fat jars for CLI usage
             if: success() && !endsWith(env.VERSION, '-SNAPSHOT')
-            run: ./gradlew clean :rules:ktlint:jar :rules:detekt:shadowJar -PuberJar --rerun-tasks
+            run: ./gradlew clean :rules:ktlint:shadowJar :rules:detekt:shadowJar -PuberJar --rerun-tasks
 
-          - name: Upload ktlint ruleset JAR to release
+          - name: Upload ktlint fat jars binaries to release
             if: success() && !endsWith(env.VERSION, '-SNAPSHOT')
             uses: svenstaro/upload-release-action@v2
             with:
                 repo_token: ${{ secrets.GITHUB_TOKEN }}
-                file: rules/ktlint/build/libs/ktlint-${{ env.VERSION }}.jar
+                file: rules/ktlint/build/libs/ktlint-${{ env.VERSION }}-all.jar
                 tag: v${{ env.VERSION }}
-                asset_name: ktlint-compose-${{ env.VERSION }}.jar
+                asset_name: ktlint-compose-${{ env.VERSION }}-all.jar
                 overwrite: true
 
           - name: Upload detekt fat jars binaries to release

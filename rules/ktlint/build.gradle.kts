@@ -5,7 +5,22 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.shadowJar)
     alias(libs.plugins.mavenPublish)
+}
+
+if (!project.hasProperty("uberJar")) {
+    afterEvaluate {
+        val javaComponent = components["java"] as AdhocComponentWithVariants
+        javaComponent.withVariantsFromConfiguration(configurations["shadowRuntimeElements"]) {
+            skip()
+        }
+    }
+}
+
+tasks.shadowJar {
+    // Shared Compose checks are already compiled into this module. The CLI supplies ktlint and its PSI classes.
+    configurations.set(emptySet())
 }
 
 java {

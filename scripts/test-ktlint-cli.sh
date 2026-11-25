@@ -35,9 +35,9 @@ else
 fi
 
 COMPOSE_RULES_VERSION=$(sed -n 's/^VERSION_NAME=//p' "$ROOT_DIR/gradle.properties")
-RULESET_JAR="$BUILD_DIR/ktlint-${COMPOSE_RULES_VERSION}.jar"
+RULESET_JAR="$BUILD_DIR/ktlint-${COMPOSE_RULES_VERSION}-all.jar"
 if [[ ! -f "$RULESET_JAR" ]]; then
-    "$ROOT_DIR/gradlew" :rules:ktlint:jar
+    "$ROOT_DIR/gradlew" :rules:ktlint:shadowJar -PuberJar
 fi
 
 echo "Running ktlint CLI on sample project..."

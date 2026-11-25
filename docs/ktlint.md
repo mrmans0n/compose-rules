@@ -2,13 +2,13 @@
 
 Compose Rules targets ktlint `2.0.0-ALPHA-5` under the Maven coordinate `io.nlopez.compose.rules:ktlint:<VERSION>`. Use a Gradle or IDE integration that supports this ktlint version. Spotless 8.12 uses the ktlint 1.x API. For a working Gradle example with the alpha, see the [JVM CLI sample](https://github.com/mrmans0n/compose-rules/tree/main/samples/ktlint-sample).
 
-Download `ktlint-compose-<VERSION>.jar` from the Compose Rules release and load it with the JVM CLI. The GraalVM native executables run only bundled rulesets. See the [ktlint CLI documentation](https://ktlint.github.io/ktlint/2.0.0-ALPHA-5/install/cli/).
+Download `ktlint-compose-<VERSION>-all.jar` from the Compose Rules release and load it with the JVM CLI. The GraalVM native executables run only bundled rulesets. See the [ktlint CLI documentation](https://ktlint.github.io/ktlint/2.0.0-ALPHA-5/install/cli/).
 
 ```shell
-ktlint -R ktlint-compose-<VERSION>.jar
+ktlint -R ktlint-compose-<VERSION>-all.jar
 ```
 
-To build the ruleset locally, run `./gradlew :rules:ktlint:jar` and find it in `rules/ktlint/build/libs/`.
+To build the ruleset locally, run `./gradlew :rules:ktlint:shadowJar -PuberJar` and find it in `rules/ktlint/build/libs/`.
 
 ## Using with ktlint 1.x
 
@@ -47,7 +47,7 @@ See [Spotless Ktlint Integration](https://github.com/diffplug/spotless/tree/main
 | Version | Ktlint version | Kotlin (Syntax) |
 |---------|----------------|-----------------|
 | 0.6.9   | 2.0.0-ALPHA-5  | 2.5.0 RC        |
-| 0.4.28–0.6.8 | 1.8.0          | 2.2.21          |
+| 0.4.28+ | 1.8.0          | 2.2.21          |
 | 0.4.26+ | 1.7.1          | 2.2.0           |
 | 0.4.25  | 1.7.0          | 2.2.0           |
 | 0.4.24  | 1.6.0          | 2.1.21          |
