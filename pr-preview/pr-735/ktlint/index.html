@@ -1064,10 +1064,10 @@
 
 <h2 id="using-with-ktlint-2">Using with ktlint 2<a class="headerlink" href="#using-with-ktlint-2" title="Permanent link">&para;</a></h2>
 <p>Compose Rules targets ktlint <code>2.0.0-ALPHA-5</code> under the Maven coordinate <code>io.nlopez.compose.rules:ktlint:&lt;VERSION&gt;</code>. Use a Gradle or IDE integration that supports this ktlint version. Spotless 8.12 uses the ktlint 1.x API. For a working Gradle example with the alpha, see the <a href="https://github.com/mrmans0n/compose-rules/tree/main/samples/ktlint-sample">JVM CLI sample</a>.</p>
-<p>Download <code>ktlint-compose-&lt;VERSION&gt;.jar</code> from the Compose Rules release and load it with the JVM CLI. The GraalVM native executables run only bundled rulesets. See the <a href="https://ktlint.github.io/ktlint/2.0.0-ALPHA-5/install/cli/">ktlint CLI documentation</a>.</p>
-<div class="highlight"><pre><span></span><code>ktlint<span class="w"> </span>-R<span class="w"> </span>ktlint-compose-&lt;VERSION&gt;.jar
+<p>Download <code>ktlint-compose-&lt;VERSION&gt;-all.jar</code> from the Compose Rules release and load it with the JVM CLI. The GraalVM native executables run only bundled rulesets. See the <a href="https://ktlint.github.io/ktlint/2.0.0-ALPHA-5/install/cli/">ktlint CLI documentation</a>.</p>
+<div class="highlight"><pre><span></span><code>ktlint<span class="w"> </span>-R<span class="w"> </span>ktlint-compose-&lt;VERSION&gt;-all.jar
 </code></pre></div>
-<p>To build the ruleset locally, run <code>./gradlew :rules:ktlint:jar</code> and find it in <code>rules/ktlint/build/libs/</code>.</p>
+<p>To build the ruleset locally, run <code>./gradlew :rules:ktlint:shadowJar -PuberJar</code> and find it in <code>rules/ktlint/build/libs/</code>.</p>
 <h2 id="using-with-ktlint-1x">Using with ktlint 1.x<a class="headerlink" href="#using-with-ktlint-1x" title="Permanent link">&para;</a></h2>
 <p>Use a Compose Rules release from the compatibility table below. Older releases use the same Maven coordinate and provide a <code>ktlint-compose-&lt;VERSION&gt;-all.jar</code> for the CLI.</p>
 <h2 id="using-with-kotlinter">Using with Kotlinter<a class="headerlink" href="#using-with-kotlinter" title="Permanent link">&para;</a></h2>
@@ -1105,7 +1105,7 @@
 <td>2.5.0 RC</td>
 </tr>
 <tr>
-<td>0.4.28–0.6.8</td>
+<td>0.4.28+</td>
 <td>1.8.0</td>
 <td>2.2.21</td>
 </tr>
