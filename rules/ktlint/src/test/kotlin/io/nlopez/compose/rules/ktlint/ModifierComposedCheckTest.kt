@@ -17,29 +17,31 @@ class ModifierComposedCheckTest {
         @Language("kotlin")
         val code =
             """
-                fun Modifier.something1(): Modifier = composed {}
-                fun Modifier.something2() = composed {}
-                fun Modifier.something3() {
-                    return composed {}
-                }
-            """.trimIndent()
+            fun Modifier.something1(): Modifier = composed {}
+            fun Modifier.something2() = composed {}
+            fun Modifier.something3() {
+                return composed {}
+            }
+            """
+                .trimIndent()
 
-        modifierRuleAssertThat(code).hasLintViolationsWithoutAutoCorrect(
-            LintViolation(
-                line = 1,
-                col = 14,
-                detail = ModifierComposed.ComposedModifier,
-            ),
-            LintViolation(
-                line = 2,
-                col = 14,
-                detail = ModifierComposed.ComposedModifier,
-            ),
-            LintViolation(
-                line = 3,
-                col = 14,
-                detail = ModifierComposed.ComposedModifier,
-            ),
-        )
+        modifierRuleAssertThat(code)
+            .hasLintViolationsWithoutAutoCorrect(
+                LintViolation(
+                    line = 1,
+                    col = 14,
+                    detail = ModifierComposed.ComposedModifier,
+                ),
+                LintViolation(
+                    line = 2,
+                    col = 14,
+                    detail = ModifierComposed.ComposedModifier,
+                ),
+                LintViolation(
+                    line = 3,
+                    col = 14,
+                    detail = ModifierComposed.ComposedModifier,
+                ),
+            )
     }
 }

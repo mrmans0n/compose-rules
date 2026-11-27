@@ -17,7 +17,8 @@ class MutableStateParameter : ComposeKtVisitor {
     }
 
     companion object {
-        private val MutableStateRegex = """
+        private val MutableStateRegex =
+            """
             (MutableState<.*>|
             Mutable(Int|Float|Double|Long)State|
             MutableIntList|MutableLongList|MutableFloatList|
@@ -25,12 +26,17 @@ class MutableStateParameter : ComposeKtVisitor {
             MutableIntIntMap|MutableIntLongMap|MutableIntFloatMap|
             MutableLongIntMap|MutableLongLongMap|MutableLongFloatMap|
             MutableFloatIntMap|MutableFloatLongMap|MutableFloatFloatMap)\??
-        """.trimIndent().replace("\n", "").toRegex()
+            """
+                .trimIndent()
+                .replace("\n", "")
+                .toRegex()
 
-        val MutableStateParameterInCompose = """
+        val MutableStateParameterInCompose =
+            """
             MutableState shouldn't be used as a parameter in a @Composable function, as it promotes joint ownership over a state between a component and its user.
             If possible, consider making the component stateless and concede the state change to the caller. If mutation of the parent’s owned property is required in the component, consider creating a ComponentState class with the domain specific meaningful field that is backed by mutableStateOf().
             See https://mrmans0n.github.io/compose-rules/rules/#do-not-use-mutablestate-as-a-parameter for more information.
-        """.trimIndent()
+            """
+                .trimIndent()
     }
 }

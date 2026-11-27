@@ -7,5 +7,4 @@ import io.nlopez.compose.rules.KtlintRule
 import io.nlopez.compose.rules.PreviewAnnotationNaming
 
 class PreviewAnnotationNamingCheck :
-    KtlintRule("compose:preview-annotation-naming"),
-    ComposeKtVisitor by PreviewAnnotationNaming()
+    KtlintRule("compose:preview-annotation-naming"), ComposeKtVisitor by PreviewAnnotationNaming()

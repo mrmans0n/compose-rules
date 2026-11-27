@@ -17,27 +17,29 @@ class DefaultsVisibilityCheckTest {
         @Language("kotlin")
         val code =
             """
-                internal object MyComposableDefaults
-                @Composable
-                fun MyComposable(someParam: Bleh = MyComposableDefaults.someParam) { }
-                private object MyOtherComposableDefaults
-                @Composable
-                internal fun MyOtherComposable() {
-                    val someUsage = MyOtherComposableDefaults.someParam.someMethod()
-                }
-            """.trimIndent()
-        modifierRuleAssertThat(code).hasLintViolationsWithoutAutoCorrect(
-            LintViolation(
-                line = 1,
-                col = 17,
-                detail = createMessage("public", "MyComposableDefaults", "internal"),
-            ),
-            LintViolation(
-                line = 4,
-                col = 16,
-                detail = createMessage("internal", "MyOtherComposableDefaults", "private"),
-            ),
-        )
+            internal object MyComposableDefaults
+            @Composable
+            fun MyComposable(someParam: Bleh = MyComposableDefaults.someParam) { }
+            private object MyOtherComposableDefaults
+            @Composable
+            internal fun MyOtherComposable() {
+                val someUsage = MyOtherComposableDefaults.someParam.someMethod()
+            }
+            """
+                .trimIndent()
+        modifierRuleAssertThat(code)
+            .hasLintViolationsWithoutAutoCorrect(
+                LintViolation(
+                    line = 1,
+                    col = 17,
+                    detail = createMessage("public", "MyComposableDefaults", "internal"),
+                ),
+                LintViolation(
+                    line = 4,
+                    col = 16,
+                    detail = createMessage("internal", "MyOtherComposableDefaults", "private"),
+                ),
+            )
     }
 
     @Test
@@ -45,24 +47,25 @@ class DefaultsVisibilityCheckTest {
         @Language("kotlin")
         val code =
             """
-                object MyComposableDefaults
-                @Composable
-                fun MyComposable(someParam: Bleh = MyComposableDefaults.someParam) { }
-                internal object MyOtherComposableDefaults
-                @Composable
-                internal fun MyOtherComposable() {
-                    val someUsage = MyOtherComposableDefaults.someParam.someMethod()
-                }
-                object MyThirdComposableDefaults
-                @Composable
-                fun MyThirdComposable(a: A) {
-                    val someUsage = MyThirdComposableDefaults.someParam
-                }
-                @Composable
-                internal fun MyThirdComposable(b: B) {
-                    val someUsage = MyThirdComposableDefaults.someParam
-                }
-            """.trimIndent()
+            object MyComposableDefaults
+            @Composable
+            fun MyComposable(someParam: Bleh = MyComposableDefaults.someParam) { }
+            internal object MyOtherComposableDefaults
+            @Composable
+            internal fun MyOtherComposable() {
+                val someUsage = MyOtherComposableDefaults.someParam.someMethod()
+            }
+            object MyThirdComposableDefaults
+            @Composable
+            fun MyThirdComposable(a: A) {
+                val someUsage = MyThirdComposableDefaults.someParam
+            }
+            @Composable
+            internal fun MyThirdComposable(b: B) {
+                val someUsage = MyThirdComposableDefaults.someParam
+            }
+            """
+                .trimIndent()
         modifierRuleAssertThat(code).hasNoLintViolations()
     }
 
@@ -71,11 +74,12 @@ class DefaultsVisibilityCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Suppress("ktlint:compose:defaults-visibility")
-                internal object MyComposableDefaults
-                @Composable
-                fun MyComposable(someParam: Bleh = MyComposableDefaults.someParam) { }
-            """.trimIndent()
+            @Suppress("ktlint:compose:defaults-visibility")
+            internal object MyComposableDefaults
+            @Composable
+            fun MyComposable(someParam: Bleh = MyComposableDefaults.someParam) { }
+            """
+                .trimIndent()
         modifierRuleAssertThat(code).hasNoLintViolations()
     }
 
@@ -84,12 +88,13 @@ class DefaultsVisibilityCheckTest {
         @Language("kotlin")
         val code =
             """
-                @file:Suppress("ktlint:compose:defaults-visibility")
+            @file:Suppress("ktlint:compose:defaults-visibility")
 
-                internal object MyComposableDefaults
-                @Composable
-                fun MyComposable(someParam: Bleh = MyComposableDefaults.someParam) { }
-            """.trimIndent()
+            internal object MyComposableDefaults
+            @Composable
+            fun MyComposable(someParam: Bleh = MyComposableDefaults.someParam) { }
+            """
+                .trimIndent()
         modifierRuleAssertThat(code).hasNoLintViolations()
     }
 }

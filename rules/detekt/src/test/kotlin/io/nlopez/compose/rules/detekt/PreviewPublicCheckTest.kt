@@ -6,7 +6,6 @@ import dev.detekt.api.Config
 import dev.detekt.api.SourceLocation
 import dev.detekt.test.lint
 import io.nlopez.compose.rules.PreviewPublic
-import io.nlopez.compose.rules.detekt.assertThat
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
 
@@ -21,7 +20,8 @@ class PreviewPublicCheckTest {
             """
             @Composable
             fun MyComposable() { }
-            """.trimIndent()
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }
@@ -37,12 +37,14 @@ class PreviewPublicCheckTest {
             @CombinedPreviews
             @Composable
             fun MyComposable() { }
-            """.trimIndent()
+            """
+                .trimIndent()
         val errors = rule.lint(code)
-        assertThat(errors).hasStartSourceLocations(
-            SourceLocation(3, 5),
-            SourceLocation(6, 5),
-        )
+        assertThat(errors)
+            .hasStartSourceLocations(
+                SourceLocation(3, 5),
+                SourceLocation(6, 5),
+            )
         for (error in errors) {
             assertThat(error).hasMessage(PreviewPublic.ComposablesPreviewShouldNotBePublic)
         }
@@ -61,7 +63,8 @@ class PreviewPublicCheckTest {
             @Composable
             internal fun MyComposable(user: User) {
             }
-            """.trimIndent()
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }

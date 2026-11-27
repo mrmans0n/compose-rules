@@ -5,7 +5,6 @@ package io.nlopez.compose.rules.detekt
 import dev.detekt.api.Config
 import dev.detekt.test.lint
 import io.nlopez.compose.rules.ModifierComposed
-import io.nlopez.compose.rules.detekt.assertThat
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
 
@@ -18,12 +17,13 @@ class ModifierComposedCheckTest {
         @Language("kotlin")
         val code =
             """
-                fun Modifier.something1(): Modifier = composed {}
-                fun Modifier.something2() = composed {}
-                fun Modifier.something3() {
-                    return composed {}
-                }
-            """.trimIndent()
+            fun Modifier.something1(): Modifier = composed {}
+            fun Modifier.something2() = composed {}
+            fun Modifier.something3() {
+                return composed {}
+            }
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors).hasTextLocations("something1", "something2", "something3")
         for (error in errors) {

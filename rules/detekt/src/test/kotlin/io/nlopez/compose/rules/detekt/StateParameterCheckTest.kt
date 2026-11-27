@@ -6,7 +6,6 @@ import dev.detekt.api.Config
 import dev.detekt.api.SourceLocation
 import dev.detekt.test.lint
 import io.nlopez.compose.rules.StateParameter
-import io.nlopez.compose.rules.detekt.assertThat
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
 
@@ -19,9 +18,10 @@ class StateParameterCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something(a: State<String>) {}
-            """.trimIndent()
+            @Composable
+            fun Something(a: State<String>) {}
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors)
             .hasStartSourceLocations(
@@ -37,14 +37,15 @@ class StateParameterCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something(
-                    a: IntState,
-                    b: FloatState,
-                    c: DoubleState,
-                    d: LongState
-                ) {}
-            """.trimIndent()
+            @Composable
+            fun Something(
+                a: IntState,
+                b: FloatState,
+                c: DoubleState,
+                d: LongState
+            ) {}
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors)
             .hasStartSourceLocations(
@@ -63,11 +64,12 @@ class StateParameterCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something(a: String, b: (Int) -> Unit) {}
-                @Composable
-                fun Something(a: MutableState<String>) {}
-            """.trimIndent()
+            @Composable
+            fun Something(a: String, b: (Int) -> Unit) {}
+            @Composable
+            fun Something(a: MutableState<String>) {}
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }

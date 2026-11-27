@@ -12,9 +12,10 @@ class UnnecessaryLaunchedEffectCheckTest {
 
     @Test
     fun `reports LaunchedEffect that only calls non-suspending functions`() {
-        val findings = rule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val findings =
+            rule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 fun update(value: String) = Unit
 
                 @Composable
@@ -24,8 +25,8 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).hasSize(1)
         assertThat(findings.single()).hasMessage(UnnecessaryLaunchedEffectCheck.UnnecessaryLaunchedEffect)
@@ -33,9 +34,10 @@ class UnnecessaryLaunchedEffectCheckTest {
 
     @Test
     fun `allows direct nested and operator suspend calls`() {
-        val findings = rule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val findings =
+            rule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 suspend fun fetch() = Unit
                 operator suspend fun Int.get(index: Int): Int = index
 
@@ -66,17 +68,18 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).isEmpty()
     }
 
     @Test
     fun `allows a chained terminal suspend call`() {
-        val findings = rule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val findings =
+            rule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 interface Flow<T> {
                     suspend fun collect(action: (T) -> Unit)
                 }
@@ -93,17 +96,18 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).isEmpty()
     }
 
     @Test
     fun `reports a flow chain without a terminal suspend call`() {
-        val findings = rule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val findings =
+            rule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 interface Flow<T>
 
                 fun <T> snapshotFlow(block: () -> T): Flow<T> = TODO()
@@ -118,17 +122,18 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).hasSize(1)
     }
 
     @Test
     fun `reports assignments with short-circuit expressions`() {
-        val findings = rule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val findings =
+            rule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 var lastValue = 0
 
                 @Composable
@@ -138,17 +143,18 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).hasSize(1)
     }
 
     @Test
     fun `reports referential equality`() {
-        val findings = rule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val findings =
+            rule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 @Composable
                 fun Example(first: Any, second: Any) {
                     LaunchedEffect(Unit) {
@@ -156,17 +162,18 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).hasSize(1)
     }
 
     @Test
     fun `reports deferred suspend lambdas`() {
-        val findings = rule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val findings =
+            rule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 fun register(callback: suspend () -> Unit) = Unit
                 suspend fun fetch() = Unit
 
@@ -177,17 +184,18 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).hasSize(1)
     }
 
     @Test
     fun `reports deferred suspend CoroutineScope receiver lambdas with context receiver calls`() {
-        val findings = rule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val findings =
+            rule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 import kotlinx.coroutines.CoroutineScope
 
                 fun register(callback: suspend CoroutineScope.() -> Unit) = Unit
@@ -202,17 +210,18 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).hasSize(1)
     }
 
     @Test
     fun `reports deferred suspend lambdas inside invoked local lambda values`() {
-        val findings = rule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val findings =
+            rule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 fun register(callback: suspend () -> Unit) = Unit
                 suspend fun fetch() = Unit
 
@@ -226,17 +235,18 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).hasSize(1)
     }
 
     @Test
     fun `allows deferred lambdas that capture the LaunchedEffect CoroutineScope`() {
-        val findings = rule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val findings =
+            rule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 import kotlinx.coroutines.CoroutineScope
 
                 fun register(callback: () -> Unit) = Unit
@@ -249,17 +259,18 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).isEmpty()
     }
 
     @Test
     fun `allows deferred lambdas that call LaunchedEffect CoroutineScope extensions`() {
-        val findings = rule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val findings =
+            rule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 import kotlinx.coroutines.CoroutineScope
 
                 fun CoroutineScope.launch(block: suspend () -> Unit) = Unit
@@ -275,17 +286,18 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).isEmpty()
     }
 
     @Test
     fun `reports non-trailing effect lambda arguments`() {
-        val findings = rule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val findings =
+            rule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 fun update() = Unit
 
                 @Composable
@@ -295,17 +307,18 @@ class UnnecessaryLaunchedEffectCheckTest {
                     LaunchedEffect(Unit, block = ({ update() }))
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).hasSize(3)
     }
 
     @Test
     fun `allows calls on LaunchedEffect CoroutineScope`() {
-        val findings = rule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val findings =
+            rule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 import kotlinx.coroutines.CoroutineScope
 
                 fun CoroutineScope.launch(block: suspend () -> Unit) = Unit
@@ -318,17 +331,18 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).isEmpty()
     }
 
     @Test
     fun `allows direct LaunchedEffect CoroutineScope receiver references`() {
-        val findings = rule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val findings =
+            rule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 import kotlinx.coroutines.CoroutineScope
 
                 fun consume(scope: CoroutineScope) = Unit
@@ -340,17 +354,18 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).isEmpty()
     }
 
     @Test
     fun `reports external CoroutineScope references`() {
-        val findings = rule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val findings =
+            rule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 import kotlinx.coroutines.CoroutineScope
 
                 fun consume(scope: CoroutineScope) = Unit
@@ -362,17 +377,18 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).hasSize(1)
     }
 
     @Test
     fun `reports labeled outer CoroutineScope receiver references`() {
-        val findings = rule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val findings =
+            rule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 import kotlinx.coroutines.CoroutineScope
 
                 fun consume(scope: CoroutineScope) = Unit
@@ -384,17 +400,18 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).hasSize(1)
     }
 
     @Test
     fun `allows labeled LaunchedEffect CoroutineScope receiver references`() {
-        val findings = rule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val findings =
+            rule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 import kotlinx.coroutines.CoroutineScope
 
                 fun consume(scope: CoroutineScope) = Unit
@@ -406,17 +423,18 @@ class UnnecessaryLaunchedEffectCheckTest {
                     })
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).isEmpty()
     }
 
     @Test
     fun `allows implicit LaunchedEffect label CoroutineScope receiver references`() {
-        val findings = rule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val findings =
+            rule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 import kotlinx.coroutines.CoroutineScope
 
                 fun consume(scope: CoroutineScope) = Unit
@@ -428,17 +446,18 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).isEmpty()
     }
 
     @Test
     fun `allows aliased LaunchedEffect label CoroutineScope receiver references`() {
-        val findings = rule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val findings =
+            rule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 import com.example.compose.fake.LaunchedEffect as LE
                 import kotlinx.coroutines.CoroutineScope
 
@@ -451,17 +470,18 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).isEmpty()
     }
 
     @Test
     fun `reports calls on external CoroutineScope receivers`() {
-        val findings = rule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val findings =
+            rule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 import kotlinx.coroutines.CoroutineScope
 
                 fun CoroutineScope.update() = Unit
@@ -473,17 +493,18 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).hasSize(1)
     }
 
     @Test
     fun `allows explicitly qualified calls with LaunchedEffect CoroutineScope context receivers`() {
-        val findings = rule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val findings =
+            rule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 import kotlinx.coroutines.CoroutineScope
 
                 class Foo
@@ -498,17 +519,18 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).isEmpty()
     }
 
     @Test
     fun `allows explicitly qualified context receiver calls inside local functions and deferred lambdas`() {
-        val findings = rule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val findings =
+            rule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 import kotlinx.coroutines.CoroutineScope
 
                 class Foo
@@ -532,17 +554,18 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).isEmpty()
     }
 
     @Test
     fun `reports property reads on external CoroutineScope receivers`() {
-        val findings = rule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val findings =
+            rule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 import kotlinx.coroutines.CoroutineScope
 
                 val CoroutineScope.ready: Boolean get() = true
@@ -555,17 +578,18 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).hasSize(1)
     }
 
     @Test
     fun `allows explicitly qualified properties with LaunchedEffect CoroutineScope context receivers`() {
-        val findings = rule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val findings =
+            rule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 import kotlinx.coroutines.CoroutineScope
 
                 class Foo
@@ -582,17 +606,18 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).isEmpty()
     }
 
     @Test
     fun `reports calls on nested external CoroutineScope implicit receivers`() {
-        val findings = rule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val findings =
+            rule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 import kotlinx.coroutines.CoroutineScope
 
                 fun CoroutineScope.update() = Unit
@@ -606,17 +631,18 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).hasSize(1)
     }
 
     @Test
     fun `reports this references in nested external CoroutineScope implicit receivers`() {
-        val findings = rule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val findings =
+            rule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 import kotlinx.coroutines.CoroutineScope
 
                 fun consume(scope: CoroutineScope) = Unit
@@ -630,17 +656,18 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).hasSize(1)
     }
 
     @Test
     fun `reports calls on run external CoroutineScope implicit receivers`() {
-        val findings = rule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val findings =
+            rule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 import kotlinx.coroutines.CoroutineScope
 
                 fun CoroutineScope.update() = Unit
@@ -654,17 +681,18 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).hasSize(1)
     }
 
     @Test
     fun `reports this references in nested custom CoroutineScope receiver lambdas`() {
-        val findings = rule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val findings =
+            rule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 import kotlinx.coroutines.CoroutineScope
 
                 fun register(block: CoroutineScope.() -> Unit) = Unit
@@ -679,17 +707,18 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).hasSize(1)
     }
 
     @Test
     fun `reports calls in nested custom CoroutineScope subtype receiver lambdas`() {
-        val findings = rule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val findings =
+            rule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 import kotlinx.coroutines.CoroutineScope
 
                 interface MyScope : CoroutineScope
@@ -706,17 +735,18 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).hasSize(1)
     }
 
     @Test
     fun `allows effect scope receiver calls inside nullable CoroutineScope receiver lambdas`() {
-        val findings = rule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val findings =
+            rule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 import kotlinx.coroutines.CoroutineScope
 
                 fun register(block: (CoroutineScope?).() -> Unit) = Unit
@@ -731,17 +761,18 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).isEmpty()
     }
 
     @Test
     fun `reports labeled this references in nested custom CoroutineScope receiver lambdas`() {
-        val findings = rule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val findings =
+            rule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 import kotlinx.coroutines.CoroutineScope
 
                 fun register(block: CoroutineScope.() -> Unit) = Unit
@@ -756,17 +787,18 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).hasSize(1)
     }
 
     @Test
     fun `reports shadowed implicit LaunchedEffect labels in nested custom CoroutineScope receiver lambdas`() {
-        val findings = rule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val findings =
+            rule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 import kotlinx.coroutines.CoroutineScope
 
                 fun register(block: CoroutineScope.() -> Unit) = Unit
@@ -781,17 +813,18 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).hasSize(1)
     }
 
     @Test
     fun `reports shadowed implicit LaunchedEffect call site labels in nested custom CoroutineScope receiver lambdas`() {
-        val findings = rule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val findings =
+            rule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 import kotlinx.coroutines.CoroutineScope
 
                 object Other {
@@ -809,17 +842,18 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).hasSize(1)
     }
 
     @Test
     fun `reports this references in local CoroutineScope receiver functions`() {
-        val findings = rule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val findings =
+            rule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 import kotlinx.coroutines.CoroutineScope
 
                 fun consume(scope: CoroutineScope) = Unit
@@ -834,17 +868,18 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).hasSize(1)
     }
 
     @Test
     fun `allows LaunchedEffect CoroutineScope calls inside nested non-scope receivers`() {
-        val findings = rule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val findings =
+            rule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 import kotlinx.coroutines.CoroutineScope
 
                 fun CoroutineScope.launch(block: suspend () -> Unit) = Unit
@@ -859,17 +894,18 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).isEmpty()
     }
 
     @Test
     fun `allows implicit effect scope calls inside user with lambdas without receivers`() {
-        val findings = rule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val findings =
+            rule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 import kotlinx.coroutines.CoroutineScope
 
                 inline fun with(scope: CoroutineScope, block: () -> Unit) = block()
@@ -885,17 +921,18 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).isEmpty()
     }
 
     @Test
     fun `allows implicit effect scope calls inside user run and apply lambdas without receivers`() {
-        val findings = rule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val findings =
+            rule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 import kotlinx.coroutines.CoroutineScope
 
                 fun CoroutineScope.run(block: () -> Unit) = block()
@@ -917,17 +954,18 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).isEmpty()
     }
 
     @Test
     fun `allows LaunchedEffect coroutineContext references`() {
-        val findings = rule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val findings =
+            rule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 import kotlinx.coroutines.CoroutineContext
 
                 fun consume(context: CoroutineContext) = Unit
@@ -939,17 +977,18 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).isEmpty()
     }
 
     @Test
     fun `allows top-level suspend coroutineContext references`() {
-        val findings = rule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val findings =
+            rule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 import kotlin.coroutines.coroutineContext as currentCoroutineContext
 
                 @Composable
@@ -959,17 +998,18 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).isEmpty()
     }
 
     @Test
     fun `allows LaunchedEffect CoroutineScope extension property references`() {
-        val findings = rule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val findings =
+            rule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 import kotlinx.coroutines.CoroutineScope
 
                 fun consume(active: Boolean) = Unit
@@ -982,17 +1022,18 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).isEmpty()
     }
 
     @Test
     fun `allows calls with a LaunchedEffect CoroutineScope context receiver`() {
-        val findings = rule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val findings =
+            rule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 import kotlinx.coroutines.CoroutineScope
 
                 context(CoroutineScope)
@@ -1005,17 +1046,18 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).isEmpty()
     }
 
     @Test
     fun `allows property reads with a LaunchedEffect CoroutineScope context receiver`() {
-        val findings = rule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val findings =
+            rule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 import kotlinx.coroutines.CoroutineScope
 
                 context(CoroutineScope)
@@ -1030,17 +1072,18 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).isEmpty()
     }
 
     @Test
     fun `allows local functions that capture the LaunchedEffect CoroutineScope`() {
-        val findings = rule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val findings =
+            rule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 import kotlinx.coroutines.CoroutineScope
 
                 fun consume(scope: CoroutineScope) = Unit
@@ -1054,17 +1097,18 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).isEmpty()
     }
 
     @Test
     fun `allows local functions that call LaunchedEffect CoroutineScope extensions`() {
-        val findings = rule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val findings =
+            rule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 import kotlinx.coroutines.CoroutineScope
 
                 fun CoroutineScope.launch(block: suspend () -> Unit) = Unit
@@ -1080,17 +1124,18 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).isEmpty()
     }
 
     @Test
     fun `allows implicit suspend convention calls`() {
-        val findings = rule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val findings =
+            rule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 class Result {
                     suspend operator fun component1(): String = "value"
                 }
@@ -1114,17 +1159,18 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).isEmpty()
     }
 
     @Test
     fun `reports explicit CoroutineScope receivers in operator syntax`() {
-        val findings = rule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val findings =
+            rule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 import kotlinx.coroutines.CoroutineScope
 
                 operator fun CoroutineScope.plus(value: String) = Unit
@@ -1144,17 +1190,18 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).hasSize(3)
     }
 
     @Test
     fun `reports explicit CoroutineScope receivers in loop syntax`() {
-        val findings = rule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val findings =
+            rule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 import kotlinx.coroutines.CoroutineScope
 
                 operator fun CoroutineScope.iterator(): Iterator<String> = listOf("value").iterator()
@@ -1169,17 +1216,18 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).hasSize(1)
     }
 
     @Test
     fun `reports explicit CoroutineScope receivers in loop iterator protocol syntax`() {
-        val findings = rule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val findings =
+            rule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 import kotlinx.coroutines.CoroutineScope
 
                 class Items
@@ -1198,17 +1246,18 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).hasSize(1)
     }
 
     @Test
     fun `reports explicit CoroutineScope receivers in destructuring syntax`() {
-        val findings = rule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val findings =
+            rule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 import kotlinx.coroutines.CoroutineScope
 
                 operator fun CoroutineScope.component1(): String = "value"
@@ -1222,17 +1271,18 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).hasSize(1)
     }
 
     @Test
     fun `reports explicit CoroutineScope receivers in delegated property syntax`() {
-        val findings = rule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val findings =
+            rule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 import kotlin.reflect.KProperty
                 import kotlinx.coroutines.CoroutineScope
 
@@ -1247,17 +1297,18 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).hasSize(1)
     }
 
     @Test
     fun `allows delegated properties with suspend convention calls`() {
-        val findings = rule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val findings =
+            rule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 import kotlin.reflect.KProperty
 
                 class Delegate {
@@ -1274,17 +1325,18 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).isEmpty()
     }
 
     @Test
     fun `allows callable references bound to LaunchedEffect CoroutineScope extensions`() {
-        val findings = rule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val findings =
+            rule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 import kotlinx.coroutines.CoroutineScope
 
                 fun CoroutineScope.update() = Unit
@@ -1297,17 +1349,18 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).isEmpty()
     }
 
     @Test
     fun `allows callable references bound to LaunchedEffect receiver supertypes`() {
-        val findings = rule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val findings =
+            rule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 @Composable
                 fun Example() {
                     LaunchedEffect(Unit) {
@@ -1316,17 +1369,19 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).isEmpty()
     }
 
     @Test
     fun `does not report unresolved calls`() {
-        val findings = rule.lintWithAnalysisApi(
-            content = codeWithFakeCompose(
-                """
+        val findings =
+            rule.lintWithAnalysisApi(
+                content =
+                    codeWithFakeCompose(
+                        """
                 @Composable
                 fun Example() {
                     LaunchedEffect(Unit) {
@@ -1334,18 +1389,19 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-            allowCompilationErrors = true,
-        )
+                    ),
+                allowCompilationErrors = true,
+            )
 
         assertThat(findings).isEmpty()
     }
 
     @Test
     fun `does not report a different function named LaunchedEffect`() {
-        val findings = rule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val findings =
+            rule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 object Other {
                     fun LaunchedEffect(key: Any?, block: suspend () -> Unit) = Unit
                 }
@@ -1359,22 +1415,24 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).isEmpty()
     }
 
     @Test
     fun `allows calls on configured receiver types`() {
-        val configuredRule = UnnecessaryLaunchedEffectCheck(
-            TestConfig(
-                "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
-            ),
-        )
-        val findings = configuredRule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val configuredRule =
+            UnnecessaryLaunchedEffectCheck(
+                TestConfig(
+                    "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
+                ),
+            )
+        val findings =
+            configuredRule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 class FocusRequester {
                     fun requestFocus() = Unit
                 }
@@ -1391,22 +1449,24 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).isEmpty()
     }
 
     @Test
     fun `allows configured receiver calls through local functions`() {
-        val configuredRule = UnnecessaryLaunchedEffectCheck(
-            TestConfig(
-                "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
-            ),
-        )
-        val findings = configuredRule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val configuredRule =
+            UnnecessaryLaunchedEffectCheck(
+                TestConfig(
+                    "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
+                ),
+            )
+        val findings =
+            configuredRule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 class FocusRequester {
                     fun requestFocus() = Unit
                 }
@@ -1421,22 +1481,24 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).isEmpty()
     }
 
     @Test
     fun `allows configured receiver calls through local function references`() {
-        val configuredRule = UnnecessaryLaunchedEffectCheck(
-            TestConfig(
-                "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
-            ),
-        )
-        val findings = configuredRule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val configuredRule =
+            UnnecessaryLaunchedEffectCheck(
+                TestConfig(
+                    "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
+                ),
+            )
+        val findings =
+            configuredRule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 class FocusRequester {
                     fun requestFocus() = Unit
                 }
@@ -1472,22 +1534,24 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).isEmpty()
     }
 
     @Test
     fun `reports configured receiver calls inside unused local functions`() {
-        val configuredRule = UnnecessaryLaunchedEffectCheck(
-            TestConfig(
-                "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
-            ),
-        )
-        val findings = configuredRule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val configuredRule =
+            UnnecessaryLaunchedEffectCheck(
+                TestConfig(
+                    "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
+                ),
+            )
+        val findings =
+            configuredRule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 class FocusRequester {
                     fun requestFocus() = Unit
                 }
@@ -1504,22 +1568,24 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).hasSize(1)
     }
 
     @Test
     fun `reports configured receiver calls inside local function references passed as arguments`() {
-        val configuredRule = UnnecessaryLaunchedEffectCheck(
-            TestConfig(
-                "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
-            ),
-        )
-        val findings = configuredRule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val configuredRule =
+            UnnecessaryLaunchedEffectCheck(
+                TestConfig(
+                    "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
+                ),
+            )
+        val findings =
+            configuredRule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 class FocusRequester {
                     fun requestFocus() = Unit
                 }
@@ -1538,22 +1604,24 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).hasSize(1)
     }
 
     @Test
     fun `reports configured receiver calls inside local functions called from deferred lambdas`() {
-        val configuredRule = UnnecessaryLaunchedEffectCheck(
-            TestConfig(
-                "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
-            ),
-        )
-        val findings = configuredRule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val configuredRule =
+            UnnecessaryLaunchedEffectCheck(
+                TestConfig(
+                    "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
+                ),
+            )
+        val findings =
+            configuredRule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 class FocusRequester {
                     fun requestFocus() = Unit
                 }
@@ -1572,22 +1640,24 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).hasSize(1)
     }
 
     @Test
     fun `reports configured receiver calls inside transitively unused local functions`() {
-        val configuredRule = UnnecessaryLaunchedEffectCheck(
-            TestConfig(
-                "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
-            ),
-        )
-        val findings = configuredRule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val configuredRule =
+            UnnecessaryLaunchedEffectCheck(
+                TestConfig(
+                    "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
+                ),
+            )
+        val findings =
+            configuredRule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 class FocusRequester {
                     fun requestFocus() = Unit
                 }
@@ -1607,22 +1677,24 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).hasSize(1)
     }
 
     @Test
     fun `allows configured receiver calls through invoked local lambda values`() {
-        val configuredRule = UnnecessaryLaunchedEffectCheck(
-            TestConfig(
-                "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
-            ),
-        )
-        val findings = configuredRule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val configuredRule =
+            UnnecessaryLaunchedEffectCheck(
+                TestConfig(
+                    "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
+                ),
+            )
+        val findings =
+            configuredRule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 class FocusRequester {
                     fun requestFocus() = Unit
                 }
@@ -1637,22 +1709,24 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).isEmpty()
     }
 
     @Test
     fun `allows configured receiver calls through invoked anonymous function values`() {
-        val configuredRule = UnnecessaryLaunchedEffectCheck(
-            TestConfig(
-                "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
-            ),
-        )
-        val findings = configuredRule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val configuredRule =
+            UnnecessaryLaunchedEffectCheck(
+                TestConfig(
+                    "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
+                ),
+            )
+        val findings =
+            configuredRule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 class FocusRequester {
                     fun requestFocus() = Unit
                 }
@@ -1667,22 +1741,24 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).isEmpty()
     }
 
     @Test
     fun `allows configured receiver calls through immediately invoked lambda literals`() {
-        val configuredRule = UnnecessaryLaunchedEffectCheck(
-            TestConfig(
-                "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
-            ),
-        )
-        val findings = configuredRule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val configuredRule =
+            UnnecessaryLaunchedEffectCheck(
+                TestConfig(
+                    "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
+                ),
+            )
+        val findings =
+            configuredRule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 class FocusRequester {
                     fun requestFocus() = Unit
                 }
@@ -1696,22 +1772,24 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).isEmpty()
     }
 
     @Test
     fun `allows configured receiver calls through local lambda values invoked from local functions`() {
-        val configuredRule = UnnecessaryLaunchedEffectCheck(
-            TestConfig(
-                "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
-            ),
-        )
-        val findings = configuredRule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val configuredRule =
+            UnnecessaryLaunchedEffectCheck(
+                TestConfig(
+                    "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
+                ),
+            )
+        val findings =
+            configuredRule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 class FocusRequester {
                     fun requestFocus() = Unit
                 }
@@ -1729,22 +1807,24 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).isEmpty()
     }
 
     @Test
     fun `allows configured receiver calls through local functions invoked from local lambda values`() {
-        val configuredRule = UnnecessaryLaunchedEffectCheck(
-            TestConfig(
-                "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
-            ),
-        )
-        val findings = configuredRule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val configuredRule =
+            UnnecessaryLaunchedEffectCheck(
+                TestConfig(
+                    "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
+                ),
+            )
+        val findings =
+            configuredRule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 class FocusRequester {
                     fun requestFocus() = Unit
                 }
@@ -1762,22 +1842,24 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).isEmpty()
     }
 
     @Test
     fun `allows configured receiver calls through invoked bound function references`() {
-        val configuredRule = UnnecessaryLaunchedEffectCheck(
-            TestConfig(
-                "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
-            ),
-        )
-        val findings = configuredRule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val configuredRule =
+            UnnecessaryLaunchedEffectCheck(
+                TestConfig(
+                    "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
+                ),
+            )
+        val findings =
+            configuredRule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 class FocusRequester {
                     fun requestFocus() = Unit
                 }
@@ -1790,22 +1872,24 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).isEmpty()
     }
 
     @Test
     fun `allows configured receiver references passed to inline calls`() {
-        val configuredRule = UnnecessaryLaunchedEffectCheck(
-            TestConfig(
-                "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
-            ),
-        )
-        val findings = configuredRule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val configuredRule =
+            UnnecessaryLaunchedEffectCheck(
+                TestConfig(
+                    "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
+                ),
+            )
+        val findings =
+            configuredRule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 class FocusRequester {
                     fun requestFocus() = Unit
                 }
@@ -1819,22 +1903,24 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).isEmpty()
     }
 
     @Test
     fun `allows configured receiver calls inside anonymous functions passed to inline calls`() {
-        val configuredRule = UnnecessaryLaunchedEffectCheck(
-            TestConfig(
-                "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
-            ),
-        )
-        val findings = configuredRule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val configuredRule =
+            UnnecessaryLaunchedEffectCheck(
+                TestConfig(
+                    "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
+                ),
+            )
+        val findings =
+            configuredRule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 class FocusRequester {
                     fun requestFocus() = Unit
                 }
@@ -1850,22 +1936,24 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).isEmpty()
     }
 
     @Test
     fun `allows configured receiver references stored and passed to inline calls`() {
-        val configuredRule = UnnecessaryLaunchedEffectCheck(
-            TestConfig(
-                "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
-            ),
-        )
-        val findings = configuredRule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val configuredRule =
+            UnnecessaryLaunchedEffectCheck(
+                TestConfig(
+                    "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
+                ),
+            )
+        val findings =
+            configuredRule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 class FocusRequester {
                     fun requestFocus() = Unit
                 }
@@ -1880,22 +1968,24 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).isEmpty()
     }
 
     @Test
     fun `allows configured receiver references invoked through local aliases`() {
-        val configuredRule = UnnecessaryLaunchedEffectCheck(
-            TestConfig(
-                "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
-            ),
-        )
-        val findings = configuredRule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val configuredRule =
+            UnnecessaryLaunchedEffectCheck(
+                TestConfig(
+                    "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
+                ),
+            )
+        val findings =
+            configuredRule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 class FocusRequester {
                     fun requestFocus() = Unit
                 }
@@ -1909,22 +1999,24 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).isEmpty()
     }
 
     @Test
     fun `allows configured receiver references assigned to local variables`() {
-        val configuredRule = UnnecessaryLaunchedEffectCheck(
-            TestConfig(
-                "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
-            ),
-        )
-        val findings = configuredRule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val configuredRule =
+            UnnecessaryLaunchedEffectCheck(
+                TestConfig(
+                    "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
+                ),
+            )
+        val findings =
+            configuredRule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 class FocusRequester {
                     fun requestFocus() = Unit
                 }
@@ -1938,22 +2030,24 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).isEmpty()
     }
 
     @Test
     fun `allows configured receiver calls inside lambdas assigned to local variables`() {
-        val configuredRule = UnnecessaryLaunchedEffectCheck(
-            TestConfig(
-                "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
-            ),
-        )
-        val findings = configuredRule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val configuredRule =
+            UnnecessaryLaunchedEffectCheck(
+                TestConfig(
+                    "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
+                ),
+            )
+        val findings =
+            configuredRule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 class FocusRequester {
                     fun requestFocus() = Unit
                 }
@@ -1967,22 +2061,24 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).isEmpty()
     }
 
     @Test
     fun `reports configured receiver references assigned after local variable invocation`() {
-        val configuredRule = UnnecessaryLaunchedEffectCheck(
-            TestConfig(
-                "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
-            ),
-        )
-        val findings = configuredRule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val configuredRule =
+            UnnecessaryLaunchedEffectCheck(
+                TestConfig(
+                    "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
+                ),
+            )
+        val findings =
+            configuredRule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 class FocusRequester {
                     fun requestFocus() = Unit
                 }
@@ -1996,22 +2092,24 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).hasSize(1)
     }
 
     @Test
     fun `reports configured receiver references overwritten before local variable invocation`() {
-        val configuredRule = UnnecessaryLaunchedEffectCheck(
-            TestConfig(
-                "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
-            ),
-        )
-        val findings = configuredRule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val configuredRule =
+            UnnecessaryLaunchedEffectCheck(
+                TestConfig(
+                    "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
+                ),
+            )
+        val findings =
+            configuredRule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 class FocusRequester {
                     fun requestFocus() = Unit
                 }
@@ -2026,22 +2124,24 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).hasSize(1)
     }
 
     @Test
     fun `allows configured receiver references invoked through assigned local aliases`() {
-        val configuredRule = UnnecessaryLaunchedEffectCheck(
-            TestConfig(
-                "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
-            ),
-        )
-        val findings = configuredRule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val configuredRule =
+            UnnecessaryLaunchedEffectCheck(
+                TestConfig(
+                    "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
+                ),
+            )
+        val findings =
+            configuredRule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 class FocusRequester {
                     fun requestFocus() = Unit
                 }
@@ -2056,22 +2156,24 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).isEmpty()
     }
 
     @Test
     fun `allows initialized configured receiver references with unreachable overwrites`() {
-        val configuredRule = UnnecessaryLaunchedEffectCheck(
-            TestConfig(
-                "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
-            ),
-        )
-        val findings = configuredRule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val configuredRule =
+            UnnecessaryLaunchedEffectCheck(
+                TestConfig(
+                    "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
+                ),
+            )
+        val findings =
+            configuredRule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 class FocusRequester {
                     fun requestFocus() = Unit
                 }
@@ -2085,22 +2187,24 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).isEmpty()
     }
 
     @Test
     fun `allows configured receiver references invoked through local functions called after assignment`() {
-        val configuredRule = UnnecessaryLaunchedEffectCheck(
-            TestConfig(
-                "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
-            ),
-        )
-        val findings = configuredRule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val configuredRule =
+            UnnecessaryLaunchedEffectCheck(
+                TestConfig(
+                    "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
+                ),
+            )
+        val findings =
+            configuredRule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 class FocusRequester {
                     fun requestFocus() = Unit
                 }
@@ -2117,22 +2221,24 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).isEmpty()
     }
 
     @Test
     fun `reports configured receiver references invoked through local functions called before assignment`() {
-        val configuredRule = UnnecessaryLaunchedEffectCheck(
-            TestConfig(
-                "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
-            ),
-        )
-        val findings = configuredRule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val configuredRule =
+            UnnecessaryLaunchedEffectCheck(
+                TestConfig(
+                    "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
+                ),
+            )
+        val findings =
+            configuredRule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 class FocusRequester {
                     fun requestFocus() = Unit
                 }
@@ -2149,22 +2255,24 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).hasSize(1)
     }
 
     @Test
     fun `reports configured receiver references invoked through overwritten local aliases`() {
-        val configuredRule = UnnecessaryLaunchedEffectCheck(
-            TestConfig(
-                "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
-            ),
-        )
-        val findings = configuredRule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val configuredRule =
+            UnnecessaryLaunchedEffectCheck(
+                TestConfig(
+                    "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
+                ),
+            )
+        val findings =
+            configuredRule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 class FocusRequester {
                     fun requestFocus() = Unit
                 }
@@ -2179,22 +2287,24 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).hasSize(1)
     }
 
     @Test
     fun `reports initialized configured receiver references overwritten before local variable invocation`() {
-        val configuredRule = UnnecessaryLaunchedEffectCheck(
-            TestConfig(
-                "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
-            ),
-        )
-        val findings = configuredRule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val configuredRule =
+            UnnecessaryLaunchedEffectCheck(
+                TestConfig(
+                    "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
+                ),
+            )
+        val findings =
+            configuredRule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 class FocusRequester {
                     fun requestFocus() = Unit
                 }
@@ -2208,22 +2318,24 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).hasSize(1)
     }
 
     @Test
     fun `allows configured local helper references assigned to local variables`() {
-        val configuredRule = UnnecessaryLaunchedEffectCheck(
-            TestConfig(
-                "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
-            ),
-        )
-        val findings = configuredRule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val configuredRule =
+            UnnecessaryLaunchedEffectCheck(
+                TestConfig(
+                    "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
+                ),
+            )
+        val findings =
+            configuredRule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 class FocusRequester {
                     fun requestFocus() = Unit
                 }
@@ -2240,22 +2352,24 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).isEmpty()
     }
 
     @Test
     fun `reports configured local helper references assigned after local variable invocation`() {
-        val configuredRule = UnnecessaryLaunchedEffectCheck(
-            TestConfig(
-                "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
-            ),
-        )
-        val findings = configuredRule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val configuredRule =
+            UnnecessaryLaunchedEffectCheck(
+                TestConfig(
+                    "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
+                ),
+            )
+        val findings =
+            configuredRule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 class FocusRequester {
                     fun requestFocus() = Unit
                 }
@@ -2272,22 +2386,24 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).hasSize(1)
     }
 
     @Test
     fun `allows configured local helper references invoked before later reassignment`() {
-        val configuredRule = UnnecessaryLaunchedEffectCheck(
-            TestConfig(
-                "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
-            ),
-        )
-        val findings = configuredRule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val configuredRule =
+            UnnecessaryLaunchedEffectCheck(
+                TestConfig(
+                    "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
+                ),
+            )
+        val findings =
+            configuredRule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 class FocusRequester {
                     fun requestFocus() = Unit
                 }
@@ -2305,22 +2421,24 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).isEmpty()
     }
 
     @Test
     fun `reports initialized configured receiver lambdas overwritten before local variable invocation`() {
-        val configuredRule = UnnecessaryLaunchedEffectCheck(
-            TestConfig(
-                "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
-            ),
-        )
-        val findings = configuredRule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val configuredRule =
+            UnnecessaryLaunchedEffectCheck(
+                TestConfig(
+                    "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
+                ),
+            )
+        val findings =
+            configuredRule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 class FocusRequester {
                     fun requestFocus() = Unit
                 }
@@ -2334,22 +2452,24 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).hasSize(1)
     }
 
     @Test
     fun `reports configured local helper calls inside overwritten initializer lambdas`() {
-        val configuredRule = UnnecessaryLaunchedEffectCheck(
-            TestConfig(
-                "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
-            ),
-        )
-        val findings = configuredRule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val configuredRule =
+            UnnecessaryLaunchedEffectCheck(
+                TestConfig(
+                    "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
+                ),
+            )
+        val findings =
+            configuredRule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 class FocusRequester {
                     fun requestFocus() = Unit
                 }
@@ -2366,22 +2486,24 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).hasSize(1)
     }
 
     @Test
     fun `reports configured receiver callback aliases created before assignment`() {
-        val configuredRule = UnnecessaryLaunchedEffectCheck(
-            TestConfig(
-                "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
-            ),
-        )
-        val findings = configuredRule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val configuredRule =
+            UnnecessaryLaunchedEffectCheck(
+                TestConfig(
+                    "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
+                ),
+            )
+        val findings =
+            configuredRule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 class FocusRequester {
                     fun requestFocus() = Unit
                 }
@@ -2396,22 +2518,24 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).hasSize(1)
     }
 
     @Test
     fun `allows configured local helpers inside lambdas assigned to local variables`() {
-        val configuredRule = UnnecessaryLaunchedEffectCheck(
-            TestConfig(
-                "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
-            ),
-        )
-        val findings = configuredRule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val configuredRule =
+            UnnecessaryLaunchedEffectCheck(
+                TestConfig(
+                    "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
+                ),
+            )
+        val findings =
+            configuredRule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 class FocusRequester {
                     fun requestFocus() = Unit
                 }
@@ -2428,22 +2552,24 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).isEmpty()
     }
 
     @Test
     fun `allows configured local helper references invoked through local aliases`() {
-        val configuredRule = UnnecessaryLaunchedEffectCheck(
-            TestConfig(
-                "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
-            ),
-        )
-        val findings = configuredRule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val configuredRule =
+            UnnecessaryLaunchedEffectCheck(
+                TestConfig(
+                    "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
+                ),
+            )
+        val findings =
+            configuredRule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 class FocusRequester {
                     fun requestFocus() = Unit
                 }
@@ -2460,22 +2586,24 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).isEmpty()
     }
 
     @Test
     fun `allows configured local helper references passed to inline calls`() {
-        val configuredRule = UnnecessaryLaunchedEffectCheck(
-            TestConfig(
-                "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
-            ),
-        )
-        val findings = configuredRule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val configuredRule =
+            UnnecessaryLaunchedEffectCheck(
+                TestConfig(
+                    "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
+                ),
+            )
+        val findings =
+            configuredRule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 class FocusRequester {
                     fun requestFocus() = Unit
                 }
@@ -2493,22 +2621,24 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).isEmpty()
     }
 
     @Test
     fun `reports shadowed configured local helper references`() {
-        val configuredRule = UnnecessaryLaunchedEffectCheck(
-            TestConfig(
-                "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
-            ),
-        )
-        val findings = configuredRule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val configuredRule =
+            UnnecessaryLaunchedEffectCheck(
+                TestConfig(
+                    "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
+                ),
+            )
+        val findings =
+            configuredRule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 class FocusRequester {
                     fun requestFocus() = Unit
                 }
@@ -2529,22 +2659,24 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).hasSize(1)
     }
 
     @Test
     fun `allows configured receiver references created inside invoked local lambda values`() {
-        val configuredRule = UnnecessaryLaunchedEffectCheck(
-            TestConfig(
-                "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
-            ),
-        )
-        val findings = configuredRule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val configuredRule =
+            UnnecessaryLaunchedEffectCheck(
+                TestConfig(
+                    "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
+                ),
+            )
+        val findings =
+            configuredRule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 class FocusRequester {
                     fun requestFocus() = Unit
                 }
@@ -2560,22 +2692,24 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).isEmpty()
     }
 
     @Test
     fun `reports configured receiver references passed as arguments`() {
-        val configuredRule = UnnecessaryLaunchedEffectCheck(
-            TestConfig(
-                "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
-            ),
-        )
-        val findings = configuredRule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val configuredRule =
+            UnnecessaryLaunchedEffectCheck(
+                TestConfig(
+                    "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
+                ),
+            )
+        val findings =
+            configuredRule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 class FocusRequester {
                     fun requestFocus() = Unit
                 }
@@ -2591,22 +2725,24 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).hasSize(1)
     }
 
     @Test
     fun `reports configured receiver references wrapped in local function values`() {
-        val configuredRule = UnnecessaryLaunchedEffectCheck(
-            TestConfig(
-                "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
-            ),
-        )
-        val findings = configuredRule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val configuredRule =
+            UnnecessaryLaunchedEffectCheck(
+                TestConfig(
+                    "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
+                ),
+            )
+        val findings =
+            configuredRule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 class FocusRequester {
                     fun requestFocus() = Unit
                 }
@@ -2621,22 +2757,24 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).hasSize(1)
     }
 
     @Test
     fun `reports configured receiver references wrapped in immediately invoked calls`() {
-        val configuredRule = UnnecessaryLaunchedEffectCheck(
-            TestConfig(
-                "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
-            ),
-        )
-        val findings = configuredRule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val configuredRule =
+            UnnecessaryLaunchedEffectCheck(
+                TestConfig(
+                    "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
+                ),
+            )
+        val findings =
+            configuredRule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 class FocusRequester {
                     fun requestFocus() = Unit
                 }
@@ -2650,22 +2788,24 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).hasSize(1)
     }
 
     @Test
     fun `reports configured receiver references shadowed by local function values`() {
-        val configuredRule = UnnecessaryLaunchedEffectCheck(
-            TestConfig(
-                "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
-            ),
-        )
-        val findings = configuredRule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val configuredRule =
+            UnnecessaryLaunchedEffectCheck(
+                TestConfig(
+                    "allowedCallReceiverTypes" to listOf("com.example.compose.fake.FocusRequester"),
+                ),
+            )
+        val findings =
+            configuredRule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 class FocusRequester {
                     fun requestFocus() = Unit
                 }
@@ -2683,22 +2823,24 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).hasSize(1)
     }
 
     @Test
     fun `allows calls with configured names`() {
-        val configuredRule = UnnecessaryLaunchedEffectCheck(
-            TestConfig(
-                "allowedCallNames" to listOf("com.example.compose.fake.logScreen"),
-            ),
-        )
-        val findings = configuredRule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val configuredRule =
+            UnnecessaryLaunchedEffectCheck(
+                TestConfig(
+                    "allowedCallNames" to listOf("com.example.compose.fake.logScreen"),
+                ),
+            )
+        val findings =
+            configuredRule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 fun logScreen() = Unit
 
                 @Composable
@@ -2708,17 +2850,18 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).isEmpty()
     }
 
     @Test
     fun `ignores suspend calls inside unused local functions`() {
-        val findings = rule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val findings =
+            rule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 fun update() = Unit
                 suspend fun fetch() = Unit
 
@@ -2732,8 +2875,8 @@ class UnnecessaryLaunchedEffectCheckTest {
                     }
                 }
                 """,
-            ),
-        )
+                ),
+            )
 
         assertThat(findings).hasSize(1)
     }

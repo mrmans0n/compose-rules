@@ -28,10 +28,10 @@ class ModifierMissing : ComposeKtVisitor {
         //  - are not Modifier factory functions
         if (
             function.returnsValue ||
-            function.isOverride ||
-            function.definedInInterface ||
-            function.isPreview ||
-            function.isModifierReceiver(config)
+                function.isOverride ||
+                function.definedInInterface ||
+                function.isPreview ||
+                function.isModifierReceiver(config)
         ) {
             return
         }
@@ -44,14 +44,13 @@ class ModifierMissing : ComposeKtVisitor {
         // - only_public: will check for modifiers only on public composables
         // - public_and_internal: will check for public and internal composables
         // - all: will check all composables (public, internal, protected, private
-        val shouldCheck = when (
-            config.getString("checkModifiersForVisibility", "only_public")
-        ) {
-            "only_public" -> function.isPublic
-            "public_and_internal" -> function.isPublic || function.isInternal
-            "all" -> true
-            else -> function.isPublic
-        }
+        val shouldCheck =
+            when (config.getString("checkModifiersForVisibility", "only_public")) {
+                "only_public" -> function.isPublic
+                "public_and_internal" -> function.isPublic || function.isInternal
+                "all" -> true
+                else -> function.isPublic
+            }
         if (!shouldCheck) return
 
         // If there is a modifier param, we bail
@@ -64,9 +63,11 @@ class ModifierMissing : ComposeKtVisitor {
     }
 
     companion object {
-        val MissingModifierContentComposable = """
+        val MissingModifierContentComposable =
+            """
             This @Composable function emits content but doesn't have a modifier parameter.
             See https://mrmans0n.github.io/compose-rules/rules/#when-should-i-expose-modifier-parameters for more information.
-        """.trimIndent()
+            """
+                .trimIndent()
     }
 }

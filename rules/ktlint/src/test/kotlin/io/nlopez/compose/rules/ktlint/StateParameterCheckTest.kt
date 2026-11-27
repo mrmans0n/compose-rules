@@ -17,16 +17,18 @@ class StateParameterCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something(a: State<String>) {}
-            """.trimIndent()
-        stateParamRuleAssertThat(code).hasLintViolationsWithoutAutoCorrect(
-            LintViolation(
-                line = 2,
-                col = 15,
-                detail = StateParameter.StateParameterInCompose,
-            ),
-        )
+            @Composable
+            fun Something(a: State<String>) {}
+            """
+                .trimIndent()
+        stateParamRuleAssertThat(code)
+            .hasLintViolationsWithoutAutoCorrect(
+                LintViolation(
+                    line = 2,
+                    col = 15,
+                    detail = StateParameter.StateParameterInCompose,
+                ),
+            )
     }
 
     @Test
@@ -34,36 +36,38 @@ class StateParameterCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something(
-                    a: IntState,
-                    b: FloatState,
-                    c: DoubleState,
-                    d: LongState
-                ) {}
-            """.trimIndent()
-        stateParamRuleAssertThat(code).hasLintViolationsWithoutAutoCorrect(
-            LintViolation(
-                line = 3,
-                col = 5,
-                detail = StateParameter.StateParameterInCompose,
-            ),
-            LintViolation(
-                line = 4,
-                col = 5,
-                detail = StateParameter.StateParameterInCompose,
-            ),
-            LintViolation(
-                line = 5,
-                col = 5,
-                detail = StateParameter.StateParameterInCompose,
-            ),
-            LintViolation(
-                line = 6,
-                col = 5,
-                detail = StateParameter.StateParameterInCompose,
-            ),
-        )
+            @Composable
+            fun Something(
+                a: IntState,
+                b: FloatState,
+                c: DoubleState,
+                d: LongState
+            ) {}
+            """
+                .trimIndent()
+        stateParamRuleAssertThat(code)
+            .hasLintViolationsWithoutAutoCorrect(
+                LintViolation(
+                    line = 3,
+                    col = 5,
+                    detail = StateParameter.StateParameterInCompose,
+                ),
+                LintViolation(
+                    line = 4,
+                    col = 5,
+                    detail = StateParameter.StateParameterInCompose,
+                ),
+                LintViolation(
+                    line = 5,
+                    col = 5,
+                    detail = StateParameter.StateParameterInCompose,
+                ),
+                LintViolation(
+                    line = 6,
+                    col = 5,
+                    detail = StateParameter.StateParameterInCompose,
+                ),
+            )
     }
 
     @Test
@@ -71,11 +75,12 @@ class StateParameterCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something(a: String, b: (Int) -> Unit) {}
-                @Composable
-                fun Something(a: MutableState<String>) {}
-            """.trimIndent()
+            @Composable
+            fun Something(a: String, b: (Int) -> Unit) {}
+            @Composable
+            fun Something(a: MutableState<String>) {}
+            """
+                .trimIndent()
         stateParamRuleAssertThat(code).hasNoLintViolations()
     }
 }

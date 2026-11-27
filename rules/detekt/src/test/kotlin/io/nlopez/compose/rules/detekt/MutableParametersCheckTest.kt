@@ -6,7 +6,6 @@ import dev.detekt.api.Config
 import dev.detekt.api.SourceLocation
 import dev.detekt.test.lint
 import io.nlopez.compose.rules.MutableParameters
-import io.nlopez.compose.rules.detekt.assertThat
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
 
@@ -19,13 +18,14 @@ class MutableParametersCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something(a: ArrayList<String>) {}
-                @Composable
-                fun Something(a: HashSet<String>) {}
-                @Composable
-                fun Something(a: MutableMap<String, String>) {}
-            """.trimIndent()
+            @Composable
+            fun Something(a: ArrayList<String>) {}
+            @Composable
+            fun Something(a: HashSet<String>) {}
+            @Composable
+            fun Something(a: MutableMap<String, String>) {}
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors)
             .hasStartSourceLocations(
@@ -43,11 +43,12 @@ class MutableParametersCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something(a: String, b: (Int) -> Unit) {}
-                @Composable
-                fun Something(a: State<String>) {}
-            """.trimIndent()
+            @Composable
+            fun Something(a: String, b: (Int) -> Unit) {}
+            @Composable
+            fun Something(a: State<String>) {}
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }

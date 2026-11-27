@@ -8,20 +8,14 @@ import org.assertj.core.api.AbstractListAssert
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.ObjectAssert
 
-/**
- * Wrapper for assertThat for lists of findings.
- */
+/** Wrapper for assertThat for lists of findings. */
 fun assertThat(actual: List<Finding>): AbstractListAssert<*, List<Finding>, Finding, ObjectAssert<Finding>> =
     Assertions.assertThat(actual)
 
-/**
- * Wrapper for assertThat for single finding.
- */
+/** Wrapper for assertThat for single finding. */
 fun assertThat(actual: Finding): ObjectAssert<Finding> = Assertions.assertThat(actual)
 
-/**
- * Asserts that the list of findings has the specified start source locations.
- */
+/** Asserts that the list of findings has the specified start source locations. */
 fun AbstractListAssert<*, List<Finding>, Finding, ObjectAssert<Finding>>.hasStartSourceLocations(
     vararg locations: SourceLocation,
 ): AbstractListAssert<*, List<Finding>, Finding, ObjectAssert<Finding>> {
@@ -31,39 +25,33 @@ fun AbstractListAssert<*, List<Finding>, Finding, ObjectAssert<Finding>>.hasStar
 }
 
 /**
- * Asserts that the list of findings has the specified text locations.
- * In detekt 2.0, we extract the name from the ktElement.
+ * Asserts that the list of findings has the specified text locations. In detekt 2.0, we extract the name from the
+ * ktElement.
  */
 fun AbstractListAssert<*, List<Finding>, Finding, ObjectAssert<Finding>>.hasTextLocations(
     vararg locations: String,
 ): AbstractListAssert<*, List<Finding>, Finding, ObjectAssert<Finding>> {
     extracting<String> { finding: Finding ->
-        // Extract the name from named declarations
-        (finding.entity.ktElement as? org.jetbrains.kotlin.psi.KtNamedDeclaration)?.name
-            ?: finding.entity.signature
-    }.containsExactlyInAnyOrder(*locations)
+            // Extract the name from named declarations
+            (finding.entity.ktElement as? org.jetbrains.kotlin.psi.KtNamedDeclaration)?.name ?: finding.entity.signature
+        }
+        .containsExactlyInAnyOrder(*locations)
     return this
 }
 
-/**
- * Asserts that a single finding has the specified start source location.
- */
+/** Asserts that a single finding has the specified start source location. */
 fun ObjectAssert<Finding>.hasStartSourceLocation(location: SourceLocation): ObjectAssert<Finding> {
     extracting { it.entity.location.source }.isEqualTo(location)
     return this
 }
 
-/**
- * Asserts that a single finding has the specified start source location (by line and column).
- */
+/** Asserts that a single finding has the specified start source location (by line and column). */
 fun ObjectAssert<Finding>.hasStartSourceLocation(line: Int, column: Int): ObjectAssert<Finding> {
     extracting { it.entity.location.source }.isEqualTo(SourceLocation(line, column))
     return this
 }
 
-/**
- * Asserts that the list contains exactly one finding with the specified start source location.
- */
+/** Asserts that the list contains exactly one finding with the specified start source location. */
 fun AbstractListAssert<*, List<Finding>, Finding, ObjectAssert<Finding>>.hasStartSourceLocation(
     line: Int,
     column: Int,
@@ -73,16 +61,12 @@ fun AbstractListAssert<*, List<Finding>, Finding, ObjectAssert<Finding>>.hasStar
     return this
 }
 
-/**
- * Asserts that the finding has the specified message.
- */
+/** Asserts that the finding has the specified message. */
 fun ObjectAssert<Finding>.hasMessage(expectedMessage: String): ObjectAssert<Finding> {
     extracting { it.message }.isEqualTo(expectedMessage)
     return this
 }
 
-/**
- * Extension to get location from a Finding for easier assertions.
- */
+/** Extension to get location from a Finding for easier assertions. */
 val Finding.startLocation: SourceLocation
     get() = entity.location.source

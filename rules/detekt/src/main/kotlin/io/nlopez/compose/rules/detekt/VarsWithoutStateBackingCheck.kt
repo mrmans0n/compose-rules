@@ -8,16 +8,14 @@ import dev.detekt.api.Finding
 import dev.detekt.api.RequiresAnalysisApi
 import dev.detekt.api.Rule
 import dev.detekt.api.RuleName
+import java.net.URI
 import org.jetbrains.kotlin.psi.KtClassOrObject
 import org.jetbrains.kotlin.psi.KtLambdaExpression
 import org.jetbrains.kotlin.psi.KtNamedFunction
 import org.jetbrains.kotlin.psi.KtProperty
 import org.jetbrains.kotlin.psi.KtPropertyAccessor
-import java.net.URI
 
-/**
- * Reports local `var` properties in composable scopes when they are not backed by observable state.
- */
+/** Reports local `var` properties in composable scopes when they are not backed by observable state. */
 class VarsWithoutStateBackingCheck(config: Config) :
     Rule(
         config,
@@ -106,10 +104,12 @@ class VarsWithoutStateBackingCheck(config: Config) :
     }
 
     internal companion object {
-        val VarsWithoutStateBacking = """
+        val VarsWithoutStateBacking =
+            """
             Local var properties in composable scopes should be backed by observable State.
 
             See https://mrmans0n.github.io/compose-rules/rules/#back-composable-vars-with-state for more information.
-        """.trimIndent()
+            """
+                .trimIndent()
     }
 }

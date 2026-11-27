@@ -8,6 +8,7 @@ import dev.detekt.api.Finding
 import dev.detekt.api.RequiresAnalysisApi
 import dev.detekt.api.Rule
 import dev.detekt.api.RuleName
+import java.net.URI
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.KtBinaryExpression
 import org.jetbrains.kotlin.psi.KtBlockExpression
@@ -25,11 +26,8 @@ import org.jetbrains.kotlin.psi.KtSafeQualifiedExpression
 import org.jetbrains.kotlin.psi.KtSimpleNameExpression
 import org.jetbrains.kotlin.psi.KtTreeVisitorVoid
 import org.jetbrains.kotlin.psi.psiUtil.getStrictParentOfType
-import java.net.URI
 
-/**
- * Reports `@Composable` declarations that do not use composition and can remove the annotation.
- */
+/** Reports `@Composable` declarations that do not use composition and can remove the annotation. */
 class UnnecessaryComposableCheck(config: Config) :
     Rule(
         config,
@@ -147,26 +145,28 @@ class UnnecessaryComposableCheck(config: Config) :
     }
 
     private fun KtNamedFunction.hasComposableSlotParameter(): Boolean =
-        valueParameters.any(KtParameter::hasComposableType) ||
-            receiverTypeReference?.hasComposableType() == true
+        valueParameters.any(KtParameter::hasComposableType) || receiverTypeReference?.hasComposableType() == true
 
     internal companion object {
-        val UnnecessaryComposable = """
+        val UnnecessaryComposable =
+            """
             This @Composable declaration does not use composition and should not be marked @Composable.
 
             See https://mrmans0n.github.io/compose-rules/rules/#do-not-mark-functions-as-composable-when-they-dont-need-it for more information.
-        """.trimIndent()
+            """
+                .trimIndent()
     }
 }
 
-private val ContractModifiers = setOf(
-    KtTokens.OVERRIDE_KEYWORD,
-    KtTokens.OPEN_KEYWORD,
-    KtTokens.ABSTRACT_KEYWORD,
-    KtTokens.EXPECT_KEYWORD,
-    KtTokens.ACTUAL_KEYWORD,
-    KtTokens.EXTERNAL_KEYWORD,
-)
+private val ContractModifiers =
+    setOf(
+        KtTokens.OVERRIDE_KEYWORD,
+        KtTokens.OPEN_KEYWORD,
+        KtTokens.ABSTRACT_KEYWORD,
+        KtTokens.EXPECT_KEYWORD,
+        KtTokens.ACTUAL_KEYWORD,
+        KtTokens.EXTERNAL_KEYWORD,
+    )
 
 private fun KtNamedFunction.hasAnyContractModifier(): Boolean = ContractModifiers.any(::hasModifier)
 
@@ -175,6 +175,7 @@ private fun KtProperty.hasAnyContractModifier(): Boolean = ContractModifiers.any
 private fun KtQualifiedExpression.isComposeStateValueReadExpression(): Boolean =
     isComposeStateValueRead() && !isAssignmentLeftHandSide()
 
-private fun KtElement.isAssignmentLeftHandSide(): Boolean = (parent as? KtBinaryExpression)?.let { expression ->
-    expression.operationToken == KtTokens.EQ && expression.left == this
-} == true
+private fun KtElement.isAssignmentLeftHandSide(): Boolean =
+    (parent as? KtBinaryExpression)?.let { expression ->
+        expression.operationToken == KtTokens.EQ && expression.left == this
+    } == true

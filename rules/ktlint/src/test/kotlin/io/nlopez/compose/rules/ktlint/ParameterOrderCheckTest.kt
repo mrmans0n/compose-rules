@@ -16,7 +16,8 @@ class ParameterOrderCheckTest {
     @Test
     fun `no errors when ordering is correct`() {
         @Language("kotlin")
-        val code = """
+        val code =
+            """
             typealias TypealiasLambda = () -> Unit
             fun interface InterfaceLambda {
                 fun whatever()
@@ -56,16 +57,16 @@ class ParameterOrderCheckTest {
 
             @Composable
             fun MyComposable(text1: String, modifier: Modifier = Modifier, m2: Modifier = Modifier, trailing: InterfaceLambda?) { }
-        """.trimIndent()
-        orderingRuleAssertThat(code)
-            .withEditorConfigOverride(treatAsLambda to "LambdaType")
-            .hasNoLintViolations()
+            """
+                .trimIndent()
+        orderingRuleAssertThat(code).withEditorConfigOverride(treatAsLambda to "LambdaType").hasNoLintViolations()
     }
 
     @Test
     fun `no errors when non-composable lambda with default value comes before required params - issue 416`() {
         @Language("kotlin")
-        val code = """
+        val code =
+            """
             @Composable
             fun Foo(
               onSelect: (Foo) -> Unit,
@@ -87,37 +88,43 @@ class ParameterOrderCheckTest {
               onValueChange: (Int) -> Unit = {},
               value: Int,
             ) { }
-        """.trimIndent()
+            """
+                .trimIndent()
         orderingRuleAssertThat(code).hasNoLintViolations()
     }
 
     @Test
     fun `error when composable lambda with default value comes before required params`() {
         @Language("kotlin")
-        val code = """
+        val code =
+            """
             @Composable
             fun Foo(
               onClick: () -> Unit,
               content: @Composable () -> Unit = {},
               title: String,
             ) { }
-        """.trimIndent()
-        orderingRuleAssertThat(code).hasLintViolationsWithoutAutoCorrect(
-            LintViolation(
-                line = 2,
-                col = 5,
-                detail = ParameterOrder.createErrorMessage(
-                    currentOrder = "onClick: () -> Unit, content: @Composable () -> Unit = {}, title: String",
-                    properOrder = "onClick: () -> Unit, title: String, content: @Composable () -> Unit = {}",
+            """
+                .trimIndent()
+        orderingRuleAssertThat(code)
+            .hasLintViolationsWithoutAutoCorrect(
+                LintViolation(
+                    line = 2,
+                    col = 5,
+                    detail =
+                        ParameterOrder.createErrorMessage(
+                            currentOrder = "onClick: () -> Unit, content: @Composable () -> Unit = {}, title: String",
+                            properOrder = "onClick: () -> Unit, title: String, content: @Composable () -> Unit = {}",
+                        ),
                 ),
-            ),
-        )
+            )
     }
 
     @Test
     fun `error when modifier is misplaced after defaulted lambdas - issue 724`() {
         @Language("kotlin")
-        val code = """
+        val code =
+            """
             @Composable
             fun Foo(
               state: String,
@@ -138,39 +145,49 @@ class ParameterOrderCheckTest {
               modifier: Modifier = Modifier,
               value: Int,
             ) { }
-        """.trimIndent()
-        orderingRuleAssertThat(code).hasLintViolationsWithoutAutoCorrect(
-            LintViolation(
-                line = 2,
-                col = 5,
-                detail = ParameterOrder.createErrorMessage(
-                    currentOrder = "state: String, onConfirmClose: () -> Unit = {}, onDismissConfirmation: () -> Unit = {}, modifier: Modifier = Modifier",
-                    properOrder = "state: String, modifier: Modifier = Modifier, onConfirmClose: () -> Unit = {}, onDismissConfirmation: () -> Unit = {}",
+            """
+                .trimIndent()
+        orderingRuleAssertThat(code)
+            .hasLintViolationsWithoutAutoCorrect(
+                LintViolation(
+                    line = 2,
+                    col = 5,
+                    detail =
+                        ParameterOrder.createErrorMessage(
+                            currentOrder =
+                                "state: String, onConfirmClose: () -> Unit = {}, onDismissConfirmation: () -> Unit = {}, modifier: Modifier = Modifier",
+                            properOrder =
+                                "state: String, modifier: Modifier = Modifier, onConfirmClose: () -> Unit = {}, onDismissConfirmation: () -> Unit = {}",
+                        ),
                 ),
-            ),
-            LintViolation(
-                line = 10,
-                col = 5,
-                detail = ParameterOrder.createErrorMessage(
-                    currentOrder = "onConfirm: () -> Unit = {}, modifier: Modifier = Modifier",
-                    properOrder = "modifier: Modifier = Modifier, onConfirm: () -> Unit = {}",
+                LintViolation(
+                    line = 10,
+                    col = 5,
+                    detail =
+                        ParameterOrder.createErrorMessage(
+                            currentOrder = "onConfirm: () -> Unit = {}, modifier: Modifier = Modifier",
+                            properOrder = "modifier: Modifier = Modifier, onConfirm: () -> Unit = {}",
+                        ),
                 ),
-            ),
-            LintViolation(
-                line = 16,
-                col = 5,
-                detail = ParameterOrder.createErrorMessage(
-                    currentOrder = "onValueChange: (Int) -> Unit = {}, modifier: Modifier = Modifier, value: Int",
-                    properOrder = "value: Int, modifier: Modifier = Modifier, onValueChange: (Int) -> Unit = {}",
+                LintViolation(
+                    line = 16,
+                    col = 5,
+                    detail =
+                        ParameterOrder.createErrorMessage(
+                            currentOrder =
+                                "onValueChange: (Int) -> Unit = {}, modifier: Modifier = Modifier, value: Int",
+                            properOrder =
+                                "value: Int, modifier: Modifier = Modifier, onValueChange: (Int) -> Unit = {}",
+                        ),
                 ),
-            ),
-        )
+            )
     }
 
     @Test
     fun `errors found when ordering is wrong`() {
         @Language("kotlin")
-        val code = """
+        val code =
+            """
             @Composable
             fun MyComposable(modifier: Modifier = Modifier, other: String, other2: String) { }
 
@@ -190,62 +207,70 @@ class ParameterOrderCheckTest {
             fun MyComposable(text1: String, m2: Modifier = Modifier, modifier: Modifier = Modifier, trailing: NonFunctionalType) { }
 
             typealias NonFunctionalType = String
-        """.trimIndent()
-        orderingRuleAssertThat(code).hasLintViolationsWithoutAutoCorrect(
-            LintViolation(
-                line = 2,
-                col = 5,
-                detail = ParameterOrder.createErrorMessage(
-                    currentOrder = "modifier: Modifier = Modifier, other: String, other2: String",
-                    properOrder = "other: String, other2: String, modifier: Modifier = Modifier",
+            """
+                .trimIndent()
+        orderingRuleAssertThat(code)
+            .hasLintViolationsWithoutAutoCorrect(
+                LintViolation(
+                    line = 2,
+                    col = 5,
+                    detail =
+                        ParameterOrder.createErrorMessage(
+                            currentOrder = "modifier: Modifier = Modifier, other: String, other2: String",
+                            properOrder = "other: String, other2: String, modifier: Modifier = Modifier",
+                        ),
                 ),
-            ),
-            LintViolation(
-                line = 5,
-                col = 5,
-                detail = ParameterOrder.createErrorMessage(
-                    currentOrder = "text: String = \"deffo\", modifier: Modifier = Modifier",
-                    properOrder = "modifier: Modifier = Modifier, text: String = \"deffo\"",
+                LintViolation(
+                    line = 5,
+                    col = 5,
+                    detail =
+                        ParameterOrder.createErrorMessage(
+                            currentOrder = "text: String = \"deffo\", modifier: Modifier = Modifier",
+                            properOrder = "modifier: Modifier = Modifier, text: String = \"deffo\"",
+                        ),
                 ),
-            ),
-            LintViolation(
-                line = 8,
-                col = 5,
-                detail = ParameterOrder.createErrorMessage(
-                    currentOrder =
-                    "modifier: Modifier = Modifier, text: String = \"123\", modifier2: Modifier = Modifier",
-                    properOrder =
-                    "modifier: Modifier = Modifier, modifier2: Modifier = Modifier, text: String = \"123\"",
+                LintViolation(
+                    line = 8,
+                    col = 5,
+                    detail =
+                        ParameterOrder.createErrorMessage(
+                            currentOrder =
+                                "modifier: Modifier = Modifier, text: String = \"123\", modifier2: Modifier = Modifier",
+                            properOrder =
+                                "modifier: Modifier = Modifier, modifier2: Modifier = Modifier, text: String = \"123\"",
+                        ),
                 ),
-            ),
-            LintViolation(
-                line = 11,
-                col = 5,
-                detail = ParameterOrder.createErrorMessage(
-                    currentOrder = "text: String = \"123\", modifier: Modifier = Modifier, lambda: () -> Unit",
-                    properOrder = "modifier: Modifier = Modifier, text: String = \"123\", lambda: () -> Unit",
+                LintViolation(
+                    line = 11,
+                    col = 5,
+                    detail =
+                        ParameterOrder.createErrorMessage(
+                            currentOrder = "text: String = \"123\", modifier: Modifier = Modifier, lambda: () -> Unit",
+                            properOrder = "modifier: Modifier = Modifier, text: String = \"123\", lambda: () -> Unit",
+                        ),
                 ),
-            ),
-            LintViolation(
-                line = 14,
-                col = 5,
-                detail = ParameterOrder.createErrorMessage(
-                    currentOrder =
-                    "text1: String, m2: Modifier = Modifier, modifier: Modifier = Modifier, trailing: () -> Unit",
-                    properOrder =
-                    "text1: String, modifier: Modifier = Modifier, m2: Modifier = Modifier, trailing: () -> Unit",
+                LintViolation(
+                    line = 14,
+                    col = 5,
+                    detail =
+                        ParameterOrder.createErrorMessage(
+                            currentOrder =
+                                "text1: String, m2: Modifier = Modifier, modifier: Modifier = Modifier, trailing: () -> Unit",
+                            properOrder =
+                                "text1: String, modifier: Modifier = Modifier, m2: Modifier = Modifier, trailing: () -> Unit",
+                        ),
                 ),
-            ),
-            LintViolation(
-                line = 17,
-                col = 5,
-                detail = ParameterOrder.createErrorMessage(
-                    currentOrder =
-                    "text1: String, m2: Modifier = Modifier, modifier: Modifier = Modifier, trailing: NonFunctionalType",
-                    properOrder =
-                    "text1: String, trailing: NonFunctionalType, modifier: Modifier = Modifier, m2: Modifier = Modifier",
+                LintViolation(
+                    line = 17,
+                    col = 5,
+                    detail =
+                        ParameterOrder.createErrorMessage(
+                            currentOrder =
+                                "text1: String, m2: Modifier = Modifier, modifier: Modifier = Modifier, trailing: NonFunctionalType",
+                            properOrder =
+                                "text1: String, trailing: NonFunctionalType, modifier: Modifier = Modifier, m2: Modifier = Modifier",
+                        ),
                 ),
-            ),
-        )
+            )
     }
 }

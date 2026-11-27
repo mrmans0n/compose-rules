@@ -11,6 +11,7 @@ junit-platform = "1.14.4"
 compose-bom = "2026.11.01"
 
 [libraries]
+ktrs = "io.github.hexay:ktrs:0.5.3"
 ktlint-core = { module = "com.pinterest.ktlint:ktlint-core", version.ref = "ktlint" }
 ktlint-rule-engine-core = { module = "com.pinterest.ktlint:ktlint-rule-engine-core", version.ref = "ktlint" }
 ktlint-rule-engine = { module = "com.pinterest.ktlint:ktlint-rule-engine", version.ref = "ktlint" }

@@ -5,22 +5,23 @@ package io.nlopez.compose.rules.detekt
 import dev.detekt.api.SourceLocation
 import dev.detekt.test.TestConfig
 import dev.detekt.test.lint
-import io.nlopez.compose.rules.detekt.assertThat
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
 
 @Suppress("ktlint:standard:max-line-length")
 class ParameterOrderCheckTest {
 
-    private val testConfig = TestConfig(
-        "treatAsLambda" to listOf("LambdaType"),
-    )
+    private val testConfig =
+        TestConfig(
+            "treatAsLambda" to listOf("LambdaType"),
+        )
     private val rule = ParameterOrderCheck(testConfig)
 
     @Test
     fun `no errors when ordering is correct`() {
         @Language("kotlin")
-        val code = """
+        val code =
+            """
             typealias TypealiasLambda = () -> Unit
             fun interface InterfaceLambda {
                 fun whatever()
@@ -62,7 +63,8 @@ class ParameterOrderCheckTest {
             fun MyComposable(text1: String, modifier: Modifier = Modifier, m2: Modifier = Modifier, trailing: InterfaceLambda?) { }
 
 
-        """.trimIndent()
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }
@@ -70,7 +72,8 @@ class ParameterOrderCheckTest {
     @Test
     fun `no errors when non-composable lambda with default value comes before required params - issue 416`() {
         @Language("kotlin")
-        val code = """
+        val code =
+            """
             @Composable
             fun Foo(
               onSelect: (Foo) -> Unit,
@@ -92,7 +95,8 @@ class ParameterOrderCheckTest {
               onValueChange: (Int) -> Unit = {},
               value: Int,
             ) { }
-        """.trimIndent()
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }
@@ -100,14 +104,16 @@ class ParameterOrderCheckTest {
     @Test
     fun `error when composable lambda with default value comes before required params`() {
         @Language("kotlin")
-        val code = """
+        val code =
+            """
             @Composable
             fun Foo(
               onClick: () -> Unit,
               content: @Composable () -> Unit = {},
               title: String,
             ) { }
-        """.trimIndent()
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors)
             .hasStartSourceLocations(
@@ -118,7 +124,8 @@ class ParameterOrderCheckTest {
     @Test
     fun `error when modifier is misplaced after defaulted lambdas - issue 724`() {
         @Language("kotlin")
-        val code = """
+        val code =
+            """
             @Composable
             fun Foo(
               state: String,
@@ -139,7 +146,8 @@ class ParameterOrderCheckTest {
               modifier: Modifier = Modifier,
               value: Int,
             ) { }
-        """.trimIndent()
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors)
             .hasStartSourceLocations(
@@ -152,7 +160,8 @@ class ParameterOrderCheckTest {
     @Test
     fun `errors found when ordering is wrong`() {
         @Language("kotlin")
-        val code = """
+        val code =
+            """
             @Composable
             fun MyComposable(modifier: Modifier = Modifier, other: String, other2: String) { }
 
@@ -172,7 +181,8 @@ class ParameterOrderCheckTest {
             fun MyComposable(text1: String, m2: Modifier = Modifier, modifier: Modifier = Modifier, trailing: NonFunctionalType) { }
 
             typealias NonFunctionalType = String
-        """.trimIndent()
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors)
             .hasStartSourceLocations(

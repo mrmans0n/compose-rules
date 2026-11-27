@@ -20,7 +20,8 @@ internal fun KtDotQualifiedExpression.isCompositionLocalCurrentRead(): Boolean =
                 supertype.symbol?.classId?.asSingleFqName() == ComposeFqNames.CompositionLocal
             }
     }
-}.getOrDefault(false)
+}
+    .getOrDefault(false)
 
 internal fun KtQualifiedExpression.isComposeStateValueRead(): Boolean = runCatching {
     val selector = selectorExpression as? KtNameReferenceExpression ?: return@runCatching false
@@ -33,12 +34,14 @@ internal fun KtQualifiedExpression.isComposeStateValueRead(): Boolean = runCatch
                 supertype.symbol?.classId?.asSingleFqName() in stateFqNames
             }
     }
-}.getOrDefault(false)
+}
+    .getOrDefault(false)
 
-private val ComposeStateValueFqNames = mapOf(
-    "value" to setOf(ComposeFqNames.State, ComposeFqNames.MutableState),
-    "intValue" to setOf(ComposeFqNames.IntState, ComposeFqNames.MutableIntState),
-    "longValue" to setOf(ComposeFqNames.LongState, ComposeFqNames.MutableLongState),
-    "floatValue" to setOf(ComposeFqNames.FloatState, ComposeFqNames.MutableFloatState),
-    "doubleValue" to setOf(ComposeFqNames.DoubleState, ComposeFqNames.MutableDoubleState),
-)
+private val ComposeStateValueFqNames =
+    mapOf(
+        "value" to setOf(ComposeFqNames.State, ComposeFqNames.MutableState),
+        "intValue" to setOf(ComposeFqNames.IntState, ComposeFqNames.MutableIntState),
+        "longValue" to setOf(ComposeFqNames.LongState, ComposeFqNames.MutableLongState),
+        "floatValue" to setOf(ComposeFqNames.FloatState, ComposeFqNames.MutableFloatState),
+        "doubleValue" to setOf(ComposeFqNames.DoubleState, ComposeFqNames.MutableDoubleState),
+    )

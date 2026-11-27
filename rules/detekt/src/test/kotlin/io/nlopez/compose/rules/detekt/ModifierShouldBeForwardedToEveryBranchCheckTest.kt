@@ -14,19 +14,20 @@ class ModifierShouldBeForwardedToEveryBranchCheckTest {
 
     @ParameterizedTest
     @ValueSource(
-        strings = [
-            "if (state == 0) LoadedContent(modifier) else LoadingContent(androidx.compose.ui.Modifier)",
-            "if (state == 0) LoadedContent(modifier) else LoadingContent(Modifier.Companion)",
-            "if (state == 0) LoadedContent(modifier) else LoadingContent(androidx.compose.ui.Modifier.padding())",
-            "when (state) { 0 -> LoadedContent(modifier); else -> LoadingContent() }",
-            "if (state == 0) LoadedContent(modifier.then(Modifier)) else LoadingContent()",
-            "if (state == 0) LoadedContent(Modifier.then(modifier)) else LoadingContent()",
-            "if (state == 0) LoadedContent(modifier.padding()) else LoadingContent(Modifier.padding())",
-            "if (state == 0) LoadedContent(label = \"ready\", modifier) else LoadingContent()",
-            "if (state == 0) LoadedContent(modifier = modifier) else LoadingContent(Modifier)",
-            "if (state == 0) LoadedContent(modifier) else if (state == 1) LoadingContent() else LoadedContent(modifier)",
-            "if (state == 0) Components.Loaded(modifier) else Components.Loading()",
-        ],
+        strings =
+            [
+                "if (state == 0) LoadedContent(modifier) else LoadingContent(androidx.compose.ui.Modifier)",
+                "if (state == 0) LoadedContent(modifier) else LoadingContent(Modifier.Companion)",
+                "if (state == 0) LoadedContent(modifier) else LoadingContent(androidx.compose.ui.Modifier.padding())",
+                "when (state) { 0 -> LoadedContent(modifier); else -> LoadingContent() }",
+                "if (state == 0) LoadedContent(modifier.then(Modifier)) else LoadingContent()",
+                "if (state == 0) LoadedContent(Modifier.then(modifier)) else LoadingContent()",
+                "if (state == 0) LoadedContent(modifier.padding()) else LoadingContent(Modifier.padding())",
+                "if (state == 0) LoadedContent(label = \"ready\", modifier) else LoadingContent()",
+                "if (state == 0) LoadedContent(modifier = modifier) else LoadingContent(Modifier)",
+                "if (state == 0) LoadedContent(modifier) else if (state == 1) LoadingContent() else LoadedContent(modifier)",
+                "if (state == 0) Components.Loaded(modifier) else Components.Loading()",
+            ],
     )
     fun `reports missing forwarding with resolved calls in another file`(body: String) {
         val findings = rule.lintWithAnalysisApi(content(body), modifierRuntime, branchRuntime)
@@ -36,21 +37,22 @@ class ModifierShouldBeForwardedToEveryBranchCheckTest {
 
     @ParameterizedTest
     @ValueSource(
-        strings = [
-            "if (state == 0) LoadedContent(modifier) else LoadingContent(modifier)",
-            "if (state == 0) LoadedContent(modifier.padding()) else LoadingContent(Modifier.then(modifier))",
-            "if (state == 0) LoadedContent(modifier) else LoadingContent(factory(modifier))",
-            "if (state == 0) LoadedContent() else LoadingContent()",
-            "if (state == 0) LoadedContent(modifier) else EmptyContent()",
-            "if (state == 0) LoadedContent(modifier) else ValueContent()",
-            "if (state == 0) LoadedContent(modifier) else ReadOnlyContent()",
-            "if (state == 0) LoadedContent(modifier) else PlainContent()",
-            "when (val modifier = Modifier) { Modifier -> LoadingContent(); else -> LoadedContent(modifier) }",
-            "if (state == 0) LoadingContent(otherModifier) else LoadedContent(modifier)",
-            "if (state == 0) LoadingContent(if (enabled) modifier else Modifier) else LoadedContent(modifier)",
-            "Container(modifier) { if (state == 0) LoadingContent() else LoadedContent() }",
-            "EmptyContent()\nif (state == 0) LoadingContent() else LoadedContent(modifier)",
-        ],
+        strings =
+            [
+                "if (state == 0) LoadedContent(modifier) else LoadingContent(modifier)",
+                "if (state == 0) LoadedContent(modifier.padding()) else LoadingContent(Modifier.then(modifier))",
+                "if (state == 0) LoadedContent(modifier) else LoadingContent(factory(modifier))",
+                "if (state == 0) LoadedContent() else LoadingContent()",
+                "if (state == 0) LoadedContent(modifier) else EmptyContent()",
+                "if (state == 0) LoadedContent(modifier) else ValueContent()",
+                "if (state == 0) LoadedContent(modifier) else ReadOnlyContent()",
+                "if (state == 0) LoadedContent(modifier) else PlainContent()",
+                "when (val modifier = Modifier) { Modifier -> LoadingContent(); else -> LoadedContent(modifier) }",
+                "if (state == 0) LoadingContent(otherModifier) else LoadedContent(modifier)",
+                "if (state == 0) LoadingContent(if (enabled) modifier else Modifier) else LoadedContent(modifier)",
+                "Container(modifier) { if (state == 0) LoadingContent() else LoadedContent() }",
+                "EmptyContent()\nif (state == 0) LoadingContent() else LoadedContent(modifier)",
+            ],
     )
     fun `ignores branches without definite missing forwarding`(body: String) {
         assertThat(rule.lintWithAnalysisApi(content(body), modifierRuntime, branchRuntime)).isEmpty()
@@ -58,34 +60,37 @@ class ModifierShouldBeForwardedToEveryBranchCheckTest {
 
     @Test
     fun `reports the omitted call rather than its forwarding sibling`() {
-        val findings = rule.lintWithAnalysisApi(
-            """
-            package sample
-            import com.example.compose.fake.Composable
-            import com.example.compose.fake.LoadedContent
-            import com.example.compose.fake.LoadingContent
-            import androidx.compose.ui.Modifier
+        val findings =
+            rule.lintWithAnalysisApi(
+                """
+                package sample
+                import com.example.compose.fake.Composable
+                import com.example.compose.fake.LoadedContent
+                import com.example.compose.fake.LoadingContent
+                import androidx.compose.ui.Modifier
 
-            @Composable
-            fun Content(loading: Boolean, modifier: Modifier) {
-                if (loading) {
-                    LoadedContent(modifier)
-                } else {
-                    LoadingContent()
+                @Composable
+                fun Content(loading: Boolean, modifier: Modifier) {
+                    if (loading) {
+                        LoadedContent(modifier)
+                    } else {
+                        LoadingContent()
+                    }
                 }
-            }
-            """.trimIndent(),
-            modifierRuntime,
-            branchRuntime,
-        )
+                """
+                    .trimIndent(),
+                modifierRuntime,
+                branchRuntime,
+            )
         assertThat(findings).hasStartSourceLocations(SourceLocation(12, 9))
     }
 
     @Test
     fun `resolves modifier type aliases`() {
-        val findings = rule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val findings =
+            rule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 import androidx.compose.ui.Modifier
                 typealias LayoutModifier = Modifier
                 @Composable
@@ -93,75 +98,82 @@ class ModifierShouldBeForwardedToEveryBranchCheckTest {
                     if (state == 0) LoadedContent(modifier) else LoadingContent()
                 }
                 """,
-            ),
-            modifierRuntime,
-            branchRuntime,
-        )
+                ),
+                modifierRuntime,
+                branchRuntime,
+            )
         assertThat(findings).hasSize(1)
     }
 
     @Test
     fun `does not mistake a shadowing slot for a same named declaration`() {
-        val findings = rule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val findings =
+            rule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 import androidx.compose.ui.Modifier
                 @Composable
                 fun Content(state: Int, modifier: Modifier, LoadingContent: @Composable () -> Unit) {
                     if (state == 0) LoadedContent(modifier) else LoadingContent()
                 }
                 """,
-            ),
-            modifierRuntime,
-            branchRuntime,
-        )
+                ),
+                modifierRuntime,
+                branchRuntime,
+            )
         assertThat(findings).isEmpty()
     }
 
     @ParameterizedTest
     @ValueSource(
-        strings = [
-            "if (state == 0) slot(modifier) else LoadingContent()",
-            "if (state == 0) LoadedContent(modifier) else slot(Modifier)",
-        ],
+        strings =
+            [
+                "if (state == 0) slot(modifier) else LoadingContent()",
+                "if (state == 0) LoadedContent(modifier) else slot(Modifier)",
+            ],
     )
     fun `reports missing forwarding for modifier accepting slots`(body: String) {
-        val findings = rule.lintWithAnalysisApi(
-            codeWithFakeCompose(
-                """
+        val findings =
+            rule.lintWithAnalysisApi(
+                codeWithFakeCompose(
+                    """
                 import androidx.compose.ui.Modifier
                 @Composable
                 fun Content(state: Int, modifier: Modifier, slot: @Composable (Modifier) -> Unit) {
                     $body
                 }
                 """,
-            ),
-            modifierRuntime,
-            branchRuntime,
-        )
+                ),
+                modifierRuntime,
+                branchRuntime,
+            )
         assertThat(findings).hasSize(1)
     }
 
-    private fun content(body: String): String = codeWithFakeCompose(
-        """
+    private fun content(body: String): String =
+        codeWithFakeCompose(
+            """
         import androidx.compose.ui.Modifier
         @Composable
         fun Content(state: Int, modifier: Modifier = Modifier, otherModifier: Modifier = Modifier, enabled: Boolean = true) {
             $body
         }
         """,
-    )
+        )
 
-    private val modifierRuntime = """
+    private val modifierRuntime =
+        """
         package androidx.compose.ui
         interface Modifier {
             fun then(other: Modifier): Modifier = this
             companion object : Modifier
         }
-    """.trimIndent()
-
-    private val branchRuntime = codeWithFakeCompose(
         """
+            .trimIndent()
+
+    private val branchRuntime =
+        codeWithFakeCompose(
+            """
         import androidx.compose.ui.Modifier
         @Composable fun LoadedContent(modifier: Modifier = Modifier) {}
         @Composable fun LoadedContent(label: String, modifier: Modifier = Modifier) {}
@@ -178,5 +190,5 @@ class ModifierShouldBeForwardedToEveryBranchCheckTest {
             @Composable fun Loading(modifier: Modifier = Modifier) {}
         }
         """,
-    )
+        )
 }

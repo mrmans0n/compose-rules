@@ -24,8 +24,7 @@ class ParameterOrder : ComposeKtVisitor {
         val lambdaTypes = file.lambdaTypes(config)
         val composableLambdaTypes = file.composableLambdaTypes(config)
 
-        val composables = file.findAllChildrenByClass<KtFunction>()
-            .filter { it.isComposable }
+        val composables = file.findAllChildrenByClass<KtFunction>().filter { it.isComposable }
 
         for (function in composables) {
             // We need to make sure the proper order is respected. It should be:
@@ -38,27 +37,27 @@ class ParameterOrder : ComposeKtVisitor {
             val currentOrder = function.valueParameters
 
             // We look in the original params without defaults and see if the last one is a function.
-            val hasTrailingFunction = function.valueParameters.lastOrNull()
-                ?.typeReference
-                ?.isLambda(treatAsLambdaTypes = lambdaTypes) == true
+            val hasTrailingFunction =
+                function.valueParameters.lastOrNull()?.typeReference?.isLambda(treatAsLambdaTypes = lambdaTypes) == true
 
-            val trailingLambda = if (hasTrailingFunction) {
-                listOf(function.valueParameters.last())
-            } else {
-                emptyList()
-            }
+            val trailingLambda =
+                if (hasTrailingFunction) {
+                    listOf(function.valueParameters.last())
+                } else {
+                    emptyList()
+                }
 
             // We extract the params without with and without defaults, and keep the order between them
-            val (withDefaults, withoutDefaults) = function.valueParameters
-                .runIf(hasTrailingFunction) { dropLast(1) }
-                .partition { it.hasDefaultValue() }
+            val (withDefaults, withoutDefaults) =
+                function.valueParameters.runIf(hasTrailingFunction) { dropLast(1) }.partition { it.hasDefaultValue() }
 
             // As ComposeModifierMissingCheck will catch modifiers without a Modifier default, we don't have to care
             // about that case. We will sort the params with defaults so that the modifier(s) go first.
-            val sortedWithDefaults = withDefaults.sortedWith(
-                compareByDescending<KtParameter> { it.isModifier(config) }
-                    .thenByDescending { it.name == "modifier" },
-            )
+            val sortedWithDefaults =
+                withDefaults.sortedWith(
+                    compareByDescending<KtParameter> { it.isModifier(config) }
+                        .thenByDescending { it.name == "modifier" },
+                )
 
             // We create our ideal ordering of params for the ideal composable.
             val properOrder = withoutDefaults + sortedWithDefaults + trailingLambda
@@ -72,18 +71,21 @@ class ParameterOrder : ComposeKtVisitor {
             // 2. The composable's current last parameter is a required parameter without default
             // 3. The parameters with defaults are already in proper order among themselves (e.g. modifier first)
             // 4. Moving to properOrder would indeed push a defaulted non-composable lambda to the trailing position
-            val shouldBeLenient = !hasTrailingFunction &&
-                function.valueParameters.lastOrNull()?.hasDefaultValue() == false &&
-                withDefaults == sortedWithDefaults &&
-                properOrder.lastOrNull()?.let { lastParam ->
-                    val typeRef = lastParam.typeReference
-                    lastParam.hasDefaultValue() &&
-                        typeRef?.isLambda(treatAsLambdaTypes = lambdaTypes) == true &&
-                        typeRef.isComposableLambda(
-                            treatAsLambdaTypes = lambdaTypes,
-                            treatAsComposableLambdaTypes = composableLambdaTypes,
-                        ).not()
-                } == true
+            val shouldBeLenient =
+                !hasTrailingFunction &&
+                    function.valueParameters.lastOrNull()?.hasDefaultValue() == false &&
+                    withDefaults == sortedWithDefaults &&
+                    properOrder.lastOrNull()?.let { lastParam ->
+                        val typeRef = lastParam.typeReference
+                        lastParam.hasDefaultValue() &&
+                            typeRef?.isLambda(treatAsLambdaTypes = lambdaTypes) == true &&
+                            typeRef
+                                .isComposableLambda(
+                                    treatAsLambdaTypes = lambdaTypes,
+                                    treatAsComposableLambdaTypes = composableLambdaTypes,
+                                )
+                                .not()
+                    } == true
 
             // If it's not the same as the current order, we show the rule violation.
             if (!shouldBeLenient && currentOrder != properOrder) {
@@ -96,10 +98,12 @@ class ParameterOrder : ComposeKtVisitor {
         fun createErrorMessage(currentOrder: List<KtParameter>, properOrder: List<KtParameter>): String =
             createErrorMessage(currentOrder.joinToString { it.text }, properOrder.joinToString { it.text })
 
-        fun createErrorMessage(currentOrder: String, properOrder: String): String = """
+        fun createErrorMessage(currentOrder: String, properOrder: String): String =
+            """
             Parameters in a composable function should be ordered following this pattern: params without defaults, modifiers, params with defaults and optionally, a trailing function that might not have a default param.
             Current params are: [$currentOrder] but could be [$properOrder].
             See https://mrmans0n.github.io/compose-rules/rules/#ordering-composable-parameters-properly for more information.
-        """.trimIndent()
+        """
+                .trimIndent()
     }
 }

@@ -14,12 +14,13 @@ class UnnecessaryComposableCheckTest {
     @Test
     fun `reports composable function that does not use composition`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             @Composable
             fun Example(): Int = 42
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -32,13 +33,14 @@ class UnnecessaryComposableCheckTest {
     @Test
     fun `reports composable getter that does not use composition`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             val value: Int
                 @Composable
                 get() = 42
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -51,8 +53,9 @@ class UnnecessaryComposableCheckTest {
     @Test
     fun `does not report composable function that calls composable function`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             @Composable
             fun EmitsContent() {
             }
@@ -62,7 +65,7 @@ class UnnecessaryComposableCheckTest {
                 EmitsContent()
             }
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -72,8 +75,9 @@ class UnnecessaryComposableCheckTest {
     @Test
     fun `does not report composable function that reads composable property`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             val LocalCount = compositionLocalOf { 0 }
 
             val currentValue: Int
@@ -83,7 +87,7 @@ class UnnecessaryComposableCheckTest {
             @Composable
             fun Example(): Int = currentValue
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -93,14 +97,15 @@ class UnnecessaryComposableCheckTest {
     @Test
     fun `does not report composable function that reads composition local current`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             val LocalCount = compositionLocalOf { 0 }
 
             @Composable
             fun Example(): Int = LocalCount.current
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -110,12 +115,13 @@ class UnnecessaryComposableCheckTest {
     @Test
     fun `does not report composable function that reads compose state value`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             @Composable
             fun Example(state: State<Int>): Int = state.value
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -125,15 +131,16 @@ class UnnecessaryComposableCheckTest {
     @Test
     fun `does not report composable function that reads delegated compose state`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             @Composable
             fun Example(state: State<Int>): Int {
                 val count by state
                 return count
             }
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -143,14 +150,15 @@ class UnnecessaryComposableCheckTest {
     @Test
     fun `reports composable function that only writes compose mutable state value`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             @Composable
             fun Example(state: MutableState<Int>) {
                 state.value = 5
             }
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -163,14 +171,15 @@ class UnnecessaryComposableCheckTest {
     @Test
     fun `does not report composable function that compound assigns compose mutable state value`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             @Composable
             fun Example(state: MutableState<Int>) {
                 state.value += 1
             }
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -180,15 +189,16 @@ class UnnecessaryComposableCheckTest {
     @Test
     fun `reports composable function that only writes delegated compose mutable state`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             @Composable
             fun Example(state: MutableState<Int>) {
                 var count by state
                 count = 5
             }
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -201,8 +211,9 @@ class UnnecessaryComposableCheckTest {
     @Test
     fun `reports composable function that only writes qualified delegated compose mutable state`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             class Holder(state: MutableState<Int>) {
                 var count by state
 
@@ -212,7 +223,7 @@ class UnnecessaryComposableCheckTest {
                 }
             }
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -225,12 +236,13 @@ class UnnecessaryComposableCheckTest {
     @Test
     fun `does not report composable function that reads nullable compose state value`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             @Composable
             fun Example(state: State<Int>?): Int? = state?.value
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -240,8 +252,9 @@ class UnnecessaryComposableCheckTest {
     @Test
     fun `does not report composable function that reads primitive compose state values`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             @Composable
             fun IntExample(state: IntState): Int = state.intValue
 
@@ -254,7 +267,7 @@ class UnnecessaryComposableCheckTest {
             @Composable
             fun DoubleExample(state: DoubleState): Double = state.doubleValue
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -264,14 +277,15 @@ class UnnecessaryComposableCheckTest {
     @Test
     fun `reports composable function that only writes primitive compose mutable state value`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             @Composable
             fun Example(state: MutableIntState) {
                 state.intValue = 5
             }
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -284,14 +298,15 @@ class UnnecessaryComposableCheckTest {
     @Test
     fun `does not report composable function that compound assigns primitive compose mutable state value`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             @Composable
             fun Example(state: MutableIntState) {
                 state.intValue += 1
             }
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -301,14 +316,15 @@ class UnnecessaryComposableCheckTest {
     @Test
     fun `does not report composable function that uses composition in default parameter value`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             val LocalCount = compositionLocalOf { 0 }
 
             @Composable
             fun Example(value: Int = LocalCount.current): Int = value
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -318,14 +334,15 @@ class UnnecessaryComposableCheckTest {
     @Test
     fun `does not report composable function with composable slot parameter`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             @Composable
             fun Wrapper(content: @Composable () -> Unit) {
                 println(content)
             }
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -335,8 +352,9 @@ class UnnecessaryComposableCheckTest {
     @Test
     fun `does not report composable function with typealiased composable slot parameter`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             typealias Slot = @Composable () -> Unit
 
             @Composable
@@ -344,7 +362,7 @@ class UnnecessaryComposableCheckTest {
                 println(content)
             }
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -354,14 +372,15 @@ class UnnecessaryComposableCheckTest {
     @Test
     fun `does not report composable extension function with composable receiver slot`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             @Composable
             fun (@Composable () -> Unit).Wrapper() {
                 println(this)
             }
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -371,8 +390,9 @@ class UnnecessaryComposableCheckTest {
     @Test
     fun `does not report contract declarations`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             interface Screen {
                 @Composable
                 fun Content()
@@ -391,7 +411,7 @@ class UnnecessaryComposableCheckTest {
                 override fun Render() = Unit
             }
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -401,8 +421,9 @@ class UnnecessaryComposableCheckTest {
     @Test
     fun `does not report read only composable declarations`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             @ReadOnlyComposable
             @Composable
             fun Example(): Int = 42
@@ -412,7 +433,7 @@ class UnnecessaryComposableCheckTest {
                 @Composable
                 get() = 42
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -422,8 +443,9 @@ class UnnecessaryComposableCheckTest {
     @Test
     fun `does not report composition use inside eager stdlib lambda`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             val LocalCount = compositionLocalOf { 0 }
 
             @Composable
@@ -431,7 +453,7 @@ class UnnecessaryComposableCheckTest {
                 LocalCount.current
             }
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -441,8 +463,9 @@ class UnnecessaryComposableCheckTest {
     @Test
     fun `does not report composition use inside eager collection transform`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             val LocalCount = compositionLocalOf { 0 }
 
             @Composable
@@ -450,7 +473,7 @@ class UnnecessaryComposableCheckTest {
                 it + LocalCount.current
             }
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -460,8 +483,9 @@ class UnnecessaryComposableCheckTest {
     @Test
     fun `does not report composition use inside eager collection association`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             enum class Month {
                 January,
             }
@@ -476,7 +500,7 @@ class UnnecessaryComposableCheckTest {
                 month.shortName()
             }
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -486,8 +510,9 @@ class UnnecessaryComposableCheckTest {
     @Test
     fun `does not report composition use inside eager sequence association`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             val LocalCount = compositionLocalOf { 0 }
 
             @Composable
@@ -495,7 +520,7 @@ class UnnecessaryComposableCheckTest {
                 item + LocalCount.current
             }
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -505,8 +530,9 @@ class UnnecessaryComposableCheckTest {
     @Test
     fun `does not report composition use inside eager collection association variants`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             val LocalCount = compositionLocalOf { 0 }
 
             @Composable
@@ -524,7 +550,7 @@ class UnnecessaryComposableCheckTest {
                 item + LocalCount.current
             }
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -534,8 +560,9 @@ class UnnecessaryComposableCheckTest {
     @Test
     fun `does not report composition use inside eager collection transform variants`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             val LocalCount = compositionLocalOf { 0 }
 
             @Composable
@@ -563,7 +590,7 @@ class UnnecessaryComposableCheckTest {
                 window.sum() + LocalCount.current
             }
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -573,8 +600,9 @@ class UnnecessaryComposableCheckTest {
     @Test
     fun `does not report composition use inside eager sequence terminal operations`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             val LocalCount = compositionLocalOf { 0 }
 
             @Composable
@@ -597,7 +625,7 @@ class UnnecessaryComposableCheckTest {
                 acc + item + LocalCount.current
             }
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -607,8 +635,9 @@ class UnnecessaryComposableCheckTest {
     @Test
     fun `reports composable function when composition use is inside lazy sequence transform`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             val LocalCount = compositionLocalOf { 0 }
 
             @Composable
@@ -616,7 +645,7 @@ class UnnecessaryComposableCheckTest {
                 item + LocalCount.current
             }
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -629,8 +658,9 @@ class UnnecessaryComposableCheckTest {
     @Test
     fun `does not report composition use inside eager stdlib builders`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             val LocalText = compositionLocalOf { "text" }
 
             @Composable
@@ -653,7 +683,7 @@ class UnnecessaryComposableCheckTest {
                 put(LocalText.current, LocalText.current)
             }
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -663,8 +693,9 @@ class UnnecessaryComposableCheckTest {
     @Test
     fun `does not report composition use inside eager builder lambda`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             import androidx.compose.ui.text.buildAnnotatedString
             import androidx.compose.ui.text.AnnotatedString
 
@@ -675,25 +706,27 @@ class UnnecessaryComposableCheckTest {
                 append(LocalText.current)
             }
             """,
-        )
+            )
 
-        val findings = rule.lintWithAnalysisApi(
-            code,
-            """
-            package androidx.compose.ui.text
+        val findings =
+            rule.lintWithAnalysisApi(
+                code,
+                """
+                package androidx.compose.ui.text
 
-            class AnnotatedString
+                class AnnotatedString
 
-            class AnnotatedStringBuilder {
-                fun append(value: String) = Unit
-            }
+                class AnnotatedStringBuilder {
+                    fun append(value: String) = Unit
+                }
 
-            fun buildAnnotatedString(builder: AnnotatedStringBuilder.() -> Unit): AnnotatedString {
-                AnnotatedStringBuilder().builder()
-                return AnnotatedString()
-            }
-            """.trimIndent(),
-        )
+                fun buildAnnotatedString(builder: AnnotatedStringBuilder.() -> Unit): AnnotatedString {
+                    AnnotatedStringBuilder().builder()
+                    return AnnotatedString()
+                }
+                """
+                    .trimIndent(),
+            )
 
         assertThat(findings).isEmpty()
     }
@@ -701,8 +734,9 @@ class UnnecessaryComposableCheckTest {
     @Test
     fun `does not report composition use inside eager annotated string helper lambdas`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             import androidx.compose.ui.text.AnnotatedString
             import androidx.compose.ui.text.LinkAnnotation
             import androidx.compose.ui.text.SpanStyle
@@ -734,45 +768,47 @@ class UnnecessaryComposableCheckTest {
                 }
             }
             """,
-        )
+            )
 
-        val findings = rule.lintWithAnalysisApi(
-            code,
-            """
-            package androidx.compose.ui.text
+        val findings =
+            rule.lintWithAnalysisApi(
+                code,
+                """
+                package androidx.compose.ui.text
 
-            class AnnotatedString
+                class AnnotatedString
 
-            class LinkAnnotation
+                class LinkAnnotation
 
-            class SpanStyle
+                class SpanStyle
 
-            class AnnotatedStringBuilder {
-                fun append(value: String) = Unit
-            }
+                class AnnotatedStringBuilder {
+                    fun append(value: String) = Unit
+                }
 
-            fun buildAnnotatedString(builder: AnnotatedStringBuilder.() -> Unit): AnnotatedString {
-                AnnotatedStringBuilder().builder()
-                return AnnotatedString()
-            }
+                fun buildAnnotatedString(builder: AnnotatedStringBuilder.() -> Unit): AnnotatedString {
+                    AnnotatedStringBuilder().builder()
+                    return AnnotatedString()
+                }
 
-            fun AnnotatedStringBuilder.withStyle(style: SpanStyle, block: AnnotatedStringBuilder.() -> Unit) {
-                block()
-            }
+                fun AnnotatedStringBuilder.withStyle(style: SpanStyle, block: AnnotatedStringBuilder.() -> Unit) {
+                    block()
+                }
 
-            fun AnnotatedStringBuilder.withLink(link: LinkAnnotation, block: AnnotatedStringBuilder.() -> Unit) {
-                block()
-            }
+                fun AnnotatedStringBuilder.withLink(link: LinkAnnotation, block: AnnotatedStringBuilder.() -> Unit) {
+                    block()
+                }
 
-            fun AnnotatedStringBuilder.withAnnotation(
-                tag: String,
-                annotation: String,
-                block: AnnotatedStringBuilder.() -> Unit,
-            ) {
-                block()
-            }
-            """.trimIndent(),
-        )
+                fun AnnotatedStringBuilder.withAnnotation(
+                    tag: String,
+                    annotation: String,
+                    block: AnnotatedStringBuilder.() -> Unit,
+                ) {
+                    block()
+                }
+                """
+                    .trimIndent(),
+            )
 
         assertThat(findings).isEmpty()
     }
@@ -780,8 +816,9 @@ class UnnecessaryComposableCheckTest {
     @Test
     fun `does not report composition use inside indexed eager collection iteration`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             val LocalCount = compositionLocalOf { 0 }
 
             @Composable
@@ -789,7 +826,7 @@ class UnnecessaryComposableCheckTest {
                 println(index + item + LocalCount.current)
             }
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -799,8 +836,9 @@ class UnnecessaryComposableCheckTest {
     @Test
     fun `does not report composition use inside custom inline lambda`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             val LocalCount = compositionLocalOf { 0 }
 
             inline fun <T> immediate(block: () -> T): T = block()
@@ -810,7 +848,7 @@ class UnnecessaryComposableCheckTest {
                 LocalCount.current
             }
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -820,8 +858,9 @@ class UnnecessaryComposableCheckTest {
     @Test
     fun `does not report composition use inside wrapped custom inline lambdas`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             @Target(AnnotationTarget.EXPRESSION)
             annotation class Marker
 
@@ -844,7 +883,7 @@ class UnnecessaryComposableCheckTest {
                 LocalCount.current
             })
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -854,8 +893,9 @@ class UnnecessaryComposableCheckTest {
     @Test
     fun `reports when inline noinline lambda only defers composition use`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             inline fun later(noinline block: () -> Int): () -> Int = block
 
             @Composable
@@ -863,7 +903,7 @@ class UnnecessaryComposableCheckTest {
                 state.value
             }
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -876,8 +916,9 @@ class UnnecessaryComposableCheckTest {
     @Test
     fun `reports when inline crossinline lambda only defers composition use`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             inline fun later(crossinline block: () -> Int): () -> Int = { block() }
 
             @Composable
@@ -885,7 +926,7 @@ class UnnecessaryComposableCheckTest {
                 state.value
             }
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -898,8 +939,9 @@ class UnnecessaryComposableCheckTest {
     @Test
     fun `does not report composition use inside eager collection reducers`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             val LocalCount = compositionLocalOf { 0 }
 
             @Composable
@@ -917,7 +959,7 @@ class UnnecessaryComposableCheckTest {
                 LocalCount.current
             }
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -927,8 +969,9 @@ class UnnecessaryComposableCheckTest {
     @Test
     fun `reports composable function when composition use is only inside deferred lambda`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             val LocalCount = compositionLocalOf { 0 }
 
             @Composable
@@ -936,7 +979,7 @@ class UnnecessaryComposableCheckTest {
                 LocalCount.current
             }
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -949,8 +992,9 @@ class UnnecessaryComposableCheckTest {
     @Test
     fun `does not report composable function that reads chained composable property`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             val LocalCount = compositionLocalOf { 0 }
 
             val CurrentCount: Int
@@ -962,7 +1006,7 @@ class UnnecessaryComposableCheckTest {
             @Composable
             fun Example(): String = describe(CurrentCount.toString())
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 

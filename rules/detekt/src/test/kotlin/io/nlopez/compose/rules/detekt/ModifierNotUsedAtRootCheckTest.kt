@@ -6,16 +6,16 @@ import dev.detekt.api.SourceLocation
 import dev.detekt.test.TestConfig
 import dev.detekt.test.lint
 import io.nlopez.compose.rules.ModifierNotUsedAtRoot.Companion.ComposableModifierShouldBeUsedAtTheTopMostPossiblePlace
-import io.nlopez.compose.rules.detekt.assertThat
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
 
 class ModifierNotUsedAtRootCheckTest {
 
-    private val testConfig = TestConfig(
-        "contentEmitters" to listOf("Potato", "Banana"),
-        "contentEmittersDenylist" to listOf("Apple"),
-    )
+    private val testConfig =
+        TestConfig(
+            "contentEmitters" to listOf("Potato", "Banana"),
+            "contentEmittersDenylist" to listOf("Apple"),
+        )
     private val rule = ModifierNotUsedAtRootCheck(testConfig)
 
     @Test
@@ -23,39 +23,40 @@ class ModifierNotUsedAtRootCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something(modifier: Modifier = Modifier) {
-                    Row {
-                        Text("Hi", modifier = modifier)
-                    }
+            @Composable
+            fun Something(modifier: Modifier = Modifier) {
+                Row {
+                    Text("Hi", modifier = modifier)
                 }
-                @Composable
-                fun Something(modifier: Modifier = Modifier) {
-                    Potato(Modifier.fillMaxWidth()) {
-                        Text("Hi", modifier = modifier)
-                    }
+            }
+            @Composable
+            fun Something(modifier: Modifier = Modifier) {
+                Potato(Modifier.fillMaxWidth()) {
+                    Text("Hi", modifier = modifier)
                 }
-                @Composable
-                fun Something(modifier: Modifier = Modifier) {
-                    val poop = if (x) modifier else modifier.fillMaxWidth()
+            }
+            @Composable
+            fun Something(modifier: Modifier = Modifier) {
+                val poop = if (x) modifier else modifier.fillMaxWidth()
+                Column {
+                    Text("Hi", modifier = poop)
+                }
+            }
+            @Composable
+            fun Something(modifier: Modifier = Modifier) {
+                if (paella.isWellDone()) {
                     Column {
-                        Text("Hi", modifier = poop)
+                        Text("Yay", modifier)
+                    }
+                } else {
+                    Row {
+                        Text("Oh no", modifier)
                     }
                 }
-                @Composable
-                fun Something(modifier: Modifier = Modifier) {
-                    if (paella.isWellDone()) {
-                        Column {
-                            Text("Yay", modifier)
-                        }
-                    } else {
-                        Row {
-                            Text("Oh no", modifier)
-                        }
-                    }
-                }
+            }
 
-            """.trimIndent()
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors)
             .hasStartSourceLocations(
@@ -75,19 +76,20 @@ class ModifierNotUsedAtRootCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something(modifier: Modifier = Modifier) {
-                    Dialog {
-                        Text("Hi", modifier = modifier)
-                    }
+            @Composable
+            fun Something(modifier: Modifier = Modifier) {
+                Dialog {
+                    Text("Hi", modifier = modifier)
                 }
-                @Composable
-                fun Something(modifier: Modifier = Modifier) {
-                    Apple {
-                        Text("Hi", modifier = modifier)
-                    }
+            }
+            @Composable
+            fun Something(modifier: Modifier = Modifier) {
+                Apple {
+                    Text("Hi", modifier = modifier)
                 }
-            """.trimIndent()
+            }
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }
@@ -97,65 +99,66 @@ class ModifierNotUsedAtRootCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something(modifier: Modifier = Modifier) {
-                    Row(modifier = modifier) {
-                        Text("Hi")
+            @Composable
+            fun Something(modifier: Modifier = Modifier) {
+                Row(modifier = modifier) {
+                    Text("Hi")
+                }
+            }
+            @Composable
+            fun Something(modifier: Modifier = Modifier) {
+                Potato(modifier.fillMaxWidth()) {
+                    Text("Hi")
+                }
+            }
+            @Composable
+            fun Something(modifier: Modifier = Modifier) {
+                val poop = if (x) modifier else modifier.fillMaxWidth()
+                Column(modifier = poop) {
+                    Text("Hi")
+                }
+            }
+            @Composable
+            fun Something(modifier: Modifier = Modifier) {
+                if (paella.isWellDone()) {
+                    Column(modifier) {
+                        Text("Yay")
+                    }
+                } else {
+                    Row(modifier) {
+                        Text("Oh no")
                     }
                 }
-                @Composable
-                fun Something(modifier: Modifier = Modifier) {
-                    Potato(modifier.fillMaxWidth()) {
-                        Text("Hi")
-                    }
-                }
-                @Composable
-                fun Something(modifier: Modifier = Modifier) {
-                    val poop = if (x) modifier else modifier.fillMaxWidth()
-                    Column(modifier = poop) {
-                        Text("Hi")
-                    }
-                }
-                @Composable
-                fun Something(modifier: Modifier = Modifier) {
-                    if (paella.isWellDone()) {
-                        Column(modifier) {
-                            Text("Yay")
-                        }
-                    } else {
-                        Row(modifier) {
-                            Text("Oh no")
-                        }
-                    }
-                }
-                @Composable
-                fun Something(
-                  modifier: Modifier = Modifier,
-                  content: @Composable BoxScope.() -> Unit
+            }
+            @Composable
+            fun Something(
+              modifier: Modifier = Modifier,
+              content: @Composable BoxScope.() -> Unit
+            ) {
+              MaterialTheme(
+                colorScheme = darkColorScheme()
+              ) {
+                Box(
+                  modifier = modifier
+                    .fillMaxSize()
+                    .background(
+                      color = MaterialTheme.colorScheme.background
+                    )
                 ) {
-                  MaterialTheme(
-                    colorScheme = darkColorScheme()
+                  Card(
+                    modifier = Modifier.fillMaxSize()
                   ) {
                     Box(
-                      modifier = modifier
-                        .fillMaxSize()
-                        .background(
-                          color = MaterialTheme.colorScheme.background
-                        )
+                      modifier = Modifier.padding(16.dp)
                     ) {
-                      Card(
-                        modifier = Modifier.fillMaxSize()
-                      ) {
-                        Box(
-                          modifier = Modifier.padding(16.dp)
-                        ) {
-                          content()
-                        }
-                      }
+                      content()
                     }
                   }
                 }
-            """.trimIndent()
+              }
+            }
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }
@@ -165,24 +168,25 @@ class ModifierNotUsedAtRootCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something(modifier: Modifier = Modifier) {
-                    Column(modifier = modifier) {
-                        Slot { modifier: Modifier ->
-                            Row(modifier = Modifier.then(modifier)) {}
-                        }
+            @Composable
+            fun Something(modifier: Modifier = Modifier) {
+                Column(modifier = modifier) {
+                    Slot { modifier: Modifier ->
+                        Row(modifier = Modifier.then(modifier)) {}
                     }
                 }
-                @Composable
-                fun Something(modifier: Modifier = Modifier) {
-                    Column(modifier = modifier) {
-                        Slot { (modifier, _) ->
-                            val local = modifier.padding(8.dp)
-                            Row(modifier = Modifier.then(local)) {}
-                        }
+            }
+            @Composable
+            fun Something(modifier: Modifier = Modifier) {
+                Column(modifier = modifier) {
+                    Slot { (modifier, _) ->
+                        val local = modifier.padding(8.dp)
+                        Row(modifier = Modifier.then(local)) {}
                     }
                 }
-            """.trimIndent()
+            }
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }
@@ -192,19 +196,19 @@ class ModifierNotUsedAtRootCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something(modifier: Modifier = Modifier) {
-                    val rootModifier = modifier
-                    Column {
-                        Slot { modifier: Modifier ->
-                            Child(modifier = modifier.then(rootModifier))
-                        }
+            @Composable
+            fun Something(modifier: Modifier = Modifier) {
+                val rootModifier = modifier
+                Column {
+                    Slot { modifier: Modifier ->
+                        Child(modifier = modifier.then(rootModifier))
                     }
                 }
-            """.trimIndent()
+            }
+            """
+                .trimIndent()
         val errors = rule.lint(code)
-        assertThat(errors)
-            .hasStartSourceLocations(SourceLocation(6, 19))
+        assertThat(errors).hasStartSourceLocations(SourceLocation(6, 19))
         for (error in errors) {
             assertThat(error).hasMessage(ComposableModifierShouldBeUsedAtTheTopMostPossiblePlace)
         }
@@ -215,19 +219,19 @@ class ModifierNotUsedAtRootCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something(modifier: Modifier = Modifier) {
-                    val rootModifier = modifier
-                    Column {
-                        Slot { modifier: Modifier ->
-                            Child(modifier = rootModifier, extra = modifier)
-                        }
+            @Composable
+            fun Something(modifier: Modifier = Modifier) {
+                val rootModifier = modifier
+                Column {
+                    Slot { modifier: Modifier ->
+                        Child(modifier = rootModifier, extra = modifier)
                     }
                 }
-            """.trimIndent()
+            }
+            """
+                .trimIndent()
         val errors = rule.lint(code)
-        assertThat(errors)
-            .hasStartSourceLocations(SourceLocation(6, 19))
+        assertThat(errors).hasStartSourceLocations(SourceLocation(6, 19))
         for (error in errors) {
             assertThat(error).hasMessage(ComposableModifierShouldBeUsedAtTheTopMostPossiblePlace)
         }

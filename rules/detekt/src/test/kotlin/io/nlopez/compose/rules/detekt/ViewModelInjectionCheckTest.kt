@@ -6,15 +6,15 @@ import dev.detekt.api.SourceLocation
 import dev.detekt.test.TestConfig
 import dev.detekt.test.lint
 import io.nlopez.compose.rules.ViewModelInjection
-import io.nlopez.compose.rules.detekt.assertThat
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 
 class ViewModelInjectionCheckTest {
-    private val testConfig = TestConfig(
-        "viewModelFactories" to listOf("bananaViewModel", "potatoViewModel"),
-    )
+    private val testConfig =
+        TestConfig(
+            "viewModelFactories" to listOf("bananaViewModel", "potatoViewModel"),
+        )
     private val rule = ViewModelInjectionCheck(testConfig)
 
     @ParameterizedTest
@@ -29,7 +29,8 @@ class ViewModelInjectionCheckTest {
                 viewModel: MyVM = $viewModel(),
                 viewModel2: MyVM = $viewModel(),
             ) { }
-            """.trimIndent()
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }
@@ -44,7 +45,8 @@ class ViewModelInjectionCheckTest {
             override fun Content() {
                 val viewModel = $viewModel<MyVM>()
             }
-            """.trimIndent()
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }
@@ -67,9 +69,11 @@ class ViewModelInjectionCheckTest {
             fun MyComposableTrailingLambda(block: () -> Unit) {
                 val viewModel: MyVM = $viewModel()
             }
-            """.trimIndent()
+            """
+                .trimIndent()
         val errors = rule.lint(code)
-        assertThat(errors).hasSize(3)
+        assertThat(errors)
+            .hasSize(3)
             .hasStartSourceLocations(
                 SourceLocation(3, 9),
                 SourceLocation(7, 9),
@@ -94,7 +98,8 @@ class ViewModelInjectionCheckTest {
                     }
                 }
             }
-            """.trimIndent()
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }
@@ -113,9 +118,11 @@ class ViewModelInjectionCheckTest {
                     val viewModel: MyOtherVM = $viewModel()
                 }
             }
-            """.trimIndent()
+            """
+                .trimIndent()
         val errors = rule.lint(code)
-        assertThat(errors).hasSize(2)
+        assertThat(errors)
+            .hasSize(2)
             .hasStartSourceLocations(
                 SourceLocation(4, 13),
                 SourceLocation(6, 13),

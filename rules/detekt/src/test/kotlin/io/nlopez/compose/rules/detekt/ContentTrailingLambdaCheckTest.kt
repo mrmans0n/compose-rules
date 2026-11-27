@@ -6,16 +6,16 @@ import dev.detekt.api.SourceLocation
 import dev.detekt.test.TestConfig
 import dev.detekt.test.lint
 import io.nlopez.compose.rules.ContentTrailingLambda
-import io.nlopez.compose.rules.detekt.assertThat
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
 
 class ContentTrailingLambdaCheckTest {
 
-    private val testConfig = TestConfig(
-        "treatAsComposableLambda" to listOf("Potato"),
-        "treatAsLambda" to listOf("Plum"),
-    )
+    private val testConfig =
+        TestConfig(
+            "treatAsComposableLambda" to listOf("Potato"),
+            "treatAsLambda" to listOf("Plum"),
+        )
     private val rule = ContentTrailingLambdaCheck(testConfig)
 
     @Test
@@ -23,9 +23,10 @@ class ContentTrailingLambdaCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun A(content: @Composable () -> Unit, text: String) {}
-            """.trimIndent()
+            @Composable
+            fun A(content: @Composable () -> Unit, text: String) {}
+            """
+                .trimIndent()
 
         val errors = rule.lint(code)
         assertThat(errors)
@@ -42,19 +43,20 @@ class ContentTrailingLambdaCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun A(content: Potato, text: String) {}
-                @Composable
-                fun A(content: Apple, text: String) {}
-                @Composable
-                fun A(content: Banana, text: String) {}
+            @Composable
+            fun A(content: Potato, text: String) {}
+            @Composable
+            fun A(content: Apple, text: String) {}
+            @Composable
+            fun A(content: Banana, text: String) {}
 
-                typealias Apple = @Composable () -> Unit
+            typealias Apple = @Composable () -> Unit
 
-                fun interface Banana {
-                    @Composable fun Content()
-                }
-            """.trimIndent()
+            fun interface Banana {
+                @Composable fun Content()
+            }
+            """
+                .trimIndent()
 
         val errors = rule.lint(code)
         assertThat(errors)
@@ -73,23 +75,24 @@ class ContentTrailingLambdaCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun A(text: String, content: @Composable () -> Unit) {}
-                @Composable
-                fun A(content: @Composable Plum) {}
-                @Composable
-                fun A(text: String, content: Potato) {}
-                @Composable
-                fun A(text: String, content: Banana) {}
-                @Composable
-                fun A(text: String, content: Apple) {}
+            @Composable
+            fun A(text: String, content: @Composable () -> Unit) {}
+            @Composable
+            fun A(content: @Composable Plum) {}
+            @Composable
+            fun A(text: String, content: Potato) {}
+            @Composable
+            fun A(text: String, content: Banana) {}
+            @Composable
+            fun A(text: String, content: Apple) {}
 
-                typealias Apple = @Composable () -> Unit
+            typealias Apple = @Composable () -> Unit
 
-                fun interface Banana {
-                    @Composable fun Content()
-                }
-            """.trimIndent()
+            fun interface Banana {
+                @Composable fun Content()
+            }
+            """
+                .trimIndent()
 
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
@@ -100,9 +103,10 @@ class ContentTrailingLambdaCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun A(content: () -> Unit, text: String) {}
-            """.trimIndent()
+            @Composable
+            fun A(content: () -> Unit, text: String) {}
+            """
+                .trimIndent()
 
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()

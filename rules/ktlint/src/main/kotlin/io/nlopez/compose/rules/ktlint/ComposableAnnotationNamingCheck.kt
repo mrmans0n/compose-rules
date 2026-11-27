@@ -7,5 +7,4 @@ import io.nlopez.compose.rules.ComposableAnnotationNaming
 import io.nlopez.compose.rules.KtlintRule
 
 class ComposableAnnotationNamingCheck :
-    KtlintRule("compose:composable-annotation-naming"),
-    ComposeKtVisitor by ComposableAnnotationNaming()
+    KtlintRule("compose:composable-annotation-naming"), ComposeKtVisitor by ComposableAnnotationNaming()

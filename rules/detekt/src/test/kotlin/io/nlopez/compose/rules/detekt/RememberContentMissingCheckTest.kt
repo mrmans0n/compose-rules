@@ -6,7 +6,6 @@ import dev.detekt.api.Config
 import dev.detekt.api.SourceLocation
 import dev.detekt.test.lint
 import io.nlopez.compose.rules.RememberContentMissing
-import io.nlopez.compose.rules.detekt.assertThat
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
 
@@ -19,8 +18,9 @@ class RememberContentMissingCheckTest {
         @Language("kotlin")
         val code =
             """
-                val mco = movableContentOf { Text("X") }
-            """.trimIndent()
+            val mco = movableContentOf { Text("X") }
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }
@@ -30,12 +30,13 @@ class RememberContentMissingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun MyComposable() {
-                    val something = movableContentOf { Text("X") }
-                }
+            @Composable
+            fun MyComposable() {
+                val something = movableContentOf { Text("X") }
+            }
 
-            """.trimIndent()
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors)
             .hasStartSourceLocations(
@@ -51,11 +52,12 @@ class RememberContentMissingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun MyComposable() {
-                    val something = movableContentWithReceiverOf { Text("X") }
-                }
-            """.trimIndent()
+            @Composable
+            fun MyComposable() {
+                val something = movableContentWithReceiverOf { Text("X") }
+            }
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors)
             .hasStartSourceLocations(
@@ -71,11 +73,12 @@ class RememberContentMissingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun MyComposable() {
-                    val something = remember { movableContentOf { Text("X") } }
-                }
-            """.trimIndent()
+            @Composable
+            fun MyComposable() {
+                val something = remember { movableContentOf { Text("X") } }
+            }
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }
@@ -85,11 +88,12 @@ class RememberContentMissingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun MyComposable() {
-                    val something = remember { movableContentWithReceiverOf { Text("X") } }
-                }
-            """.trimIndent()
+            @Composable
+            fun MyComposable() {
+                val something = remember { movableContentWithReceiverOf { Text("X") } }
+            }
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }
@@ -99,11 +103,12 @@ class RememberContentMissingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun MyComposable() {
-                    val something = retain { movableContentOf { Text("X") } }
-                }
-            """.trimIndent()
+            @Composable
+            fun MyComposable() {
+                val something = retain { movableContentOf { Text("X") } }
+            }
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }
@@ -113,11 +118,12 @@ class RememberContentMissingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun MyComposable() {
-                    val something = retain { movableContentWithReceiverOf { Text("X") } }
-                }
-            """.trimIndent()
+            @Composable
+            fun MyComposable() {
+                val something = retain { movableContentWithReceiverOf { Text("X") } }
+            }
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }

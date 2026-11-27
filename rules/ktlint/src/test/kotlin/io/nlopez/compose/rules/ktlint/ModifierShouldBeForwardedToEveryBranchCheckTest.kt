@@ -29,14 +29,16 @@ class ModifierShouldBeForwardedToEveryBranchCheckTest {
                 fun LoadedContent(modifier: Modifier = Modifier) {}
                 @Composable
                 fun LoadingContent(modifier: Modifier = Modifier) {}
-            """.trimIndent()
-        modifierRuleAssertThat(code).hasLintViolationsWithoutAutoCorrect(
-            LintViolation(
-                5,
-                17,
-                "One branch forwards the modifier parameter, but this branch does not. Pass it to every branch whose composable accepts a modifier.",
-            ),
-        )
+            """
+                .trimIndent()
+        modifierRuleAssertThat(code)
+            .hasLintViolationsWithoutAutoCorrect(
+                LintViolation(
+                    5,
+                    17,
+                    "One branch forwards the modifier parameter, but this branch does not. Pass it to every branch whose composable accepts a modifier.",
+                ),
+            )
     }
 
     @Test
@@ -44,46 +46,49 @@ class ModifierShouldBeForwardedToEveryBranchCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Content(state: Int, modifier: Modifier = Modifier) {
-                    if (state == 0) {
-                        LoadedContent("ready", modifier.padding(8.dp))
-                    } else if (state == 1) {
-                        LoadingContent("loading", Modifier)
-                    } else {
-                        LoadedContent("ready", modifier = modifier)
-                    }
+            @Composable
+            fun Content(state: Int, modifier: Modifier = Modifier) {
+                if (state == 0) {
+                    LoadedContent("ready", modifier.padding(8.dp))
+                } else if (state == 1) {
+                    LoadingContent("loading", Modifier)
+                } else {
+                    LoadedContent("ready", modifier = modifier)
                 }
-                @Composable
-                fun LoadedContent(label: String, modifier: Modifier = Modifier) {}
-                @Composable
-                fun LoadingContent(label: String, rootModifier: Modifier = Modifier) {}
-            """.trimIndent()
-        modifierRuleAssertThat(code).hasLintViolationsWithoutAutoCorrect(
-            LintViolation(
-                6,
-                9,
-                "One branch forwards the modifier parameter, but this branch does not. Pass it to every branch whose composable accepts a modifier.",
-            ),
-        )
+            }
+            @Composable
+            fun LoadedContent(label: String, modifier: Modifier = Modifier) {}
+            @Composable
+            fun LoadingContent(label: String, rootModifier: Modifier = Modifier) {}
+            """
+                .trimIndent()
+        modifierRuleAssertThat(code)
+            .hasLintViolationsWithoutAutoCorrect(
+                LintViolation(
+                    6,
+                    9,
+                    "One branch forwards the modifier parameter, but this branch does not. Pass it to every branch whose composable accepts a modifier.",
+                ),
+            )
     }
 
     @ParameterizedTest
     @ValueSource(
-        strings = [
-            "if (state == 0) LoadingContent(modifier) else LoadedContent(modifier)",
-            "if (state == 0) LoadingContent() else LoadedContent()",
-            "if (state == 0) EmptyContent() else LoadedContent(modifier)",
-            "if (state == 0) ExternalContent() else LoadedContent(modifier)",
-            "if (state == 0) Other.LoadingContent() else LoadedContent(modifier)",
-            "if (state == 0) OverloadedContent() else LoadedContent(modifier)",
-            "if (state == 0) LoadingContent(unknownModifier) else LoadedContent(modifier)",
-            "when (val modifier = otherModifier) { Modifier -> LoadingContent(); else -> LoadedContent(modifier) }",
-            "if (state == 0) MixedContent(label = \"loading\", modifier) else LoadedContent(modifier)",
-            "if (state == 0) LoadingContent(if (enabled) modifier else Modifier) else LoadedContent(modifier)",
-            "Box(modifier) { if (state == 0) LoadingContent() else LoadedContent() }",
-            "Header()\nif (state == 0) LoadingContent() else LoadedContent(modifier)",
-        ],
+        strings =
+            [
+                "if (state == 0) LoadingContent(modifier) else LoadedContent(modifier)",
+                "if (state == 0) LoadingContent() else LoadedContent()",
+                "if (state == 0) EmptyContent() else LoadedContent(modifier)",
+                "if (state == 0) ExternalContent() else LoadedContent(modifier)",
+                "if (state == 0) Other.LoadingContent() else LoadedContent(modifier)",
+                "if (state == 0) OverloadedContent() else LoadedContent(modifier)",
+                "if (state == 0) LoadingContent(unknownModifier) else LoadedContent(modifier)",
+                "when (val modifier = otherModifier) { Modifier -> LoadingContent(); else -> LoadedContent(modifier) }",
+                "if (state == 0) MixedContent(label = \"loading\", modifier) else LoadedContent(modifier)",
+                "if (state == 0) LoadingContent(if (enabled) modifier else Modifier) else LoadedContent(modifier)",
+                "Box(modifier) { if (state == 0) LoadingContent() else LoadedContent() }",
+                "Header()\nif (state == 0) LoadingContent() else LoadedContent(modifier)",
+            ],
     )
     fun `skips branches without a definite missing modifier`(body: String) {
         @Language("kotlin")
@@ -105,7 +110,8 @@ class ModifierShouldBeForwardedToEveryBranchCheckTest {
                 fun OverloadedContent(modifier: Modifier = Modifier) {}
                 @Composable
                 fun OverloadedContent(label: String = "", modifier: Modifier = Modifier) {}
-            """.trimIndent()
+            """
+                .trimIndent()
         modifierRuleAssertThat(code).hasNoLintViolations()
     }
 }

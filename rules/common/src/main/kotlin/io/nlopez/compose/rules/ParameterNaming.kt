@@ -19,18 +19,19 @@ class ParameterNaming : ComposeKtVisitor {
         val lambdaTypes = function.containingKtFile.lambdaTypes(config)
         val allowed = config.getSet("allowedLambdaParameterNames", emptySet())
 
-        val errors = function.valueParameters
-            .asSequence()
-            .filter { it.typeReference?.isLambda(lambdaTypes) == true }
-            .filter {
-                // As per why not force lambdas to all start with `on`, we cannot really know when they are used for
-                // lazy initialization purposes -- and also don't want to be overly annoying.
-                it.name?.startsWith("on") == true
-            }
-            .filterNot { it.name in allowed }
-            .filterNot { it.name in ExceptionsInCompose }
-            .filter { it.name?.isPastTense == true }
-            .toList()
+        val errors =
+            function.valueParameters
+                .asSequence()
+                .filter { it.typeReference?.isLambda(lambdaTypes) == true }
+                .filter {
+                    // As per why not force lambdas to all start with `on`, we cannot really know when they are used for
+                    // lazy initialization purposes -- and also don't want to be overly annoying.
+                    it.name?.startsWith("on") == true
+                }
+                .filterNot { it.name in allowed }
+                .filterNot { it.name in ExceptionsInCompose }
+                .filter { it.name?.isPastTense == true }
+                .toList()
 
         for (error in errors) {
             emitter.report(error, LambdaParametersInPresentTense)
@@ -38,8 +39,9 @@ class ParameterNaming : ComposeKtVisitor {
     }
 
     private val String.isPastTense: Boolean
-        get() = VerbsPresentTenseEndingInEd.none { endsWith(it) } &&
-            (endsWith("ed") || IrregularVerbsInPastTense.any { endsWith(it) })
+        get() =
+            VerbsPresentTenseEndingInEd.none { endsWith(it) } &&
+                (endsWith("ed") || IrregularVerbsInPastTense.any { endsWith(it) })
 
     companion object {
         // A list of common irregular verbs in english, excluding those where present tense == past tense,
@@ -238,10 +240,12 @@ class ParameterNaming : ComposeKtVisitor {
             )
         }
 
-        val LambdaParametersInPresentTense = """
+        val LambdaParametersInPresentTense =
+            """
             Lambda parameters in a composable function should be in present tense, not past tense.
             Examples: `onClick` and not `onClicked`, `onTextChange` and not `onTextChanged`, etc.
             See https://mrmans0n.github.io/compose-rules/rules/#naming-parameters-properly for more information.
-        """.trimIndent()
+            """
+                .trimIndent()
     }
 }

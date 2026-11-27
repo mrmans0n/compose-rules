@@ -17,17 +17,19 @@ class ContentTrailingLambdaCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun A(content: @Composable () -> Unit, text: String) {}
-            """.trimIndent()
+            @Composable
+            fun A(content: @Composable () -> Unit, text: String) {}
+            """
+                .trimIndent()
 
-        ruleAssertThat(code).hasLintViolationsWithoutAutoCorrect(
-            LintViolation(
-                line = 2,
-                col = 7,
-                detail = ContentTrailingLambda.ContentShouldBeTrailingLambda,
-            ),
-        )
+        ruleAssertThat(code)
+            .hasLintViolationsWithoutAutoCorrect(
+                LintViolation(
+                    line = 2,
+                    col = 7,
+                    detail = ContentTrailingLambda.ContentShouldBeTrailingLambda,
+                ),
+            )
     }
 
     @Test
@@ -35,19 +37,20 @@ class ContentTrailingLambdaCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun A(content: Potato, text: String) {}
-                @Composable
-                fun A(content: Apple, text: String) {}
-                @Composable
-                fun A(content: Banana, text: String) {}
+            @Composable
+            fun A(content: Potato, text: String) {}
+            @Composable
+            fun A(content: Apple, text: String) {}
+            @Composable
+            fun A(content: Banana, text: String) {}
 
-                typealias Apple = @Composable () -> Unit
+            typealias Apple = @Composable () -> Unit
 
-                fun interface Banana {
-                    @Composable fun Content()
-                }
-            """.trimIndent()
+            fun interface Banana {
+                @Composable fun Content()
+            }
+            """
+                .trimIndent()
 
         ruleAssertThat(code)
             .withEditorConfigOverride(treatAsComposableLambda to "Potato")
@@ -75,23 +78,24 @@ class ContentTrailingLambdaCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun A(text: String, content: @Composable () -> Unit) {}
-                @Composable
-                fun A(content: @Composable Plum) {}
-                @Composable
-                fun A(text: String, content: Potato) {}
-                @Composable
-                fun A(text: String, content: Banana) {}
-                @Composable
-                fun A(text: String, content: Apple) {}
+            @Composable
+            fun A(text: String, content: @Composable () -> Unit) {}
+            @Composable
+            fun A(content: @Composable Plum) {}
+            @Composable
+            fun A(text: String, content: Potato) {}
+            @Composable
+            fun A(text: String, content: Banana) {}
+            @Composable
+            fun A(text: String, content: Apple) {}
 
-                typealias Apple = @Composable () -> Unit
+            typealias Apple = @Composable () -> Unit
 
-                fun interface Banana {
-                    @Composable fun Content()
-                }
-            """.trimIndent()
+            fun interface Banana {
+                @Composable fun Content()
+            }
+            """
+                .trimIndent()
 
         ruleAssertThat(code)
             .withEditorConfigOverride(treatAsComposableLambda to "Potato", treatAsLambda to "Plum")
@@ -103,9 +107,10 @@ class ContentTrailingLambdaCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun A(content: () -> Unit, text: String) {}
-            """.trimIndent()
+            @Composable
+            fun A(content: () -> Unit, text: String) {}
+            """
+                .trimIndent()
 
         ruleAssertThat(code).hasNoLintViolations()
     }

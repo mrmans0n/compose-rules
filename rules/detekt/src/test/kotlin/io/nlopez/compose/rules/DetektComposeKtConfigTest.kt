@@ -7,15 +7,16 @@ import org.assertj.core.api.AssertionsForInterfaceTypes.assertThat
 import org.junit.jupiter.api.Test
 
 class DetektComposeKtConfigTest {
-    private val detektConfig = TestConfig(
-        "myInt" to 10,
-        "myString" to "abcd",
-        "myList" to "a,b,c,a",
-        "myList2" to "a , b , c,a",
-        "mySet" to "a,b,c,a,b,c",
-        "mySet2" to "  a, b,c ,a  , b  ,  c ",
-        "myBool" to true,
-    )
+    private val detektConfig =
+        TestConfig(
+            "myInt" to 10,
+            "myString" to "abcd",
+            "myList" to "a,b,c,a",
+            "myList2" to "a , b , c,a",
+            "mySet" to "a,b,c,a,b,c",
+            "mySet2" to "  a, b,c ,a  , b  ,  c ",
+            "myBool" to true,
+        )
     private val config = DetektComposeKtConfig(detektConfig)
 
     @Test

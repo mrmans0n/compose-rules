@@ -8,6 +8,7 @@ import dev.detekt.api.Finding
 import dev.detekt.api.RequiresAnalysisApi
 import dev.detekt.api.Rule
 import dev.detekt.api.RuleName
+import java.net.URI
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtElement
 import org.jetbrains.kotlin.psi.KtLambdaExpression
@@ -15,12 +16,8 @@ import org.jetbrains.kotlin.psi.KtNamedFunction
 import org.jetbrains.kotlin.psi.KtPropertyAccessor
 import org.jetbrains.kotlin.psi.KtSimpleNameExpression
 import org.jetbrains.kotlin.psi.KtTreeVisitorVoid
-import java.net.URI
 
-/**
- * Reports `@ReadOnlyComposable` declarations that make composable calls which are not also
- * `@ReadOnlyComposable`.
- */
+/** Reports `@ReadOnlyComposable` declarations that make composable calls which are not also `@ReadOnlyComposable`. */
 class InvalidReadOnlyComposableCheck(config: Config) :
     Rule(
         config,
@@ -83,10 +80,7 @@ class InvalidReadOnlyComposableCheck(config: Config) :
 
                 override fun visitSimpleNameExpression(expression: KtSimpleNameExpression) {
                     if (firstInvalidCall != null || firstInvalidPropertyRead != null) return
-                    if (
-                        expression.isComposablePropertyRead() &&
-                        !expression.isReadOnlyComposablePropertyRead()
-                    ) {
+                    if (expression.isComposablePropertyRead() && !expression.isReadOnlyComposablePropertyRead()) {
                         firstInvalidPropertyRead = expression
                         return
                     }
@@ -113,10 +107,12 @@ class InvalidReadOnlyComposableCheck(config: Config) :
     }
 
     internal companion object {
-        val InvalidReadOnlyComposable = """
+        val InvalidReadOnlyComposable =
+            """
             This @ReadOnlyComposable declaration calls a composable that is not read-only.
 
             See https://mrmans0n.github.io/compose-rules/rules/#do-not-mark-composables-that-emit-content-as-read-only for more information.
-        """.trimIndent()
+            """
+                .trimIndent()
     }
 }

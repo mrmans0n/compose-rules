@@ -17,21 +17,22 @@ class ComposableNestingDepthCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun TooDeep() {
+            @Composable
+            fun TooDeep() {
+                Box {
                     Box {
                         Box {
                             Box {
                                 Box {
-                                    Box {
-                                        Text("")
-                                    }
+                                    Text("")
                                 }
                             }
                         }
                     }
                 }
-            """.trimIndent()
+            }
+            """
+                .trimIndent()
         nestingRuleAssertThat(code).hasNoLintViolations()
     }
 
@@ -40,11 +41,12 @@ class ComposableNestingDepthCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Plain() {
-                    Text("hello")
-                }
-            """.trimIndent()
+            @Composable
+            fun Plain() {
+                Text("hello")
+            }
+            """
+                .trimIndent()
         nestingRuleAssertThat(code)
             .withEditorConfigOverride(composableNestingDepthEnabled to true)
             .hasNoLintViolations()
@@ -55,17 +57,18 @@ class ComposableNestingDepthCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun WithinLimit() {
+            @Composable
+            fun WithinLimit() {
+                Box {
                     Box {
                         Box {
-                            Box {
-                                Bar()
-                            }
+                            Bar()
                         }
                     }
                 }
-            """.trimIndent()
+            }
+            """
+                .trimIndent()
         nestingRuleAssertThat(code)
             .withEditorConfigOverride(composableNestingDepthEnabled to true)
             .hasNoLintViolations()
@@ -76,21 +79,22 @@ class ComposableNestingDepthCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun TooDeep() {
+            @Composable
+            fun TooDeep() {
+                Box {
                     Box {
                         Box {
                             Box {
                                 Box {
-                                    Box {
-                                        Text("")
-                                    }
+                                    Text("")
                                 }
                             }
                         }
                     }
                 }
-            """.trimIndent()
+            }
+            """
+                .trimIndent()
         nestingRuleAssertThat(code)
             .withEditorConfigOverride(composableNestingDepthEnabled to true)
             .hasLintViolationsWithoutAutoCorrect(
@@ -107,19 +111,20 @@ class ComposableNestingDepthCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun TooDeepA() {
-                    Box { Box { Box { Box { Text("a") } } } }
-                }
-                @Composable
-                fun ShallowB() {
-                    Box { Text("b") }
-                }
-                @Composable
-                fun TooDeepC() {
-                    Column { Row { Box { Box { Text("c") } } } }
-                }
-            """.trimIndent()
+            @Composable
+            fun TooDeepA() {
+                Box { Box { Box { Box { Text("a") } } } }
+            }
+            @Composable
+            fun ShallowB() {
+                Box { Text("b") }
+            }
+            @Composable
+            fun TooDeepC() {
+                Column { Row { Box { Box { Text("c") } } } }
+            }
+            """
+                .trimIndent()
         nestingRuleAssertThat(code)
             .withEditorConfigOverride(composableNestingDepthEnabled to true)
             .hasLintViolationsWithoutAutoCorrect(
@@ -141,15 +146,16 @@ class ComposableNestingDepthCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun BarelyOk() {
+            @Composable
+            fun BarelyOk() {
+                Box {
                     Box {
-                        Box {
-                            Text("hello")
-                        }
+                        Text("hello")
                     }
                 }
-            """.trimIndent()
+            }
+            """
+                .trimIndent()
         nestingRuleAssertThat(code)
             .withEditorConfigOverride(
                 composableNestingDepthEnabled to true,
@@ -169,19 +175,20 @@ class ComposableNestingDepthCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun PreviouslyTooDeep() {
+            @Composable
+            fun PreviouslyTooDeep() {
+                Box {
                     Box {
                         Box {
                             Box {
-                                Box {
-                                    Text("hello")
-                                }
+                                Text("hello")
                             }
                         }
                     }
                 }
-            """.trimIndent()
+            }
+            """
+                .trimIndent()
         nestingRuleAssertThat(code)
             .withEditorConfigOverride(
                 composableNestingDepthEnabled to true,
@@ -195,19 +202,20 @@ class ComposableNestingDepthCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun WithControlFlow(items: List<String>, cond: Boolean) {
-                    Box {
-                        if (cond) {
-                            for (item in items) {
-                                Box {
-                                    Text(item)
-                                }
+            @Composable
+            fun WithControlFlow(items: List<String>, cond: Boolean) {
+                Box {
+                    if (cond) {
+                        for (item in items) {
+                            Box {
+                                Text(item)
                             }
                         }
                     }
                 }
-            """.trimIndent()
+            }
+            """
+                .trimIndent()
         nestingRuleAssertThat(code)
             .withEditorConfigOverride(composableNestingDepthEnabled to true)
             .hasNoLintViolations()
@@ -218,8 +226,9 @@ class ComposableNestingDepthCheckTest {
         @Language("kotlin")
         val code =
             """
-                val Content: @Composable () -> Unit = { Text("hi") }
-            """.trimIndent()
+            val Content: @Composable () -> Unit = { Text("hi") }
+            """
+                .trimIndent()
         nestingRuleAssertThat(code)
             .withEditorConfigOverride(composableNestingDepthEnabled to true)
             .hasNoLintViolations()
@@ -230,23 +239,24 @@ class ComposableNestingDepthCheckTest {
         @Language("kotlin")
         val code =
             """
+            @Composable
+            fun Outer() {
                 @Composable
-                fun Outer() {
-                    @Composable
-                    fun Inner() {
+                fun Inner() {
+                    Box {
                         Box {
                             Box {
                                 Box {
-                                    Box {
-                                        Text("hi")
-                                    }
+                                    Text("hi")
                                 }
                             }
                         }
                     }
-                    Inner()
                 }
-            """.trimIndent()
+                Inner()
+            }
+            """
+                .trimIndent()
         // Outer's body only calls Inner() (not an emitter), so it must not be flagged.
         // Inner itself has 4 nested Boxes around Text, so it should be flagged on its own.
         nestingRuleAssertThat(code)
@@ -265,11 +275,12 @@ class ComposableNestingDepthCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun TooDeep() = Box { Box { Box { Box { Text("x") } } } }
-                @Composable
-                fun WithinLimit() = Box { Box { Box { Text("x") } } }
-            """.trimIndent()
+            @Composable
+            fun TooDeep() = Box { Box { Box { Box { Text("x") } } } }
+            @Composable
+            fun WithinLimit() = Box { Box { Box { Text("x") } } }
+            """
+                .trimIndent()
         // TooDeep nests 4 emitters around Text (> threshold) and is flagged.
         // WithinLimit nests 3 (== threshold) and is intentionally absent from the expected violations.
         nestingRuleAssertThat(code)

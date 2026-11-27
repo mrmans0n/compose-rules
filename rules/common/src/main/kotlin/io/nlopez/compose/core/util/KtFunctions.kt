@@ -54,21 +54,23 @@ val KtNamedFunction.isNested: Boolean
 /**
  * Returns true if the function has any context receivers or context parameters.
  *
- * Context receivers use the old syntax: `context(ColumnScope)`
- * Context parameters use the new syntax: `context(columnScope: ColumnScope)`
+ * Context receivers use the old syntax: `context(ColumnScope)` Context parameters use the new syntax:
+ * `context(columnScope: ColumnScope)`
  *
- * This property is backward compatible with older Kotlin compiler versions that don't
- * support the contextParameters API.
+ * This property is backward compatible with older Kotlin compiler versions that don't support the contextParameters
+ * API.
  */
 val KtNamedFunction.hasAnyContextArguments: Boolean
-    get() = contextReceivers.isNotEmpty() ||
-        contextParametersOrEmpty().isNotEmpty() ||
-        text.trimStart().startsWith("context(")
+    get() =
+        contextReceivers.isNotEmpty() ||
+            contextParametersOrEmpty().isNotEmpty() ||
+            text.trimStart().startsWith("context(")
 
 private fun KtNamedFunction.contextParametersOrEmpty(): List<*> {
-    val method = javaClass.methods.firstOrNull { method ->
-        method.name == "getContextParameters" && method.parameterCount == 0
-    } ?: return emptyList<Any>()
+    val method =
+        javaClass.methods.firstOrNull { method ->
+            method.name == "getContextParameters" && method.parameterCount == 0
+        } ?: return emptyList<Any>()
 
     return try {
         method.invoke(this) as? List<*> ?: emptyList<Any>()
