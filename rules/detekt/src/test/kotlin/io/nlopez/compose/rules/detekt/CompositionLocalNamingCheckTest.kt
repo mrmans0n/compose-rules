@@ -6,7 +6,6 @@ import dev.detekt.api.Config
 import dev.detekt.api.SourceLocation
 import dev.detekt.test.lint
 import io.nlopez.compose.rules.CompositionLocalNaming
-import io.nlopez.compose.rules.detekt.assertThat
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
 
@@ -19,10 +18,11 @@ class CompositionLocalNamingCheckTest {
         @Language("kotlin")
         val code =
             """
-                val AppleLocal = staticCompositionLocalOf<String> { "Apple" }
-                val Plum: ProvidableCompositionLocal<String> = staticCompositionLocalOf { "Plum" }
-                private val Lemon = compositionLocalWithComputedDefaultOf { "Lemon" }
-            """.trimIndent()
+            val AppleLocal = staticCompositionLocalOf<String> { "Apple" }
+            val Plum: ProvidableCompositionLocal<String> = staticCompositionLocalOf { "Plum" }
+            private val Lemon = compositionLocalWithComputedDefaultOf { "Lemon" }
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors)
             .hasStartSourceLocations(
@@ -40,10 +40,11 @@ class CompositionLocalNamingCheckTest {
         @Language("kotlin")
         val code =
             """
-                val LocalBanana = staticCompositionLocalOf<String> { "Banana" }
-                val LocalPotato = compositionLocalOf { "Potato" }
-                val LocalPeach = compositionLocalWithComputedDefaultOf { "Peach" }
-            """.trimIndent()
+            val LocalBanana = staticCompositionLocalOf<String> { "Banana" }
+            val LocalPotato = compositionLocalOf { "Potato" }
+            val LocalPeach = compositionLocalWithComputedDefaultOf { "Peach" }
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }

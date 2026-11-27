@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package io.nlopez.compose.rules.detekt
 
+import io.nlopez.compose.core.util.isComposable as hasComposableAnnotationText
 import org.jetbrains.kotlin.analysis.api.analyze
 import org.jetbrains.kotlin.analysis.api.annotations.KaAnnotated
 import org.jetbrains.kotlin.analysis.api.components.expectedType
@@ -18,7 +19,6 @@ import org.jetbrains.kotlin.psi.KtNamedFunction
 import org.jetbrains.kotlin.psi.KtParameter
 import org.jetbrains.kotlin.psi.KtPropertyAccessor
 import org.jetbrains.kotlin.psi.KtTypeReference
-import io.nlopez.compose.core.util.isComposable as hasComposableAnnotationText
 
 internal fun KtElement.isInsideComposableScope(): Boolean {
     var current = parent
@@ -33,62 +33,75 @@ internal fun KtElement.isInsideComposableScope(): Boolean {
     return false
 }
 
-internal fun KtNamedFunction.isComposable(): Boolean = hasComposableAnnotationText ||
-    runCatching {
-        analyze(this) {
-            this@isComposable.symbol.hasComposableAnnotation()
-        }
-    }.getOrDefault(false)
+internal fun KtNamedFunction.isComposable(): Boolean =
+    hasComposableAnnotationText ||
+        runCatching {
+                analyze(this) {
+                    this@isComposable.symbol.hasComposableAnnotation()
+                }
+            }
+            .getOrDefault(false)
 
-internal fun KtPropertyAccessor.isComposable(): Boolean = hasComposableAnnotationText ||
-    runCatching {
-        analyze(this) {
-            this@isComposable.symbol.hasComposableAnnotation()
-        }
-    }.getOrDefault(false)
+internal fun KtPropertyAccessor.isComposable(): Boolean =
+    hasComposableAnnotationText ||
+        runCatching {
+                analyze(this) {
+                    this@isComposable.symbol.hasComposableAnnotation()
+                }
+            }
+            .getOrDefault(false)
 
 internal fun KtLambdaExpression.isComposable(): Boolean =
     (parent as? KtAnnotatedExpression)?.hasComposableAnnotationText == true ||
         runCatching {
-            analyze(this) {
-                functionLiteral.functionType.hasComposableAnnotation() ||
-                    this@isComposable.expectedType?.hasComposableAnnotation() == true
+                analyze(this) {
+                    functionLiteral.functionType.hasComposableAnnotation() ||
+                        this@isComposable.expectedType?.hasComposableAnnotation() == true
+                }
             }
-        }.getOrDefault(false)
+            .getOrDefault(false)
 
 internal fun KtLambdaExpression.hasFunctionTypeReceiver(): Boolean = runCatching {
     analyze(this) {
         (functionLiteral.functionType as? KaFunctionType)?.hasReceiver == true ||
             (this@hasFunctionTypeReceiver.expectedType as? KaFunctionType)?.hasReceiver == true
     }
-}.getOrDefault(false)
+}
+    .getOrDefault(false)
 
 internal fun KtNamedFunction.isReadOnlyComposable(): Boolean = runCatching {
     analyze(this) {
         this@isReadOnlyComposable.symbol.hasReadOnlyComposableAnnotation()
     }
-}.getOrDefault(false)
+}
+    .getOrDefault(false)
 
 internal fun KtPropertyAccessor.isReadOnlyComposable(): Boolean = runCatching {
     analyze(this) {
         this@isReadOnlyComposable.symbol.hasReadOnlyComposableAnnotation()
     }
-}.getOrDefault(false)
+}
+    .getOrDefault(false)
 
 internal fun KtParameter.hasComposableType(): Boolean = typeReference?.hasComposableType() == true
 
-internal fun KtTypeReference.hasComposableType(): Boolean = text.contains("@Composable") ||
-    runCatching {
-        analyze(this) {
-            type.hasComposableAnnotation()
-        }
-    }.getOrDefault(false)
+internal fun KtTypeReference.hasComposableType(): Boolean =
+    text.contains("@Composable") ||
+        runCatching {
+                analyze(this) {
+                    type.hasComposableAnnotation()
+                }
+            }
+            .getOrDefault(false)
 
-internal fun KaAnnotatedSymbol.hasComposableAnnotation(): Boolean =
-    annotations.any { it.classId == ClassId.topLevel(ComposeFqNames.Composable) }
+internal fun KaAnnotatedSymbol.hasComposableAnnotation(): Boolean = annotations.any {
+    it.classId == ClassId.topLevel(ComposeFqNames.Composable)
+}
 
-internal fun KaAnnotated.hasComposableAnnotation(): Boolean =
-    annotations.any { it.classId == ClassId.topLevel(ComposeFqNames.Composable) }
+internal fun KaAnnotated.hasComposableAnnotation(): Boolean = annotations.any {
+    it.classId == ClassId.topLevel(ComposeFqNames.Composable)
+}
 
-internal fun KaAnnotatedSymbol.hasReadOnlyComposableAnnotation(): Boolean =
-    annotations.any { it.classId == ClassId.topLevel(ComposeFqNames.ReadOnlyComposable) }
+internal fun KaAnnotatedSymbol.hasReadOnlyComposableAnnotation(): Boolean = annotations.any {
+    it.classId == ClassId.topLevel(ComposeFqNames.ReadOnlyComposable)
+}

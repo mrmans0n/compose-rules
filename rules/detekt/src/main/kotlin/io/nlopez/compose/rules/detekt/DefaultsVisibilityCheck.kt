@@ -17,5 +17,6 @@ class DefaultsVisibilityCheck(config: Config) :
     ),
     ComposeKtVisitor by DefaultsVisibility() {
 
-    override val ruleName: RuleName get() = RuleName("DefaultsVisibility")
+    override val ruleName: RuleName
+        get() = RuleName("DefaultsVisibility")
 }

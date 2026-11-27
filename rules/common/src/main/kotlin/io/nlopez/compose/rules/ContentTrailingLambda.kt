@@ -17,11 +17,12 @@ class ContentTrailingLambda : ComposeKtVisitor {
         val lambdaTypes = function.containingKtFile.lambdaTypes(config)
         val composableLambdaTypes = function.containingKtFile.composableLambdaTypes(config)
 
-        val candidate = function.valueParameters
-            .filter { it.name == "content" }
-            .singleOrNull { parameter ->
-                parameter.typeReference?.isComposableLambda(lambdaTypes, composableLambdaTypes) == true
-            }
+        val candidate =
+            function.valueParameters
+                .filter { it.name == "content" }
+                .singleOrNull { parameter ->
+                    parameter.typeReference?.isComposableLambda(lambdaTypes, composableLambdaTypes) == true
+                }
 
         if (candidate != null && candidate != function.valueParameters.last()) {
             emitter.report(candidate, ContentShouldBeTrailingLambda)
@@ -29,9 +30,11 @@ class ContentTrailingLambda : ComposeKtVisitor {
     }
 
     companion object {
-        val ContentShouldBeTrailingLambda = """
+        val ContentShouldBeTrailingLambda =
+            """
             A @Composable `content` parameter should be moved to be the trailing lambda in a composable function.
             See https://mrmans0n.github.io/compose-rules/rules/#slots-for-main-content-should-be-the-trailing-lambda for more information.
-        """.trimIndent()
+            """
+                .trimIndent()
     }
 }

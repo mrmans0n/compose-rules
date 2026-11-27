@@ -24,11 +24,12 @@ import org.jetbrains.kotlin.psi.psiUtil.startOffset
 abstract class KtlintRule(id: String, editorConfigProperties: Set<EditorConfigProperty<*>> = emptySet()) :
     Rule(
         ruleId = RuleId(id),
-        about = About(
-            maintainer = "Compose Rules",
-            repositoryUrl = "https://github.com/mrmans0n/compose-rules",
-            issueTrackerUrl = "https://github.com/mrmans0n/compose-rules/issues",
-        ),
+        about =
+            About(
+                maintainer = "Compose Rules",
+                repositoryUrl = "https://github.com/mrmans0n/compose-rules",
+                issueTrackerUrl = "https://github.com/mrmans0n/compose-rules/issues",
+            ),
         usesEditorConfigProperties = editorConfigProperties,
     ),
     ComposeKtVisitor,
@@ -69,11 +70,12 @@ abstract class KtlintRule(id: String, editorConfigProperties: Set<EditorConfigPr
 
     private fun ((Int, String, Boolean) -> AutocorrectDecision).toEmitter() =
         Emitter { element, errorMessage, canBeAutoCorrected ->
-            val offset = if (element is PsiNameIdentifierOwner) {
-                element.startOffsetFromName
-            } else {
-                element.startOffset
-            }
+            val offset =
+                if (element is PsiNameIdentifierOwner) {
+                    element.startOffsetFromName
+                } else {
+                    element.startOffset
+                }
             when (invoke(offset, errorMessage, canBeAutoCorrected)) {
                 AutocorrectDecision.ALLOW_AUTOCORRECT -> Decision.Fix
                 AutocorrectDecision.NO_AUTOCORRECT -> Decision.Ignore

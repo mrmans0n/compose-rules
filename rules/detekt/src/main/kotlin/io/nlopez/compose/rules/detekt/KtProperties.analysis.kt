@@ -18,17 +18,19 @@ internal fun KtProperty.hasComposeStateDelegate(): Boolean = runCatching {
                 supertype.symbol?.classId?.asSingleFqName() in ComposeStateFqNames
             }
     }
-}.getOrDefault(false)
+}
+    .getOrDefault(false)
 
-private val ComposeStateFqNames: Set<FqName> = setOf(
-    ComposeFqNames.State,
-    ComposeFqNames.MutableState,
-    ComposeFqNames.IntState,
-    ComposeFqNames.MutableIntState,
-    ComposeFqNames.LongState,
-    ComposeFqNames.MutableLongState,
-    ComposeFqNames.FloatState,
-    ComposeFqNames.MutableFloatState,
-    ComposeFqNames.DoubleState,
-    ComposeFqNames.MutableDoubleState,
-)
+private val ComposeStateFqNames: Set<FqName> =
+    setOf(
+        ComposeFqNames.State,
+        ComposeFqNames.MutableState,
+        ComposeFqNames.IntState,
+        ComposeFqNames.MutableIntState,
+        ComposeFqNames.LongState,
+        ComposeFqNames.MutableLongState,
+        ComposeFqNames.FloatState,
+        ComposeFqNames.MutableFloatState,
+        ComposeFqNames.DoubleState,
+        ComposeFqNames.MutableDoubleState,
+    )

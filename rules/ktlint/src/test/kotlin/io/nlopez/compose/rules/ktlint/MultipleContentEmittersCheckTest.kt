@@ -17,17 +17,18 @@ class MultipleContentEmittersCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something() {
-                    val something = rememberWhatever()
-                    Column {
-                        Text("Hi")
-                        Text("Hola")
-                    }
-                    LaunchedEffect(Unit) {
-                    }
+            @Composable
+            fun Something() {
+                val something = rememberWhatever()
+                Column {
+                    Text("Hi")
+                    Text("Hola")
                 }
-            """.trimIndent()
+                LaunchedEffect(Unit) {
+                }
+            }
+            """
+                .trimIndent()
         emittersRuleAssertThat(code).hasNoLintViolations()
     }
 
@@ -36,17 +37,18 @@ class MultipleContentEmittersCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun ColumnScope.Something() {
-                    Text("Hi")
-                    Text("Hola")
-                }
-                @Composable
-                fun RowScope.Something() {
-                    Spacer()
-                    Text("Hola")
-                }
-            """.trimIndent()
+            @Composable
+            fun ColumnScope.Something() {
+                Text("Hi")
+                Text("Hola")
+            }
+            @Composable
+            fun RowScope.Something() {
+                Spacer()
+                Text("Hola")
+            }
+            """
+                .trimIndent()
         emittersRuleAssertThat(code).hasNoLintViolations()
     }
 
@@ -55,19 +57,20 @@ class MultipleContentEmittersCheckTest {
         @Language("kotlin")
         val code =
             """
-                context(ColumnScope)
-                @Composable
-                fun Something() {
-                    Text("Hi")
-                    Text("Hola")
-                }
-                context(RowScope)
-                @Composable
-                fun Something() {
-                    Spacer()
-                    Text("Hola")
-                }
-            """.trimIndent()
+            context(ColumnScope)
+            @Composable
+            fun Something() {
+                Text("Hi")
+                Text("Hola")
+            }
+            context(RowScope)
+            @Composable
+            fun Something() {
+                Spacer()
+                Text("Hola")
+            }
+            """
+                .trimIndent()
         emittersRuleAssertThat(code).hasNoLintViolations()
     }
 
@@ -76,19 +79,20 @@ class MultipleContentEmittersCheckTest {
         @Language("kotlin")
         val code =
             """
-                context(columnScope: ColumnScope)
-                @Composable
-                fun Something() {
-                    Text("Hi")
-                    Text("Hola")
-                }
-                context(rowScope: RowScope)
-                @Composable
-                fun Something() {
-                    Spacer()
-                    Text("Hola")
-                }
-            """.trimIndent()
+            context(columnScope: ColumnScope)
+            @Composable
+            fun Something() {
+                Text("Hi")
+                Text("Hola")
+            }
+            context(rowScope: RowScope)
+            @Composable
+            fun Something() {
+                Spacer()
+                Text("Hola")
+            }
+            """
+                .trimIndent()
         emittersRuleAssertThat(code).hasNoLintViolations()
     }
 
@@ -97,49 +101,51 @@ class MultipleContentEmittersCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something() {
-                    Text("Hi")
-                    Text("Hola")
-                }
-                @Composable
-                fun Something() {
-                    Spacer()
-                    Text("Hola")
-                }
-                @Composable
-                fun Something(title: String?, subtitle: String?) {
-                    title?.let { Text(title) }
-                    subtitle?.let { Text(subtitle) }
-                }
-                @Composable
-                fun Something(title: String?, subtitle: String?) {
-                    with(title) { Text(this) }
-                    with(subtitle) { Text(this) }
-                }
-            """.trimIndent()
-        emittersRuleAssertThat(code).hasLintViolationsWithoutAutoCorrect(
-            LintViolation(
-                line = 2,
-                col = 5,
-                detail = MultipleContentEmitters.MultipleContentEmittersDetected,
-            ),
-            LintViolation(
-                line = 7,
-                col = 5,
-                detail = MultipleContentEmitters.MultipleContentEmittersDetected,
-            ),
-            LintViolation(
-                line = 12,
-                col = 5,
-                detail = MultipleContentEmitters.MultipleContentEmittersDetected,
-            ),
-            LintViolation(
-                line = 17,
-                col = 5,
-                detail = MultipleContentEmitters.MultipleContentEmittersDetected,
-            ),
-        )
+            @Composable
+            fun Something() {
+                Text("Hi")
+                Text("Hola")
+            }
+            @Composable
+            fun Something() {
+                Spacer()
+                Text("Hola")
+            }
+            @Composable
+            fun Something(title: String?, subtitle: String?) {
+                title?.let { Text(title) }
+                subtitle?.let { Text(subtitle) }
+            }
+            @Composable
+            fun Something(title: String?, subtitle: String?) {
+                with(title) { Text(this) }
+                with(subtitle) { Text(this) }
+            }
+            """
+                .trimIndent()
+        emittersRuleAssertThat(code)
+            .hasLintViolationsWithoutAutoCorrect(
+                LintViolation(
+                    line = 2,
+                    col = 5,
+                    detail = MultipleContentEmitters.MultipleContentEmittersDetected,
+                ),
+                LintViolation(
+                    line = 7,
+                    col = 5,
+                    detail = MultipleContentEmitters.MultipleContentEmittersDetected,
+                ),
+                LintViolation(
+                    line = 12,
+                    col = 5,
+                    detail = MultipleContentEmitters.MultipleContentEmittersDetected,
+                ),
+                LintViolation(
+                    line = 17,
+                    col = 5,
+                    detail = MultipleContentEmitters.MultipleContentEmittersDetected,
+                ),
+            )
     }
 
     @Test
@@ -147,29 +153,30 @@ class MultipleContentEmittersCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something1() {
-                    Something2()
-                }
-                @Composable
-                fun Something2() {
-                    Text("Hola")
-                    Something3()
-                }
-                @Composable
-                fun Something3() {
-                    Text("Hi")
-                }
-                @Composable
-                fun Something4() {
-                    Banana()
-                }
-                @Composable
-                fun Something5() {
-                    Something3()
-                    Something4()
-                }
-            """.trimIndent()
+            @Composable
+            fun Something1() {
+                Something2()
+            }
+            @Composable
+            fun Something2() {
+                Text("Hola")
+                Something3()
+            }
+            @Composable
+            fun Something3() {
+                Text("Hi")
+            }
+            @Composable
+            fun Something4() {
+                Banana()
+            }
+            @Composable
+            fun Something5() {
+                Something3()
+                Something4()
+            }
+            """
+                .trimIndent()
         emittersRuleAssertThat(code)
             .withEditorConfigOverride(
                 contentEmittersProperty to "Potato,Banana",
@@ -193,42 +200,43 @@ class MultipleContentEmittersCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun A() {
-                    if (something) {
-                        Text("1")
-                        Text("2")
-                    } else {
-                        Text("1")
-                        Text("2")
-                    }
-                }
-                @Composable
-                fun B() {
-                    if (something) {
-                        Text("1")
-                        Text("2")
-                    } else {
-                        Text("1")
-                    }
-                }
-                @Composable
-                fun C() {
-                    if (something) {
-                        Text("1")
-                    } else {
-                        Text("1")
-                        Text("2")
-                    }
-                }
-                @Composable
-                fun D() {
-                    if (something) {
-                        Text("1")
-                    }
+            @Composable
+            fun A() {
+                if (something) {
+                    Text("1")
+                    Text("2")
+                } else {
+                    Text("1")
                     Text("2")
                 }
-            """.trimIndent()
+            }
+            @Composable
+            fun B() {
+                if (something) {
+                    Text("1")
+                    Text("2")
+                } else {
+                    Text("1")
+                }
+            }
+            @Composable
+            fun C() {
+                if (something) {
+                    Text("1")
+                } else {
+                    Text("1")
+                    Text("2")
+                }
+            }
+            @Composable
+            fun D() {
+                if (something) {
+                    Text("1")
+                }
+                Text("2")
+            }
+            """
+                .trimIndent()
         emittersRuleAssertThat(code)
             .hasLintViolationsWithoutAutoCorrect(
                 LintViolation(
@@ -259,38 +267,39 @@ class MultipleContentEmittersCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun A() {
-                    text?.let {
-                        Text("1")
-                        Text("2")
-                    } ?: run {
-                        Text("1")
-                        Text("2")
-                    }
-                }
-                @Composable
-                fun B() {
-                    text?.let {
-                        Text("1")
-                        Text("2")
-                    } ?: Text("1")
-                }
-                @Composable
-                fun C() {
-                    text?.let {
-                        Text("1")
-                    } ?: run {
-                        Text("1")
-                        Text("2")
-                    }
-                }
-                @Composable
-                fun D() {
-                    text?.let { Text("1") }
+            @Composable
+            fun A() {
+                text?.let {
+                    Text("1")
+                    Text("2")
+                } ?: run {
+                    Text("1")
                     Text("2")
                 }
-            """.trimIndent()
+            }
+            @Composable
+            fun B() {
+                text?.let {
+                    Text("1")
+                    Text("2")
+                } ?: Text("1")
+            }
+            @Composable
+            fun C() {
+                text?.let {
+                    Text("1")
+                } ?: run {
+                    Text("1")
+                    Text("2")
+                }
+            }
+            @Composable
+            fun D() {
+                text?.let { Text("1") }
+                Text("2")
+            }
+            """
+                .trimIndent()
         emittersRuleAssertThat(code)
             .hasLintViolationsWithoutAutoCorrect(
                 LintViolation(
@@ -321,52 +330,53 @@ class MultipleContentEmittersCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun A() {
-                    when {
-                        isPotato -> {
-                            Text("1")
-                            Text("2")
-                        }
-                        else -> {
-                            Text("1")
-                            Text("2")
-                        }
+            @Composable
+            fun A() {
+                when {
+                    isPotato -> {
+                        Text("1")
+                        Text("2")
+                    }
+                    else -> {
+                        Text("1")
+                        Text("2")
                     }
                 }
-                @Composable
-                fun B() {
-                    when {
-                        isPotato -> {
-                            Text("1")
-                        }
-                        else -> {
-                            Text("1")
-                            Text("2")
-                        }
+            }
+            @Composable
+            fun B() {
+                when {
+                    isPotato -> {
+                        Text("1")
+                    }
+                    else -> {
+                        Text("1")
+                        Text("2")
                     }
                 }
-                @Composable
-                fun C() {
-                    when {
-                        isPotato -> {
-                            Text("1")
-                            Text("2")
-                        }
-                        else -> {
-                            Text("1")
-                        }
+            }
+            @Composable
+            fun C() {
+                when {
+                    isPotato -> {
+                        Text("1")
+                        Text("2")
+                    }
+                    else -> {
+                        Text("1")
                     }
                 }
-                @Composable
-                fun D() {
-                    Text("1")
-                    when {
-                        isPotato -> Text("2")
-                        else -> {}
-                    }
+            }
+            @Composable
+            fun D() {
+                Text("1")
+                when {
+                    isPotato -> Text("2")
+                    else -> {}
                 }
-            """.trimIndent()
+            }
+            """
+                .trimIndent()
         emittersRuleAssertThat(code)
             .hasLintViolationsWithoutAutoCorrect(
                 LintViolation(
@@ -397,30 +407,33 @@ class MultipleContentEmittersCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something() {
-                    Text("Hi")
-                    Text("Hola")
-                    Something2()
-                }
-                @Composable
-                fun Something2() {
-                    Text("Alo")
-                }
-            """.trimIndent()
-        emittersRuleAssertThat(code).hasLintViolationsWithoutAutoCorrect(
-            LintViolation(
-                line = 2,
-                col = 5,
-                detail = MultipleContentEmitters.MultipleContentEmittersDetected,
-            ),
-        )
+            @Composable
+            fun Something() {
+                Text("Hi")
+                Text("Hola")
+                Something2()
+            }
+            @Composable
+            fun Something2() {
+                Text("Alo")
+            }
+            """
+                .trimIndent()
+        emittersRuleAssertThat(code)
+            .hasLintViolationsWithoutAutoCorrect(
+                LintViolation(
+                    line = 2,
+                    col = 5,
+                    detail = MultipleContentEmitters.MultipleContentEmittersDetected,
+                ),
+            )
     }
 
     @Test
     fun `for loops are captured`() {
         @Language("kotlin")
-        val code = """
+        val code =
+            """
             @Composable
             fun MultipleContent(texts: List<String>, modifier: Modifier = Modifier) {
                 for (text in texts) {
@@ -434,19 +447,21 @@ class MultipleContentEmittersCheckTest {
                     Text(otherText)
                 }
             }
-        """.trimIndent()
-        emittersRuleAssertThat(code).hasLintViolationsWithoutAutoCorrect(
-            LintViolation(
-                line = 2,
-                col = 5,
-                detail = MultipleContentEmitters.MultipleContentEmittersDetected,
-            ),
-            LintViolation(
-                line = 8,
-                col = 5,
-                detail = MultipleContentEmitters.MultipleContentEmittersDetected,
-            ),
-        )
+            """
+                .trimIndent()
+        emittersRuleAssertThat(code)
+            .hasLintViolationsWithoutAutoCorrect(
+                LintViolation(
+                    line = 2,
+                    col = 5,
+                    detail = MultipleContentEmitters.MultipleContentEmittersDetected,
+                ),
+                LintViolation(
+                    line = 8,
+                    col = 5,
+                    detail = MultipleContentEmitters.MultipleContentEmittersDetected,
+                ),
+            )
     }
 
     @Test
@@ -454,15 +469,14 @@ class MultipleContentEmittersCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something() {
-                    Text("Hi")
-                    Spacer()
-                }
-            """.trimIndent()
-        emittersRuleAssertThat(code)
-            .withEditorConfigOverride(contentEmittersDenylist to "Spacer")
-            .hasNoLintViolations()
+            @Composable
+            fun Something() {
+                Text("Hi")
+                Spacer()
+            }
+            """
+                .trimIndent()
+        emittersRuleAssertThat(code).withEditorConfigOverride(contentEmittersDenylist to "Spacer").hasNoLintViolations()
     }
 
     @Test
@@ -470,15 +484,16 @@ class MultipleContentEmittersCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something() {
-                    if (x) {
-                        Text("1")
-                        return
-                    }
-                    Text("2")
+            @Composable
+            fun Something() {
+                if (x) {
+                    Text("1")
+                    return
                 }
-            """.trimIndent()
+                Text("2")
+            }
+            """
+                .trimIndent()
         emittersRuleAssertThat(code).hasNoLintViolations()
     }
 
@@ -487,35 +502,37 @@ class MultipleContentEmittersCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something() {
+            @Composable
+            fun Something() {
+                Text("1")
+                if (x) {
+                    Text("2")
+                    return
+                }
+            }
+            @Composable
+            fun Something() {
+                if (x) {
                     Text("1")
-                    if (x) {
-                        Text("2")
-                        return
-                    }
+                    Text("2")
+                    return
                 }
-                @Composable
-                fun Something() {
-                    if (x) {
-                        Text("1")
-                        Text("2")
-                        return
-                    }
-                }
-            """.trimIndent()
-        emittersRuleAssertThat(code).hasLintViolationsWithoutAutoCorrect(
-            LintViolation(
-                line = 2,
-                col = 5,
-                detail = MultipleContentEmitters.MultipleContentEmittersDetected,
-            ),
-            LintViolation(
-                line = 10,
-                col = 5,
-                detail = MultipleContentEmitters.MultipleContentEmittersDetected,
-            ),
-        )
+            }
+            """
+                .trimIndent()
+        emittersRuleAssertThat(code)
+            .hasLintViolationsWithoutAutoCorrect(
+                LintViolation(
+                    line = 2,
+                    col = 5,
+                    detail = MultipleContentEmitters.MultipleContentEmittersDetected,
+                ),
+                LintViolation(
+                    line = 10,
+                    col = 5,
+                    detail = MultipleContentEmitters.MultipleContentEmittersDetected,
+                ),
+            )
     }
 
     @Test
@@ -523,15 +540,16 @@ class MultipleContentEmittersCheckTest {
         @Language("kotlin")
         val code =
             """
+            @Composable
+            fun Something() {
                 @Composable
-                fun Something() {
-                    @Composable
-                    fun Potato() {
-                        Text("1")
-                    }
-                    Potato()
+                fun Potato() {
+                    Text("1")
                 }
-            """.trimIndent()
+                Potato()
+            }
+            """
+                .trimIndent()
         emittersRuleAssertThat(code).hasNoLintViolations()
     }
 
@@ -540,22 +558,24 @@ class MultipleContentEmittersCheckTest {
         @Language("kotlin")
         val code =
             """
+            @Composable
+            fun Something() {
                 @Composable
-                fun Something() {
-                    @Composable
-                    fun Potato() {
-                        Text("1")
-                    }
-                    Potato()
-                    Potato()
+                fun Potato() {
+                    Text("1")
                 }
-            """.trimIndent()
-        emittersRuleAssertThat(code).hasLintViolationsWithoutAutoCorrect(
-            LintViolation(
-                line = 2,
-                col = 5,
-                detail = MultipleContentEmitters.MultipleContentEmittersDetected,
-            ),
-        )
+                Potato()
+                Potato()
+            }
+            """
+                .trimIndent()
+        emittersRuleAssertThat(code)
+            .hasLintViolationsWithoutAutoCorrect(
+                LintViolation(
+                    line = 2,
+                    col = 5,
+                    detail = MultipleContentEmitters.MultipleContentEmittersDetected,
+                ),
+            )
     }
 }

@@ -20,7 +20,8 @@ tasks.withType<KotlinCompile>().configureEach {
 
 tasks.test {
     // Konsist reads the sources of other modules, so they must be inputs for the task to rerun when they change
-    inputs.files(rootProject.fileTree("rules") { include("*/src/**/*.kt") })
+    inputs
+        .files(rootProject.fileTree("rules") { include("*/src/**/*.kt") })
         .withPathSensitivity(PathSensitivity.RELATIVE)
 }
 

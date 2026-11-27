@@ -6,17 +6,17 @@ import dev.detekt.api.SourceLocation
 import dev.detekt.test.TestConfig
 import dev.detekt.test.lint
 import io.nlopez.compose.rules.ViewModelForwarding
-import io.nlopez.compose.rules.detekt.assertThat
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
 
 class ViewModelForwardingCheckTest {
 
-    private val testConfig = TestConfig(
-        "allowedStateHolderNames" to listOf(".*Component", ".*StateHolder"),
-        "allowedForwarding" to listOf(".*Content"),
-        "allowedForwardingOfTypes" to listOf("PotatoViewModel"),
-    )
+    private val testConfig =
+        TestConfig(
+            "allowedStateHolderNames" to listOf(".*Component", ".*StateHolder"),
+            "allowedForwarding" to listOf(".*Content"),
+            "allowedForwardingOfTypes" to listOf("PotatoViewModel"),
+        )
     private val rule = ViewModelForwardingCheck(testConfig)
 
     @Test
@@ -29,7 +29,8 @@ class ViewModelForwardingCheckTest {
                 val viewModel = weaverViewModel<MyVM>()
                 AnotherComposable(viewModel)
             }
-            """.trimIndent()
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }
@@ -46,7 +47,8 @@ class ViewModelForwardingCheckTest {
                     AnotherComposable(viewModel)
                 }
             }
-            """.trimIndent()
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }
@@ -61,7 +63,8 @@ class ViewModelForwardingCheckTest {
                 val state by viewModel.watchAsState()
                 AnotherComposable(state, onAvatarClicked = { viewModel(AvatarClickedIntent) })
             }
-            """.trimIndent()
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }
@@ -85,13 +88,15 @@ class ViewModelForwardingCheckTest {
             fun MyComposable3(viewModel: MyViewModel) {
                 AnotherComposable(vm = viewModel)
             }
-            """.trimIndent()
+            """
+                .trimIndent()
         val errors = rule.lint(code)
-        assertThat(errors).hasStartSourceLocations(
-            SourceLocation(3, 5),
-            SourceLocation(8, 9),
-            SourceLocation(13, 5),
-        )
+        assertThat(errors)
+            .hasStartSourceLocations(
+                SourceLocation(3, 5),
+                SourceLocation(8, 9),
+                SourceLocation(13, 5),
+            )
         for (error in errors) {
             assertThat(error).hasMessage(ViewModelForwarding.AvoidViewModelForwarding)
         }
@@ -114,12 +119,14 @@ class ViewModelForwardingCheckTest {
                     AnotherComposable(vm = this)
                 }
             }
-            """.trimIndent()
+            """
+                .trimIndent()
         val errors = rule.lint(code)
-        assertThat(errors).hasStartSourceLocations(
-            SourceLocation(4, 9),
-            SourceLocation(10, 9),
-        )
+        assertThat(errors)
+            .hasStartSourceLocations(
+                SourceLocation(4, 9),
+                SourceLocation(10, 9),
+            )
         for (error in errors) {
             assertThat(error).hasMessage(ViewModelForwarding.AvoidViewModelForwarding)
         }
@@ -142,12 +149,14 @@ class ViewModelForwardingCheckTest {
                     AnotherComposable(vm = this)
                 }
             }
-            """.trimIndent()
+            """
+                .trimIndent()
         val errors = rule.lint(code)
-        assertThat(errors).hasStartSourceLocations(
-            SourceLocation(4, 9),
-            SourceLocation(10, 9),
-        )
+        assertThat(errors)
+            .hasStartSourceLocations(
+                SourceLocation(4, 9),
+                SourceLocation(10, 9),
+            )
         for (error in errors) {
             assertThat(error).hasMessage(ViewModelForwarding.AvoidViewModelForwarding)
         }
@@ -170,12 +179,14 @@ class ViewModelForwardingCheckTest {
                     AnotherComposable(vm = this)
                 }
             }
-            """.trimIndent()
+            """
+                .trimIndent()
         val errors = rule.lint(code)
-        assertThat(errors).hasStartSourceLocations(
-            SourceLocation(4, 9),
-            SourceLocation(10, 9),
-        )
+        assertThat(errors)
+            .hasStartSourceLocations(
+                SourceLocation(4, 9),
+                SourceLocation(10, 9),
+            )
         for (error in errors) {
             assertThat(error).hasMessage(ViewModelForwarding.AvoidViewModelForwarding)
         }
@@ -198,12 +209,14 @@ class ViewModelForwardingCheckTest {
                     AnotherComposable(vm = it)
                 }
             }
-            """.trimIndent()
+            """
+                .trimIndent()
         val errors = rule.lint(code)
-        assertThat(errors).hasStartSourceLocations(
-            SourceLocation(4, 9),
-            SourceLocation(10, 9),
-        )
+        assertThat(errors)
+            .hasStartSourceLocations(
+                SourceLocation(4, 9),
+                SourceLocation(10, 9),
+            )
         for (error in errors) {
             assertThat(error).hasMessage(ViewModelForwarding.AvoidViewModelForwarding)
         }
@@ -226,12 +239,14 @@ class ViewModelForwardingCheckTest {
                     AnotherComposable(vm = it)
                 }
             }
-            """.trimIndent()
+            """
+                .trimIndent()
         val errors = rule.lint(code)
-        assertThat(errors).hasStartSourceLocations(
-            SourceLocation(4, 9),
-            SourceLocation(10, 9),
-        )
+        assertThat(errors)
+            .hasStartSourceLocations(
+                SourceLocation(4, 9),
+                SourceLocation(10, 9),
+            )
         for (error in errors) {
             assertThat(error).hasMessage(ViewModelForwarding.AvoidViewModelForwarding)
         }
@@ -282,7 +297,8 @@ class ViewModelForwardingCheckTest {
                     }
                 }
             }
-            """.trimIndent()
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }
@@ -299,7 +315,8 @@ class ViewModelForwardingCheckTest {
                 val x = remember(viewModel) { "ABC" }
                 LaunchedEffect(viewModel) { }
             }
-            """.trimIndent()
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }
@@ -317,12 +334,14 @@ class ViewModelForwardingCheckTest {
             fun MyComposable2(viewModel: MyStateHolder) {
                 AnotherComposable(viewModel)
             }
-            """.trimIndent()
+            """
+                .trimIndent()
         val errors = rule.lint(code)
-        assertThat(errors).hasStartSourceLocations(
-            SourceLocation(3, 5),
-            SourceLocation(7, 5),
-        )
+        assertThat(errors)
+            .hasStartSourceLocations(
+                SourceLocation(3, 5),
+                SourceLocation(7, 5),
+            )
         for (error in errors) {
             assertThat(error).hasMessage(ViewModelForwarding.AvoidViewModelForwarding)
         }
@@ -347,7 +366,8 @@ class ViewModelForwardingCheckTest {
             fun MyComposable3(viewModel: MyViewModel) {
                 AnotherComposableContent(vm = viewModel)
             }
-            """.trimIndent()
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }
@@ -375,7 +395,8 @@ class ViewModelForwardingCheckTest {
             fun MyComposable4(viewModel: PotatoViewModel) {
                 with(viewModel) { AnotherComposable(vm = this) }
             }
-            """.trimIndent()
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }

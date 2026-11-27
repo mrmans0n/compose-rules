@@ -7,5 +7,4 @@ import io.nlopez.compose.rules.KtlintRule
 import io.nlopez.compose.rules.MutableStateAutoboxing
 
 class MutableStateAutoboxingCheck :
-    KtlintRule("compose:mutable-state-autoboxing"),
-    ComposeKtVisitor by MutableStateAutoboxing()
+    KtlintRule("compose:mutable-state-autoboxing"), ComposeKtVisitor by MutableStateAutoboxing()

@@ -18,7 +18,8 @@ class PreviewAnnotationNamingCheckTest {
         val code =
             """
             annotation class Banana
-            """.trimIndent()
+            """
+                .trimIndent()
         ruleAssertThat(code).hasNoLintViolations()
     }
 
@@ -40,7 +41,8 @@ class PreviewAnnotationNamingCheckTest {
             @PreviewBanana
             @PreviewApple
             annotation class PreviewFruitBasket
-            """.trimIndent()
+            """
+                .trimIndent()
         ruleAssertThat(code).hasNoLintViolations()
     }
 
@@ -55,24 +57,26 @@ class PreviewAnnotationNamingCheckTest {
             annotation class BananaPreviews
             @BananaPreview
             annotation class WithBananaPreviews
-            """.trimIndent()
-        ruleAssertThat(code).hasLintViolationsWithoutAutoCorrect(
-            LintViolation(
-                line = 2,
-                col = 18,
-                detail = PreviewAnnotationNaming.PreviewAnnotationDoesNotStartWithPreview,
-            ),
-            LintViolation(
-                line = 4,
-                col = 18,
-                detail = PreviewAnnotationNaming.PreviewAnnotationDoesNotStartWithPreview,
-            ),
-            LintViolation(
-                line = 6,
-                col = 18,
-                detail = PreviewAnnotationNaming.PreviewAnnotationDoesNotStartWithPreview,
-            ),
-        )
+            """
+                .trimIndent()
+        ruleAssertThat(code)
+            .hasLintViolationsWithoutAutoCorrect(
+                LintViolation(
+                    line = 2,
+                    col = 18,
+                    detail = PreviewAnnotationNaming.PreviewAnnotationDoesNotStartWithPreview,
+                ),
+                LintViolation(
+                    line = 4,
+                    col = 18,
+                    detail = PreviewAnnotationNaming.PreviewAnnotationDoesNotStartWithPreview,
+                ),
+                LintViolation(
+                    line = 6,
+                    col = 18,
+                    detail = PreviewAnnotationNaming.PreviewAnnotationDoesNotStartWithPreview,
+                ),
+            )
     }
 
     @Test
@@ -86,18 +90,20 @@ class PreviewAnnotationNamingCheckTest {
             @BananaPreview
             @BananaPreview
             annotation class BananaPreview
-            """.trimIndent()
-        ruleAssertThat(code).hasLintViolationsWithoutAutoCorrect(
-            LintViolation(
-                line = 3,
-                col = 18,
-                detail = PreviewAnnotationNaming.PreviewAnnotationDoesNotStartWithPreview,
-            ),
-            LintViolation(
-                line = 6,
-                col = 18,
-                detail = PreviewAnnotationNaming.PreviewAnnotationDoesNotStartWithPreview,
-            ),
-        )
+            """
+                .trimIndent()
+        ruleAssertThat(code)
+            .hasLintViolationsWithoutAutoCorrect(
+                LintViolation(
+                    line = 3,
+                    col = 18,
+                    detail = PreviewAnnotationNaming.PreviewAnnotationDoesNotStartWithPreview,
+                ),
+                LintViolation(
+                    line = 6,
+                    col = 18,
+                    detail = PreviewAnnotationNaming.PreviewAnnotationDoesNotStartWithPreview,
+                ),
+            )
     }
 }

@@ -6,7 +6,6 @@ import dev.detekt.api.Config
 import dev.detekt.api.SourceLocation
 import dev.detekt.test.lint
 import io.nlopez.compose.rules.UnstableCollections.Companion.createErrorMessage
-import io.nlopez.compose.rules.detekt.assertThat
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
 
@@ -19,13 +18,14 @@ class UnstableCollectionsCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something(a: List<String>) {}
-                @Composable
-                fun Something(a: Set<String>) {}
-                @Composable
-                fun Something(a: Map<String, Int>) {}
-            """.trimIndent()
+            @Composable
+            fun Something(a: List<String>) {}
+            @Composable
+            fun Something(a: Set<String>) {}
+            @Composable
+            fun Something(a: Map<String, Int>) {}
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors)
             .hasStartSourceLocations(
@@ -43,11 +43,12 @@ class UnstableCollectionsCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something(a: ImmutableList<String>, b: ImmutableSet<String>, c: ImmutableMap<String, Int>) {}
-                @Composable
-                fun Something(a: StringList, b: StringSet, c: StringToIntMap) {}
-            """.trimIndent()
+            @Composable
+            fun Something(a: ImmutableList<String>, b: ImmutableSet<String>, c: ImmutableMap<String, Int>) {}
+            @Composable
+            fun Something(a: StringList, b: StringSet, c: StringToIntMap) {}
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }

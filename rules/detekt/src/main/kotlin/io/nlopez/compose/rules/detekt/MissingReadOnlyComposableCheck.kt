@@ -8,6 +8,7 @@ import dev.detekt.api.Finding
 import dev.detekt.api.RequiresAnalysisApi
 import dev.detekt.api.Rule
 import dev.detekt.api.RuleName
+import java.net.URI
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.KtArrayAccessExpression
 import org.jetbrains.kotlin.psi.KtBinaryExpression
@@ -22,7 +23,6 @@ import org.jetbrains.kotlin.psi.KtPsiUtil
 import org.jetbrains.kotlin.psi.KtSimpleNameExpression
 import org.jetbrains.kotlin.psi.KtTreeVisitorVoid
 import org.jetbrains.kotlin.psi.KtUnaryExpression
-import java.net.URI
 
 /**
  * Reports composable declarations that call only read-only composables, and can therefore be marked
@@ -126,7 +126,7 @@ class MissingReadOnlyComposableCheck(config: Config) :
                     val operationToken = expression.operationToken
                     if (
                         operationToken in KtTokens.ALL_ASSIGNMENTS ||
-                        (!expression.isIdentityOrNullCheck() && !expression.isBuiltInOrLibraryOperator())
+                            (!expression.isIdentityOrNullCheck() && !expression.isBuiltInOrLibraryOperator())
                     ) {
                         hasNonReadOnlyComposableUsage = true
                         return
@@ -165,22 +165,27 @@ class MissingReadOnlyComposableCheck(config: Config) :
     }
 
     internal companion object {
-        val MissingReadOnlyComposable = """
+        val MissingReadOnlyComposable =
+            """
             This @Composable declaration only calls read-only composables and should be marked @ReadOnlyComposable.
 
             See https://mrmans0n.github.io/compose-rules/rules/#mark-read-only-composables-as-read-only for more information.
-        """.trimIndent()
+            """
+                .trimIndent()
     }
 }
 
 private val IncrementOrDecrementOperators = setOf(KtTokens.PLUSPLUS, KtTokens.MINUSMINUS)
 
 /** Identity checks and comparisons with `null` never call `equals`. */
-private fun KtBinaryExpression.isIdentityOrNullCheck(): Boolean = when (operationToken) {
-    KtTokens.EQEQEQ, KtTokens.EXCLEQEQEQ -> true
-    KtTokens.EQEQ, KtTokens.EXCLEQ -> listOfNotNull(left, right).any { operand -> KtPsiUtil.isNullConstant(operand) }
-    else -> false
-}
+private fun KtBinaryExpression.isIdentityOrNullCheck(): Boolean =
+    when (operationToken) {
+        KtTokens.EQEQEQ,
+        KtTokens.EXCLEQEQEQ -> true
+        KtTokens.EQEQ,
+        KtTokens.EXCLEQ -> listOfNotNull(left, right).any { operand -> KtPsiUtil.isNullConstant(operand) }
+        else -> false
+    }
 
 private data class ReadOnlyComposableUsage(
     val hasReadOnlyComposableUsage: Boolean,

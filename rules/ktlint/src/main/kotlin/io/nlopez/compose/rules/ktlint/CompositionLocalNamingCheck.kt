@@ -7,5 +7,4 @@ import io.nlopez.compose.rules.CompositionLocalNaming
 import io.nlopez.compose.rules.KtlintRule
 
 class CompositionLocalNamingCheck :
-    KtlintRule("compose:compositionlocal-naming"),
-    ComposeKtVisitor by CompositionLocalNaming()
+    KtlintRule("compose:compositionlocal-naming"), ComposeKtVisitor by CompositionLocalNaming()

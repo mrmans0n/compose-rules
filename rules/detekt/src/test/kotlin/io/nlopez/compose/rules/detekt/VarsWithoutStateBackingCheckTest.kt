@@ -14,8 +14,9 @@ class VarsWithoutStateBackingCheckTest {
     @Test
     fun `reports bare local vars in composable functions`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             @Composable
             fun Example() {
                 var count = 0
@@ -25,7 +26,7 @@ class VarsWithoutStateBackingCheckTest {
                 }
             }
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -41,8 +42,9 @@ class VarsWithoutStateBackingCheckTest {
     @Test
     fun `reports bare local vars in composable lambdas`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             @Composable
             fun Row(content: @Composable () -> Unit) {
                 content()
@@ -56,7 +58,7 @@ class VarsWithoutStateBackingCheckTest {
                 }
             }
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -69,14 +71,15 @@ class VarsWithoutStateBackingCheckTest {
     @Test
     fun `reports bare local vars in top-level composable lambda properties`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             val Content: @Composable () -> Unit = {
                 var count = 0
                 println(count)
             }
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -89,8 +92,9 @@ class VarsWithoutStateBackingCheckTest {
     @Test
     fun `reports bare local vars in eager lambdas inside composable functions`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             @Composable
             fun Example() {
                 run {
@@ -99,7 +103,7 @@ class VarsWithoutStateBackingCheckTest {
                 }
             }
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -112,8 +116,9 @@ class VarsWithoutStateBackingCheckTest {
     @Test
     fun `reports bare local vars in composable getters`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             val value: Int
                 @Composable
                 get() {
@@ -121,7 +126,7 @@ class VarsWithoutStateBackingCheckTest {
                     return count
                 }
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -134,8 +139,9 @@ class VarsWithoutStateBackingCheckTest {
     @Test
     fun `does not report local vars in non-composable lambdas`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             @Composable
             fun Button(onClick: () -> Unit, content: @Composable () -> Unit) {
                 content()
@@ -153,7 +159,7 @@ class VarsWithoutStateBackingCheckTest {
                 }
             }
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -163,8 +169,9 @@ class VarsWithoutStateBackingCheckTest {
     @Test
     fun `does not report local vars in annotated string builder lambdas`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             import androidx.compose.ui.text.AnnotatedString
             import androidx.compose.ui.text.buildAnnotatedString
 
@@ -174,25 +181,27 @@ class VarsWithoutStateBackingCheckTest {
                 append(tag)
             }
             """,
-        )
+            )
 
-        val findings = rule.lintWithAnalysisApi(
-            code,
-            """
-            package androidx.compose.ui.text
+        val findings =
+            rule.lintWithAnalysisApi(
+                code,
+                """
+                package androidx.compose.ui.text
 
-            class AnnotatedString
+                class AnnotatedString
 
-            class AnnotatedStringBuilder {
-                fun append(value: String) = Unit
-            }
+                class AnnotatedStringBuilder {
+                    fun append(value: String) = Unit
+                }
 
-            fun buildAnnotatedString(builder: AnnotatedStringBuilder.() -> Unit): AnnotatedString {
-                AnnotatedStringBuilder().builder()
-                return AnnotatedString()
-            }
-            """.trimIndent(),
-        )
+                fun buildAnnotatedString(builder: AnnotatedStringBuilder.() -> Unit): AnnotatedString {
+                    AnnotatedStringBuilder().builder()
+                    return AnnotatedString()
+                }
+                """
+                    .trimIndent(),
+            )
 
         assertThat(findings).isEmpty()
     }
@@ -200,8 +209,9 @@ class VarsWithoutStateBackingCheckTest {
     @Test
     fun `does not report local vars in stdlib builder lambdas`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             @Composable
             fun BuildStringExample(): String = buildString {
                 var first = true
@@ -226,7 +236,7 @@ class VarsWithoutStateBackingCheckTest {
                 put(key, "value")
             }
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -236,8 +246,9 @@ class VarsWithoutStateBackingCheckTest {
     @Test
     fun `does not report local vars in non-composable getters`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             @Composable
             fun Example() {
                 val value: Int
@@ -248,7 +259,7 @@ class VarsWithoutStateBackingCheckTest {
                 println(value)
             }
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -258,8 +269,9 @@ class VarsWithoutStateBackingCheckTest {
     @Test
     fun `does not report member vars in anonymous objects`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             @Composable
             fun Example() {
                 val holder = object {
@@ -268,7 +280,7 @@ class VarsWithoutStateBackingCheckTest {
                 println(holder.count)
             }
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -278,8 +290,9 @@ class VarsWithoutStateBackingCheckTest {
     @Test
     fun `does not report local vars in non-composable inline composable lambdas`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             @Composable
             inline fun <T> inlineRemember(calculation: () -> T): T = calculation()
 
@@ -292,7 +305,7 @@ class VarsWithoutStateBackingCheckTest {
                 println(values)
             }
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -302,8 +315,9 @@ class VarsWithoutStateBackingCheckTest {
     @Test
     fun `reports local vars in composable lambdas nested in skipped lambdas`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             @Composable
             inline fun <T> inlineRemember(calculation: () -> T): T = calculation()
 
@@ -318,7 +332,7 @@ class VarsWithoutStateBackingCheckTest {
                 content()
             }
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -331,8 +345,9 @@ class VarsWithoutStateBackingCheckTest {
     @Test
     fun `reports non-compose delegated local vars`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             import kotlin.reflect.KProperty
 
             class NonComposeDelegate {
@@ -346,7 +361,7 @@ class VarsWithoutStateBackingCheckTest {
                 count = 1
             }
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -359,15 +374,16 @@ class VarsWithoutStateBackingCheckTest {
     @Test
     fun `does not report compose state delegated local vars`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             @Composable
             fun Example(state: MutableState<Int>) {
                 var count by state
                 count = 1
             }
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -377,8 +393,9 @@ class VarsWithoutStateBackingCheckTest {
     @Test
     fun `does not report local vars outside composable functions`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             fun Example() {
                 var count = 0
                 if (count == 0) {
@@ -387,7 +404,7 @@ class VarsWithoutStateBackingCheckTest {
                 }
             }
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 

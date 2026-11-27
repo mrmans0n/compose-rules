@@ -18,7 +18,8 @@ class ComposableAnnotationNamingCheckTest {
         val code =
             """
             annotation class Banana
-            """.trimIndent()
+            """
+                .trimIndent()
         ruleAssertThat(code).hasNoLintViolations()
     }
 
@@ -31,7 +32,8 @@ class ComposableAnnotationNamingCheckTest {
             annotation class BananaComposable
             @ComposableTargetMarker
             annotation class AppleComposable
-            """.trimIndent()
+            """
+                .trimIndent()
         ruleAssertThat(code).hasNoLintViolations()
     }
 
@@ -44,18 +46,20 @@ class ComposableAnnotationNamingCheckTest {
             annotation class Banana
             @ComposableTargetMarker
             annotation class Apple
-            """.trimIndent()
-        ruleAssertThat(code).hasLintViolationsWithoutAutoCorrect(
-            LintViolation(
-                line = 2,
-                col = 18,
-                detail = ComposableAnnotationNaming.ComposableAnnotationDoesNotEndWithComposable,
-            ),
-            LintViolation(
-                line = 4,
-                col = 18,
-                detail = ComposableAnnotationNaming.ComposableAnnotationDoesNotEndWithComposable,
-            ),
-        )
+            """
+                .trimIndent()
+        ruleAssertThat(code)
+            .hasLintViolationsWithoutAutoCorrect(
+                LintViolation(
+                    line = 2,
+                    col = 18,
+                    detail = ComposableAnnotationNaming.ComposableAnnotationDoesNotEndWithComposable,
+                ),
+                LintViolation(
+                    line = 4,
+                    col = 18,
+                    detail = ComposableAnnotationNaming.ComposableAnnotationDoesNotEndWithComposable,
+                ),
+            )
     }
 }

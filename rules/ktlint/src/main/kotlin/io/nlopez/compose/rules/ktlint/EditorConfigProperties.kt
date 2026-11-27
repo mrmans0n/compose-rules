@@ -8,12 +8,13 @@ import org.ec4j.core.model.PropertyType.PropertyValueParser
 
 val contentEmittersProperty: EditorConfigProperty<String> =
     EditorConfigProperty(
-        type = PropertyType.LowerCasingPropertyType(
-            "compose_content_emitters",
-            "A comma separated list of composable functions that emit content (e.g. UI)",
-            PropertyValueParser.IDENTITY_VALUE_PARSER,
-            emptySet(),
-        ),
+        type =
+            PropertyType.LowerCasingPropertyType(
+                "compose_content_emitters",
+                "A comma separated list of composable functions that emit content (e.g. UI)",
+                PropertyValueParser.IDENTITY_VALUE_PARSER,
+                emptySet(),
+            ),
         defaultValue = "",
         propertyMapper = { property, _ ->
             when {
@@ -26,13 +27,14 @@ val contentEmittersProperty: EditorConfigProperty<String> =
 
 val contentEmittersDenylist: EditorConfigProperty<String> =
     EditorConfigProperty(
-        type = PropertyType.LowerCasingPropertyType(
-            "compose_content_emitters_denylist",
-            "A comma separated list of composable functions that we don't want to take into acccount " +
-                "when assessing if something is a content emitter",
-            PropertyValueParser.IDENTITY_VALUE_PARSER,
-            emptySet(),
-        ),
+        type =
+            PropertyType.LowerCasingPropertyType(
+                "compose_content_emitters_denylist",
+                "A comma separated list of composable functions that we don't want to take into acccount " +
+                    "when assessing if something is a content emitter",
+                PropertyValueParser.IDENTITY_VALUE_PARSER,
+                emptySet(),
+            ),
         defaultValue = "",
         propertyMapper = { property, _ ->
             when {
@@ -45,12 +47,13 @@ val contentEmittersDenylist: EditorConfigProperty<String> =
 
 val checkModifiersForVisibility: EditorConfigProperty<String> =
     EditorConfigProperty(
-        type = PropertyType.LowerCasingPropertyType(
-            "compose_check_modifiers_for_visibility",
-            "Visibility of the composables where we want to check if a Modifier parameter is missing",
-            PropertyValueParser.IDENTITY_VALUE_PARSER,
-            setOf("only_public", "public_and_internal", "all"),
-        ),
+        type =
+            PropertyType.LowerCasingPropertyType(
+                "compose_check_modifiers_for_visibility",
+                "Visibility of the composables where we want to check if a Modifier parameter is missing",
+                PropertyValueParser.IDENTITY_VALUE_PARSER,
+                setOf("only_public", "public_and_internal", "all"),
+            ),
         defaultValue = "only_public",
         propertyMapper = { property, _ ->
             when {
@@ -63,12 +66,13 @@ val checkModifiersForVisibility: EditorConfigProperty<String> =
 
 val compositionLocalAllowlistProperty: EditorConfigProperty<String> =
     EditorConfigProperty(
-        type = PropertyType.LowerCasingPropertyType(
-            "compose_allowed_composition_locals",
-            "A comma separated list of allowed CompositionLocals",
-            PropertyValueParser.IDENTITY_VALUE_PARSER,
-            emptySet(),
-        ),
+        type =
+            PropertyType.LowerCasingPropertyType(
+                "compose_allowed_composition_locals",
+                "A comma separated list of allowed CompositionLocals",
+                PropertyValueParser.IDENTITY_VALUE_PARSER,
+                emptySet(),
+            ),
         defaultValue = "",
         propertyMapper = { property, _ ->
             when {
@@ -81,12 +85,13 @@ val compositionLocalAllowlistProperty: EditorConfigProperty<String> =
 
 val allowedComposeNamingNames: EditorConfigProperty<String> =
     EditorConfigProperty(
-        type = PropertyType.LowerCasingPropertyType(
-            "compose_allowed_composable_function_names",
-            "A comma separated list of regexes of allowed composable function names",
-            PropertyValueParser.IDENTITY_VALUE_PARSER,
-            emptySet(),
-        ),
+        type =
+            PropertyType.LowerCasingPropertyType(
+                "compose_allowed_composable_function_names",
+                "A comma separated list of regexes of allowed composable function names",
+                PropertyValueParser.IDENTITY_VALUE_PARSER,
+                emptySet(),
+            ),
         defaultValue = "",
         propertyMapper = { property, _ ->
             when {
@@ -99,12 +104,13 @@ val allowedComposeNamingNames: EditorConfigProperty<String> =
 
 val viewModelFactories: EditorConfigProperty<String> =
     EditorConfigProperty(
-        type = PropertyType.LowerCasingPropertyType(
-            "compose_view_model_factories",
-            "A comma separated list of ViewModel factory methods",
-            PropertyValueParser.IDENTITY_VALUE_PARSER,
-            emptySet(),
-        ),
+        type =
+            PropertyType.LowerCasingPropertyType(
+                "compose_view_model_factories",
+                "A comma separated list of ViewModel factory methods",
+                PropertyValueParser.IDENTITY_VALUE_PARSER,
+                emptySet(),
+            ),
         defaultValue = "",
         propertyMapper = { property, _ ->
             when {
@@ -117,12 +123,13 @@ val viewModelFactories: EditorConfigProperty<String> =
 
 val allowedStateHolderNames: EditorConfigProperty<String> =
     EditorConfigProperty(
-        type = PropertyType.LowerCasingPropertyType(
-            "compose_allowed_state_holder_names",
-            "A comma separated list of regexes of valid state holders / ViewModel / Presenter names",
-            PropertyValueParser.IDENTITY_VALUE_PARSER,
-            emptySet(),
-        ),
+        type =
+            PropertyType.LowerCasingPropertyType(
+                "compose_allowed_state_holder_names",
+                "A comma separated list of regexes of valid state holders / ViewModel / Presenter names",
+                PropertyValueParser.IDENTITY_VALUE_PARSER,
+                emptySet(),
+            ),
         defaultValue = "",
         propertyMapper = { property, _ ->
             when {
@@ -135,13 +142,14 @@ val allowedStateHolderNames: EditorConfigProperty<String> =
 
 val allowedForwarding: EditorConfigProperty<String> =
     EditorConfigProperty(
-        type = PropertyType.LowerCasingPropertyType(
-            "compose_allowed_forwarding",
-            "A comma separated list of regexes of composable names where forwarding a " +
-                "state holder / ViewModel / Presenter names is alright to do",
-            PropertyValueParser.IDENTITY_VALUE_PARSER,
-            emptySet(),
-        ),
+        type =
+            PropertyType.LowerCasingPropertyType(
+                "compose_allowed_forwarding",
+                "A comma separated list of regexes of composable names where forwarding a " +
+                    "state holder / ViewModel / Presenter names is alright to do",
+                PropertyValueParser.IDENTITY_VALUE_PARSER,
+                emptySet(),
+            ),
         defaultValue = "",
         propertyMapper = { property, _ ->
             when {
@@ -154,13 +162,14 @@ val allowedForwarding: EditorConfigProperty<String> =
 
 val allowedForwardingOfTypes: EditorConfigProperty<String> =
     EditorConfigProperty(
-        type = PropertyType.LowerCasingPropertyType(
-            "compose_allowed_forwarding_of_types",
-            "A comma separated list of regexes of state holder/ViewModel names which are exempt from " +
-                "the forwarding rule",
-            PropertyValueParser.IDENTITY_VALUE_PARSER,
-            emptySet(),
-        ),
+        type =
+            PropertyType.LowerCasingPropertyType(
+                "compose_allowed_forwarding_of_types",
+                "A comma separated list of regexes of state holder/ViewModel names which are exempt from " +
+                    "the forwarding rule",
+                PropertyValueParser.IDENTITY_VALUE_PARSER,
+                emptySet(),
+            ),
         defaultValue = "",
         propertyMapper = { property, _ ->
             when {
@@ -173,12 +182,13 @@ val allowedForwardingOfTypes: EditorConfigProperty<String> =
 
 val customModifiers: EditorConfigProperty<String> =
     EditorConfigProperty(
-        type = PropertyType.LowerCasingPropertyType(
-            "compose_custom_modifiers",
-            "A comma separated list of custom Modifier implementations",
-            PropertyValueParser.IDENTITY_VALUE_PARSER,
-            emptySet(),
-        ),
+        type =
+            PropertyType.LowerCasingPropertyType(
+                "compose_custom_modifiers",
+                "A comma separated list of custom Modifier implementations",
+                PropertyValueParser.IDENTITY_VALUE_PARSER,
+                emptySet(),
+            ),
         defaultValue = "",
         propertyMapper = { property, _ ->
             when {
@@ -191,13 +201,14 @@ val customModifiers: EditorConfigProperty<String> =
 
 val treatAsLambda: EditorConfigProperty<String> =
     EditorConfigProperty(
-        type = PropertyType.LowerCasingPropertyType(
-            "compose_treat_as_lambda",
-            "A comma separated list of types that should be treated as lambdas " +
-                "(e.g. typedefs of lambdas, fun interfaces)",
-            PropertyValueParser.IDENTITY_VALUE_PARSER,
-            emptySet(),
-        ),
+        type =
+            PropertyType.LowerCasingPropertyType(
+                "compose_treat_as_lambda",
+                "A comma separated list of types that should be treated as lambdas " +
+                    "(e.g. typedefs of lambdas, fun interfaces)",
+                PropertyValueParser.IDENTITY_VALUE_PARSER,
+                emptySet(),
+            ),
         defaultValue = "",
         propertyMapper = { property, _ ->
             when {
@@ -210,13 +221,14 @@ val treatAsLambda: EditorConfigProperty<String> =
 
 val treatAsComposableLambda: EditorConfigProperty<String> =
     EditorConfigProperty(
-        type = PropertyType.LowerCasingPropertyType(
-            "compose_treat_as_composable_lambda",
-            "A comma separated list of types that should be treated as @Composable lambdas " +
-                "(e.g. typedefs of lambdas, fun interfaces)",
-            PropertyValueParser.IDENTITY_VALUE_PARSER,
-            emptySet(),
-        ),
+        type =
+            PropertyType.LowerCasingPropertyType(
+                "compose_treat_as_composable_lambda",
+                "A comma separated list of types that should be treated as @Composable lambdas " +
+                    "(e.g. typedefs of lambdas, fun interfaces)",
+                PropertyValueParser.IDENTITY_VALUE_PARSER,
+                emptySet(),
+            ),
         defaultValue = "",
         propertyMapper = { property, _ ->
             when {
@@ -229,12 +241,13 @@ val treatAsComposableLambda: EditorConfigProperty<String> =
 
 val allowedFromM2: EditorConfigProperty<String> =
     EditorConfigProperty(
-        type = PropertyType.LowerCasingPropertyType(
-            "compose_allowed_from_m2",
-            "A comma separated list of Material 2 APIs that are allowed",
-            PropertyValueParser.IDENTITY_VALUE_PARSER,
-            emptySet(),
-        ),
+        type =
+            PropertyType.LowerCasingPropertyType(
+                "compose_allowed_from_m2",
+                "A comma separated list of Material 2 APIs that are allowed",
+                PropertyValueParser.IDENTITY_VALUE_PARSER,
+                emptySet(),
+            ),
         defaultValue = "",
         propertyMapper = { property, _ ->
             when {
@@ -247,23 +260,25 @@ val allowedFromM2: EditorConfigProperty<String> =
 
 val disallowMaterial2: EditorConfigProperty<Boolean> =
     EditorConfigProperty(
-        type = PropertyType.LowerCasingPropertyType(
-            "compose_disallow_material2",
-            "When enabled, Compose Material 2 (M2) usages will be disallowed.",
-            PropertyValueParser.BOOLEAN_VALUE_PARSER,
-            setOf(true.toString(), false.toString()),
-        ),
+        type =
+            PropertyType.LowerCasingPropertyType(
+                "compose_disallow_material2",
+                "When enabled, Compose Material 2 (M2) usages will be disallowed.",
+                PropertyValueParser.BOOLEAN_VALUE_PARSER,
+                setOf(true.toString(), false.toString()),
+            ),
         defaultValue = false,
     )
 
 val allowedLambdaParameterNames: EditorConfigProperty<String> =
     EditorConfigProperty(
-        type = PropertyType.LowerCasingPropertyType(
-            "compose_allowed_lambda_parameter_names",
-            "A comma separated list of lambda name that are allowed",
-            PropertyValueParser.IDENTITY_VALUE_PARSER,
-            emptySet(),
-        ),
+        type =
+            PropertyType.LowerCasingPropertyType(
+                "compose_allowed_lambda_parameter_names",
+                "A comma separated list of lambda name that are allowed",
+                PropertyValueParser.IDENTITY_VALUE_PARSER,
+                emptySet(),
+            ),
         defaultValue = "",
         propertyMapper = { property, _ ->
             when {
@@ -276,23 +291,25 @@ val allowedLambdaParameterNames: EditorConfigProperty<String> =
 
 val disallowUnstableCollections: EditorConfigProperty<Boolean> =
     EditorConfigProperty(
-        type = PropertyType.LowerCasingPropertyType(
-            "compose_disallow_unstable_collections",
-            "When enabled, unstable collections (e.g. List/Set/Map) will be disallowed.",
-            PropertyValueParser.BOOLEAN_VALUE_PARSER,
-            setOf(true.toString(), false.toString()),
-        ),
+        type =
+            PropertyType.LowerCasingPropertyType(
+                "compose_disallow_unstable_collections",
+                "When enabled, unstable collections (e.g. List/Set/Map) will be disallowed.",
+                PropertyValueParser.BOOLEAN_VALUE_PARSER,
+                setOf(true.toString(), false.toString()),
+            ),
         defaultValue = false,
     )
 
 val modifierMissingIgnoreAnnotated: EditorConfigProperty<String> =
     EditorConfigProperty(
-        type = PropertyType.LowerCasingPropertyType(
-            "compose_modifier_missing_ignore_annotated",
-            "A comma separated list of composable functions that should be exempt from the ModifierMissing check",
-            PropertyValueParser.IDENTITY_VALUE_PARSER,
-            emptySet(),
-        ),
+        type =
+            PropertyType.LowerCasingPropertyType(
+                "compose_modifier_missing_ignore_annotated",
+                "A comma separated list of composable functions that should be exempt from the ModifierMissing check",
+                PropertyValueParser.IDENTITY_VALUE_PARSER,
+                emptySet(),
+            ),
         defaultValue = "",
         propertyMapper = { property, _ ->
             when {
@@ -305,23 +322,25 @@ val modifierMissingIgnoreAnnotated: EditorConfigProperty<String> =
 
 val composePreviewNamingEnabled: EditorConfigProperty<Boolean> =
     EditorConfigProperty(
-        type = PropertyType.LowerCasingPropertyType(
-            "compose_preview_naming_enabled",
-            "When enabled, preview composables should follow the configured naming strategy.",
-            PropertyValueParser.BOOLEAN_VALUE_PARSER,
-            setOf(true.toString(), false.toString()),
-        ),
+        type =
+            PropertyType.LowerCasingPropertyType(
+                "compose_preview_naming_enabled",
+                "When enabled, preview composables should follow the configured naming strategy.",
+                PropertyValueParser.BOOLEAN_VALUE_PARSER,
+                setOf(true.toString(), false.toString()),
+            ),
         defaultValue = false,
     )
 
 val composePreviewNamingStrategy: EditorConfigProperty<String> =
     EditorConfigProperty(
-        type = PropertyType.LowerCasingPropertyType(
-            "compose_preview_naming_strategy",
-            "The naming strategy for preview composables.",
-            PropertyValueParser.IDENTITY_VALUE_PARSER,
-            emptySet(),
-        ),
+        type =
+            PropertyType.LowerCasingPropertyType(
+                "compose_preview_naming_strategy",
+                "The naming strategy for preview composables.",
+                PropertyValueParser.IDENTITY_VALUE_PARSER,
+                emptySet(),
+            ),
         defaultValue = "suffix",
         propertyMapper = { property, _ ->
             when {
@@ -334,22 +353,24 @@ val composePreviewNamingStrategy: EditorConfigProperty<String> =
 
 val composableNestingDepthEnabled: EditorConfigProperty<Boolean> =
     EditorConfigProperty(
-        type = PropertyType.LowerCasingPropertyType(
-            "compose_composable_nesting_depth_enabled",
-            "When enabled, @Composable functions that nest content emitters too deeply will be flagged.",
-            PropertyValueParser.BOOLEAN_VALUE_PARSER,
-            setOf(true.toString(), false.toString()),
-        ),
+        type =
+            PropertyType.LowerCasingPropertyType(
+                "compose_composable_nesting_depth_enabled",
+                "When enabled, @Composable functions that nest content emitters too deeply will be flagged.",
+                PropertyValueParser.BOOLEAN_VALUE_PARSER,
+                setOf(true.toString(), false.toString()),
+            ),
         defaultValue = false,
     )
 
 val composableNestingDepthThreshold: EditorConfigProperty<Int> =
     EditorConfigProperty(
-        type = PropertyType.LowerCasingPropertyType(
-            "compose_composable_nesting_depth_threshold",
-            "Maximum nesting depth allowed for content emitters inside a single @Composable function.",
-            PropertyValueParser.POSITIVE_INT_VALUE_PARSER,
-            emptySet(),
-        ),
+        type =
+            PropertyType.LowerCasingPropertyType(
+                "compose_composable_nesting_depth_threshold",
+                "Maximum nesting depth allowed for content emitters inside a single @Composable function.",
+                PropertyValueParser.POSITIVE_INT_VALUE_PARSER,
+                emptySet(),
+            ),
         defaultValue = 3,
     )

@@ -16,18 +16,20 @@ class LambdaParameterEventTrailingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something(modifier: Modifier = Modifier, onClick: () -> Unit) {
-                    Text("Hello")
-                }
-            """.trimIndent()
-        ruleAssertThat(code).hasLintViolationsWithoutAutoCorrect(
-            LintViolation(
-                line = 2,
-                col = 46,
-                detail = LambdaParameterEventTrailing.EventLambdaIsTrailingLambda,
-            ),
-        )
+            @Composable
+            fun Something(modifier: Modifier = Modifier, onClick: () -> Unit) {
+                Text("Hello")
+            }
+            """
+                .trimIndent()
+        ruleAssertThat(code)
+            .hasLintViolationsWithoutAutoCorrect(
+                LintViolation(
+                    line = 2,
+                    col = 46,
+                    detail = LambdaParameterEventTrailing.EventLambdaIsTrailingLambda,
+                ),
+            )
     }
 
     @Test
@@ -35,11 +37,12 @@ class LambdaParameterEventTrailingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something(onClick: () -> Unit, modifier: Modifier = Modifier) {
-                    Text("Hello")
-                }
-            """.trimIndent()
+            @Composable
+            fun Something(onClick: () -> Unit, modifier: Modifier = Modifier) {
+                Text("Hello")
+            }
+            """
+                .trimIndent()
         ruleAssertThat(code).hasNoLintViolations()
     }
 
@@ -48,11 +51,12 @@ class LambdaParameterEventTrailingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something(modifier: Modifier = Modifier, on: @Composable () -> Unit) {
-                    Text("Hello")
-                }
-            """.trimIndent()
+            @Composable
+            fun Something(modifier: Modifier = Modifier, on: @Composable () -> Unit) {
+                Text("Hello")
+            }
+            """
+                .trimIndent()
         ruleAssertThat(code).hasNoLintViolations()
     }
 
@@ -61,9 +65,10 @@ class LambdaParameterEventTrailingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun something(modifier: Modifier = Modifier, onClick: () -> Unit) {}
-            """.trimIndent()
+            @Composable
+            fun something(modifier: Modifier = Modifier, onClick: () -> Unit) {}
+            """
+                .trimIndent()
         ruleAssertThat(code).hasNoLintViolations()
     }
 }

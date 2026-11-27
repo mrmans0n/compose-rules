@@ -15,8 +15,9 @@ class MissingReadOnlyComposableCheckTest {
     @Test
     fun `reports composable function that only calls read only composables`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             @ReadOnlyComposable
             @Composable
             fun currentValue(): Int = 42
@@ -24,7 +25,7 @@ class MissingReadOnlyComposableCheckTest {
             @Composable
             fun Example(): Int = currentValue()
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -37,8 +38,9 @@ class MissingReadOnlyComposableCheckTest {
     @Test
     fun `reports composable getter that only calls read only composables`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             @ReadOnlyComposable
             @Composable
             fun currentValue(): Int = 42
@@ -47,7 +49,7 @@ class MissingReadOnlyComposableCheckTest {
                 @Composable
                 get() = currentValue()
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -60,8 +62,9 @@ class MissingReadOnlyComposableCheckTest {
     @Test
     fun `reports composable function that reads read only composable property`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             val currentValue: Int
                 @ReadOnlyComposable
                 @Composable
@@ -70,7 +73,7 @@ class MissingReadOnlyComposableCheckTest {
             @Composable
             fun Example(): Int = currentValue
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -83,8 +86,9 @@ class MissingReadOnlyComposableCheckTest {
     @Test
     fun `reports composable function that reads chained read only composable property`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             val currentValue: Pair<Int, Int>
                 @ReadOnlyComposable
                 @Composable
@@ -93,7 +97,7 @@ class MissingReadOnlyComposableCheckTest {
             @Composable
             fun Example(): Int = currentValue.first
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -106,8 +110,9 @@ class MissingReadOnlyComposableCheckTest {
     @Test
     fun `does not report composable function that reads chained non read only composable property`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             val currentValue: Pair<Int, Int>
                 @Composable
                 get() = 1 to 2
@@ -115,7 +120,7 @@ class MissingReadOnlyComposableCheckTest {
             @Composable
             fun Example(): Int = currentValue.first
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -125,14 +130,15 @@ class MissingReadOnlyComposableCheckTest {
     @Test
     fun `reports composable function that only reads composition local current`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             val LocalCount = compositionLocalOf { 0 }
 
             @Composable
             fun Example(): Int = LocalCount.current
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -145,14 +151,15 @@ class MissingReadOnlyComposableCheckTest {
     @Test
     fun `does not report composition local current read with ordinary receiver call`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             fun localWithSideEffects(): CompositionLocal<Int> = compositionLocalOf { 0 }
 
             @Composable
             fun Example(): Int = localWithSideEffects().current
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -162,8 +169,9 @@ class MissingReadOnlyComposableCheckTest {
     @Test
     fun `does not report composition local current read with ordinary operator receiver call`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             class Locals {
                 operator fun get(index: Int): CompositionLocal<Int> = compositionLocalOf { index }
             }
@@ -171,7 +179,7 @@ class MissingReadOnlyComposableCheckTest {
             @Composable
             fun Example(locals: Locals): Int = locals[0].current
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -181,12 +189,13 @@ class MissingReadOnlyComposableCheckTest {
     @Test
     fun `does not report composable function without read only usage`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             @Composable
             fun Example(): Int = 42
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -196,8 +205,9 @@ class MissingReadOnlyComposableCheckTest {
     @Test
     fun `does not report composable function that calls non read only composable`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             @Composable
             fun EmitsContent() {
             }
@@ -207,7 +217,7 @@ class MissingReadOnlyComposableCheckTest {
                 EmitsContent()
             }
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -217,14 +227,15 @@ class MissingReadOnlyComposableCheckTest {
     @Test
     fun `does not report composable function that calls composable lambda parameter`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             @Composable
             fun Example(content: @Composable () -> Unit) {
                 content()
             }
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -234,8 +245,9 @@ class MissingReadOnlyComposableCheckTest {
     @Test
     fun `does not report composable function with read only usage and ordinary call`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             val LocalCount = compositionLocalOf { 0 }
 
             fun trackMetric() {
@@ -247,7 +259,7 @@ class MissingReadOnlyComposableCheckTest {
                 return LocalCount.current
             }
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -257,8 +269,9 @@ class MissingReadOnlyComposableCheckTest {
     @Test
     fun `does not report composable function with read only usage and ordinary custom getter read`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             val LocalCount = compositionLocalOf { 0 }
 
             val sideEffectingValue: Int
@@ -267,7 +280,7 @@ class MissingReadOnlyComposableCheckTest {
             @Composable
             fun Example(): Int = LocalCount.current + sideEffectingValue
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -277,8 +290,9 @@ class MissingReadOnlyComposableCheckTest {
     @Test
     fun `does not report composable function with read only usage and delegated property read`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             val LocalCount = compositionLocalOf { 0 }
 
             val token by lazy { 1 }
@@ -286,7 +300,7 @@ class MissingReadOnlyComposableCheckTest {
             @Composable
             fun Example(): Int = LocalCount.current + token
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -296,8 +310,9 @@ class MissingReadOnlyComposableCheckTest {
     @Test
     fun `does not report composable function with read only usage and custom operator call`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             val LocalCounter = compositionLocalOf { Counter(0) }
 
             class Counter(val value: Int) {
@@ -307,7 +322,7 @@ class MissingReadOnlyComposableCheckTest {
             @Composable
             fun Example(other: Counter): Counter = LocalCounter.current + other
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -317,8 +332,9 @@ class MissingReadOnlyComposableCheckTest {
     @Test
     fun `does not report composable function with read only usage and mutation`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             val LocalCount = compositionLocalOf { 0 }
 
             var count = 0
@@ -329,7 +345,7 @@ class MissingReadOnlyComposableCheckTest {
                 return LocalCount.current
             }
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -339,13 +355,14 @@ class MissingReadOnlyComposableCheckTest {
     @Test
     fun `does not report already read only composable function`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             @ReadOnlyComposable
             @Composable
             fun Example(): Int = 42
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -355,8 +372,9 @@ class MissingReadOnlyComposableCheckTest {
     @Test
     fun `does not report override composable function`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             abstract class Base {
                 @Composable
                 abstract fun currentValue(): Int
@@ -367,7 +385,7 @@ class MissingReadOnlyComposableCheckTest {
                 override fun currentValue(): Int = 42
             }
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -377,8 +395,9 @@ class MissingReadOnlyComposableCheckTest {
     @Test
     fun `does not report override composable getter`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             val LocalCount = compositionLocalOf { 0 }
 
             abstract class Base {
@@ -391,7 +410,7 @@ class MissingReadOnlyComposableCheckTest {
                     @Composable get() = LocalCount.current
             }
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -401,8 +420,9 @@ class MissingReadOnlyComposableCheckTest {
     @Test
     fun `does not report composable getter that calls non read only composable`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             @Composable
             fun EmitsContent() {
             }
@@ -411,7 +431,7 @@ class MissingReadOnlyComposableCheckTest {
                 @Composable
                 get() = EmitsContent()
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -421,8 +441,9 @@ class MissingReadOnlyComposableCheckTest {
     @Test
     fun `reports read only usage inside eager stdlib lambda`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             @ReadOnlyComposable
             @Composable
             fun currentValue(): Int = 42
@@ -432,7 +453,7 @@ class MissingReadOnlyComposableCheckTest {
                 currentValue()
             }
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -445,8 +466,9 @@ class MissingReadOnlyComposableCheckTest {
     @Test
     fun `reports read only usage inside labeled eager stdlib lambda`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             @ReadOnlyComposable
             @Composable
             fun currentValue(): Int = 42
@@ -456,7 +478,7 @@ class MissingReadOnlyComposableCheckTest {
                 currentValue()
             }
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -469,8 +491,9 @@ class MissingReadOnlyComposableCheckTest {
     @Test
     fun `does not report read only usage inside deferred lambda`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             @ReadOnlyComposable
             @Composable
             fun currentValue(): Int = 42
@@ -480,7 +503,7 @@ class MissingReadOnlyComposableCheckTest {
                 currentValue()
             }
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -490,8 +513,9 @@ class MissingReadOnlyComposableCheckTest {
     @Test
     fun `does not report deferred lambda returned from eager stdlib lambda`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             @ReadOnlyComposable
             @Composable
             fun currentValue(): Int = 42
@@ -503,7 +527,7 @@ class MissingReadOnlyComposableCheckTest {
                 }
             }
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -513,14 +537,15 @@ class MissingReadOnlyComposableCheckTest {
     @Test
     fun `reports read only usage with library call on the result`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             $STRING_RESOURCE
 
             @Composable
             fun Example(): String = stringResource(1).uppercase()
             """,
-        )
+            )
 
         assertSingleFinding(rule.lintWithAnalysisApi(code), SourceLocation(10, 9))
     }
@@ -528,14 +553,15 @@ class MissingReadOnlyComposableCheckTest {
     @Test
     fun `reports read only usage inside let with library call on the result`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             $STRING_RESOURCE
 
             @Composable
             fun Example(value: String?): String = value?.let { stringResource(1) }.orEmpty()
             """,
-        )
+            )
 
         assertSingleFinding(rule.lintWithAnalysisApi(code), SourceLocation(10, 9))
     }
@@ -543,8 +569,9 @@ class MissingReadOnlyComposableCheckTest {
     @Test
     fun `reports read only usage inside annotated string builder`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             import androidx.compose.ui.text.AnnotatedString
             import androidx.compose.ui.text.SpanStyle
             import androidx.compose.ui.text.buildAnnotatedString
@@ -562,7 +589,7 @@ class MissingReadOnlyComposableCheckTest {
                 }
             }
             """,
-        )
+            )
 
         assertSingleFinding(rule.lintWithAnalysisApi(code, FAKE_COMPOSE_UI_TEXT), SourceLocation(15, 9))
     }
@@ -570,14 +597,15 @@ class MissingReadOnlyComposableCheckTest {
     @Test
     fun `reports read only usage with elvis operator`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             $STRING_RESOURCE
 
             @Composable
             fun Example(value: String?): String = value ?: stringResource(1)
             """,
-        )
+            )
 
         assertSingleFinding(rule.lintWithAnalysisApi(code), SourceLocation(10, 9))
     }
@@ -585,15 +613,16 @@ class MissingReadOnlyComposableCheckTest {
     @Test
     fun `reports read only usage with library binary operators`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             $STRING_RESOURCE
 
             @Composable
             fun Example(count: Int, other: String?): String =
                 if (count > 0 && other != null) stringResource(1) + count else stringResource(2)
             """,
-        )
+            )
 
         assertSingleFinding(rule.lintWithAnalysisApi(code), SourceLocation(10, 9))
     }
@@ -601,8 +630,9 @@ class MissingReadOnlyComposableCheckTest {
     @Test
     fun `reports read only usage with data class equality`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             $STRING_RESOURCE
 
             data class Token(val id: Int)
@@ -611,7 +641,7 @@ class MissingReadOnlyComposableCheckTest {
             fun Example(token: Token, other: Token): String =
                 if (token == other) stringResource(1) else stringResource(2)
             """,
-        )
+            )
 
         assertSingleFinding(rule.lintWithAnalysisApi(code), SourceLocation(12, 9))
     }
@@ -619,8 +649,9 @@ class MissingReadOnlyComposableCheckTest {
     @Test
     fun `reports read only usage with null and identity checks on type with custom equals`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             $STRING_RESOURCE
 
             class Token(val id: Int) {
@@ -633,7 +664,7 @@ class MissingReadOnlyComposableCheckTest {
             fun Example(token: Token?, other: Token): String =
                 if (token != null && token !== other) stringResource(1) else stringResource(2)
             """,
-        )
+            )
 
         assertSingleFinding(rule.lintWithAnalysisApi(code), SourceLocation(16, 9))
     }
@@ -641,8 +672,9 @@ class MissingReadOnlyComposableCheckTest {
     @Test
     fun `does not report read only usage with custom equals`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             $STRING_RESOURCE
 
             class Token(val id: Int) {
@@ -655,7 +687,7 @@ class MissingReadOnlyComposableCheckTest {
             fun Example(token: Token, other: Token): String =
                 if (token == other) stringResource(1) else stringResource(2)
             """,
-        )
+            )
 
         assertThat(rule.lintWithAnalysisApi(code)).isEmpty()
     }
@@ -663,8 +695,9 @@ class MissingReadOnlyComposableCheckTest {
     @Test
     fun `reports read only usage inside fast collection helper lambda`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             import androidx.compose.ui.util.fastMap
 
             $STRING_RESOURCE
@@ -672,7 +705,7 @@ class MissingReadOnlyComposableCheckTest {
             @Composable
             fun Example(ids: List<Int>): String = ids.fastMap { stringResource(it) }.joinToString()
             """,
-        )
+            )
 
         assertSingleFinding(rule.lintWithAnalysisApi(code, FAKE_COMPOSE_UI_UTIL), SourceLocation(12, 9))
     }
@@ -680,8 +713,9 @@ class MissingReadOnlyComposableCheckTest {
     @Test
     fun `reports annotated string assembled from read only usages`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             import androidx.compose.ui.text.AnnotatedString
             import androidx.compose.ui.text.buildAnnotatedString
 
@@ -708,7 +742,7 @@ class MissingReadOnlyComposableCheckTest {
                 }
             }
             """,
-        )
+            )
 
         assertSingleFinding(rule.lintWithAnalysisApi(code, FAKE_COMPOSE_UI_TEXT), SourceLocation(17, 9))
     }
@@ -716,8 +750,9 @@ class MissingReadOnlyComposableCheckTest {
     @Test
     fun `does not report read only usage with non read only composable call`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             $STRING_RESOURCE
 
             @Composable
@@ -729,7 +764,7 @@ class MissingReadOnlyComposableCheckTest {
                 Text(stringResource(1))
             }
             """,
-        )
+            )
 
         assertThat(rule.lintWithAnalysisApi(code)).isEmpty()
     }
@@ -737,8 +772,9 @@ class MissingReadOnlyComposableCheckTest {
     @Test
     fun `does not report read only usage with remember`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             $STRING_RESOURCE
 
             @Composable
@@ -747,7 +783,7 @@ class MissingReadOnlyComposableCheckTest {
                 return prefix + stringResource(1)
             }
             """,
-        )
+            )
 
         assertThat(rule.lintWithAnalysisApi(code)).isEmpty()
     }
@@ -755,14 +791,15 @@ class MissingReadOnlyComposableCheckTest {
     @Test
     fun `does not report read only usage inside non inline library lambda`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             $STRING_RESOURCE
 
             @Composable
             fun Example(): Pair<String, Lazy<Int>> = stringResource(1) to lazy { 1 }
             """,
-        )
+            )
 
         assertThat(rule.lintWithAnalysisApi(code)).isEmpty()
     }
@@ -770,8 +807,9 @@ class MissingReadOnlyComposableCheckTest {
     @Test
     fun `does not report read only usage with function type invocation`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             $STRING_RESOURCE
 
             @Composable
@@ -780,7 +818,7 @@ class MissingReadOnlyComposableCheckTest {
                 return stringResource(1)
             }
             """,
-        )
+            )
 
         assertThat(rule.lintWithAnalysisApi(code)).isEmpty()
     }
@@ -788,8 +826,9 @@ class MissingReadOnlyComposableCheckTest {
     @Test
     fun `does not report read only usage with local var mutation`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             $STRING_RESOURCE
 
             @Composable
@@ -799,7 +838,7 @@ class MissingReadOnlyComposableCheckTest {
                 return text
             }
             """,
-        )
+            )
 
         assertThat(rule.lintWithAnalysisApi(code)).isEmpty()
     }
@@ -807,8 +846,9 @@ class MissingReadOnlyComposableCheckTest {
     @Test
     fun `does not report read only usage with non read only composable operator`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             $STRING_RESOURCE
 
             class Label(val text: String)
@@ -819,7 +859,7 @@ class MissingReadOnlyComposableCheckTest {
             @Composable
             fun Example(label: Label): Label = label + stringResource(1)
             """,
-        )
+            )
 
         assertThat(rule.lintWithAnalysisApi(code)).isEmpty()
     }
@@ -832,14 +872,18 @@ class MissingReadOnlyComposableCheckTest {
     }
 
     private companion object {
-        const val STRING_RESOURCE = """
+        const val STRING_RESOURCE =
+            """
             @ReadOnlyComposable
             @Composable
             fun stringResource(id: Int, vararg formatArgs: Any): String = id.toString()
         """
 
-        /** The builder is a library type, like the real `AnnotatedString.Builder`, so `append` resolves as library code. */
-        const val FAKE_COMPOSE_UI_TEXT = """
+        /**
+         * The builder is a library type, like the real `AnnotatedString.Builder`, so `append` resolves as library code.
+         */
+        const val FAKE_COMPOSE_UI_TEXT =
+            """
             package androidx.compose.ui.text
 
             class AnnotatedString(val text: String)
@@ -855,7 +899,8 @@ class MissingReadOnlyComposableCheckTest {
                 block()
         """
 
-        const val FAKE_COMPOSE_UI_UTIL = """
+        const val FAKE_COMPOSE_UI_UTIL =
+            """
             package androidx.compose.ui.util
 
             inline fun <T, R> List<T>.fastMap(transform: (T) -> R): List<R> = map(transform)

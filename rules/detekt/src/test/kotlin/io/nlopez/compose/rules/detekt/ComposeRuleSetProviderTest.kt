@@ -10,14 +10,14 @@ import dev.detekt.api.Config
 import dev.detekt.api.Rule
 import io.nlopez.compose.core.ComposeKtVisitor
 import io.nlopez.compose.rules.DetektRule
+import java.io.File
+import java.lang.reflect.Modifier
+import kotlin.jvm.java
 import org.assertj.core.api.AssertionsForInterfaceTypes.assertThat
 import org.junit.jupiter.api.Test
 import org.reflections.Reflections
 import org.reflections.scanners.Scanners
 import org.reflections.util.ConfigurationBuilder
-import java.io.File
-import java.lang.reflect.Modifier
-import kotlin.jvm.java
 
 class ComposeRuleSetProviderTest {
 
@@ -27,35 +27,29 @@ class ComposeRuleSetProviderTest {
     @Test
     fun `ensure all rules in the package are represented in the ruleset`() {
         val reflections = Reflections(ruleSetProvider.javaClass.packageName)
-        val ruleClassesInPackage = reflections.getSubTypesOf(Rule::class.java)
-            .filterNot { Modifier.isAbstract(it.modifiers) }
-            .toSet()
-        val ruleClassesInRuleSet = ruleSet.rules.values
-            .map { it(Config.empty)::class.java }
-            .toSet()
+        val ruleClassesInPackage =
+            reflections.getSubTypesOf(Rule::class.java).filterNot { Modifier.isAbstract(it.modifiers) }.toSet()
+        val ruleClassesInRuleSet = ruleSet.rules.values.map { it(Config.empty)::class.java }.toSet()
         assertThat(ruleClassesInRuleSet).containsExactlyInAnyOrderElementsOf(ruleClassesInPackage)
     }
 
     @Test
     fun `ensure all rules in the package are listed in alphabetical order`() {
         val ruleNames = ruleSet.rules.keys.map { it.value }
-        val isOrdered = ruleNames
-            .zipWithNext { a, b -> a <= b }
-            .all { it }
-        assertThat(isOrdered)
-            .describedAs("ComposeRuleSetProvider should have the rules in alphabetical order")
-            .isTrue()
+        val isOrdered = ruleNames.zipWithNext { a, b -> a <= b }.all { it }
+        assertThat(isOrdered).describedAs("ComposeRuleSetProvider should have the rules in alphabetical order").isTrue()
     }
 
     @Test
     fun `ensure all rules in the package are listed in the default config`() {
-        val rules = ruleSet.rules
-            .asSequence()
-            .map { (name, factory) ->
-                val rule = factory(Config.empty)
-                name.value to ((rule as? DetektRule)?.isOptIn ?: false)
-            }
-            .toList()
+        val rules =
+            ruleSet.rules
+                .asSequence()
+                .map { (name, factory) ->
+                    val rule = factory(Config.empty)
+                    name.value to ((rule as? DetektRule)?.isOptIn ?: false)
+                }
+                .toList()
 
         val optIn = rules.associate { it }
 
@@ -80,10 +74,11 @@ class ComposeRuleSetProviderTest {
             .containsExactlyInAnyOrderElementsOf(ruleIds)
 
         // Check that all rules in the package match the active config
-        val ruleIdsWithActiveConfig = configRules
-            .filter { it.value.yamlMap.getKey("active") != null }
-            .mapKeys { it.key.content }
-            .mapValues { it.value.yamlMap.get<YamlScalar>("active")?.toBoolean() }
+        val ruleIdsWithActiveConfig =
+            configRules
+                .filter { it.value.yamlMap.getKey("active") != null }
+                .mapKeys { it.key.content }
+                .mapValues { it.value.yamlMap.get<YamlScalar>("active")?.toBoolean() }
 
         assertThat(ruleIdsWithActiveConfig.keys)
             .describedAs { "all rules in the ruleset are defining whether they are active" }
@@ -105,9 +100,7 @@ class ComposeRuleSetProviderTest {
 
     @Test
     fun `ensure all rules in the default config are in alphabetical order`() {
-        val rules = ruleSet.rules.keys
-            .map { it.value }
-            .sorted()
+        val rules = ruleSet.rules.keys.map { it.value }.sorted()
 
         // Grab the config file and read it
         val defaultConfig = javaClass.classLoader.getResource("config/config.yml")
@@ -132,11 +125,12 @@ class ComposeRuleSetProviderTest {
         val detektRulesReflections = Reflections(ruleSetProvider.javaClass.packageName)
         val detektRuleNames = detektRulesReflections.getSubTypesOf(DetektRule::class.java).map { it.simpleName }
 
-        val commonRulesReflections = Reflections(
-            ConfigurationBuilder()
-                .setClassLoaders(arrayOf(ComposeKtVisitor::class.java.classLoader))
-                .setScanners(Scanners.SubTypes),
-        )
+        val commonRulesReflections =
+            Reflections(
+                ConfigurationBuilder()
+                    .setClassLoaders(arrayOf(ComposeKtVisitor::class.java.classLoader))
+                    .setScanners(Scanners.SubTypes),
+            )
         val ruleNames = commonRulesReflections.getSubTypesOf(ComposeKtVisitor::class.java).map { it.simpleName }
 
         for (ruleName in ruleNames) {

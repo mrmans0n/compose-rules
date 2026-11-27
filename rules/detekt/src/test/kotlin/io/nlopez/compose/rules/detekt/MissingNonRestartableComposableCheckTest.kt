@@ -23,15 +23,16 @@ class MissingNonRestartableComposableCheckTest {
     @Test
     fun `reports a composable that only forwards to one composable child`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             @Composable
             fun Content(value: String) {}
 
             @Composable
             fun Wrapper(value: String) = Content(value)
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -41,8 +42,9 @@ class MissingNonRestartableComposableCheckTest {
     @Test
     fun `does not report preview composables`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             annotation class Preview
 
             @Preview
@@ -59,7 +61,7 @@ class MissingNonRestartableComposableCheckTest {
             @Composable
             fun CustomPreview() = Content()
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -71,8 +73,9 @@ class MissingNonRestartableComposableCheckTest {
         val rule = MissingNonRestartableComposableCheck(TestConfig("ignoresPreviews" to false))
 
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             annotation class Preview
 
             @Composable
@@ -82,7 +85,7 @@ class MissingNonRestartableComposableCheckTest {
             @Composable
             fun PreviewContent() = Content()
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -92,15 +95,16 @@ class MissingNonRestartableComposableCheckTest {
     @Test
     fun `does not report a wrapper around a value-returning composable`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             @Composable
             fun ValueContent(): String = "value"
 
             @Composable
             fun Wrapper() = ValueContent()
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -110,8 +114,9 @@ class MissingNonRestartableComposableCheckTest {
     @Test
     fun `reports single-call block bodies and parenthesized calls`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             @Composable
             fun Content(value: String) {}
 
@@ -123,7 +128,7 @@ class MissingNonRestartableComposableCheckTest {
             @Composable
             fun ParenthesizedWrapper(value: String) = (((Content(value))))
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -133,15 +138,16 @@ class MissingNonRestartableComposableCheckTest {
     @Test
     fun `does not report a wrapper that calculates an argument`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             @Composable
             fun Content(value: String) {}
 
             @Composable
             fun Wrapper(value: String) = Content(value.uppercase())
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -151,8 +157,9 @@ class MissingNonRestartableComposableCheckTest {
     @Test
     fun `reports a wrapper that passes compiler-static values`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             object Defaults
 
             enum class Choice { First }
@@ -165,7 +172,7 @@ class MissingNonRestartableComposableCheckTest {
                 fun Wrapper() = Content("fixed", 1 + 2, Defaults, Choice.First, this)
             }
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -175,8 +182,9 @@ class MissingNonRestartableComposableCheckTest {
     @Test
     fun `does not report a wrapper with a dynamic default expression`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             fun defaultValue(): String = "value"
 
             @Composable
@@ -185,7 +193,7 @@ class MissingNonRestartableComposableCheckTest {
             @Composable
             fun Wrapper(value: String = defaultValue()) = Content(value)
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -195,8 +203,9 @@ class MissingNonRestartableComposableCheckTest {
     @Test
     fun `reports a wrapper with compiler-static defaults`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             object Defaults
 
             @Composable
@@ -206,7 +215,7 @@ class MissingNonRestartableComposableCheckTest {
             fun Wrapper(value: String = "value", defaults: Defaults = Defaults) =
                 Content(value, defaults)
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -216,8 +225,9 @@ class MissingNonRestartableComposableCheckTest {
     @Test
     fun `only reports qualified calls with forwarded receivers`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             class Host
             class Holder(val host: Host)
 
@@ -230,7 +240,7 @@ class MissingNonRestartableComposableCheckTest {
             @Composable
             fun PropertyReceiver(holder: Holder, value: String) = holder.host.Content(value)
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -240,8 +250,9 @@ class MissingNonRestartableComposableCheckTest {
     @Test
     fun `does not report wrappers or children with explicit group contracts`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             annotation class NonRestartableComposable
             annotation class NonSkippableComposable
             annotation class ExplicitGroupsComposable
@@ -289,7 +300,7 @@ class MissingNonRestartableComposableCheckTest {
             @Composable
             fun ExplicitGroupsChildWrapper() = ExplicitGroupsChild()
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -299,8 +310,9 @@ class MissingNonRestartableComposableCheckTest {
     @Test
     fun `does not report non-concrete wrappers or children`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             @Composable
             fun Content() {}
 
@@ -336,7 +348,7 @@ class MissingNonRestartableComposableCheckTest {
             @Composable
             fun OpenChildWrapper(base: Base) = base.OpenWrapper()
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -346,8 +358,9 @@ class MissingNonRestartableComposableCheckTest {
     @Test
     fun `does not report a Unit wrapper that ignores a composable result`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             @Composable
             fun ValueContent(): String = "value"
 
@@ -356,7 +369,7 @@ class MissingNonRestartableComposableCheckTest {
                 ValueContent()
             }
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -366,8 +379,9 @@ class MissingNonRestartableComposableCheckTest {
     @Test
     fun `reports a composable property getter that only forwards to one child`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             @Composable
             fun Content() {}
 
@@ -375,7 +389,7 @@ class MissingNonRestartableComposableCheckTest {
                 @Composable
                 get() = Content()
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -385,8 +399,9 @@ class MissingNonRestartableComposableCheckTest {
     @Test
     fun `does not report calls with lambdas spreads or safe calls`() {
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             class Content {
                 @Composable
                 fun Render() {}
@@ -409,7 +424,7 @@ class MissingNonRestartableComposableCheckTest {
                 content?.Render()
             }
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code)
 
@@ -419,7 +434,8 @@ class MissingNonRestartableComposableCheckTest {
     @Test
     fun `reports a wrapper around a compiled composable`() {
         @Language("kotlin")
-        val dependency = """
+        val dependency =
+            """
             package com.example.dependency
 
             import com.example.compose.fake.Composable
@@ -428,17 +444,19 @@ class MissingNonRestartableComposableCheckTest {
                 @Composable
                 fun Render(value: String) {}
             }
-        """.trimIndent()
+            """
+                .trimIndent()
 
         @Language("kotlin")
-        val code = codeWithFakeCompose(
-            """
+        val code =
+            codeWithFakeCompose(
+                """
             import com.example.dependency.CompiledContent
 
             @Composable
             fun Wrapper(content: CompiledContent, value: String) = content.Render(value)
             """,
-        )
+            )
 
         val findings = rule.lintWithAnalysisApi(code, dependency)
 

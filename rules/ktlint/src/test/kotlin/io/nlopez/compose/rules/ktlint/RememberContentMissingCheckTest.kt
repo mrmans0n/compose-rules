@@ -17,8 +17,9 @@ class RememberContentMissingCheckTest {
         @Language("kotlin")
         val code =
             """
-                val msof = movableContentOf { Text("X") }
-            """.trimIndent()
+            val msof = movableContentOf { Text("X") }
+            """
+                .trimIndent()
         rememberRuleAssertThat(code).hasNoLintViolations()
     }
 
@@ -27,18 +28,20 @@ class RememberContentMissingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun MyComposable() {
-                    val something = movableContentOf { Text("X") }
-                }
-            """.trimIndent()
-        rememberRuleAssertThat(code).hasLintViolationsWithoutAutoCorrect(
-            LintViolation(
-                line = 3,
-                col = 21,
-                detail = RememberContentMissing.MovableContentOfNotRemembered,
-            ),
-        )
+            @Composable
+            fun MyComposable() {
+                val something = movableContentOf { Text("X") }
+            }
+            """
+                .trimIndent()
+        rememberRuleAssertThat(code)
+            .hasLintViolationsWithoutAutoCorrect(
+                LintViolation(
+                    line = 3,
+                    col = 21,
+                    detail = RememberContentMissing.MovableContentOfNotRemembered,
+                ),
+            )
     }
 
     @Test
@@ -46,18 +49,20 @@ class RememberContentMissingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun MyComposable() {
-                    val something = movableContentWithReceiverOf { Text("X") }
-                }
-            """.trimIndent()
-        rememberRuleAssertThat(code).hasLintViolationsWithoutAutoCorrect(
-            LintViolation(
-                line = 3,
-                col = 21,
-                detail = RememberContentMissing.MovableContentWithReceiverOfNotRemembered,
-            ),
-        )
+            @Composable
+            fun MyComposable() {
+                val something = movableContentWithReceiverOf { Text("X") }
+            }
+            """
+                .trimIndent()
+        rememberRuleAssertThat(code)
+            .hasLintViolationsWithoutAutoCorrect(
+                LintViolation(
+                    line = 3,
+                    col = 21,
+                    detail = RememberContentMissing.MovableContentWithReceiverOfNotRemembered,
+                ),
+            )
     }
 
     @Test
@@ -65,11 +70,12 @@ class RememberContentMissingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun MyComposable() {
-                    val something = remember { movableContentOf { Text("X") } }
-                }
-            """.trimIndent()
+            @Composable
+            fun MyComposable() {
+                val something = remember { movableContentOf { Text("X") } }
+            }
+            """
+                .trimIndent()
         rememberRuleAssertThat(code).hasNoLintViolations()
     }
 
@@ -78,11 +84,12 @@ class RememberContentMissingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun MyComposable() {
-                    val something = remember { movableContentWithReceiverOf { Text("X") } }
-                }
-            """.trimIndent()
+            @Composable
+            fun MyComposable() {
+                val something = remember { movableContentWithReceiverOf { Text("X") } }
+            }
+            """
+                .trimIndent()
         rememberRuleAssertThat(code).hasNoLintViolations()
     }
 
@@ -91,11 +98,12 @@ class RememberContentMissingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun MyComposable() {
-                    val something = retain { movableContentOf { Text("X") } }
-                }
-            """.trimIndent()
+            @Composable
+            fun MyComposable() {
+                val something = retain { movableContentOf { Text("X") } }
+            }
+            """
+                .trimIndent()
         rememberRuleAssertThat(code).hasNoLintViolations()
     }
 
@@ -104,11 +112,12 @@ class RememberContentMissingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun MyComposable() {
-                    val something = retain { movableContentWithReceiverOf { Text("X") } }
-                }
-            """.trimIndent()
+            @Composable
+            fun MyComposable() {
+                val something = retain { movableContentWithReceiverOf { Text("X") } }
+            }
+            """
+                .trimIndent()
         rememberRuleAssertThat(code).hasNoLintViolations()
     }
 }

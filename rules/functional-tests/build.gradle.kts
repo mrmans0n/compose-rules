@@ -38,8 +38,9 @@ dependencies {
 // Read versions from files
 fun readVersionFromToml(propertyName: String): String {
     val tomlFile = rootProject.file("gradle/libs.versions.toml")
-    val versionLine = tomlFile.readLines().find { it.trim().startsWith("$propertyName =") }
-        ?: error("Version $propertyName not found in libs.versions.toml")
+    val versionLine =
+        tomlFile.readLines().find { it.trim().startsWith("$propertyName =") }
+            ?: error("Version $propertyName not found in libs.versions.toml")
     return versionLine.substringAfter("\"").substringBefore("\"")
 }
 
@@ -49,33 +50,34 @@ val ktlintVersionValue = readVersionFromToml("ktlint")
 val detektVersionValue = readVersionFromToml("detekt")
 
 // Register the functional test task
-val functionalTest by tasks.registering(Test::class) {
-    description = "Runs functional tests."
-    group = "verification"
+val functionalTest by
+    tasks.registering(Test::class) {
+        description = "Runs functional tests."
+        group = "verification"
 
-    testClassesDirs = sourceSets["functionalTest"].output.classesDirs
-    classpath = sourceSets["functionalTest"].runtimeClasspath
+        testClassesDirs = sourceSets["functionalTest"].output.classesDirs
+        classpath = sourceSets["functionalTest"].runtimeClasspath
 
-    useJUnitPlatform()
+        useJUnitPlatform()
 
-    // Pass version information to tests via system properties
-    systemProperty("composeRulesVersion", composeRulesVersionValue)
-    systemProperty("kotlinVersion", kotlinVersionValue)
-    systemProperty("ktlintVersion", ktlintVersionValue)
-    systemProperty("detektVersion", detektVersionValue)
+        // Pass version information to tests via system properties
+        systemProperty("composeRulesVersion", composeRulesVersionValue)
+        systemProperty("kotlinVersion", kotlinVersionValue)
+        systemProperty("ktlintVersion", ktlintVersionValue)
+        systemProperty("detektVersion", detektVersionValue)
 
-    // Make built artifacts available to tests
-    dependsOn(":rules:detekt:assemble", ":rules:ktlint:assemble")
+        // Make built artifacts available to tests
+        dependsOn(":rules:detekt:assemble", ":rules:ktlint:assemble")
 
-    // Set test output for better debugging
-    testLogging {
-        events("passed", "skipped", "failed")
-        showStandardStreams = true
-        showExceptions = true
-        showCauses = true
-        showStackTraces = true
+        // Set test output for better debugging
+        testLogging {
+            events("passed", "skipped", "failed")
+            showStandardStreams = true
+            showExceptions = true
+            showCauses = true
+            showStackTraces = true
+        }
     }
-}
 
 tasks.check {
     dependsOn(functionalTest)

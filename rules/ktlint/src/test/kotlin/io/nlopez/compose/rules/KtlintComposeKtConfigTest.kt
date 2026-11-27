@@ -13,30 +13,33 @@ import org.ec4j.core.model.PropertyType.PropertyValueParser.BOOLEAN_VALUE_PARSER
 import org.junit.jupiter.api.Test
 
 class KtlintComposeKtConfigTest {
-    private val mapping = mutableMapOf<String, Property>().apply {
-        put("compose_my_int", "10".prop)
-        put("compose_my_string", "abcd".prop)
-        put("compose_my_list", "a,b,c,a".prop)
-        put("compose_my_list2", "a , b , c,a".prop)
-        put("compose_my_set", "a,b,c,a,b,c".prop)
-        put("compose_my_set2", "  a, b,c ,a  , b  ,  c ".prop)
-        put("compose_my_bool", true.prop)
-        put("compose_this_is_broken", "asdf".prop)
-    }
+    private val mapping =
+        mutableMapOf<String, Property>().apply {
+            put("compose_my_int", "10".prop)
+            put("compose_my_string", "abcd".prop)
+            put("compose_my_list", "a,b,c,a".prop)
+            put("compose_my_list2", "a , b , c,a".prop)
+            put("compose_my_set", "a,b,c,a,b,c".prop)
+            put("compose_my_set2", "  a, b,c ,a  , b  ,  c ".prop)
+            put("compose_my_bool", true.prop)
+            put("compose_this_is_broken", "asdf".prop)
+        }
 
     private val properties: EditorConfig = EditorConfig(mapping)
-    private val config = KtlintComposeKtConfig(
-        properties = properties,
-        editorConfigProperties = setOf(
-            stringProperty("compose_my_int"),
-            stringProperty("compose_my_string"),
-            stringProperty("compose_my_list"),
-            stringProperty("compose_my_list2"),
-            stringProperty("compose_my_set"),
-            stringProperty("compose_my_set2"),
-            booleanProperty("compose_my_bool"),
-        ),
-    )
+    private val config =
+        KtlintComposeKtConfig(
+            properties = properties,
+            editorConfigProperties =
+                setOf(
+                    stringProperty("compose_my_int"),
+                    stringProperty("compose_my_string"),
+                    stringProperty("compose_my_list"),
+                    stringProperty("compose_my_list2"),
+                    stringProperty("compose_my_set"),
+                    stringProperty("compose_my_set2"),
+                    booleanProperty("compose_my_bool"),
+                ),
+        )
 
     @Test
     fun `returns ints from properties`() {
@@ -101,42 +104,46 @@ class KtlintComposeKtConfigTest {
         get() = Property.builder().value(this).build()
 
     private val Boolean.prop: Property
-        get() = Property.builder()
-            .type(LowerCasingPropertyType("", "", BOOLEAN_VALUE_PARSER, "true", "false"))
-            .value(
-                when (this) {
-                    true -> valid("true", true)
-                    false -> valid("false", false)
-                },
-            )
-            .build()
+        get() =
+            Property.builder()
+                .type(LowerCasingPropertyType("", "", BOOLEAN_VALUE_PARSER, "true", "false"))
+                .value(
+                    when (this) {
+                        true -> valid("true", true)
+                        false -> valid("false", false)
+                    },
+                )
+                .build()
 
     private fun booleanProperty(key: String, default: Boolean = false): EditorConfigProperty<Boolean> =
         EditorConfigProperty(
-            type = LowerCasingPropertyType(
-                key,
-                "Internal boolean value for $key",
-                BOOLEAN_VALUE_PARSER,
-                "true",
-                "false",
-            ),
+            type =
+                LowerCasingPropertyType(
+                    key,
+                    "Internal boolean value for $key",
+                    BOOLEAN_VALUE_PARSER,
+                    "true",
+                    "false",
+                ),
             defaultValue = default,
         )
 
-    private fun stringProperty(key: String, default: String = ""): EditorConfigProperty<String> = EditorConfigProperty(
-        type = LowerCasingPropertyType(
-            key,
-            "Internal string value for $key",
-            PropertyType.PropertyValueParser.IDENTITY_VALUE_PARSER,
-            emptySet(),
-        ),
-        defaultValue = default,
-        propertyMapper = { property, _ ->
-            when {
-                property?.isUnset == true -> ""
-                property?.getValueAs<String>() != null -> property.getValueAs<String>()
-                else -> property?.getValueAs()
-            }
-        },
-    )
+    private fun stringProperty(key: String, default: String = ""): EditorConfigProperty<String> =
+        EditorConfigProperty(
+            type =
+                LowerCasingPropertyType(
+                    key,
+                    "Internal string value for $key",
+                    PropertyType.PropertyValueParser.IDENTITY_VALUE_PARSER,
+                    emptySet(),
+                ),
+            defaultValue = default,
+            propertyMapper = { property, _ ->
+                when {
+                    property?.isUnset == true -> ""
+                    property?.getValueAs<String>() != null -> property.getValueAs<String>()
+                    else -> property?.getValueAs()
+                }
+            },
+        )
 }

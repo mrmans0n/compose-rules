@@ -6,16 +6,16 @@ import dev.detekt.api.SourceLocation
 import dev.detekt.test.TestConfig
 import dev.detekt.test.lint
 import io.nlopez.compose.rules.ParameterNaming
-import io.nlopez.compose.rules.detekt.assertThat
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
 
 class ParameterNamingCheckTest {
 
-    private val testConfig = TestConfig(
-        "treatAsLambda" to listOf("Potato"),
-        "allowedLambdaParameterNames" to listOf("onGloballyPositioned", "onSizeChanged"),
-    )
+    private val testConfig =
+        TestConfig(
+            "treatAsLambda" to listOf("Potato"),
+            "allowedLambdaParameterNames" to listOf("onGloballyPositioned", "onSizeChanged"),
+        )
     private val rule = ParameterNamingCheck(testConfig)
 
     @Test
@@ -23,13 +23,14 @@ class ParameterNamingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun A(onClicked: () -> Boolean) { }
-                @Composable
-                fun A(onWrote: () -> Boolean) { }
-                @Composable
-                fun A(onPotatoed: Potato) { }
-            """.trimIndent()
+            @Composable
+            fun A(onClicked: () -> Boolean) { }
+            @Composable
+            fun A(onWrote: () -> Boolean) { }
+            @Composable
+            fun A(onPotatoed: Potato) { }
+            """
+                .trimIndent()
 
         val errors = rule.lint(code)
         assertThat(errors)
@@ -48,9 +49,10 @@ class ParameterNamingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun A(blehWrote: () -> Unit, mehChanged: () -> Unit, potatoed: Potato) {}
-            """.trimIndent()
+            @Composable
+            fun A(blehWrote: () -> Unit, mehChanged: () -> Unit, potatoed: Potato) {}
+            """
+                .trimIndent()
 
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
@@ -61,19 +63,20 @@ class ParameterNamingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun A(
-                    onClick: () -> Unit,
-                    onValueChange: (Int) -> Unit,
-                    onWrite: () -> Unit,
-                    onPotato: Potato,
-                    onEmbed: () -> Unit,
-                    onDone: () -> Unit,
-                    onFocusChanged: () -> Unit,
-                    onPlaced: (LayoutCoordinates) -> Unit,
-                    onValueChangeFinished: () -> Unit,
-                ) {}
-            """.trimIndent()
+            @Composable
+            fun A(
+                onClick: () -> Unit,
+                onValueChange: (Int) -> Unit,
+                onWrite: () -> Unit,
+                onPotato: Potato,
+                onEmbed: () -> Unit,
+                onDone: () -> Unit,
+                onFocusChanged: () -> Unit,
+                onPlaced: (LayoutCoordinates) -> Unit,
+                onValueChangeFinished: () -> Unit,
+            ) {}
+            """
+                .trimIndent()
 
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
@@ -84,12 +87,13 @@ class ParameterNamingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun A(
-                    onSizeChanged: (Int) -> Unit,
-                    onGloballyPositioned: () -> Unit,
-                ) {}
-            """.trimIndent()
+            @Composable
+            fun A(
+                onSizeChanged: (Int) -> Unit,
+                onGloballyPositioned: () -> Unit,
+            ) {}
+            """
+                .trimIndent()
 
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()

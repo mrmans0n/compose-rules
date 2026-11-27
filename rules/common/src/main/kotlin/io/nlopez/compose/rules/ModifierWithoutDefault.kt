@@ -21,17 +21,18 @@ class ModifierWithoutDefault : ComposeKtVisitor {
     override fun visitComposable(function: KtFunction, emitter: Emitter, config: ComposeKtConfig) {
         if (
             function.definedInInterface ||
-            function.isActual ||
-            function.isOverride ||
-            function.isAbstract ||
-            function.isOpen ||
-            function.isModifierReceiver(config)
+                function.isActual ||
+                function.isOverride ||
+                function.isAbstract ||
+                function.isOpen ||
+                function.isModifierReceiver(config)
         ) {
             return
         }
 
         // Look for modifier params in the composable signature, and if any without a default value is found, error out.
-        function.valueParameters.filter { it.isModifier(config) }
+        function.valueParameters
+            .filter { it.isModifier(config) }
             .filterNot { it.hasDefaultValue() }
             .forEach { modifierParameter ->
                 emitter.report(modifierParameter, MissingModifierDefaultParam, true).ifFix {
@@ -48,9 +49,11 @@ class ModifierWithoutDefault : ComposeKtVisitor {
     }
 
     companion object {
-        val MissingModifierDefaultParam = """
+        val MissingModifierDefaultParam =
+            """
             This @Composable function has a modifier parameter but it doesn't have a default value.
             See https://mrmans0n.github.io/compose-rules/rules/#modifiers-should-have-default-parameters for more information.
-        """.trimIndent()
+            """
+                .trimIndent()
     }
 }

@@ -8,6 +8,8 @@ import dev.detekt.api.Finding
 import dev.detekt.api.RequiresAnalysisApi
 import dev.detekt.api.Rule
 import dev.detekt.api.RuleName
+import java.net.URI
+import java.util.ArrayDeque
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.KtArrayAccessExpression
 import org.jetbrains.kotlin.psi.KtBinaryExpression
@@ -21,8 +23,6 @@ import org.jetbrains.kotlin.psi.KtPropertyAccessor
 import org.jetbrains.kotlin.psi.KtSimpleNameExpression
 import org.jetbrains.kotlin.psi.KtTreeVisitorVoid
 import org.jetbrains.kotlin.psi.KtValueArgument
-import java.net.URI
-import java.util.ArrayDeque
 
 class StaleRememberUpdatedStateInRememberCheck(config: Config) :
     Rule(
@@ -84,11 +84,12 @@ class StaleRememberUpdatedStateInRememberCheck(config: Config) :
 
     private fun KtProperty.toRememberUpdatedStateProperty(): RememberUpdatedStateProperty? {
         if (!isInsideComposableScope()) return null
-        val readKind = if (hasDelegate()) {
-            RememberUpdatedStateReadKind.DelegatedValue
-        } else {
-            RememberUpdatedStateReadKind.StateValue
-        }
+        val readKind =
+            if (hasDelegate()) {
+                RememberUpdatedStateReadKind.DelegatedValue
+            } else {
+                RememberUpdatedStateReadKind.StateValue
+            }
         val rememberUpdatedStateCall = (delegateExpression ?: initializer)?.rememberUpdatedStateCall() ?: return null
         if (!rememberUpdatedStateCall.isRememberUpdatedStateCall()) return null
         val name = name ?: return null
@@ -103,9 +104,7 @@ class StaleRememberUpdatedStateInRememberCheck(config: Config) :
 
     private fun reportStaleReads(expression: KtCallExpression) {
         val keyExpressions = expression.keyExpressions()
-        val properties = propertyScopes
-            .flatMap { it }
-            .filterNot { property -> property.isKeyedBy(keyExpressions) }
+        val properties = propertyScopes.flatMap { it }.filterNot { property -> property.isKeyedBy(keyExpressions) }
         if (properties.isEmpty()) return
 
         val propertiesByName = properties.groupBy { it.name }
@@ -128,9 +127,10 @@ class StaleRememberUpdatedStateInRememberCheck(config: Config) :
 
                 override fun visitSimpleNameExpression(expression: KtSimpleNameExpression) {
                     if (expression.isPropertyDeclarationName()) return
-                    if (propertiesByName[expression.getReferencedName()]
-                            .orEmpty()
-                            .any { property -> property.isStaleRead(expression) }
+                    if (
+                        propertiesByName[expression.getReferencedName()].orEmpty().any { property ->
+                            property.isStaleRead(expression)
+                        }
                     ) {
                         report(
                             Finding(
@@ -145,11 +145,12 @@ class StaleRememberUpdatedStateInRememberCheck(config: Config) :
         )
     }
 
-    private fun KtCallExpression.calculationLambda(): KtLambdaExpression? = valueArguments
-        .firstOrNull { argument -> argument.argumentName().isInitializerArgumentName() }
-        ?.getArgumentExpression() as? KtLambdaExpression
-        ?: lambdaArguments.lastOrNull()?.getLambdaExpression()
-        ?: valueArguments.lastOrNull()?.getArgumentExpression() as? KtLambdaExpression
+    private fun KtCallExpression.calculationLambda(): KtLambdaExpression? =
+        valueArguments
+            .firstOrNull { argument -> argument.argumentName().isInitializerArgumentName() }
+            ?.getArgumentExpression() as? KtLambdaExpression
+            ?: lambdaArguments.lastOrNull()?.getLambdaExpression()
+            ?: valueArguments.lastOrNull()?.getArgumentExpression() as? KtLambdaExpression
 
     private fun RememberUpdatedStateProperty.isKeyedBy(keyExpressions: List<KtExpression>): Boolean =
         keyExpressions.any { keyExpression ->
@@ -158,8 +159,7 @@ class StaleRememberUpdatedStateInRememberCheck(config: Config) :
                     (keyExpression as? KtSimpleNameExpression)?.isResolvedReadOf(property) == true
 
                 RememberUpdatedStateReadKind.StateValue -> keyExpression.isStateValueReadOf(property)
-            } ||
-                sourceExpressions.any { sourceExpression -> keyExpression.isSameResolvedValueAs(sourceExpression) }
+            } || sourceExpressions.any { sourceExpression -> keyExpression.isSameResolvedValueAs(sourceExpression) }
         }
 
     private fun RememberUpdatedStateProperty.isStaleRead(expression: KtSimpleNameExpression): Boolean =
@@ -192,7 +192,8 @@ class StaleRememberUpdatedStateInRememberCheck(config: Config) :
             if (expression is KtLambdaExpression) return@flatMap emptyList()
 
             when (argument.argumentName()) {
-                null, "inputs" -> argument.flattenedKeyExpressions()
+                null,
+                "inputs" -> argument.flattenedKeyExpressions()
                 else -> emptyList()
             }
         }
@@ -205,23 +206,28 @@ class StaleRememberUpdatedStateInRememberCheck(config: Config) :
         )
     }
 
-    private fun KtValueArgument.containingCallExpression(): KtCallExpression? = generateSequence(parent) { element ->
-        element.parent
-    }.filterIsInstance<KtCallExpression>().firstOrNull()
+    private fun KtValueArgument.containingCallExpression(): KtCallExpression? =
+        generateSequence(parent) { element ->
+                element.parent
+            }
+            .filterIsInstance<KtCallExpression>()
+            .firstOrNull()
 
     private fun KtExpression.flattenKeyExpression(
         containingCall: KtCallExpression? = null,
         shouldFlattenArrayInitializer: Boolean = false,
-    ): List<KtExpression> = when {
-        this is KtCallExpression && isArrayOfCall() -> argumentExpressions()
+    ): List<KtExpression> =
+        when {
+            this is KtCallExpression && isArrayOfCall() -> argumentExpressions()
 
-        shouldFlattenArrayInitializer && this is KtSimpleNameExpression -> resolvedPropertyInitializer()
-            ?.takeUnless { containingCall != null && isMutatedBefore(containingCall) }
-            ?.flattenKeyExpression(containingCall = containingCall, shouldFlattenArrayInitializer = true)
-            ?: listOf(this)
+            shouldFlattenArrayInitializer && this is KtSimpleNameExpression ->
+                resolvedPropertyInitializer()
+                    ?.takeUnless { containingCall != null && isMutatedBefore(containingCall) }
+                    ?.flattenKeyExpression(containingCall = containingCall, shouldFlattenArrayInitializer = true)
+                    ?: listOf(this)
 
-        else -> listOf(this)
-    }
+            else -> listOf(this)
+        }
 
     private fun KtSimpleNameExpression.isMutatedBefore(containingCall: KtCallExpression): Boolean {
         val property = resolvedLocalImmutableProperty() ?: return true
@@ -250,11 +256,12 @@ class StaleRememberUpdatedStateInRememberCheck(config: Config) :
 
                 override fun visitBinaryExpression(expression: KtBinaryExpression) {
                     if (expression.textOffset >= containingCall.textOffset) return
-                    if (expression.operationToken == KtTokens.EQ &&
-                        (expression.left as? KtArrayAccessExpression)
-                            ?.arrayExpression
-                            ?.let { arrayExpression -> arrayExpression as? KtSimpleNameExpression }
-                            ?.isReadOfArrayAlias(property) == true
+                    if (
+                        expression.operationToken == KtTokens.EQ &&
+                            (expression.left as? KtArrayAccessExpression)
+                                ?.arrayExpression
+                                ?.let { arrayExpression -> arrayExpression as? KtSimpleNameExpression }
+                                ?.isReadOfArrayAlias(property) == true
                     ) {
                         isMutated = true
                         return
@@ -264,10 +271,11 @@ class StaleRememberUpdatedStateInRememberCheck(config: Config) :
 
                 override fun visitDotQualifiedExpression(expression: KtDotQualifiedExpression) {
                     if (expression.textOffset >= containingCall.textOffset) return
-                    if ((expression.receiverExpression as? KtSimpleNameExpression)?.isReadOfArrayAlias(
+                    if (
+                        (expression.receiverExpression as? KtSimpleNameExpression)?.isReadOfArrayAlias(
                             property,
                         ) == true &&
-                        (expression.selectorExpression as? KtCallExpression)?.calleeExpression?.text == "set"
+                            (expression.selectorExpression as? KtCallExpression)?.calleeExpression?.text == "set"
                     ) {
                         isMutated = true
                         return
@@ -280,24 +288,27 @@ class StaleRememberUpdatedStateInRememberCheck(config: Config) :
         return isMutated
     }
 
-    private fun KtCallExpression.isSetCallOn(property: KtProperty): Boolean = calleeExpression?.text == "set" &&
-        (parent as? KtDotQualifiedExpression)
-            ?.receiverExpression
-            ?.let { receiver -> receiver as? KtSimpleNameExpression }
-            ?.isReadOfArrayAlias(property) == true
+    private fun KtCallExpression.isSetCallOn(property: KtProperty): Boolean =
+        calleeExpression?.text == "set" &&
+            (parent as? KtDotQualifiedExpression)
+                ?.receiverExpression
+                ?.let { receiver -> receiver as? KtSimpleNameExpression }
+                ?.isReadOfArrayAlias(property) == true
 
     private fun KtSimpleNameExpression.isReadOfArrayAlias(property: KtProperty): Boolean = isResolvedReadOf(property)
 
     private fun KtCallExpression.isArrayOfCall(): Boolean = calleeExpression?.text == "arrayOf"
 
-    private fun KtCallExpression.argumentExpressions(): List<KtExpression> = valueArguments
-        .mapNotNull { argument -> argument.getArgumentExpression() }
-
-    private fun KtExpression.rememberUpdatedStateCall(): KtCallExpression? = when (this) {
-        is KtCallExpression -> this
-        is KtDotQualifiedExpression -> selectorExpression as? KtCallExpression
-        else -> null
+    private fun KtCallExpression.argumentExpressions(): List<KtExpression> = valueArguments.mapNotNull { argument ->
+        argument.getArgumentExpression()
     }
+
+    private fun KtExpression.rememberUpdatedStateCall(): KtCallExpression? =
+        when (this) {
+            is KtCallExpression -> this
+            is KtDotQualifiedExpression -> selectorExpression as? KtCallExpression
+            else -> null
+        }
 
     private fun KtValueArgument.argumentName(): String? = getArgumentName()?.asName?.asString()
 
@@ -321,12 +332,14 @@ class StaleRememberUpdatedStateInRememberCheck(config: Config) :
         receiverExpression == receiver && selectorExpression?.text == "value"
 
     internal companion object {
-        val StaleRememberUpdatedStateInRemember = """
+        val StaleRememberUpdatedStateInRemember =
+            """
             Reading a `rememberUpdatedState` value directly inside `remember { }`, `rememberSaveable { }`, or `retain { }` captures the initial value only.
             Key the call on the source value or defer the read in a lambda.
 
             See https://mrmans0n.github.io/compose-rules/rules/#stale-rememberupdatedstate-in-remember for more information.
-        """.trimIndent()
+            """
+                .trimIndent()
     }
 }
 

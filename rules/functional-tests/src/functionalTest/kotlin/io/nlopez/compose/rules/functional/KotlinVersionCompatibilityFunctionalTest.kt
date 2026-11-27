@@ -8,23 +8,21 @@ import io.nlopez.compose.rules.functional.FunctionalTestUtils.ktlintVersion
 import io.nlopez.compose.rules.functional.FunctionalTestUtils.writeFile
 import io.nlopez.compose.rules.functional.FunctionalTestUtils.writeGradleProperties
 import io.nlopez.compose.rules.functional.FunctionalTestUtils.writeSettings
+import java.io.File
 import org.junit.jupiter.api.io.TempDir
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
-import java.io.File
 
 /**
  * Functional tests for Kotlin version compatibility with compose-rules.
  *
- * These tests verify that compose-rules work correctly across different Kotlin compiler versions,
- * specifically testing that NO crashes (NoSuchMethodError) occur when processing code with context
- * receivers and context parameters. In the future we might include tests for other Kotlin features
- * if they cause issues
+ * These tests verify that compose-rules work correctly across different Kotlin compiler versions, specifically testing
+ * that NO crashes (NoSuchMethodError) occur when processing code with context receivers and context parameters. In the
+ * future we might include tests for other Kotlin features if they cause issues
  */
 class KotlinVersionCompatibilityFunctionalTest {
 
-    @TempDir
-    lateinit var projectDir: File
+    @TempDir lateinit var projectDir: File
 
     @ParameterizedTest(name = "Kotlin {0} compatibility")
     @ValueSource(strings = ["2.0.21", "2.1.10", "2.2.21"])
@@ -70,10 +68,12 @@ class KotlinVersionCompatibilityFunctionalTest {
         )
 
         // Run spotless check - should succeed (proper composables)
-        val result = createGradleRunner(
-            projectDir = projectDir,
-            arguments = listOf("spotlessKotlinCheck"),
-        ).build()
+        val result =
+            createGradleRunner(
+                    projectDir = projectDir,
+                    arguments = listOf("spotlessKotlinCheck"),
+                )
+                .build()
 
         result.assertTaskSucceeded(":spotlessKotlinCheck")
 
@@ -109,10 +109,12 @@ class KotlinVersionCompatibilityFunctionalTest {
         )
 
         // Should pass without crashing
-        val result = createGradleRunner(
-            projectDir = projectDir,
-            arguments = listOf("spotlessKotlinCheck"),
-        ).build()
+        val result =
+            createGradleRunner(
+                    projectDir = projectDir,
+                    arguments = listOf("spotlessKotlinCheck"),
+                )
+                .build()
 
         result.assertTaskSucceeded(":spotlessKotlinCheck")
         result.assertOutputDoesNotContain("NoSuchMethodError")

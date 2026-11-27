@@ -6,7 +6,6 @@ import dev.detekt.api.Config
 import dev.detekt.api.SourceLocation
 import dev.detekt.test.lint
 import io.nlopez.compose.rules.PreviewAnnotationNaming
-import io.nlopez.compose.rules.detekt.assertThat
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
 
@@ -20,7 +19,8 @@ class PreviewAnnotationNamingCheckTest {
         val code =
             """
             annotation class Banana
-            """.trimIndent()
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }
@@ -43,7 +43,8 @@ class PreviewAnnotationNamingCheckTest {
             @PreviewBanana
             @PreviewApple
             annotation class PreviewFruitBasket
-            """.trimIndent()
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }
@@ -59,16 +60,17 @@ class PreviewAnnotationNamingCheckTest {
             annotation class BananaPreviews
             @BananaPreview
             annotation class WithBananaPreviews
-            """.trimIndent()
+            """
+                .trimIndent()
         val errors = rule.lint(code)
-        assertThat(errors).hasStartSourceLocations(
-            SourceLocation(2, 18),
-            SourceLocation(4, 18),
-            SourceLocation(6, 18),
-        )
+        assertThat(errors)
+            .hasStartSourceLocations(
+                SourceLocation(2, 18),
+                SourceLocation(4, 18),
+                SourceLocation(6, 18),
+            )
         for (error in errors) {
-            assertThat(error)
-                .hasMessage(PreviewAnnotationNaming.PreviewAnnotationDoesNotStartWithPreview)
+            assertThat(error).hasMessage(PreviewAnnotationNaming.PreviewAnnotationDoesNotStartWithPreview)
         }
     }
 
@@ -83,15 +85,16 @@ class PreviewAnnotationNamingCheckTest {
             @BananaPreview
             @BananaPreview
             annotation class BananaPreview
-            """.trimIndent()
+            """
+                .trimIndent()
         val errors = rule.lint(code)
-        assertThat(errors).hasStartSourceLocations(
-            SourceLocation(3, 18),
-            SourceLocation(6, 18),
-        )
+        assertThat(errors)
+            .hasStartSourceLocations(
+                SourceLocation(3, 18),
+                SourceLocation(6, 18),
+            )
         for (error in errors) {
-            assertThat(error)
-                .hasMessage(PreviewAnnotationNaming.PreviewAnnotationDoesNotStartWithPreview)
+            assertThat(error).hasMessage(PreviewAnnotationNaming.PreviewAnnotationDoesNotStartWithPreview)
         }
     }
 }

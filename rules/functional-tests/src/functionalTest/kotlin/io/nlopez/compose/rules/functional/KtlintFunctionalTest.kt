@@ -9,9 +9,9 @@ import io.nlopez.compose.rules.functional.FunctionalTestUtils.ktlintVersion
 import io.nlopez.compose.rules.functional.FunctionalTestUtils.writeFile
 import io.nlopez.compose.rules.functional.FunctionalTestUtils.writeGradleProperties
 import io.nlopez.compose.rules.functional.FunctionalTestUtils.writeSettings
+import java.io.File
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
-import java.io.File
 
 /**
  * Functional tests for ktlint integration with compose-rules.
@@ -22,8 +22,7 @@ import java.io.File
  */
 class KtlintFunctionalTest {
 
-    @TempDir
-    lateinit var projectDir: File
+    @TempDir lateinit var projectDir: File
 
     @Test
     fun `ModifierMissing is detected via ktlint spotless`() {
@@ -46,10 +45,12 @@ class KtlintFunctionalTest {
             """,
         )
 
-        val result = createGradleRunner(
-            projectDir = projectDir,
-            arguments = listOf("spotlessKotlinCheck"),
-        ).buildAndFail()
+        val result =
+            createGradleRunner(
+                    projectDir = projectDir,
+                    arguments = listOf("spotlessKotlinCheck"),
+                )
+                .buildAndFail()
 
         // Build should fail due to violations
         result.assertOutputContains("compose:modifier-missing-check")
@@ -105,10 +106,12 @@ class KtlintFunctionalTest {
             """,
         )
 
-        val result = createGradleRunner(
-            projectDir = projectDir,
-            arguments = listOf("spotlessKotlinCheck"),
-        ).buildAndFail()
+        val result =
+            createGradleRunner(
+                    projectDir = projectDir,
+                    arguments = listOf("spotlessKotlinCheck"),
+                )
+                .buildAndFail()
 
         // Build should fail due to multiple violations
         result.assertOutputContains(
@@ -140,10 +143,12 @@ class KtlintFunctionalTest {
             """,
         )
 
-        val result = createGradleRunner(
-            projectDir = projectDir,
-            arguments = listOf("spotlessKotlinCheck"),
-        ).build()
+        val result =
+            createGradleRunner(
+                    projectDir = projectDir,
+                    arguments = listOf("spotlessKotlinCheck"),
+                )
+                .build()
 
         result.assertTaskSucceeded(":spotlessKotlinCheck")
     }
@@ -169,18 +174,22 @@ class KtlintFunctionalTest {
         )
 
         // First build
-        val firstResult = createGradleRunner(
-            projectDir = projectDir,
-            arguments = listOf("spotlessKotlinCheck"),
-        ).build()
+        val firstResult =
+            createGradleRunner(
+                    projectDir = projectDir,
+                    arguments = listOf("spotlessKotlinCheck"),
+                )
+                .build()
 
         firstResult.assertTaskSucceeded(":spotlessKotlinCheck")
 
         // Second build without changes should be up-to-date
-        val secondResult = createGradleRunner(
-            projectDir = projectDir,
-            arguments = listOf("spotlessKotlinCheck"),
-        ).build()
+        val secondResult =
+            createGradleRunner(
+                    projectDir = projectDir,
+                    arguments = listOf("spotlessKotlinCheck"),
+                )
+                .build()
 
         secondResult.assertTaskUpToDate(":spotlessKotlinCheck")
     }

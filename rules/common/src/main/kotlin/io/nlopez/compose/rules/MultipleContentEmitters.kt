@@ -19,16 +19,18 @@ class MultipleContentEmitters : ComposeKtVisitor {
 
     override fun visitFile(file: KtFile, emitter: Emitter, config: ComposeKtConfig) {
         // CHECK #1 : We want to find the composables first that are at risk of emitting content from multiple sources.
-        val composables = file.findAllChildrenByClass<KtNamedFunction>()
-            .filter { it.isComposable }
-            // We don't want to analyze composables that are extension functions, as they might be things like
-            // BoxScope which are legit, and we want to avoid false positives.
-            .filter { it.hasBlockBody() }
-            // Same applies to context receivers/parameters: we could have a BoxScope/ColumnScope/RowScope
-            // and it'd be legit. We don't have a way to know for sure, so we'd better avoid the issue altogether.
-            .filterNot { it.hasAnyContextArguments }
-            // We want only methods with a body
-            .filterNot { it.hasReceiverType }
+        val composables =
+            file
+                .findAllChildrenByClass<KtNamedFunction>()
+                .filter { it.isComposable }
+                // We don't want to analyze composables that are extension functions, as they might be things like
+                // BoxScope which are legit, and we want to avoid false positives.
+                .filter { it.hasBlockBody() }
+                // Same applies to context receivers/parameters: we could have a BoxScope/ColumnScope/RowScope
+                // and it'd be legit. We don't have a way to know for sure, so we'd better avoid the issue altogether.
+                .filterNot { it.hasAnyContextArguments }
+                // We want only methods with a body
+                .filterNot { it.hasReceiverType }
 
         // Now we want to get the count of direct emitters in them: the composables we know for a fact that output UI
         val composableToEmissionCount = composables.createDirectComposableToEmissionCountMapping(config)
@@ -49,7 +51,8 @@ class MultipleContentEmitters : ComposeKtVisitor {
 
         // Here we have the settled data after all the needed passes, so we want to show errors for them,
         // if they were not caught already by the 1st emission loop
-        currentMapping.filterValues { it > 1 }
+        currentMapping
+            .filterValues { it > 1 }
             .filterNot { directEmissionsReported.contains(it.key) }
             .keys
             .forEach { composable ->
@@ -59,9 +62,11 @@ class MultipleContentEmitters : ComposeKtVisitor {
 
     companion object {
 
-        val MultipleContentEmittersDetected = """
+        val MultipleContentEmittersDetected =
+            """
             Composable functions should only be emitting content into the composition from one source at their top level.
             See https://mrmans0n.github.io/compose-rules/rules/#do-not-emit-multiple-pieces-of-content for more information.
-        """.trimIndent()
+            """
+                .trimIndent()
     }
 }

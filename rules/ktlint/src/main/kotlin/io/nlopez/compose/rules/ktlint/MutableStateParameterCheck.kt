@@ -7,5 +7,4 @@ import io.nlopez.compose.rules.KtlintRule
 import io.nlopez.compose.rules.MutableStateParameter
 
 class MutableStateParameterCheck :
-    KtlintRule("compose:mutable-state-param-check"),
-    ComposeKtVisitor by MutableStateParameter()
+    KtlintRule("compose:mutable-state-param-check"), ComposeKtVisitor by MutableStateParameter()

@@ -12,12 +12,13 @@ import org.jetbrains.kotlin.psi.KtFunction
 class ComposableNestingDepthCheck :
     KtlintRule(
         id = "compose:composable-nesting-depth-check",
-        editorConfigProperties = setOf(
-            composableNestingDepthEnabled,
-            composableNestingDepthThreshold,
-            contentEmittersProperty,
-            contentEmittersDenylist,
-        ),
+        editorConfigProperties =
+            setOf(
+                composableNestingDepthEnabled,
+                composableNestingDepthThreshold,
+                contentEmittersProperty,
+                contentEmittersDenylist,
+            ),
     ),
     ComposeKtVisitor {
 
