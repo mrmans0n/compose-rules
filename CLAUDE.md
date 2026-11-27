@@ -11,7 +11,7 @@ This file provides guidance to Claude Code (claude.ai/code) and other AI assista
 ```bash
 ./gradlew build          # Build everything
 ./gradlew test           # Run all tests
-./gradlew spotlessApply  # Format code (Spotless + ktlint)
+./gradlew spotlessApply  # Format code (Spotless + ktfmt via ktrs)
 ./gradlew spotlessCheck  # Check formatting (used by CI)
 ```
 
