@@ -2,8 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 package io.nlopez.compose.rules.ktlint
 
+import io.github.ktlint.core.cli.ruleset.core.api.RuleSetV2Provider
 import io.nlopez.compose.core.ComposeKtVisitor
 import io.nlopez.compose.rules.KtlintRule
+import java.util.ServiceLoader
 import org.assertj.core.api.AssertionsForInterfaceTypes.assertThat
 import org.junit.jupiter.api.Test
 import org.reflections.Reflections
@@ -12,7 +14,8 @@ import org.reflections.util.ConfigurationBuilder
 
 class ComposeRuleSetProviderTest {
 
-    private val ruleSetProvider = ComposeRuleSetProvider()
+    private val ruleSetProvider =
+        ServiceLoader.load(RuleSetV2Provider::class.java).filterIsInstance<ComposeRuleSetProvider>().single()
     private val ruleClassesInPackage =
         Reflections(ruleSetProvider.javaClass.packageName).getSubTypesOf(KtlintRule::class.java)
 

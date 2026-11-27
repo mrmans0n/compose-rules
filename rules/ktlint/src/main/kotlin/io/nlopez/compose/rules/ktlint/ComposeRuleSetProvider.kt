@@ -2,52 +2,52 @@
 // SPDX-License-Identifier: Apache-2.0
 package io.nlopez.compose.rules.ktlint
 
-import com.pinterest.ktlint.cli.ruleset.core.api.RuleSetProviderV3
-import com.pinterest.ktlint.rule.engine.core.api.RuleProvider
-import com.pinterest.ktlint.rule.engine.core.api.RuleSetId
+import io.github.ktlint.core.cli.ruleset.core.api.RuleSetV2Provider
+import io.github.ktlint.core.rule.engine.core.api.RuleSetId
+import io.github.ktlint.core.rule.engine.core.api.RuleV2Provider
 
 class ComposeRuleSetProvider :
-    RuleSetProviderV3(
+    RuleSetV2Provider(
         customRuleSetId,
     ) {
 
-    override fun getRuleProviders(): Set<RuleProvider> =
+    override fun getRuleProviders(): Set<RuleV2Provider> =
         setOf(
-            RuleProvider { ComposableAnnotationNamingCheck() },
-            RuleProvider { ComposableNestingDepthCheck() },
-            RuleProvider { CompositionLocalAllowlistCheck() },
-            RuleProvider { CompositionLocalNamingCheck() },
-            RuleProvider { ContentEmitterReturningValuesCheck() },
-            RuleProvider { ContentSlotReusedCheck() },
-            RuleProvider { ContentTrailingLambdaCheck() },
-            RuleProvider { DefaultsVisibilityCheck() },
-            RuleProvider { LambdaParameterEventTrailingCheck() },
-            RuleProvider { LambdaParameterInRestartableEffectCheck() },
-            RuleProvider { Material2Check() },
-            RuleProvider { ModifierClickableOrderCheck() },
-            RuleProvider { ModifierComposedCheck() },
-            RuleProvider { ModifierMissingCheck() },
-            RuleProvider { ModifierNamingCheck() },
-            RuleProvider { ModifierNotUsedAtRootCheck() },
-            RuleProvider { ModifierReusedCheck() },
-            RuleProvider { ModifierShouldBeForwardedToEveryBranchCheck() },
-            RuleProvider { ModifierWithoutDefaultCheck() },
-            RuleProvider { MultipleContentEmittersCheck() },
-            RuleProvider { MutableParametersCheck() },
-            RuleProvider { MutableStateAutoboxingCheck() },
-            RuleProvider { MutableStateParameterCheck() },
-            RuleProvider { StateParameterCheck() },
-            RuleProvider { NamingCheck() },
-            RuleProvider { ParameterNamingCheck() },
-            RuleProvider { ParameterOrderCheck() },
-            RuleProvider { PreviewAnnotationNamingCheck() },
-            RuleProvider { PreviewNamingCheck() },
-            RuleProvider { PreviewPublicCheck() },
-            RuleProvider { RememberContentMissingCheck() },
-            RuleProvider { RememberStateMissingCheck() },
-            RuleProvider { UnstableCollectionsCheck() },
-            RuleProvider { ViewModelForwardingCheck() },
-            RuleProvider { ViewModelInjectionCheck() },
+            RuleV2Provider { ComposableAnnotationNamingCheck() },
+            RuleV2Provider { ComposableNestingDepthCheck() },
+            RuleV2Provider { CompositionLocalAllowlistCheck() },
+            RuleV2Provider { CompositionLocalNamingCheck() },
+            RuleV2Provider { ContentEmitterReturningValuesCheck() },
+            RuleV2Provider { ContentSlotReusedCheck() },
+            RuleV2Provider { ContentTrailingLambdaCheck() },
+            RuleV2Provider { DefaultsVisibilityCheck() },
+            RuleV2Provider { LambdaParameterEventTrailingCheck() },
+            RuleV2Provider { LambdaParameterInRestartableEffectCheck() },
+            RuleV2Provider { Material2Check() },
+            RuleV2Provider { ModifierClickableOrderCheck() },
+            RuleV2Provider { ModifierComposedCheck() },
+            RuleV2Provider { ModifierMissingCheck() },
+            RuleV2Provider { ModifierNamingCheck() },
+            RuleV2Provider { ModifierNotUsedAtRootCheck() },
+            RuleV2Provider { ModifierReusedCheck() },
+            RuleV2Provider { ModifierShouldBeForwardedToEveryBranchCheck() },
+            RuleV2Provider { ModifierWithoutDefaultCheck() },
+            RuleV2Provider { MultipleContentEmittersCheck() },
+            RuleV2Provider { MutableParametersCheck() },
+            RuleV2Provider { MutableStateAutoboxingCheck() },
+            RuleV2Provider { MutableStateParameterCheck() },
+            RuleV2Provider { StateParameterCheck() },
+            RuleV2Provider { NamingCheck() },
+            RuleV2Provider { ParameterNamingCheck() },
+            RuleV2Provider { ParameterOrderCheck() },
+            RuleV2Provider { PreviewAnnotationNamingCheck() },
+            RuleV2Provider { PreviewNamingCheck() },
+            RuleV2Provider { PreviewPublicCheck() },
+            RuleV2Provider { RememberContentMissingCheck() },
+            RuleV2Provider { RememberStateMissingCheck() },
+            RuleV2Provider { UnstableCollectionsCheck() },
+            RuleV2Provider { ViewModelForwardingCheck() },
+            RuleV2Provider { ViewModelInjectionCheck() },
         )
 
     private companion object {

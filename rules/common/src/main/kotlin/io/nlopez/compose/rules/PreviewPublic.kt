@@ -6,7 +6,6 @@ import com.intellij.psi.impl.source.tree.LeafPsiElement
 import io.nlopez.compose.core.ComposeKtConfig
 import io.nlopez.compose.core.ComposeKtVisitor
 import io.nlopez.compose.core.Emitter
-import io.nlopez.compose.core.ifFix
 import io.nlopez.compose.core.util.firstChildLeafOrSelf
 import io.nlopez.compose.core.util.isPreview
 import org.jetbrains.kotlin.psi.KtFunction
@@ -20,14 +19,14 @@ class PreviewPublic : ComposeKtVisitor {
         // We only care about public methods
         if (!function.isPublic) return
 
-        emitter.report(function, ComposablesPreviewShouldNotBePublic, true).ifFix {
+        emitter.report(function, ComposablesPreviewShouldNotBePublic) {
             // Ideally if the kotlin embeddable compiler exposes what we need, this would be it:
             //  function.addModifier(KtTokens.PRIVATE_KEYWORD)
 
             // For now we need to do it by hand with ASTNode: find the "fun" modifier, and prepend "private".
             val node =
                 function.node.findChildByType(org.jetbrains.kotlin.lexer.KtTokens.FUN_KEYWORD)?.firstChildLeafOrSelf()
-                    as? LeafPsiElement ?: return@ifFix
+                    as? LeafPsiElement ?: return@report
             node.rawReplaceWithText(
                 org.jetbrains.kotlin.lexer.KtTokens.PRIVATE_KEYWORD.value +
                     " " +

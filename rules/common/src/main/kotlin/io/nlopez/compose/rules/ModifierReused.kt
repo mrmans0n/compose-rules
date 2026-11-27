@@ -6,6 +6,7 @@ import com.intellij.psi.PsiElement
 import io.nlopez.compose.core.ComposeKtConfig
 import io.nlopez.compose.core.ComposeKtVisitor
 import io.nlopez.compose.core.Emitter
+import io.nlopez.compose.core.report
 import io.nlopez.compose.core.util.emitsContent
 import io.nlopez.compose.core.util.findAllChildrenByClass
 import io.nlopez.compose.core.util.isFullyShadowed
@@ -93,7 +94,7 @@ class ModifierReused : ComposeKtVisitor {
                     // We don't want to double report
                     .distinct()
                     .forEach { callExpression ->
-                        emitter.report(callExpression, ModifierShouldBeUsedOnceOnly, false)
+                        emitter.report(callExpression, ModifierShouldBeUsedOnceOnly)
                     }
             }
     }

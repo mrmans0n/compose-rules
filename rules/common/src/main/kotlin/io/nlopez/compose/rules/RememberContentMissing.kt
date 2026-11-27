@@ -5,6 +5,7 @@ package io.nlopez.compose.rules
 import io.nlopez.compose.core.ComposeKtConfig
 import io.nlopez.compose.core.ComposeKtVisitor
 import io.nlopez.compose.core.Emitter
+import io.nlopez.compose.core.report
 import io.nlopez.compose.core.util.findAllChildrenByClass
 import io.nlopez.compose.core.util.isRemembered
 import org.jetbrains.kotlin.psi.KtCallExpression
@@ -27,14 +28,12 @@ class RememberContentMissing : ComposeKtVisitor {
                         emitter.report(
                             element = callExpression,
                             errorMessage = MovableContentOfNotRemembered,
-                            canBeAutoCorrected = false,
                         )
 
                     "movableContentWithReceiverOf" ->
                         emitter.report(
                             element = callExpression,
                             errorMessage = MovableContentWithReceiverOfNotRemembered,
-                            canBeAutoCorrected = false,
                         )
                 }
             }

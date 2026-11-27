@@ -38,7 +38,6 @@ rootProject.name = "compose-rules"
 include(
     ":rules:common",
     ":rules:common-detekt",
-    ":rules:common-ktlint",
     ":rules:detekt",
     ":rules:ktlint",
     ":rules:functional-tests",

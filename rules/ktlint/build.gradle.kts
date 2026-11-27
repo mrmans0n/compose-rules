@@ -1,12 +1,14 @@
 // Copyright 2024 Nacho Lopez
 // SPDX-License-Identifier: Apache-2.0
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.shadowJar)
     alias(libs.plugins.mavenPublish)
 }
 
-// if publishing and it's not the uber jar, we want to remove the shadowRuntimeElements variant
 if (!project.hasProperty("uberJar")) {
     afterEvaluate {
         val javaComponent = components["java"] as AdhocComponentWithVariants
@@ -17,25 +19,34 @@ if (!project.hasProperty("uberJar")) {
 }
 
 tasks.shadowJar {
-    // Relocate packages that may conflict with the ones IntelliJ IDEA provides as well.
-    // See https://github.com/nbadal/ktlint-intellij-plugin/blob/main/lib/build.gradle.kts
-    relocate("org.jetbrains.concurrency", "shadow.org.jetbrains.concurrency")
-    relocate("org.jetbrains.kotlin.psi.KtPsiFactory", "shadow.org.jetbrains.kotlin.psi.KtPsiFactory")
-    relocate("org.jetbrains.kotlin.psi.psiUtil", "shadow.org.jetbrains.kotlin.psi.psiUtil")
-    relocate("org.jetbrains.org", "shadow.org.jetbrains.org")
+    // Shared Compose checks are already compiled into this module. The CLI supplies ktlint and its PSI classes.
+    configurations.set(emptySet())
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+tasks.withType<KotlinCompile>().configureEach {
+    compilerOptions.jvmTarget.set(JvmTarget.JVM_17)
 }
 
 dependencies {
-    api(libs.ktlint.rule.engine)
     api(libs.ktlint.cli.ruleset.core)
-    api(projects.rules.commonKtlint)
+    // The alpha's PSI API references IntelliJ classes such as NlsSafe that are
+    // only present in the implementation artifact. ktlint supplies it at runtime.
+    compileOnly(libs.kotlin.ktlint.intellij) {
+        isTransitive = false
+    }
 
-    testImplementation(libs.ktlint.test)
+    testImplementation(libs.ktlint.rule.engine)
     testImplementation(libs.ktlint.ruleset.standard)
-    testImplementation(libs.junit5)
-    testImplementation(libs.junit5.params)
-    testImplementation(libs.junit5.engine)
-    testImplementation(libs.junit5.platform.launcher)
-    testImplementation(libs.assertj)
+    testImplementation(libs.ktlint.test)
+    testRuntimeOnly(libs.junit5.platform.launcher)
     testImplementation(libs.reflections)
+}
+
+sourceSets.main {
+    kotlin.srcDir("../common/src/main/kotlin")
 }

@@ -1,11 +1,11 @@
 # Sample Projects
 
-This directory contains sample projects used to verify that the compose-rules work correctly with both detekt and ktlint/spotless in CI.
+This directory contains sample projects used to verify that the compose-rules work correctly with both detekt and ktlint in CI.
 
 ## Structure
 
 - **detekt-sample/** - A minimal project configured to use detekt with compose-rules
-- **ktlint-sample/** - A minimal project configured to use spotless/ktlint with compose-rules
+- **ktlint-sample/** - A minimal project configured to use ktlint with compose-rules
 
 Each sample contains separate files for different intentional violations to ensure each rule type is tested.
 
@@ -22,7 +22,6 @@ Each sample project contains separate violation files:
 | `ParameterNamingViolation.kt` | ParameterNaming | Lambda parameter with past tense (`onClicked` vs `onClick`) |
 | `MultipleEmittersViolation.kt` | MultipleEmitters | Multiple content emitters in one composable |
 
-**Note:** Due to a limitation in Spotless, the ktlint sample only reports one lint error per file. By splitting violations into separate files, we ensure each rule type is validated.
 
 ## Testing Locally
 
@@ -57,7 +56,7 @@ This should fail with compose-rules violations detected (plus some standard dete
 
 ```bash
 cd samples/ktlint-sample
-../../gradlew spotlessCheck
+../../gradlew ktlintCheck
 ```
 
 This should fail with compose-rules violations detected (6 lint errors, one per file).

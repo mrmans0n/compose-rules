@@ -5,6 +5,7 @@ package io.nlopez.compose.rules
 import io.nlopez.compose.core.ComposeKtConfig
 import io.nlopez.compose.core.ComposeKtVisitor
 import io.nlopez.compose.core.Emitter
+import io.nlopez.compose.core.report
 import io.nlopez.compose.core.util.KotlinItObjectScopeFunctions
 import io.nlopez.compose.core.util.KotlinScopeFunctions
 import io.nlopez.compose.core.util.definedInInterface
@@ -127,7 +128,7 @@ class ViewModelForwarding : ComposeKtVisitor {
                         .map { callExpression }
                 }
                 .forEach { callExpression ->
-                    emitter.report(callExpression, AvoidViewModelForwarding, false)
+                    emitter.report(callExpression, AvoidViewModelForwarding)
                 }
         }
 

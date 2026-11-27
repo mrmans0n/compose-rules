@@ -8,7 +8,6 @@ import com.intellij.psi.impl.source.tree.LeafPsiElement
 import io.nlopez.compose.core.ComposeKtConfig
 import io.nlopez.compose.core.ComposeKtVisitor
 import io.nlopez.compose.core.Emitter
-import io.nlopez.compose.core.ifFix
 import io.nlopez.compose.core.util.definedInInterface
 import io.nlopez.compose.core.util.findAllChildrenByClass
 import io.nlopez.compose.core.util.findDirectChildrenByClass
@@ -43,7 +42,7 @@ class ViewModelInjection : ComposeKtVisitor {
                     .map { property to it.calleeExpression!!.text }
             }
             .forEach { (property, viewModelFactoryName) ->
-                emitter.report(property, errorMessage(viewModelFactoryName), true).ifFix {
+                emitter.report(property, errorMessage(viewModelFactoryName)) {
                     fix(function, property, viewModelFactoryName)
                 }
             }

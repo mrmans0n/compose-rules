@@ -3,25 +3,10 @@
 package io.nlopez.compose.core
 
 import com.intellij.psi.PsiElement
-import kotlin.contracts.ExperimentalContracts
-import kotlin.contracts.contract
 
 fun interface Emitter {
-    fun report(element: PsiElement, errorMessage: String, canBeAutoCorrected: Boolean): Decision
+    fun report(element: PsiElement, errorMessage: String, autoCorrect: (() -> Unit)?)
 }
 
 fun Emitter.report(element: PsiElement, errorMessage: String) =
-    report(element = element, errorMessage = errorMessage, canBeAutoCorrected = false)
-
-enum class Decision {
-    Fix,
-    Ignore,
-}
-
-@OptIn(ExperimentalContracts::class)
-fun Decision.ifFix(block: () -> Unit) {
-    contract {
-        callsInPlace(block, kotlin.contracts.InvocationKind.AT_MOST_ONCE)
-    }
-    if (this == Decision.Fix) block()
-}
+    report(element = element, errorMessage = errorMessage, autoCorrect = null)

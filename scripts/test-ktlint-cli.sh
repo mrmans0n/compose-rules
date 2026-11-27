@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 # Script to validate that the ktlint CLI correctly detects compose-rules violations
-# when using the fat JAR as a custom ruleset.
+# when using the ruleset JAR as a custom ruleset.
 # Returns 0 if all expected violations are found, non-zero otherwise.
 
 set -euo pipefail
@@ -16,7 +16,7 @@ CACHE_DIR="$ROOT_DIR/.gradle/cli-cache"
 
 # Get ktlint version from libs.versions.toml
 KTLINT_VERSION=$("$SCRIPT_DIR/get-version-from-toml.sh" ktlint)
-KTLINT_CLI_URL="https://github.com/pinterest/ktlint/releases/download/${KTLINT_VERSION}/ktlint"
+KTLINT_CLI_URL="https://github.com/ktlint/ktlint/releases/download/${KTLINT_VERSION}/ktlint"
 KTLINT_CLI="$CACHE_DIR/ktlint-${KTLINT_VERSION}"
 
 echo "=== Testing ktlint CLI ==="
@@ -27,21 +27,17 @@ mkdir -p "$CACHE_DIR"
 # Download ktlint CLI if not cached
 if [[ ! -f "$KTLINT_CLI" ]]; then
     echo "Downloading ktlint CLI ${KTLINT_VERSION}..."
-    curl -sL "$KTLINT_CLI_URL" -o "$KTLINT_CLI"
+    curl -fsSL "$KTLINT_CLI_URL" -o "$KTLINT_CLI"
     chmod +x "$KTLINT_CLI"
     echo "Downloaded ktlint CLI to $KTLINT_CLI"
 else
     echo "Using cached ktlint CLI ${KTLINT_VERSION}..."
 fi
 
-# Build the fat JAR if it doesn't exist
-FAT_JAR=$(find "$BUILD_DIR" -name "*-all.jar" 2>/dev/null | head -n 1 || true)
-if [[ -z "$FAT_JAR" ]]; then
-    echo "Building compose-rules ktlint fat JAR..."
-    "$ROOT_DIR/gradlew" :rules:ktlint:shadowJar -PuberJar > /dev/null 2>&1
-    FAT_JAR=$(find "$BUILD_DIR" -name "*-all.jar" | head -n 1)
-else
-    echo "Using existing fat JAR: $FAT_JAR"
+COMPOSE_RULES_VERSION=$(sed -n 's/^VERSION_NAME=//p' "$ROOT_DIR/gradle.properties")
+RULESET_JAR="$BUILD_DIR/ktlint-${COMPOSE_RULES_VERSION}-all.jar"
+if [[ ! -f "$RULESET_JAR" ]]; then
+    "$ROOT_DIR/gradlew" :rules:ktlint:shadowJar -PuberJar
 fi
 
 echo "Running ktlint CLI on sample project..."
@@ -50,7 +46,7 @@ echo "Running ktlint CLI on sample project..."
 # ktlint uses -R or --ruleset for custom rulesets
 set +e
 OUTPUT=$("$KTLINT_CLI" \
-    --ruleset="$FAT_JAR" \
+    --ruleset="$RULESET_JAR" \
     --editorconfig="$SAMPLE_DIR/.editorconfig" \
     "$SAMPLE_DIR/src/**/*.kt" \
     2>&1)
@@ -98,7 +94,7 @@ if [[ ${#MISSING_RULES[@]} -gt 0 ]]; then
     echo "  1. A rule is broken or disabled"
     echo "  2. The sample violation file was modified"
     echo "  3. The rule ID changed"
-    echo "  4. The fat JAR is not properly built"
+    echo "  4. The ruleset JAR is not properly built"
     echo ""
     echo "Full output:"
     echo "----------------------------------------"

@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 package io.nlopez.compose.rules.ktlint
 
-import com.pinterest.ktlint.test.KtLintAssertThat
-import com.pinterest.ktlint.test.LintViolation
+import io.github.ktlint.core.test.KtLintAssertThat
+import io.github.ktlint.core.test.LintViolation
 import io.nlopez.compose.rules.LambdaParameterInRestartableEffect
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test

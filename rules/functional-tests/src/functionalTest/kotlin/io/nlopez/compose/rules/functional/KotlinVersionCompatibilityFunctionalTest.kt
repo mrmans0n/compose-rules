@@ -2,9 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 package io.nlopez.compose.rules.functional
 
-import io.nlopez.compose.rules.functional.FunctionalTestUtils.composeRulesVersion
 import io.nlopez.compose.rules.functional.FunctionalTestUtils.createGradleRunner
-import io.nlopez.compose.rules.functional.FunctionalTestUtils.ktlintVersion
+import io.nlopez.compose.rules.functional.FunctionalTestUtils.ktlintCheckTask
 import io.nlopez.compose.rules.functional.FunctionalTestUtils.writeFile
 import io.nlopez.compose.rules.functional.FunctionalTestUtils.writeGradleProperties
 import io.nlopez.compose.rules.functional.FunctionalTestUtils.writeSettings
@@ -67,15 +66,15 @@ class KotlinVersionCompatibilityFunctionalTest {
             """,
         )
 
-        // Run spotless check - should succeed (proper composables)
+        // Run ktlint check - should succeed (proper composables)
         val result =
             createGradleRunner(
                     projectDir = projectDir,
-                    arguments = listOf("spotlessKotlinCheck"),
+                    arguments = listOf("ktlintCheck"),
                 )
                 .build()
 
-        result.assertTaskSucceeded(":spotlessKotlinCheck")
+        result.assertTaskSucceeded(":ktlintCheck")
 
         // Most importantly: No NoSuchMethodError should occur
         // This would indicate the fallback logic is working correctly across Kotlin versions
@@ -112,11 +111,11 @@ class KotlinVersionCompatibilityFunctionalTest {
         val result =
             createGradleRunner(
                     projectDir = projectDir,
-                    arguments = listOf("spotlessKotlinCheck"),
+                    arguments = listOf("ktlintCheck"),
                 )
                 .build()
 
-        result.assertTaskSucceeded(":spotlessKotlinCheck")
+        result.assertTaskSucceeded(":ktlintCheck")
         result.assertOutputDoesNotContain("NoSuchMethodError")
     }
 
@@ -130,7 +129,6 @@ class KotlinVersionCompatibilityFunctionalTest {
             plugins {
                 kotlin("jvm") version "$kotlinVersion"
                 kotlin("plugin.compose") version "$kotlinVersion"
-                id("com.diffplug.spotless") version "8.1.0"
             }
 
             repositories {
@@ -146,18 +144,7 @@ class KotlinVersionCompatibilityFunctionalTest {
                 implementation("androidx.compose.material3:material3")
             }
 
-            spotless {
-                kotlin {
-                    target("**/*.kt")
-                    ktlint("$ktlintVersion")
-                        .setEditorConfigPath("${"$"}{project.rootDir}/.editorconfig")
-                        .customRuleSets(
-                            listOf(
-                                "io.nlopez.compose.rules:ktlint:$composeRulesVersion"
-                            )
-                        )
-                }
-            }
+            $ktlintCheckTask
 
             java {
                 toolchain {

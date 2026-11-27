@@ -8,7 +8,6 @@ import dev.detekt.api.Entity
 import dev.detekt.api.Finding
 import dev.detekt.api.Rule
 import io.nlopez.compose.core.ComposeKtVisitor
-import io.nlopez.compose.core.Decision
 import io.nlopez.compose.core.Emitter
 import io.nlopez.compose.core.util.isComposable
 import java.net.URI
@@ -27,7 +26,7 @@ abstract class DetektRule(
 
     private val composeConfig: DetektComposeKtConfig by lazy { DetektComposeKtConfig(config) }
 
-    private val emitter: Emitter = Emitter { element, message, canBeAutoCorrected ->
+    private val emitter: Emitter = Emitter { element, message, autoCorrect ->
         // Use Entity.atName() for named declarations to report at the name identifier location
         val entity =
             when (element) {
@@ -45,10 +44,7 @@ abstract class DetektRule(
 
         report(finding)
 
-        when {
-            this@DetektRule.autoCorrect && canBeAutoCorrected -> Decision.Fix
-            else -> Decision.Ignore
-        }
+        if (this@DetektRule.autoCorrect) autoCorrect?.invoke()
     }
 
     override fun visit(root: KtFile) {

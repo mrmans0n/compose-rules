@@ -2,10 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 package io.nlopez.compose.rules.functional
 
-import io.nlopez.compose.rules.functional.FunctionalTestUtils.composeRulesVersion
 import io.nlopez.compose.rules.functional.FunctionalTestUtils.createGradleRunner
 import io.nlopez.compose.rules.functional.FunctionalTestUtils.kotlinVersion
-import io.nlopez.compose.rules.functional.FunctionalTestUtils.ktlintVersion
+import io.nlopez.compose.rules.functional.FunctionalTestUtils.ktlintCheckTask
 import io.nlopez.compose.rules.functional.FunctionalTestUtils.writeFile
 import io.nlopez.compose.rules.functional.FunctionalTestUtils.writeGradleProperties
 import io.nlopez.compose.rules.functional.FunctionalTestUtils.writeSettings
@@ -13,19 +12,13 @@ import java.io.File
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 
-/**
- * Functional tests for ktlint integration with compose-rules.
- *
- * These tests create actual Gradle projects and run them to verify that:
- * 1. Rules are detected correctly via spotless/ktlint
- * 2. Basic Gradle integration works (caching, up-to-date checks)
- */
+/** Runs the published Compose ruleset with the ktlint CLI from Gradle. */
 class KtlintFunctionalTest {
 
     @TempDir lateinit var projectDir: File
 
     @Test
-    fun `ModifierMissing is detected via ktlint spotless`() {
+    fun `ModifierMissing is detected via the ktlint CLI`() {
         setupKtlintProject()
 
         projectDir.writeFile(
@@ -48,7 +41,7 @@ class KtlintFunctionalTest {
         val result =
             createGradleRunner(
                     projectDir = projectDir,
-                    arguments = listOf("spotlessKotlinCheck"),
+                    arguments = listOf("ktlintCheck"),
                 )
                 .buildAndFail()
 
@@ -109,7 +102,7 @@ class KtlintFunctionalTest {
         val result =
             createGradleRunner(
                     projectDir = projectDir,
-                    arguments = listOf("spotlessKotlinCheck"),
+                    arguments = listOf("ktlintCheck"),
                 )
                 .buildAndFail()
 
@@ -146,52 +139,11 @@ class KtlintFunctionalTest {
         val result =
             createGradleRunner(
                     projectDir = projectDir,
-                    arguments = listOf("spotlessKotlinCheck"),
+                    arguments = listOf("ktlintCheck"),
                 )
                 .build()
 
-        result.assertTaskSucceeded(":spotlessKotlinCheck")
-    }
-
-    @Test
-    fun `gradle integration - up-to-date checks work`() {
-        setupKtlintProject()
-
-        projectDir.writeFile(
-            "src/main/kotlin/com/example/Example.kt",
-            """
-            package com.example
-
-            import androidx.compose.foundation.layout.Row
-            import androidx.compose.runtime.Composable
-            import androidx.compose.ui.Modifier
-
-            @Composable
-            fun Example(modifier: Modifier = Modifier) {
-                Row(modifier = modifier) { }
-            }
-            """,
-        )
-
-        // First build
-        val firstResult =
-            createGradleRunner(
-                    projectDir = projectDir,
-                    arguments = listOf("spotlessKotlinCheck"),
-                )
-                .build()
-
-        firstResult.assertTaskSucceeded(":spotlessKotlinCheck")
-
-        // Second build without changes should be up-to-date
-        val secondResult =
-            createGradleRunner(
-                    projectDir = projectDir,
-                    arguments = listOf("spotlessKotlinCheck"),
-                )
-                .build()
-
-        secondResult.assertTaskUpToDate(":spotlessKotlinCheck")
+        result.assertTaskSucceeded(":ktlintCheck")
     }
 
     // TODO: Add test for preview composable exclusion once configured properly
@@ -207,7 +159,6 @@ class KtlintFunctionalTest {
             plugins {
                 kotlin("jvm") version "$kotlinVersion"
                 kotlin("plugin.compose") version "$kotlinVersion"
-                id("com.diffplug.spotless") version "8.1.0"
             }
 
             repositories {
@@ -224,18 +175,7 @@ class KtlintFunctionalTest {
                 implementation("androidx.compose.ui:ui-tooling-preview")
             }
 
-            spotless {
-                kotlin {
-                    target("**/*.kt")
-                    ktlint("$ktlintVersion")
-                        .setEditorConfigPath("${"$"}{project.rootDir}/.editorconfig")
-                        .customRuleSets(
-                            listOf(
-                                "io.nlopez.compose.rules:ktlint:$composeRulesVersion"
-                            )
-                        )
-                }
-            }
+            $ktlintCheckTask
 
             java {
                 toolchain {

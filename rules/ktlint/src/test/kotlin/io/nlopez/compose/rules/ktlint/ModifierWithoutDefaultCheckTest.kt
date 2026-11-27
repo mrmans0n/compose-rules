@@ -2,13 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 package io.nlopez.compose.rules.ktlint
 
-import com.pinterest.ktlint.rule.engine.api.Code
-import com.pinterest.ktlint.rule.engine.api.KtLintRuleEngine
-import com.pinterest.ktlint.rule.engine.core.api.AutocorrectDecision
-import com.pinterest.ktlint.rule.engine.core.api.RuleProvider
-import com.pinterest.ktlint.ruleset.standard.StandardRuleSetProvider
-import com.pinterest.ktlint.test.KtLintAssertThat.Companion.assertThatRule
-import com.pinterest.ktlint.test.LintViolation
+import io.github.ktlint.core.rule.engine.api.Code
+import io.github.ktlint.core.rule.engine.api.KtLintRuleEngine
+import io.github.ktlint.core.rule.engine.core.api.AutocorrectDecision
+import io.github.ktlint.core.rule.engine.core.api.RuleV2Provider
+import io.github.ktlint.core.ruleset.standard.StandardRuleSetProvider
+import io.github.ktlint.core.test.KtLintAssertThat.Companion.assertThatRule
+import io.github.ktlint.core.test.LintViolation
 import io.nlopez.compose.rules.ModifierWithoutDefault
 import org.assertj.core.api.Assertions.assertThat
 import org.intellij.lang.annotations.Language
@@ -106,7 +106,7 @@ class ModifierWithoutDefaultCheckTest {
         val engine =
             KtLintRuleEngine(
                 ruleProviders =
-                    setOf(RuleProvider { ModifierWithoutDefaultCheck() }) +
+                    setOf(RuleV2Provider { ModifierWithoutDefaultCheck() }) +
                         StandardRuleSetProvider().getRuleProviders().filter {
                             it.createNewRuleInstance().ruleId.value == "standard:no-unused-imports"
                         },

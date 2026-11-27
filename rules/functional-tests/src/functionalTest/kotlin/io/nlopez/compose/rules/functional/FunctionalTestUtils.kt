@@ -14,8 +14,37 @@ object FunctionalTestUtils {
     /** Gets version information from system properties set by the build. */
     val composeRulesVersion: String = System.getProperty("composeRulesVersion")
     val kotlinVersion: String = System.getProperty("kotlinVersion")
-    val ktlintVersion: String = System.getProperty("ktlintVersion")
+    private val ktlintVersion: String = System.getProperty("ktlintVersion")
     val detektVersion: String = System.getProperty("detektVersion")
+
+    val ktlintCheckTask: String
+        get() =
+            """
+            val ktlintCli = configurations.create("ktlintCli") {
+                isCanBeConsumed = false
+            }
+            val composeRules = configurations.create("composeRules") {
+                isCanBeConsumed = false
+                isTransitive = false
+            }
+
+            dependencies {
+                add(ktlintCli.name, "io.github.ktlint.core:ktlint-cli:$ktlintVersion")
+                add(composeRules.name, "io.nlopez.compose.rules:ktlint:$composeRulesVersion")
+            }
+
+            tasks.register<JavaExec>("ktlintCheck") {
+                classpath = ktlintCli
+                mainClass.set("io.github.ktlint.core.Main")
+                javaLauncher.set(javaToolchains.launcherFor {
+                    languageVersion.set(JavaLanguageVersion.of(JavaVersion.current().majorVersion.toInt()))
+                })
+                argumentProviders.add(CommandLineArgumentProvider {
+                    listOf("--ruleset=${"$"}{composeRules.singleFile.absolutePath}", "src/**/*.kt")
+                })
+            }
+        """
+                .trimIndent()
 
     /** Creates a temporary Gradle project directory structure. */
     fun createTempProjectDir(): File =
