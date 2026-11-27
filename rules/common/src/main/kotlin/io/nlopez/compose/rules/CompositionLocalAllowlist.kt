@@ -14,8 +14,7 @@ import org.jetbrains.kotlin.psi.KtProperty
 class CompositionLocalAllowlist : ComposeKtVisitor {
 
     override fun visitFile(file: KtFile, emitter: Emitter, config: ComposeKtConfig) {
-        val compositionLocals = file.findAllChildrenByClass<KtProperty>()
-            .filter { it.declaresCompositionLocal }
+        val compositionLocals = file.findAllChildrenByClass<KtProperty>().filter { it.declaresCompositionLocal }
 
         if (compositionLocals.none()) return
 
@@ -31,9 +30,11 @@ class CompositionLocalAllowlist : ComposeKtVisitor {
     }
 
     companion object {
-        val CompositionLocalNotInAllowlist = """
+        val CompositionLocalNotInAllowlist =
+            """
             CompositionLocals are implicit dependencies and creating new ones should be avoided.
             See https://mrmans0n.github.io/compose-rules/rules/#compositionlocals for more information.
-        """.trimIndent()
+            """
+                .trimIndent()
     }
 }

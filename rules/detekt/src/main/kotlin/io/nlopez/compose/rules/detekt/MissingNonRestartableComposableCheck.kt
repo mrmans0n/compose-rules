@@ -11,6 +11,7 @@ import dev.detekt.api.RequiresAnalysisApi
 import dev.detekt.api.Rule
 import dev.detekt.api.RuleName
 import io.nlopez.compose.core.util.definedInInterface
+import java.net.URI
 import org.jetbrains.kotlin.analysis.api.KaExperimentalApi
 import org.jetbrains.kotlin.analysis.api.analyze
 import org.jetbrains.kotlin.analysis.api.annotations.KaAnnotation
@@ -45,7 +46,6 @@ import org.jetbrains.kotlin.psi.KtPsiUtil
 import org.jetbrains.kotlin.psi.KtThisExpression
 import org.jetbrains.kotlin.psi.psiUtil.blockExpressionsOrSingle
 import org.jetbrains.kotlin.psi.psiUtil.getStrictParentOfType
-import java.net.URI
 
 /** Reports pass-through composables that can avoid generating their own restart boundary. */
 class MissingNonRestartableComposableCheck(config: Config) :
@@ -70,7 +70,8 @@ class MissingNonRestartableComposableCheck(config: Config) :
         if (function.hasIneligibleModifier()) return
         if (ignoresPreviews && function.isPreview()) return
         if (function.hasIneligibleAnnotation()) return
-        if (function.valueParameters.any { parameter ->
+        if (
+            function.valueParameters.any { parameter ->
                 parameter.defaultValue?.isSafeValue(function.valueParameters) == false
             }
         ) {
@@ -103,9 +104,9 @@ class MissingNonRestartableComposableCheck(config: Config) :
         if (!call.isComposableCall()) return
         if (!call.returnsUnit()) return
         if (call.hasIneligibleContract()) return
-        if (call.valueArguments.any { argument ->
-                argument.getSpreadElement() != null ||
-                    argument.getArgumentExpression()?.isSafeValue(parameters) != true
+        if (
+            call.valueArguments.any { argument ->
+                argument.getSpreadElement() != null || argument.getArgumentExpression()?.isSafeValue(parameters) != true
             }
         ) {
             return
@@ -123,26 +124,30 @@ class MissingNonRestartableComposableCheck(config: Config) :
         analyze(this) {
             symbol.returnType.semanticallyEquals(builtinTypes.unit)
         }
-    }.getOrDefault(false)
+    }
+        .getOrDefault(false)
 
     private fun KtPropertyAccessor.returnsUnit(): Boolean = runCatching {
         analyze(this) {
             symbol.returnType.semanticallyEquals(builtinTypes.unit)
         }
-    }.getOrDefault(false)
+    }
+        .getOrDefault(false)
 
     private fun KtCallExpression.returnsUnit(): Boolean = runCatching {
         analyze(this) {
             expressionType?.semanticallyEquals(builtinTypes.unit) == true
         }
-    }.getOrDefault(false)
+    }
+        .getOrDefault(false)
 
     private fun KtNamedFunction.hasIneligibleAnnotation(): Boolean = runCatching {
         analyze(this) {
             val annotationClassIds = ineligibleAnnotationClassIds()
             symbol.annotations.any { annotation -> annotation.classId in annotationClassIds }
         }
-    }.getOrDefault(false)
+    }
+        .getOrDefault(false)
 
     private fun KtNamedFunction.isPreview(): Boolean = runCatching {
         analyze(this) {
@@ -157,14 +162,16 @@ class MissingNonRestartableComposableCheck(config: Config) :
 
             symbol.annotations.any { annotation -> annotation.isPreview() }
         }
-    }.getOrDefault(false)
+    }
+        .getOrDefault(false)
 
     private fun KtPropertyAccessor.hasIneligibleAnnotation(): Boolean = runCatching {
         analyze(this) {
             val annotationClassIds = ineligibleAnnotationClassIds()
             symbol.annotations.any { annotation -> annotation.classId in annotationClassIds }
         }
-    }.getOrDefault(false)
+    }
+        .getOrDefault(false)
 
     private fun KtCallExpression.hasIneligibleContract(): Boolean = runCatching {
         analyze(this) {
@@ -179,23 +186,23 @@ class MissingNonRestartableComposableCheck(config: Config) :
             }
 
             symbol is KaNamedFunctionSymbol &&
-                (
-                    symbol.isInline ||
-                        symbol.isOverride ||
-                        symbol.isExpect ||
-                        symbol.isExternal ||
-                        symbol.isTailRec ||
-                        symbol.modality != KaSymbolModality.FINAL
-                    )
+                (symbol.isInline ||
+                    symbol.isOverride ||
+                    symbol.isExpect ||
+                    symbol.isExternal ||
+                    symbol.isTailRec ||
+                    symbol.modality != KaSymbolModality.FINAL)
         }
-    }.getOrDefault(true)
+    }
+        .getOrDefault(true)
 
-    private fun ineligibleAnnotationClassIds(): Set<ClassId> = setOf(
-        ClassId.topLevel(ComposeFqNames.NonRestartableComposable),
-        ClassId.topLevel(ComposeFqNames.NonSkippableComposable),
-        ClassId.topLevel(ComposeFqNames.ReadOnlyComposable),
-        ClassId.topLevel(ComposeFqNames.ExplicitGroupsComposable),
-    )
+    private fun ineligibleAnnotationClassIds(): Set<ClassId> =
+        setOf(
+            ClassId.topLevel(ComposeFqNames.NonRestartableComposable),
+            ClassId.topLevel(ComposeFqNames.NonSkippableComposable),
+            ClassId.topLevel(ComposeFqNames.ReadOnlyComposable),
+            ClassId.topLevel(ComposeFqNames.ExplicitGroupsComposable),
+        )
 
     private fun KtExpression?.singleBodyExpression(): KtExpression? {
         val expression = this?.blockExpressionsOrSingle()?.singleOrNull() as? KtExpression ?: return null
@@ -204,14 +211,15 @@ class MissingNonRestartableComposableCheck(config: Config) :
 
     private fun KtModifierListOwner.hasIneligibleModifier(): Boolean = IneligibleModifiers.any(::hasModifier)
 
-    private fun KtExpression.directCall(): DirectCall? = when (this) {
-        is KtCallExpression -> DirectCall(this, null)
+    private fun KtExpression.directCall(): DirectCall? =
+        when (this) {
+            is KtCallExpression -> DirectCall(this, null)
 
-        is KtDotQualifiedExpression ->
-            (selectorExpression as? KtCallExpression)?.let { call -> DirectCall(call, receiverExpression) }
+            is KtDotQualifiedExpression ->
+                (selectorExpression as? KtCallExpression)?.let { call -> DirectCall(call, receiverExpression) }
 
-        else -> null
-    }
+            else -> null
+        }
 
     private fun KtExpression.isSafeReceiver(parameters: List<KtParameter>): Boolean =
         when (val expression = KtPsiUtil.safeDeparenthesize(this)) {
@@ -239,58 +247,67 @@ class MissingNonRestartableComposableCheck(config: Config) :
     private fun KtNameReferenceExpression.resolvesToQualifier(): Boolean = runCatching {
         analyze(this) {
             when (mainReference.resolveToSymbol()) {
-                is KaClassLikeSymbol, is KaEnumEntrySymbol, is KaPackageSymbol -> true
+                is KaClassLikeSymbol,
+                is KaEnumEntrySymbol,
+                is KaPackageSymbol -> true
                 else -> false
             }
         }
-    }.getOrDefault(false)
+    }
+        .getOrDefault(false)
 
     private fun KtNameReferenceExpression.resolvesToParameter(parameters: List<KtParameter>): Boolean = runCatching {
         analyze(this) {
             mainReference.resolveToSymbol()?.sourcePsiSafe<KtParameter>() in parameters
         }
-    }.getOrDefault(false)
+    }
+        .getOrDefault(false)
 
     private fun KtExpression.isSafeValue(parameters: List<KtParameter>): Boolean {
         val expression = KtPsiUtil.safeDeparenthesize(this)
         return runCatching {
-            analyze(expression) {
-                if (expression.evaluate() != null) return@analyze true
-                if (expression is KtThisExpression) return@analyze true
+                analyze(expression) {
+                    if (expression.evaluate() != null) return@analyze true
+                    if (expression is KtThisExpression) return@analyze true
 
-                val reference = when (expression) {
-                    is KtNameReferenceExpression -> expression
-                    is KtDotQualifiedExpression -> expression.selectorExpression as? KtNameReferenceExpression
-                    else -> null
-                } ?: return@analyze false
+                    val reference =
+                        when (expression) {
+                            is KtNameReferenceExpression -> expression
+                            is KtDotQualifiedExpression -> expression.selectorExpression as? KtNameReferenceExpression
+                            else -> null
+                        } ?: return@analyze false
 
-                when (val symbol = reference.mainReference.resolveToSymbol()) {
-                    is KaEnumEntrySymbol -> true
-                    is KaNamedClassSymbol -> symbol.classKind.isObject
-                    else -> symbol?.sourcePsiSafe<KtParameter>() in parameters
+                    when (val symbol = reference.mainReference.resolveToSymbol()) {
+                        is KaEnumEntrySymbol -> true
+                        is KaNamedClassSymbol -> symbol.classKind.isObject
+                        else -> symbol?.sourcePsiSafe<KtParameter>() in parameters
+                    }
                 }
             }
-        }.getOrDefault(false)
+            .getOrDefault(false)
     }
 
     internal companion object {
-        val MissingNonRestartableComposable = """
+        val MissingNonRestartableComposable =
+            """
             This @Composable declaration only delegates to another composable. Consider marking it @NonRestartableComposable when its own restart and skip boundary is not useful.
 
             See https://mrmans0n.github.io/compose-rules/rules/#mark-pass-through-composables-as-non-restartable for more information.
-        """.trimIndent()
+            """
+                .trimIndent()
     }
 }
 
 private data class DirectCall(val call: KtCallExpression, val receiver: KtExpression?)
 
-private val IneligibleModifiers = setOf(
-    KtTokens.INLINE_KEYWORD,
-    KtTokens.OPEN_KEYWORD,
-    KtTokens.OVERRIDE_KEYWORD,
-    KtTokens.ABSTRACT_KEYWORD,
-    KtTokens.EXPECT_KEYWORD,
-    KtTokens.ACTUAL_KEYWORD,
-    KtTokens.EXTERNAL_KEYWORD,
-    KtTokens.TAILREC_KEYWORD,
-)
+private val IneligibleModifiers =
+    setOf(
+        KtTokens.INLINE_KEYWORD,
+        KtTokens.OPEN_KEYWORD,
+        KtTokens.OVERRIDE_KEYWORD,
+        KtTokens.ABSTRACT_KEYWORD,
+        KtTokens.EXPECT_KEYWORD,
+        KtTokens.ACTUAL_KEYWORD,
+        KtTokens.EXTERNAL_KEYWORD,
+        KtTokens.TAILREC_KEYWORD,
+    )

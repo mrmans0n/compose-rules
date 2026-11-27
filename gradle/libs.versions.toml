@@ -2,7 +2,6 @@
 kotlin = "2.4.0" # Used for the code of the rules
 ktlint = "2.0.0-ALPHA-5"
 kotlin-ktlint = "2.5.0-RC" # Match the dependencies published by ktlint
-spotless-ktlint = "1.8.0"
 detekt = "2.0.0-alpha.6"
 kotlin-detekt = "2.4.10" # Update only when detekt version updates
 junit = "5.14.4"
@@ -12,6 +11,7 @@ junit-platform = "1.14.4"
 compose-bom = "2026.11.01"
 
 [libraries]
+ktrs = "io.github.hexay:ktrs:0.5.3"
 ktlint-runner = { module = "io.github.ktlint.core:ktlint-cli", version.ref = "ktlint" }
 ktlint-cli-ruleset-core = { module = "io.github.ktlint.core:ktlint-cli-ruleset-core", version.ref = "ktlint" }
 ktlint-rule-engine = { module = "io.github.ktlint.core:ktlint-rule-engine", version.ref = "ktlint" }

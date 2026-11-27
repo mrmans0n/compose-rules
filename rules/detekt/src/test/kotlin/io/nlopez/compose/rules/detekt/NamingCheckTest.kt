@@ -6,15 +6,15 @@ import dev.detekt.api.SourceLocation
 import dev.detekt.test.TestConfig
 import dev.detekt.test.lint
 import io.nlopez.compose.rules.Naming
-import io.nlopez.compose.rules.detekt.assertThat
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
 
 class NamingCheckTest {
 
-    private val testConfig = TestConfig(
-        "allowedComposableFunctionNames" to listOf(".*Presenter"),
-    )
+    private val testConfig =
+        TestConfig(
+            "allowedComposableFunctionNames" to listOf(".*Presenter"),
+        )
     private val rule = NamingCheck(testConfig)
 
     @Test
@@ -22,9 +22,10 @@ class NamingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun myComposable(): Something { }
-            """.trimIndent()
+            @Composable
+            fun myComposable(): Something { }
+            """
+                .trimIndent()
         assertThat(rule.lint(code)).isEmpty()
     }
 
@@ -33,9 +34,10 @@ class NamingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun ProfilePresenter(): Something { }
-            """.trimIndent()
+            @Composable
+            fun ProfilePresenter(): Something { }
+            """
+                .trimIndent()
         assertThat(rule.lint(code)).isEmpty()
     }
 
@@ -44,11 +46,12 @@ class NamingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun MyComposable() { }
-                @Composable
-                fun MyComposable(): Unit { }
-            """.trimIndent()
+            @Composable
+            fun MyComposable() { }
+            @Composable
+            fun MyComposable(): Unit { }
+            """
+                .trimIndent()
         assertThat(rule.lint(code)).isEmpty()
     }
 
@@ -57,17 +60,18 @@ class NamingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun MyComposable() = Text("bleh")
+            @Composable
+            fun MyComposable() = Text("bleh")
 
-                val composable: Something
-                    @Composable get() { }
+            val composable: Something
+                @Composable get() { }
 
-                val composable: Something
-                    @Composable get() = OtherComposable()
+            val composable: Something
+                @Composable get() = OtherComposable()
 
-                val whatever = @Composable { }
-            """.trimIndent()
+            val whatever = @Composable { }
+            """
+                .trimIndent()
         assertThat(rule.lint(code)).isEmpty()
     }
 
@@ -76,11 +80,13 @@ class NamingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun MyComposable(): Something { }
-            """.trimIndent()
+            @Composable
+            fun MyComposable(): Something { }
+            """
+                .trimIndent()
         val errors = rule.lint(code)
-        assertThat(errors).hasSize(1)
+        assertThat(errors)
+            .hasSize(1)
             .hasStartSourceLocations(
                 SourceLocation(2, 5),
             )
@@ -92,10 +98,11 @@ class NamingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Suppress("ComposableNaming")
-                @Composable
-                fun MyComposable(): Something { }
-            """.trimIndent()
+            @Suppress("ComposableNaming")
+            @Composable
+            fun MyComposable(): Something { }
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }
@@ -105,14 +112,15 @@ class NamingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Suppress("ComposableNaming")
-                @Composable
-                fun myComposable() { }
+            @Suppress("ComposableNaming")
+            @Composable
+            fun myComposable() { }
 
-                @Suppress("ComposableNaming")
-                @Composable
-                fun myComposable(): Unit { }
-            """.trimIndent()
+            @Suppress("ComposableNaming")
+            @Composable
+            fun myComposable(): Unit { }
+            """
+                .trimIndent()
 
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
@@ -123,15 +131,17 @@ class NamingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun myComposable() { }
+            @Composable
+            fun myComposable() { }
 
-                @Composable
-                fun myComposable(): Unit { }
-            """.trimIndent()
+            @Composable
+            fun myComposable(): Unit { }
+            """
+                .trimIndent()
 
         val errors = rule.lint(code)
-        assertThat(errors).hasSize(2)
+        assertThat(errors)
+            .hasSize(2)
             .hasStartSourceLocations(
                 SourceLocation(2, 5),
                 SourceLocation(5, 5),
@@ -146,12 +156,13 @@ class NamingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Potato.myComposable() { }
+            @Composable
+            fun Potato.myComposable() { }
 
-                @Composable
-                fun Banana.myComposable(): Unit { }
-            """.trimIndent()
+            @Composable
+            fun Banana.myComposable(): Unit { }
+            """
+                .trimIndent()
 
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
@@ -162,9 +173,10 @@ class NamingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                operator fun invoke() { }
-            """.trimIndent()
+            @Composable
+            operator fun invoke() { }
+            """
+                .trimIndent()
 
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
@@ -175,11 +187,12 @@ class NamingCheckTest {
         @Language("kotlin")
         val code =
             """
-                interface Bleh {
-                    @Composable
-                    override fun component() { }
-                }
-            """.trimIndent()
+            interface Bleh {
+                @Composable
+                override fun component() { }
+            }
+            """
+                .trimIndent()
 
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()

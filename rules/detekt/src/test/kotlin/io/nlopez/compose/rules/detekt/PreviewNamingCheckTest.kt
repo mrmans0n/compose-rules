@@ -7,7 +7,6 @@ import dev.detekt.api.SourceLocation
 import dev.detekt.test.TestConfig
 import dev.detekt.test.lint
 import io.nlopez.compose.rules.PreviewNaming
-import io.nlopez.compose.rules.detekt.assertThat
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
 
@@ -23,11 +22,13 @@ class PreviewNamingCheckTest {
             @Preview
             @Composable
             fun A() { }
-            """.trimIndent()
+            """
+                .trimIndent()
         val errors = rule.lint(code)
-        assertThat(errors).hasStartSourceLocations(
-            SourceLocation(3, 5),
-        )
+        assertThat(errors)
+            .hasStartSourceLocations(
+                SourceLocation(3, 5),
+            )
         for (error in errors) {
             assertThat(error).hasMessage(PreviewNaming.PreviewDoesNotEndWithPreview)
         }
@@ -43,11 +44,13 @@ class PreviewNamingCheckTest {
             @Preview
             @Composable
             fun A() { }
-            """.trimIndent()
+            """
+                .trimIndent()
         val errors = rule.lint(code)
-        assertThat(errors).hasStartSourceLocations(
-            SourceLocation(3, 5),
-        )
+        assertThat(errors)
+            .hasStartSourceLocations(
+                SourceLocation(3, 5),
+            )
         for (error in errors) {
             assertThat(error).hasMessage(PreviewNaming.PreviewDoesNotStartWithPreview)
         }
@@ -63,11 +66,13 @@ class PreviewNamingCheckTest {
             @Preview
             @Composable
             fun A() { }
-            """.trimIndent()
+            """
+                .trimIndent()
         val errors = rule.lint(code)
-        assertThat(errors).hasStartSourceLocations(
-            SourceLocation(3, 5),
-        )
+        assertThat(errors)
+            .hasStartSourceLocations(
+                SourceLocation(3, 5),
+            )
         for (error in errors) {
             assertThat(error).hasMessage(PreviewNaming.PreviewDoesNotContainPreview)
         }
@@ -81,7 +86,8 @@ class PreviewNamingCheckTest {
             @Preview
             @Composable
             fun APreview() { }
-            """.trimIndent()
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }
@@ -96,7 +102,8 @@ class PreviewNamingCheckTest {
             @Preview
             @Composable
             fun PreviewA() { }
-            """.trimIndent()
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }
@@ -111,7 +118,8 @@ class PreviewNamingCheckTest {
             @Preview
             @Composable
             fun BananaPreviewPotato() { }
-            """.trimIndent()
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }
@@ -130,7 +138,8 @@ class PreviewNamingCheckTest {
             @PreviewWrapperProvider(CustomThemeWrapper::class)
             @Composable
             fun SomeFeatureListLoaded() { }
-            """.trimIndent()
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }

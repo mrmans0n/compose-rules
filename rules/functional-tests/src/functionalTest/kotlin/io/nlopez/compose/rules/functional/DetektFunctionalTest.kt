@@ -9,9 +9,9 @@ import io.nlopez.compose.rules.functional.FunctionalTestUtils.kotlinVersion
 import io.nlopez.compose.rules.functional.FunctionalTestUtils.writeFile
 import io.nlopez.compose.rules.functional.FunctionalTestUtils.writeGradleProperties
 import io.nlopez.compose.rules.functional.FunctionalTestUtils.writeSettings
+import java.io.File
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
-import java.io.File
 
 /**
  * Functional tests for detekt integration with compose-rules.
@@ -22,8 +22,7 @@ import java.io.File
  */
 class DetektFunctionalTest {
 
-    @TempDir
-    lateinit var projectDir: File
+    @TempDir lateinit var projectDir: File
 
     @Test
     fun `ModifierMissing is detected via detekt`() {
@@ -46,10 +45,12 @@ class DetektFunctionalTest {
             """,
         )
 
-        val result = createGradleRunner(
-            projectDir = projectDir,
-            arguments = listOf("detekt"),
-        ).buildAndFail()
+        val result =
+            createGradleRunner(
+                    projectDir = projectDir,
+                    arguments = listOf("detekt"),
+                )
+                .buildAndFail()
 
         // Build should fail due to violations
         result.assertOutputContains("[ModifierMissing]")
@@ -90,10 +91,12 @@ class DetektFunctionalTest {
             """,
         )
 
-        val result = createGradleRunner(
-            projectDir = projectDir,
-            arguments = listOf("detekt"),
-        ).buildAndFail()
+        val result =
+            createGradleRunner(
+                    projectDir = projectDir,
+                    arguments = listOf("detekt"),
+                )
+                .buildAndFail()
 
         // Build should fail due to multiple violations
         result.assertOutputContains(
@@ -132,10 +135,12 @@ class DetektFunctionalTest {
             """,
         )
 
-        val result = createGradleRunner(
-            projectDir = projectDir,
-            arguments = listOf("detektMain"),
-        ).buildAndFail()
+        val result =
+            createGradleRunner(
+                    projectDir = projectDir,
+                    arguments = listOf("detektMain"),
+                )
+                .buildAndFail()
 
         result.assertOutputContains("[StaleRememberUpdatedStateInRemember]")
     }
@@ -165,10 +170,12 @@ class DetektFunctionalTest {
             """,
         )
 
-        val result = createGradleRunner(
-            projectDir = projectDir,
-            arguments = listOf("detekt"),
-        ).build()
+        val result =
+            createGradleRunner(
+                    projectDir = projectDir,
+                    arguments = listOf("detekt"),
+                )
+                .build()
 
         result.assertTaskSucceeded(":detekt")
     }
@@ -194,18 +201,22 @@ class DetektFunctionalTest {
         )
 
         // First build
-        val firstResult = createGradleRunner(
-            projectDir = projectDir,
-            arguments = listOf("detekt"),
-        ).build()
+        val firstResult =
+            createGradleRunner(
+                    projectDir = projectDir,
+                    arguments = listOf("detekt"),
+                )
+                .build()
 
         firstResult.assertTaskSucceeded(":detekt")
 
         // Second build without changes should be up-to-date
-        val secondResult = createGradleRunner(
-            projectDir = projectDir,
-            arguments = listOf("detekt"),
-        ).build()
+        val secondResult =
+            createGradleRunner(
+                    projectDir = projectDir,
+                    arguments = listOf("detekt"),
+                )
+                .build()
 
         secondResult.assertTaskUpToDate(":detekt")
     }
@@ -213,7 +224,8 @@ class DetektFunctionalTest {
     @Test
     fun `detekt configuration can be customized`() {
         setupDetektProject(
-            customDetektConfig = """
+            customDetektConfig =
+                """
             naming:
               FunctionNaming:
                 ignoreAnnotated:
@@ -246,10 +258,12 @@ class DetektFunctionalTest {
             """,
         )
 
-        val result = createGradleRunner(
-            projectDir = projectDir,
-            arguments = listOf("detekt"),
-        ).build()
+        val result =
+            createGradleRunner(
+                    projectDir = projectDir,
+                    arguments = listOf("detekt"),
+                )
+                .build()
 
         // Should succeed since we disabled ModifierMissing
         result.assertTaskSucceeded(":detekt")
@@ -305,10 +319,11 @@ class DetektFunctionalTest {
             """,
         )
 
-        val detektYml = if (customDetektConfig != null) {
-            customDetektConfig
-        } else {
-            """
+        val detektYml =
+            if (customDetektConfig != null) {
+                customDetektConfig
+            } else {
+                """
             naming:
               FunctionNaming:
                 ignoreAnnotated:
@@ -340,7 +355,7 @@ class DetektFunctionalTest {
               ParameterNaming:
                 active: true
             """
-        }
+            }
 
         projectDir.writeFile("detekt.yml", detektYml)
     }

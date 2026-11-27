@@ -17,8 +17,9 @@ class Material2CheckTest {
         @Language("kotlin")
         val code =
             """
-                import androidx.compose.material.Surface
-            """.trimIndent()
+            import androidx.compose.material.Surface
+            """
+                .trimIndent()
 
         ruleAssertThat(code).hasNoLintViolations()
     }
@@ -28,10 +29,11 @@ class Material2CheckTest {
         @Language("kotlin")
         val code =
             """
-                import androidx.compose.material.Surface
-                import androidx.compose.material.Text
-                import androidx.compose.material.Typography as M2Typography
-            """.trimIndent()
+            import androidx.compose.material.Surface
+            import androidx.compose.material.Text
+            import androidx.compose.material.Typography as M2Typography
+            """
+                .trimIndent()
 
         ruleAssertThat(code)
             .withEditorConfigOverride(disallowMaterial2 to true)
@@ -59,10 +61,11 @@ class Material2CheckTest {
         @Language("kotlin")
         val code =
             """
-                import androidx.compose.material.icons.Icons
-                import androidx.compose.material.icons.Icons.Arrow
-                import androidx.compose.material.TopAppBar
-            """.trimIndent()
+            import androidx.compose.material.icons.Icons
+            import androidx.compose.material.icons.Icons.Arrow
+            import androidx.compose.material.TopAppBar
+            """
+                .trimIndent()
 
         ruleAssertThat(code)
             .withEditorConfigOverride(
@@ -77,12 +80,13 @@ class Material2CheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something() {
-                    androidx.compose.material.Text("hi")
-                    Icon(imageVector = androidx.compose.material.potato.Banana, contentDescription = null)
-                }
-            """.trimIndent()
+            @Composable
+            fun Something() {
+                androidx.compose.material.Text("hi")
+                Icon(imageVector = androidx.compose.material.potato.Banana, contentDescription = null)
+            }
+            """
+                .trimIndent()
 
         ruleAssertThat(code)
             .withEditorConfigOverride(disallowMaterial2 to true)
@@ -105,12 +109,13 @@ class Material2CheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something() {
-                    androidx.compose.material.TopAppBar(title = { Text("boo") })
-                    Icon(imageVector = androidx.compose.material.icons.Icons.Arrow, contentDescription = null)
-                }
-            """.trimIndent()
+            @Composable
+            fun Something() {
+                androidx.compose.material.TopAppBar(title = { Text("boo") })
+                Icon(imageVector = androidx.compose.material.icons.Icons.Arrow, contentDescription = null)
+            }
+            """
+                .trimIndent()
 
         ruleAssertThat(code)
             .withEditorConfigOverride(

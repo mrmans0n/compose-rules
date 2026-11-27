@@ -32,15 +32,18 @@ class ModifierReused : ComposeKtVisitor {
 
         initialModifierNames
             .map {
-                // Try to get all possible names for each modifier by iterating on possible name reassignments until it's stable
+                // Try to get all possible names for each modifier by iterating on possible name reassignments until
+                // it's stable
                 composableBlockExpression.obtainAllModifierNames(it).toSet()
             }
             .forEach { modifierNames ->
                 // Find all composable-looking CALL_EXPRESSIONs that are using any of these modifier names
-                composableBlockExpression.findAllChildrenByClass<KtCallExpression>()
+                composableBlockExpression
+                    .findAllChildrenByClass<KtCallExpression>()
                     .filter { it.calleeExpression?.text?.first()?.isUpperCase() == true }
                     .filter { it.isUsingModifiers(modifierNames, typeNames) }
-                    // For those modifiers, we look at the parents and see if any of them is a function that has a param with
+                    // For those modifiers, we look at the parents and see if any of them is a function that has a param
+                    // with
                     //  the same name.
                     .filterNot { it.isFullyShadowed(modifierNames, function, typeNames) }
                     .map { callExpression ->
@@ -53,8 +56,8 @@ class ModifierReused : ComposeKtVisitor {
                         // To get an accurate count (and respecting if/when/whatever different branches)
                         // we'll need to traverse backwards up to the [function] from each one of these usages
                         // to see the real amount of usages.
-                        val composableHits = callExpression.walkBackwards(stopAtParent = composableBlockExpression)
-                            .modifierUsagesSet()
+                        val composableHits =
+                            callExpression.walkBackwards(stopAtParent = composableBlockExpression).modifierUsagesSet()
 
                         if (composableHits.size == 1) {
                             // There is a special case, where if the detected modifier uses is local, it has 1 use,
@@ -68,12 +71,13 @@ class ModifierReused : ComposeKtVisitor {
                             //   Text("", modifier = modifier)
                             // }
                             // To prevent false positives, we will get rid artificially of the first usage.
-                            val prevLocalHits = callExpression.siblings(forward = false, withItself = true)
-                                .modifierUsagesSet()
+                            val prevLocalHits =
+                                callExpression.siblings(forward = false, withItself = true).modifierUsagesSet()
                             if (prevLocalHits == composableHits) {
-                                val isFollowedByEarlyReturn = callExpression.siblings(forward = true)
-                                    .filterIsInstance<KtReturnExpression>()
-                                    .any { it.labeledExpression == null }
+                                val isFollowedByEarlyReturn =
+                                    callExpression.siblings(forward = true).filterIsInstance<KtReturnExpression>().any {
+                                        it.labeledExpression == null
+                                    }
                                 if (isFollowedByEarlyReturn) emptySet() else composableHits
                             } else {
                                 composableHits
@@ -96,10 +100,12 @@ class ModifierReused : ComposeKtVisitor {
     }
 
     companion object {
-        val ModifierShouldBeUsedOnceOnly = """
+        val ModifierShouldBeUsedOnceOnly =
+            """
             Modifiers should only be used once and by the root level layout of a Composable. This is true even if appended to or with other modifiers e.g. 'modifier.fillMaxWidth()'.
             Use Modifier (with a capital 'M') to construct a new Modifier that you can pass to other composables.
             See https://mrmans0n.github.io/compose-rules/rules/#dont-re-use-modifiers for more information.
-        """.trimIndent()
+            """
+                .trimIndent()
     }
 }

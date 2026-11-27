@@ -25,7 +25,8 @@ class ViewModelInjectionCheckTest {
                 viewModel: MyVM = $viewModel(),
                 viewModel2: MyVM = $viewModel(),
             ) { }
-            """.trimIndent()
+            """
+                .trimIndent()
         injectionRuleAssertThat(code)
             .withEditorConfigOverride(viewModelFactories to "bananaViewModel,potatoViewModel")
             .hasNoLintViolations()
@@ -41,7 +42,8 @@ class ViewModelInjectionCheckTest {
             override fun Content() {
                 val viewModel = $viewModel<MyVM>()
             }
-            """.trimIndent()
+            """
+                .trimIndent()
         injectionRuleAssertThat(code)
             .withEditorConfigOverride(viewModelFactories to "bananaViewModel,potatoViewModel")
             .hasNoLintViolations()
@@ -65,7 +67,8 @@ class ViewModelInjectionCheckTest {
             fun MyComposableTrailingLambda(block: () -> Unit) {
                 val viewModel: MyVM = $viewModel()
             }
-            """.trimIndent()
+            """
+                .trimIndent()
         injectionRuleAssertThat(code)
             .withEditorConfigOverride(viewModelFactories to "bananaViewModel,potatoViewModel")
             .hasLintViolations(
@@ -101,7 +104,8 @@ class ViewModelInjectionCheckTest {
                     }
                 }
             }
-            """.trimIndent()
+            """
+                .trimIndent()
         injectionRuleAssertThat(code)
             .withEditorConfigOverride(viewModelFactories to "bananaViewModel,potatoViewModel")
             .hasNoLintViolations()
@@ -121,7 +125,8 @@ class ViewModelInjectionCheckTest {
                     val viewModel: MyOtherVM = $viewModel()
                 }
             }
-            """.trimIndent()
+            """
+                .trimIndent()
         injectionRuleAssertThat(code)
             .withEditorConfigOverride(viewModelFactories to "bananaViewModel,potatoViewModel")
             .hasLintViolations(
@@ -142,19 +147,23 @@ class ViewModelInjectionCheckTest {
     @ValueSource(strings = ["viewModel", "weaverViewModel", "hiltViewModel", "bananaViewModel", "potatoViewModel"])
     fun `fix no args composable function adds the code inside the parentheses`(viewModel: String) {
         @Language("kotlin")
-        val badCode = """
+        val badCode =
+            """
             @Composable
             fun MyComposableNoParams() {
                 val viewModel: MyVM = $viewModel()
             }
-        """.trimIndent()
+        """
+                .trimIndent()
 
         @Language("kotlin")
-        val expectedCode = """
+        val expectedCode =
+            """
             @Composable
             fun MyComposableNoParams(viewModel: MyVM = $viewModel()) {
             }
-        """.trimIndent()
+        """
+                .trimIndent()
 
         injectionRuleAssertThat(badCode)
             .withEditorConfigOverride(viewModelFactories to "bananaViewModel,potatoViewModel")
@@ -165,7 +174,8 @@ class ViewModelInjectionCheckTest {
     @ValueSource(strings = ["viewModel", "weaverViewModel", "hiltViewModel", "bananaViewModel", "potatoViewModel"])
     fun `fix normal args composable function adds the new code at the end`(viewModel: String) {
         @Language("kotlin")
-        val badCode = """
+        val badCode =
+            """
             @Composable
             fun MyComposable(modifier: Modifier = Modifier) {
                 val viewModel: MyVM = $viewModel()
@@ -174,17 +184,20 @@ class ViewModelInjectionCheckTest {
             fun MyComposable(modifier: Modifier = Modifier,) {
                 val viewModel: MyVM = $viewModel()
             }
-        """.trimIndent()
+        """
+                .trimIndent()
 
         @Language("kotlin")
-        val expectedCode = """
+        val expectedCode =
+            """
             @Composable
             fun MyComposable(modifier: Modifier = Modifier,viewModel: MyVM = $viewModel()) {
             }
             @Composable
             fun MyComposable(modifier: Modifier = Modifier,viewModel: MyVM = $viewModel(),) {
             }
-        """.trimIndent()
+        """
+                .trimIndent()
         injectionRuleAssertThat(badCode)
             .withEditorConfigOverride(viewModelFactories to "bananaViewModel,potatoViewModel")
             .isFormattedAs(expectedCode)
@@ -194,7 +207,8 @@ class ViewModelInjectionCheckTest {
     @ValueSource(strings = ["viewModel", "weaverViewModel", "hiltViewModel", "bananaViewModel", "potatoViewModel"])
     fun `fix trailing lambda args composable function adds the new code before the trailing lambda`(viewModel: String) {
         @Language("kotlin")
-        val badCode = """
+        val badCode =
+            """
             @Composable
             fun MyComposableTrailingLambda(block: () -> Unit) {
                 val viewModel: MyVM = $viewModel()
@@ -210,10 +224,12 @@ class ViewModelInjectionCheckTest {
             ) {
                 val viewModel: MyVM = $viewModel()
             }
-        """.trimIndent()
+        """
+                .trimIndent()
 
         @Language("kotlin")
-        val expectedCode = """
+        val expectedCode =
+            """
             @Composable
             fun MyComposableTrailingLambda(viewModel: MyVM = $viewModel(), block: () -> Unit) {
             }
@@ -226,7 +242,8 @@ class ViewModelInjectionCheckTest {
                 block: () -> Unit
             ) {
             }
-        """.trimIndent()
+        """
+                .trimIndent()
         injectionRuleAssertThat(badCode)
             .withEditorConfigOverride(viewModelFactories to "bananaViewModel,potatoViewModel")
             .isFormattedAs(expectedCode)

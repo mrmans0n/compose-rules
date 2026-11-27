@@ -6,6 +6,4 @@ import io.nlopez.compose.core.ComposeKtVisitor
 import io.nlopez.compose.rules.KtlintRule
 import io.nlopez.compose.rules.StateParameter
 
-class StateParameterCheck :
-    KtlintRule("compose:state-param-check"),
-    ComposeKtVisitor by StateParameter()
+class StateParameterCheck : KtlintRule("compose:state-param-check"), ComposeKtVisitor by StateParameter()

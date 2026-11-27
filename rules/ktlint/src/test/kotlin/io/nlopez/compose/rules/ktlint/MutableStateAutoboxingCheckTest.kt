@@ -17,34 +17,36 @@ class MutableStateAutoboxingCheckTest {
         @Language("kotlin")
         val code =
             """
-                var a by mutableStateOf(0)
-                var b by mutableStateOf(0L)
-                var c by mutableStateOf(0.0)
-                var d by mutableStateOf(0f)
-            """.trimIndent()
+            var a by mutableStateOf(0)
+            var b by mutableStateOf(0L)
+            var c by mutableStateOf(0.0)
+            var d by mutableStateOf(0f)
+            """
+                .trimIndent()
 
-        ruleAssertThat(code).hasLintViolationsWithoutAutoCorrect(
-            LintViolation(
-                line = 1,
-                col = 10,
-                detail = MutableStateAutoboxing.MutableStateAutoboxingInt,
-            ),
-            LintViolation(
-                line = 2,
-                col = 10,
-                detail = MutableStateAutoboxing.MutableStateAutoboxingLong,
-            ),
-            LintViolation(
-                line = 3,
-                col = 10,
-                detail = MutableStateAutoboxing.MutableStateAutoboxingDouble,
-            ),
-            LintViolation(
-                line = 4,
-                col = 10,
-                detail = MutableStateAutoboxing.MutableStateAutoboxingFloat,
-            ),
-        )
+        ruleAssertThat(code)
+            .hasLintViolationsWithoutAutoCorrect(
+                LintViolation(
+                    line = 1,
+                    col = 10,
+                    detail = MutableStateAutoboxing.MutableStateAutoboxingInt,
+                ),
+                LintViolation(
+                    line = 2,
+                    col = 10,
+                    detail = MutableStateAutoboxing.MutableStateAutoboxingLong,
+                ),
+                LintViolation(
+                    line = 3,
+                    col = 10,
+                    detail = MutableStateAutoboxing.MutableStateAutoboxingDouble,
+                ),
+                LintViolation(
+                    line = 4,
+                    col = 10,
+                    detail = MutableStateAutoboxing.MutableStateAutoboxingFloat,
+                ),
+            )
     }
 
     @Test
@@ -52,35 +54,37 @@ class MutableStateAutoboxingCheckTest {
         @Language("kotlin")
         val code =
             """
-                fun myFunction(a: Int, b: Long, c: Double, d: Float) {
-                    var a by mutableStateOf(a)
-                    var b by mutableStateOf(b)
-                    var c by mutableStateOf(c)
-                    var d by mutableStateOf(d)
-                }
-            """.trimIndent()
-        ruleAssertThat(code).hasLintViolationsWithoutAutoCorrect(
-            LintViolation(
-                line = 2,
-                col = 14,
-                detail = MutableStateAutoboxing.MutableStateAutoboxingInt,
-            ),
-            LintViolation(
-                line = 3,
-                col = 14,
-                detail = MutableStateAutoboxing.MutableStateAutoboxingLong,
-            ),
-            LintViolation(
-                line = 4,
-                col = 14,
-                detail = MutableStateAutoboxing.MutableStateAutoboxingDouble,
-            ),
-            LintViolation(
-                line = 5,
-                col = 14,
-                detail = MutableStateAutoboxing.MutableStateAutoboxingFloat,
-            ),
-        )
+            fun myFunction(a: Int, b: Long, c: Double, d: Float) {
+                var a by mutableStateOf(a)
+                var b by mutableStateOf(b)
+                var c by mutableStateOf(c)
+                var d by mutableStateOf(d)
+            }
+            """
+                .trimIndent()
+        ruleAssertThat(code)
+            .hasLintViolationsWithoutAutoCorrect(
+                LintViolation(
+                    line = 2,
+                    col = 14,
+                    detail = MutableStateAutoboxing.MutableStateAutoboxingInt,
+                ),
+                LintViolation(
+                    line = 3,
+                    col = 14,
+                    detail = MutableStateAutoboxing.MutableStateAutoboxingLong,
+                ),
+                LintViolation(
+                    line = 4,
+                    col = 14,
+                    detail = MutableStateAutoboxing.MutableStateAutoboxingDouble,
+                ),
+                LintViolation(
+                    line = 5,
+                    col = 14,
+                    detail = MutableStateAutoboxing.MutableStateAutoboxingFloat,
+                ),
+            )
     }
 
     @Test
@@ -88,22 +92,23 @@ class MutableStateAutoboxingCheckTest {
         @Language("kotlin")
         val code =
             """
-                fun myFunction(a: List<Int>, b: List<Long>, c: List<Float>) {
-                    var a by mutableStateOf(a)
-                    var b by mutableStateOf(b)
-                    var c by mutableStateOf(c)
-                }
-                fun myFunction(a: ImmutableList<Int>, b: ImmutableList<Long>, c: ImmutableList<Float>) {
-                    var a by mutableStateOf(a)
-                    var b by mutableStateOf(b)
-                    var c by mutableStateOf(c)
-                }
-                fun myFunction(a: PersistentList<Int>, b: PersistentList<Long>, c: PersistentList<Float>) {
-                    var a by mutableStateOf(a)
-                    var b by mutableStateOf(b)
-                    var c by mutableStateOf(c)
-                }
-            """.trimIndent()
+            fun myFunction(a: List<Int>, b: List<Long>, c: List<Float>) {
+                var a by mutableStateOf(a)
+                var b by mutableStateOf(b)
+                var c by mutableStateOf(c)
+            }
+            fun myFunction(a: ImmutableList<Int>, b: ImmutableList<Long>, c: ImmutableList<Float>) {
+                var a by mutableStateOf(a)
+                var b by mutableStateOf(b)
+                var c by mutableStateOf(c)
+            }
+            fun myFunction(a: PersistentList<Int>, b: PersistentList<Long>, c: PersistentList<Float>) {
+                var a by mutableStateOf(a)
+                var b by mutableStateOf(b)
+                var c by mutableStateOf(c)
+            }
+            """
+                .trimIndent()
         ruleAssertThat(code)
             .hasLintViolationsWithoutAutoCorrect(
                 LintViolation(
@@ -159,22 +164,23 @@ class MutableStateAutoboxingCheckTest {
         @Language("kotlin")
         val code =
             """
-                fun myFunction(a: Set<Int>, b: Set<Long>, c: Set<Float>) {
-                    var a by mutableStateOf(a)
-                    var b by mutableStateOf(b)
-                    var c by mutableStateOf(c)
-                }
-                fun myFunction(a: ImmutableSet<Int>, b: ImmutableSet<Long>, c: ImmutableSet<Float>) {
-                    var a by mutableStateOf(a)
-                    var b by mutableStateOf(b)
-                    var c by mutableStateOf(c)
-                }
-                fun myFunction(a: PersistentSet<Int>, b: PersistentSet<Long>, c: PersistentSet<Float>) {
-                    var a by mutableStateOf(a)
-                    var b by mutableStateOf(b)
-                    var c by mutableStateOf(c)
-                }
-            """.trimIndent()
+            fun myFunction(a: Set<Int>, b: Set<Long>, c: Set<Float>) {
+                var a by mutableStateOf(a)
+                var b by mutableStateOf(b)
+                var c by mutableStateOf(c)
+            }
+            fun myFunction(a: ImmutableSet<Int>, b: ImmutableSet<Long>, c: ImmutableSet<Float>) {
+                var a by mutableStateOf(a)
+                var b by mutableStateOf(b)
+                var c by mutableStateOf(c)
+            }
+            fun myFunction(a: PersistentSet<Int>, b: PersistentSet<Long>, c: PersistentSet<Float>) {
+                var a by mutableStateOf(a)
+                var b by mutableStateOf(b)
+                var c by mutableStateOf(c)
+            }
+            """
+                .trimIndent()
         ruleAssertThat(code)
             .hasLintViolationsWithoutAutoCorrect(
                 LintViolation(
@@ -230,22 +236,23 @@ class MutableStateAutoboxingCheckTest {
         @Language("kotlin")
         val code =
             """
-                fun myFunction(a: Map<Int, Int>, b: Map<Int, Long>, c: Map<Int, Float>) {
-                    var a by mutableStateOf(a)
-                    var b by mutableStateOf(b)
-                    var c by mutableStateOf(c)
-                }
-                fun myFunction(a: Map<Long, Int>, b: Map<Long, Long>, c: Map<Long, Float>) {
-                    var a by mutableStateOf(a)
-                    var b by mutableStateOf(b)
-                    var c by mutableStateOf(c)
-                }
-                fun myFunction(a: Map<Float, Int>, b: Map<Float, Long>, c: Map<Float, Float>) {
-                    var a by mutableStateOf(a)
-                    var b by mutableStateOf(b)
-                    var c by mutableStateOf(c)
-                }
-            """.trimIndent()
+            fun myFunction(a: Map<Int, Int>, b: Map<Int, Long>, c: Map<Int, Float>) {
+                var a by mutableStateOf(a)
+                var b by mutableStateOf(b)
+                var c by mutableStateOf(c)
+            }
+            fun myFunction(a: Map<Long, Int>, b: Map<Long, Long>, c: Map<Long, Float>) {
+                var a by mutableStateOf(a)
+                var b by mutableStateOf(b)
+                var c by mutableStateOf(c)
+            }
+            fun myFunction(a: Map<Float, Int>, b: Map<Float, Long>, c: Map<Float, Float>) {
+                var a by mutableStateOf(a)
+                var b by mutableStateOf(b)
+                var c by mutableStateOf(c)
+            }
+            """
+                .trimIndent()
         ruleAssertThat(code)
             .hasLintViolationsWithoutAutoCorrect(
                 LintViolation(
@@ -301,16 +308,17 @@ class MutableStateAutoboxingCheckTest {
         @Language("kotlin")
         val code =
             """
-                var a by mutableStateOf("")
-                var b by mutableStateOf(true)
-                var c by remember { mutableStateOf(0U) }
-                var d by mutableStateOf(0u)
-                var e by mutableStateOf(0UL)
-                var f by mutableStateOf(0uL)
-                fun bleh(c: String) {
-                    var ccc by mutableStateOf(c)
-                }
-            """.trimIndent()
+            var a by mutableStateOf("")
+            var b by mutableStateOf(true)
+            var c by remember { mutableStateOf(0U) }
+            var d by mutableStateOf(0u)
+            var e by mutableStateOf(0UL)
+            var f by mutableStateOf(0uL)
+            fun bleh(c: String) {
+                var ccc by mutableStateOf(c)
+            }
+            """
+                .trimIndent()
         ruleAssertThat(code).hasNoLintViolations()
     }
 }

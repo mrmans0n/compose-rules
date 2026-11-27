@@ -17,13 +17,14 @@ class UnstableCollectionsCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something(a: List<String>) {}
-                @Composable
-                fun Something(a: Set<String>) {}
-                @Composable
-                fun Something(a: Map<String, Int>) {}
-            """.trimIndent()
+            @Composable
+            fun Something(a: List<String>) {}
+            @Composable
+            fun Something(a: Set<String>) {}
+            @Composable
+            fun Something(a: Map<String, Int>) {}
+            """
+                .trimIndent()
         ruleAssertThat(code)
             .withEditorConfigOverride(disallowUnstableCollections to true)
             .hasLintViolationsWithoutAutoCorrect(
@@ -50,13 +51,14 @@ class UnstableCollectionsCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something(a: List<String>) {}
-                @Composable
-                fun Something(a: Set<String>) {}
-                @Composable
-                fun Something(a: Map<String, Int>) {}
-            """.trimIndent()
+            @Composable
+            fun Something(a: List<String>) {}
+            @Composable
+            fun Something(a: Set<String>) {}
+            @Composable
+            fun Something(a: Map<String, Int>) {}
+            """
+                .trimIndent()
         ruleAssertThat(code).hasNoLintViolations()
     }
 
@@ -65,13 +67,12 @@ class UnstableCollectionsCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something(a: ImmutableList<String>, b: ImmutableSet<String>, c: ImmutableMap<String, Int>) {}
-                @Composable
-                fun Something(a: StringList, b: StringSet, c: StringToIntMap) {}
-            """.trimIndent()
-        ruleAssertThat(code)
-            .withEditorConfigOverride(disallowUnstableCollections to true)
-            .hasNoLintViolations()
+            @Composable
+            fun Something(a: ImmutableList<String>, b: ImmutableSet<String>, c: ImmutableMap<String, Int>) {}
+            @Composable
+            fun Something(a: StringList, b: StringSet, c: StringToIntMap) {}
+            """
+                .trimIndent()
+        ruleAssertThat(code).withEditorConfigOverride(disallowUnstableCollections to true).hasNoLintViolations()
     }
 }

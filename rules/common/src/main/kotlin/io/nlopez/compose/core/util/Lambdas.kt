@@ -13,12 +13,13 @@ import org.jetbrains.kotlin.psi.KtTypeElement
 import org.jetbrains.kotlin.psi.KtTypeReference
 import org.jetbrains.kotlin.psi.KtUserType
 
-fun KtTypeElement.isLambda(treatAsLambdaTypes: Set<String> = emptySet()): Boolean = when (this) {
-    is KtFunctionType -> true
-    is KtNullableType -> innerType?.isLambda(treatAsLambdaTypes) == true
-    is KtUserType -> referencedName in treatAsLambdaTypes
-    else -> false
-}
+fun KtTypeElement.isLambda(treatAsLambdaTypes: Set<String> = emptySet()): Boolean =
+    when (this) {
+        is KtFunctionType -> true
+        is KtNullableType -> innerType?.isLambda(treatAsLambdaTypes) == true
+        is KtUserType -> referencedName in treatAsLambdaTypes
+        else -> false
+    }
 
 fun KtTypeReference.isLambda(treatAsLambdaTypes: Set<String> = emptySet()): Boolean =
     typeElement?.isLambda(treatAsLambdaTypes) == true
@@ -26,53 +27,61 @@ fun KtTypeReference.isLambda(treatAsLambdaTypes: Set<String> = emptySet()): Bool
 fun KtTypeReference.isComposableLambda(
     treatAsLambdaTypes: Set<String> = emptySet(),
     treatAsComposableLambdaTypes: Set<String> = emptySet(),
-): Boolean = when (val element = typeElement) {
-    null -> false
+): Boolean =
+    when (val element = typeElement) {
+        null -> false
 
-    is KtFunctionType -> isComposable
+        is KtFunctionType -> isComposable
 
-    is KtNullableType -> (isComposable && element.isLambda(treatAsLambdaTypes)) ||
-        // Only possibility for this to not have a @Composable annotation is for it to be a KtUserType
-        (element.innerType as? KtUserType)?.referencedName in treatAsComposableLambdaTypes
+        is KtNullableType ->
+            (isComposable && element.isLambda(treatAsLambdaTypes)) ||
+                // Only possibility for this to not have a @Composable annotation is for it to be a KtUserType
+                (element.innerType as? KtUserType)?.referencedName in treatAsComposableLambdaTypes
 
-    is KtUserType -> (isComposable && element.referencedName in treatAsLambdaTypes) ||
-        element.referencedName in treatAsComposableLambdaTypes
+        is KtUserType ->
+            (isComposable && element.referencedName in treatAsLambdaTypes) ||
+                element.referencedName in treatAsComposableLambdaTypes
 
-    else -> false
-}
+        else -> false
+    }
 
 fun KtTypeReference.isComposableUiEmitterLambda(
     treatAsLambdaTypes: Set<String> = emptySet(),
     treatAsComposableLambdaTypes: Set<String> = emptySet(),
-): Boolean = when (val element = typeElement) {
-    null -> false
+): Boolean =
+    when (val element = typeElement) {
+        null -> false
 
-    is KtFunctionType -> isComposable && element.returnsUnit
+        is KtFunctionType -> isComposable && element.returnsUnit
 
-    is KtNullableType -> (isComposable && element.isLambda(treatAsLambdaTypes)) ||
-        // Only possibility for this to not have a @Composable annotation is for it to be a KtUserType
-        (element.innerType as? KtUserType)?.referencedName in treatAsComposableLambdaTypes
+        is KtNullableType ->
+            (isComposable && element.isLambda(treatAsLambdaTypes)) ||
+                // Only possibility for this to not have a @Composable annotation is for it to be a KtUserType
+                (element.innerType as? KtUserType)?.referencedName in treatAsComposableLambdaTypes
 
-    is KtUserType -> (isComposable && element.referencedName in treatAsLambdaTypes) ||
-        element.referencedName in treatAsComposableLambdaTypes
+        is KtUserType ->
+            (isComposable && element.referencedName in treatAsLambdaTypes) ||
+                element.referencedName in treatAsComposableLambdaTypes
 
-    else -> false
-}
+        else -> false
+    }
 
 val KtTypeElement.returnsUnit: Boolean
-    get() = when (this) {
-        is KtFunctionType -> returnTypeReference?.text == "Unit"
-        is KtNullableType -> innerType?.returnsUnit == true
-        else -> false
-    }
+    get() =
+        when (this) {
+            is KtFunctionType -> returnTypeReference?.text == "Unit"
+            is KtNullableType -> innerType?.returnsUnit == true
+            else -> false
+        }
 
 val KtTypeReference.returnsUnit: Boolean
-    get() = when (val element = typeElement) {
-        null -> false
-        is KtFunctionType -> element.returnsUnit
-        is KtNullableType -> element.innerType?.returnsUnit == true
-        else -> false
-    }
+    get() =
+        when (val element = typeElement) {
+            null -> false
+            is KtFunctionType -> element.returnsUnit
+            is KtNullableType -> element.innerType?.returnsUnit == true
+            else -> false
+        }
 
 fun KtFile.lambdaTypes(config: ComposeKtConfig): Set<String> = buildSet {
     // Add the provided types
@@ -104,11 +113,8 @@ fun KtFile.composableLambdaTypes(config: ComposeKtConfig): Set<String> = buildSe
             .filter { it.isInterface() && it.hasModifier(KtTokens.FUN_KEYWORD) }
             .filter { funInterface ->
                 // Find if the method that has no implementation (aka the SAM) is @Composable
-                funInterface.body
-                    ?.functions
-                    ?.filterNot { it.hasBody() }
-                    ?.map { it.isComposable }
-                    ?.firstOrNull() ?: false
+                funInterface.body?.functions?.filterNot { it.hasBody() }?.map { it.isComposable }?.firstOrNull()
+                    ?: false
             }
             .mapNotNull { it.name },
     )

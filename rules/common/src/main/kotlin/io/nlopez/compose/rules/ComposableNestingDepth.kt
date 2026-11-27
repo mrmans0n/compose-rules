@@ -25,19 +25,20 @@ class ComposableNestingDepth : ComposeKtVisitor {
         // Exclude calls that live inside a nested function or class dec, then
         // For each content-emitting call in this function, count how many enclosing content-emitting,
         // calls it has (its nesting level). Top-level emitters have nesting 0.
-        val deepest = body.findAllChildrenByClass<KtCallExpression>()
-            .filter { call ->
-                call.parents
-                    .takeWhile { it != body }
-                    .none { it is KtNamedFunction || it is KtClassOrObject }
-            }
-            .filter { it.emitsContent(config) }
-            .maxOfOrNull { call ->
-                bodyBaseDepth + call.parents
-                    .takeWhile { it != body }
-                    .filterIsInstance<KtCallExpression>()
-                    .count { it.emitsContent(config) }
-            } ?: return
+        val deepest =
+            body
+                .findAllChildrenByClass<KtCallExpression>()
+                .filter { call ->
+                    call.parents.takeWhile { it != body }.none { it is KtNamedFunction || it is KtClassOrObject }
+                }
+                .filter { it.emitsContent(config) }
+                .maxOfOrNull { call ->
+                    bodyBaseDepth +
+                        call.parents
+                            .takeWhile { it != body }
+                            .filterIsInstance<KtCallExpression>()
+                            .count { it.emitsContent(config) }
+                } ?: return
 
         if (deepest > threshold) {
             emitter.report(function, ComposableTooDeeplyNested)
@@ -46,9 +47,11 @@ class ComposableNestingDepth : ComposeKtVisitor {
 
     companion object {
 
-        val ComposableTooDeeplyNested = """
+        val ComposableTooDeeplyNested =
+            """
             This @Composable function nests content emitters more deeply than the configured threshold. Extract inner sections into dedicated private @Composable functions to keep the structure readable.
             See https://mrmans0n.github.io/compose-rules/rules/#avoid-deeply-nested-composables for more information.
-        """.trimIndent()
+            """
+                .trimIndent()
     }
 }

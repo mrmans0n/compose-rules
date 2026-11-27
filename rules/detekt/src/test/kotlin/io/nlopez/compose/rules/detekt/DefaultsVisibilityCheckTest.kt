@@ -6,7 +6,6 @@ import dev.detekt.api.Config
 import dev.detekt.api.SourceLocation
 import dev.detekt.test.lint
 import io.nlopez.compose.rules.DefaultsVisibility.Companion.createMessage
-import io.nlopez.compose.rules.detekt.assertThat
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
 
@@ -19,27 +18,30 @@ class DefaultsVisibilityCheckTest {
         @Language("kotlin")
         val code =
             """
-                internal object MyComposableDefaults
-                @Composable
-                fun MyComposable(someParam: Bleh = MyComposableDefaults.someParam) { }
-                private object MyOtherComposableDefaults
-                @Composable
-                internal fun MyOtherComposable() {
-                    val someUsage = MyOtherComposableDefaults.someParam.someMethod()
-                }
-            """.trimIndent()
+            internal object MyComposableDefaults
+            @Composable
+            fun MyComposable(someParam: Bleh = MyComposableDefaults.someParam) { }
+            private object MyOtherComposableDefaults
+            @Composable
+            internal fun MyOtherComposable() {
+                val someUsage = MyOtherComposableDefaults.someParam.someMethod()
+            }
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors)
             .hasStartSourceLocations(
                 SourceLocation(1, 17),
                 SourceLocation(4, 16),
             )
-        assertThat(errors[0]).hasMessage(
-            createMessage("public", "MyComposableDefaults", "internal"),
-        )
-        assertThat(errors[1]).hasMessage(
-            createMessage("internal", "MyOtherComposableDefaults", "private"),
-        )
+        assertThat(errors[0])
+            .hasMessage(
+                createMessage("public", "MyComposableDefaults", "internal"),
+            )
+        assertThat(errors[1])
+            .hasMessage(
+                createMessage("internal", "MyOtherComposableDefaults", "private"),
+            )
     }
 
     @Test
@@ -47,24 +49,25 @@ class DefaultsVisibilityCheckTest {
         @Language("kotlin")
         val code =
             """
-                object MyComposableDefaults
-                @Composable
-                fun MyComposable(someParam: Bleh = MyComposableDefaults.someParam) { }
-                internal object MyOtherComposableDefaults
-                @Composable
-                internal fun MyOtherComposable() {
-                    val someUsage = MyOtherComposableDefaults.someParam.someMethod()
-                }
-                object MyThirdComposableDefaults
-                @Composable
-                fun MyThirdComposable(a: A) {
-                    val someUsage = MyThirdComposableDefaults.someParam
-                }
-                @Composable
-                internal fun MyThirdComposable(b: B) {
-                    val someUsage = MyThirdComposableDefaults.someParam
-                }
-            """.trimIndent()
+            object MyComposableDefaults
+            @Composable
+            fun MyComposable(someParam: Bleh = MyComposableDefaults.someParam) { }
+            internal object MyOtherComposableDefaults
+            @Composable
+            internal fun MyOtherComposable() {
+                val someUsage = MyOtherComposableDefaults.someParam.someMethod()
+            }
+            object MyThirdComposableDefaults
+            @Composable
+            fun MyThirdComposable(a: A) {
+                val someUsage = MyThirdComposableDefaults.someParam
+            }
+            @Composable
+            internal fun MyThirdComposable(b: B) {
+                val someUsage = MyThirdComposableDefaults.someParam
+            }
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }
@@ -74,11 +77,12 @@ class DefaultsVisibilityCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Suppress("DefaultsVisibility")
-                internal object MyComposableDefaults
-                @Composable
-                fun MyComposable(someParam: Bleh = MyComposableDefaults.someParam) { }
-            """.trimIndent()
+            @Suppress("DefaultsVisibility")
+            internal object MyComposableDefaults
+            @Composable
+            fun MyComposable(someParam: Bleh = MyComposableDefaults.someParam) { }
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }

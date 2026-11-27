@@ -17,29 +17,31 @@ class ModifierNamingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something1(m: Modifier) {}
-                @Composable
-                fun Something2(m: Modifier, m2: Modifier) {}
-            """.trimIndent()
+            @Composable
+            fun Something1(m: Modifier) {}
+            @Composable
+            fun Something2(m: Modifier, m2: Modifier) {}
+            """
+                .trimIndent()
 
-        modifierRuleAssertThat(code).hasLintViolationsWithoutAutoCorrect(
-            LintViolation(
-                line = 2,
-                col = 16,
-                detail = ModifierNaming.ModifiersAreSupposedToBeCalledModifierWhenAlone,
-            ),
-            LintViolation(
-                line = 4,
-                col = 16,
-                detail = ModifierNaming.ModifiersAreSupposedToEndInModifierWhenMultiple,
-            ),
-            LintViolation(
-                line = 4,
-                col = 29,
-                detail = ModifierNaming.ModifiersAreSupposedToEndInModifierWhenMultiple,
-            ),
-        )
+        modifierRuleAssertThat(code)
+            .hasLintViolationsWithoutAutoCorrect(
+                LintViolation(
+                    line = 2,
+                    col = 16,
+                    detail = ModifierNaming.ModifiersAreSupposedToBeCalledModifierWhenAlone,
+                ),
+                LintViolation(
+                    line = 4,
+                    col = 16,
+                    detail = ModifierNaming.ModifiersAreSupposedToEndInModifierWhenMultiple,
+                ),
+                LintViolation(
+                    line = 4,
+                    col = 29,
+                    detail = ModifierNaming.ModifiersAreSupposedToEndInModifierWhenMultiple,
+                ),
+            )
     }
 
     @Test
@@ -47,11 +49,12 @@ class ModifierNamingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something1(modifier: Modifier) {}
-                @Composable
-                fun Something2(modifier: Modifier, otherModifier: Modifier) {}
-            """.trimIndent()
+            @Composable
+            fun Something1(modifier: Modifier) {}
+            @Composable
+            fun Something2(modifier: Modifier, otherModifier: Modifier) {}
+            """
+                .trimIndent()
 
         modifierRuleAssertThat(code).hasNoLintViolations()
     }
@@ -61,14 +64,16 @@ class ModifierNamingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something1(myModifier: Modifier) {}
-            """.trimIndent()
+            @Composable
+            fun Something1(myModifier: Modifier) {}
+            """
+                .trimIndent()
 
-        modifierRuleAssertThat(code).hasLintViolationWithoutAutoCorrect(
-            line = 2,
-            col = 16,
-            detail = ModifierNaming.ModifiersAreSupposedToBeCalledModifierWhenAlone,
-        )
+        modifierRuleAssertThat(code)
+            .hasLintViolationWithoutAutoCorrect(
+                line = 2,
+                col = 16,
+                detail = ModifierNaming.ModifiersAreSupposedToBeCalledModifierWhenAlone,
+            )
     }
 }

@@ -17,76 +17,78 @@ class ModifierClickableOrderCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something1(modifier: Modifier = Modifier, bananaModifier: Modifier = Modifier) {
-                    Something2(
-                        modifier = Modifier.clickable { }.clip(shape = RoundedCornerShape(8.dp))
-                    )
-                    Something3(
-                        modifier = modifier.clickable { }.clip(CircleShape())
-                    )
-                    Something4(
-                        Modifier.clickable { }.clip(MyShape)
-                    )
-                    Something5(
-                        modifier = Modifier.clip(CircleShape).clickable { }.background(MyShape)
-                    )
-                    Something6(
-                        modifier.clickable { }.then(if (x) border(TurdShape) else Modifier)
-                    )
-                    Something7(
-                        modifier = bananaModifier.clickable { }.clip(shape = RoundedCornerShape(8.dp))
-                    )
-                    Something8(
-                        modifier = bananaModifier.clickable { }.clip(Potato)
-                    )
-                    Something9(
-                        modifier = bananaModifier.clickable { }.background(MaterialTheme.shapes.large)
-                    )
-                }
-            """.trimIndent()
-        modifierRuleAssertThat(code).hasLintViolationsWithoutAutoCorrect(
-            LintViolation(
-                line = 4,
-                col = 29,
-                detail = ModifierClickableOrder.ModifierChainWithSuspiciousOrder,
-            ),
-            LintViolation(
-                line = 7,
-                col = 29,
-                detail = ModifierClickableOrder.ModifierChainWithSuspiciousOrder,
-            ),
-            LintViolation(
-                line = 10,
-                col = 18,
-                detail = ModifierClickableOrder.ModifierChainWithSuspiciousOrder,
-            ),
-            LintViolation(
-                line = 13,
-                col = 47,
-                detail = ModifierClickableOrder.ModifierChainWithSuspiciousOrder,
-            ),
-            LintViolation(
-                line = 16,
-                col = 18,
-                detail = ModifierClickableOrder.ModifierChainWithSuspiciousOrder,
-            ),
-            LintViolation(
-                line = 19,
-                col = 35,
-                detail = ModifierClickableOrder.ModifierChainWithSuspiciousOrder,
-            ),
-            LintViolation(
-                line = 22,
-                col = 35,
-                detail = ModifierClickableOrder.ModifierChainWithSuspiciousOrder,
-            ),
-            LintViolation(
-                line = 25,
-                col = 35,
-                detail = ModifierClickableOrder.ModifierChainWithSuspiciousOrder,
-            ),
-        )
+            @Composable
+            fun Something1(modifier: Modifier = Modifier, bananaModifier: Modifier = Modifier) {
+                Something2(
+                    modifier = Modifier.clickable { }.clip(shape = RoundedCornerShape(8.dp))
+                )
+                Something3(
+                    modifier = modifier.clickable { }.clip(CircleShape())
+                )
+                Something4(
+                    Modifier.clickable { }.clip(MyShape)
+                )
+                Something5(
+                    modifier = Modifier.clip(CircleShape).clickable { }.background(MyShape)
+                )
+                Something6(
+                    modifier.clickable { }.then(if (x) border(TurdShape) else Modifier)
+                )
+                Something7(
+                    modifier = bananaModifier.clickable { }.clip(shape = RoundedCornerShape(8.dp))
+                )
+                Something8(
+                    modifier = bananaModifier.clickable { }.clip(Potato)
+                )
+                Something9(
+                    modifier = bananaModifier.clickable { }.background(MaterialTheme.shapes.large)
+                )
+            }
+            """
+                .trimIndent()
+        modifierRuleAssertThat(code)
+            .hasLintViolationsWithoutAutoCorrect(
+                LintViolation(
+                    line = 4,
+                    col = 29,
+                    detail = ModifierClickableOrder.ModifierChainWithSuspiciousOrder,
+                ),
+                LintViolation(
+                    line = 7,
+                    col = 29,
+                    detail = ModifierClickableOrder.ModifierChainWithSuspiciousOrder,
+                ),
+                LintViolation(
+                    line = 10,
+                    col = 18,
+                    detail = ModifierClickableOrder.ModifierChainWithSuspiciousOrder,
+                ),
+                LintViolation(
+                    line = 13,
+                    col = 47,
+                    detail = ModifierClickableOrder.ModifierChainWithSuspiciousOrder,
+                ),
+                LintViolation(
+                    line = 16,
+                    col = 18,
+                    detail = ModifierClickableOrder.ModifierChainWithSuspiciousOrder,
+                ),
+                LintViolation(
+                    line = 19,
+                    col = 35,
+                    detail = ModifierClickableOrder.ModifierChainWithSuspiciousOrder,
+                ),
+                LintViolation(
+                    line = 22,
+                    col = 35,
+                    detail = ModifierClickableOrder.ModifierChainWithSuspiciousOrder,
+                ),
+                LintViolation(
+                    line = 25,
+                    col = 35,
+                    detail = ModifierClickableOrder.ModifierChainWithSuspiciousOrder,
+                ),
+            )
     }
 
     @Test
@@ -94,60 +96,62 @@ class ModifierClickableOrderCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something1(modifier: Modifier = Modifier) {
-                    Something2(
-                        modifier = Modifier.clickable { }.shadow(8.dp, RoundedCornerShape(8.dp))
-                    )
-                    Something3(
-                        modifier = modifier.clickable { }.shadow(elevation = 4.dp, shape = CircleShape)
-                    )
-                    Something4(
-                        modifier.clickable { }.then(if (x) shadow(8.dp, MyShape) else Modifier)
-                    )
-                    Something5(
-                        modifier.clickable { }.then(if (x) Modifier.shadow(8.dp, MyShape) else Modifier)
-                    )
-                    Something6(
-                        modifier.clickable { }.then(if (x) Modifier.shadow(8.dp, MyShape).padding(4.dp) else Modifier)
-                    )
-                    Something7(
-                        modifier = modifier.clickable { }.shadow(8.dp, shape)
-                    )
-                }
-            """.trimIndent()
-        modifierRuleAssertThat(code).hasLintViolationsWithoutAutoCorrect(
-            LintViolation(
-                line = 4,
-                col = 29,
-                detail = ModifierClickableOrder.ModifierChainWithSuspiciousOrder,
-            ),
-            LintViolation(
-                line = 7,
-                col = 29,
-                detail = ModifierClickableOrder.ModifierChainWithSuspiciousOrder,
-            ),
-            LintViolation(
-                line = 10,
-                col = 18,
-                detail = ModifierClickableOrder.ModifierChainWithSuspiciousOrder,
-            ),
-            LintViolation(
-                line = 13,
-                col = 18,
-                detail = ModifierClickableOrder.ModifierChainWithSuspiciousOrder,
-            ),
-            LintViolation(
-                line = 16,
-                col = 18,
-                detail = ModifierClickableOrder.ModifierChainWithSuspiciousOrder,
-            ),
-            LintViolation(
-                line = 19,
-                col = 29,
-                detail = ModifierClickableOrder.ModifierChainWithSuspiciousOrder,
-            ),
-        )
+            @Composable
+            fun Something1(modifier: Modifier = Modifier) {
+                Something2(
+                    modifier = Modifier.clickable { }.shadow(8.dp, RoundedCornerShape(8.dp))
+                )
+                Something3(
+                    modifier = modifier.clickable { }.shadow(elevation = 4.dp, shape = CircleShape)
+                )
+                Something4(
+                    modifier.clickable { }.then(if (x) shadow(8.dp, MyShape) else Modifier)
+                )
+                Something5(
+                    modifier.clickable { }.then(if (x) Modifier.shadow(8.dp, MyShape) else Modifier)
+                )
+                Something6(
+                    modifier.clickable { }.then(if (x) Modifier.shadow(8.dp, MyShape).padding(4.dp) else Modifier)
+                )
+                Something7(
+                    modifier = modifier.clickable { }.shadow(8.dp, shape)
+                )
+            }
+            """
+                .trimIndent()
+        modifierRuleAssertThat(code)
+            .hasLintViolationsWithoutAutoCorrect(
+                LintViolation(
+                    line = 4,
+                    col = 29,
+                    detail = ModifierClickableOrder.ModifierChainWithSuspiciousOrder,
+                ),
+                LintViolation(
+                    line = 7,
+                    col = 29,
+                    detail = ModifierClickableOrder.ModifierChainWithSuspiciousOrder,
+                ),
+                LintViolation(
+                    line = 10,
+                    col = 18,
+                    detail = ModifierClickableOrder.ModifierChainWithSuspiciousOrder,
+                ),
+                LintViolation(
+                    line = 13,
+                    col = 18,
+                    detail = ModifierClickableOrder.ModifierChainWithSuspiciousOrder,
+                ),
+                LintViolation(
+                    line = 16,
+                    col = 18,
+                    detail = ModifierClickableOrder.ModifierChainWithSuspiciousOrder,
+                ),
+                LintViolation(
+                    line = 19,
+                    col = 29,
+                    detail = ModifierClickableOrder.ModifierChainWithSuspiciousOrder,
+                ),
+            )
     }
 
     @Test
@@ -155,29 +159,30 @@ class ModifierClickableOrderCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something1() {
-                    Something2(
-                        modifier = Modifier.shadow(8.dp, RoundedCornerShape(8.dp)).clickable { }
-                    )
-                    Something3(
-                        modifier = Modifier.clickable { }.shadow(8.dp, MyShape, clip = false)
-                    )
-                    Something4(
-                        modifier = Modifier.clickable { }.shadow(8.dp, MyShape, false)
-                    )
-                    Something5(
-                        modifier = Modifier.clickable { }.shadow(0.dp, MyShape)
-                    )
-                    Something6(
-                        modifier = Modifier.clickable { }.shadow(elevation = 0.dp, shape = MyShape)
-                    )
-                    Something7(
-                        modifier = Modifier.clickable { }
-                            .then(if (x) run { something(Modifier.clip(CircleShape)); Modifier } else Modifier)
-                    )
-                }
-            """.trimIndent()
+            @Composable
+            fun Something1() {
+                Something2(
+                    modifier = Modifier.shadow(8.dp, RoundedCornerShape(8.dp)).clickable { }
+                )
+                Something3(
+                    modifier = Modifier.clickable { }.shadow(8.dp, MyShape, clip = false)
+                )
+                Something4(
+                    modifier = Modifier.clickable { }.shadow(8.dp, MyShape, false)
+                )
+                Something5(
+                    modifier = Modifier.clickable { }.shadow(0.dp, MyShape)
+                )
+                Something6(
+                    modifier = Modifier.clickable { }.shadow(elevation = 0.dp, shape = MyShape)
+                )
+                Something7(
+                    modifier = Modifier.clickable { }
+                        .then(if (x) run { something(Modifier.clip(CircleShape)); Modifier } else Modifier)
+                )
+            }
+            """
+                .trimIndent()
 
         modifierRuleAssertThat(code).hasNoLintViolations()
     }
@@ -187,16 +192,17 @@ class ModifierClickableOrderCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something1() {
-                    Something2(
-                        modifier = Modifier.clip(RoundedCornerShape(8.dp)).background(shape = Circle()).clickable { }
-                    )
-                    Something2(
-                        modifier = Modifier.clip(shape = Whatever).background().clickable { }
-                    )
-                }
-            """.trimIndent()
+            @Composable
+            fun Something1() {
+                Something2(
+                    modifier = Modifier.clip(RoundedCornerShape(8.dp)).background(shape = Circle()).clickable { }
+                )
+                Something2(
+                    modifier = Modifier.clip(shape = Whatever).background().clickable { }
+                )
+            }
+            """
+                .trimIndent()
 
         modifierRuleAssertThat(code).hasNoLintViolations()
     }

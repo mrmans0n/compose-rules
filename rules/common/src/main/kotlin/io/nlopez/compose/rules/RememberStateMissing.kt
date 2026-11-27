@@ -16,7 +16,8 @@ class RememberStateMissing : ComposeKtVisitor {
     override fun visitComposable(function: KtFunction, emitter: Emitter, config: ComposeKtConfig) {
         // To keep memory consumption in check, we first traverse down until we see one of our known functions
         // that need remembering
-        function.findAllChildrenByClass<KtCallExpression>()
+        function
+            .findAllChildrenByClass<KtCallExpression>()
             .filter { it.calleeExpression?.text in MethodsThatNeedRemembering }
             // Only for those, we traverse up to [function], to see if it was actually remembered
             .filterNot { it.isRemembered(function) }
@@ -28,39 +29,42 @@ class RememberStateMissing : ComposeKtVisitor {
     }
 
     companion object {
-        private val MethodsThatNeedRemembering = setOf(
-            "derivedStateOf",
-            "mutableStateOf",
-            // Primitives
-            "mutableIntStateOf",
-            "mutableFloatStateOf",
-            "mutableDoubleStateOf",
-            "mutableLongStateOf",
-            // Primitive Lists
-            "mutableIntListOf",
-            "mutableLongListOf",
-            "mutableFloatListOf",
-            // Primitive Sets
-            "mutableIntSetOf",
-            "mutableLongSetOf",
-            "mutableFloatSetOf",
-            // Primitive Maps
-            "mutableIntIntMapOf",
-            "mutableIntLongMapOf",
-            "mutableIntFloatMapOf",
-            "mutableLongIntMapOf",
-            "mutableLongLongMapOf",
-            "mutableLongFloatMapOf",
-            "mutableFloatIntMapOf",
-            "mutableFloatLongMapOf",
-            "mutableFloatFloatMapOf",
-        )
+        private val MethodsThatNeedRemembering =
+            setOf(
+                "derivedStateOf",
+                "mutableStateOf",
+                // Primitives
+                "mutableIntStateOf",
+                "mutableFloatStateOf",
+                "mutableDoubleStateOf",
+                "mutableLongStateOf",
+                // Primitive Lists
+                "mutableIntListOf",
+                "mutableLongListOf",
+                "mutableFloatListOf",
+                // Primitive Sets
+                "mutableIntSetOf",
+                "mutableLongSetOf",
+                "mutableFloatSetOf",
+                // Primitive Maps
+                "mutableIntIntMapOf",
+                "mutableIntLongMapOf",
+                "mutableIntFloatMapOf",
+                "mutableLongIntMapOf",
+                "mutableLongLongMapOf",
+                "mutableLongFloatMapOf",
+                "mutableFloatIntMapOf",
+                "mutableFloatLongMapOf",
+                "mutableFloatFloatMapOf",
+            )
         private val MethodsAndErrorsThatNeedRemembering = MethodsThatNeedRemembering.associateWith { errorMessage(it) }
 
-        fun errorMessage(name: String): String = """
+        fun errorMessage(name: String): String =
+            """
             Using `$name` in a @Composable function without it being inside of a remember function.
             If you don't remember the state instance, a new state instance will be created when the function is recomposed.
             See https://mrmans0n.github.io/compose-rules/rules/#state-should-be-remembered-in-composables for more information.
-        """.trimIndent()
+        """
+                .trimIndent()
     }
 }

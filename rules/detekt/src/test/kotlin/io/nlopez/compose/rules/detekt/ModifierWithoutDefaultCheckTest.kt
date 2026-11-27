@@ -22,18 +22,21 @@ class ModifierWithoutDefaultCheckTest {
     @Test
     fun `errors when a Composable has modifiers but without default values`() {
         @Language("kotlin")
-        val composableCode = """
-                @Composable
-                fun Something(modifier: Modifier) { }
-                @Composable
-                fun Something(modifier: Modifier = Modifier, modifier2: Modifier) { }
-        """.trimIndent()
+        val composableCode =
+            """
+            @Composable
+            fun Something(modifier: Modifier) { }
+            @Composable
+            fun Something(modifier: Modifier = Modifier, modifier2: Modifier) { }
+            """
+                .trimIndent()
 
         val errors = rule.lint(composableCode)
-        assertThat(errors).hasStartSourceLocations(
-            SourceLocation(2, 15),
-            SourceLocation(4, 46),
-        )
+        assertThat(errors)
+            .hasStartSourceLocations(
+                SourceLocation(2, 15),
+                SourceLocation(4, 46),
+            )
         assertThat(errors[0]).hasMessage(ModifierWithoutDefault.MissingModifierDefaultParam)
         assertThat(errors[1]).hasMessage(ModifierWithoutDefault.MissingModifierDefaultParam)
     }
@@ -41,20 +44,24 @@ class ModifierWithoutDefaultCheckTest {
     @Test
     fun `autocorrects by adding a default value that keeps the Modifier type reference intact`() {
         @Language("kotlin")
-        val composableCode = """
-                @Composable
-                fun Something(modifier: Modifier, title: String) { }
-        """.trimIndent()
+        val composableCode =
+            """
+            @Composable
+            fun Something(modifier: Modifier, title: String) { }
+            """
+                .trimIndent()
 
         val file = compileContentForTest(composableCode)
         ModifierWithoutDefaultCheck(TestConfig("autoCorrect" to true)).lint(file)
 
-        assertThat(file.text).isEqualTo(
-            """
-            @Composable
-            fun Something(modifier: Modifier = Modifier, title: String) { }
-            """.trimIndent(),
-        )
+        assertThat(file.text)
+            .isEqualTo(
+                """
+                @Composable
+                fun Something(modifier: Modifier = Modifier, title: String) { }
+                """
+                    .trimIndent(),
+            )
 
         // The type reference has to survive the fix as a real reference, or rules that resolve references
         // (such as unused import detection) would no longer see the Modifier import as used.
@@ -66,18 +73,20 @@ class ModifierWithoutDefaultCheckTest {
     @Test
     fun `passes when a Composable inside of an interface has modifiers but without default values`() {
         @Language("kotlin")
-        val composableCode = """
-                interface Bleh {
-                    @Composable
-                    fun Something(modifier: Modifier)
-                }
-                class BlehImpl : Bleh {
-                    @Composable
-                    override fun Something(modifier: Modifier) {}
-                }
+        val composableCode =
+            """
+            interface Bleh {
                 @Composable
-                actual fun Something(modifier: Modifier) {}
-        """.trimIndent()
+                fun Something(modifier: Modifier)
+            }
+            class BlehImpl : Bleh {
+                @Composable
+                override fun Something(modifier: Modifier) {}
+            }
+            @Composable
+            actual fun Something(modifier: Modifier) {}
+            """
+                .trimIndent()
 
         val errors = rule.lint(composableCode)
         assertThat(errors).isEmpty()
@@ -86,15 +95,17 @@ class ModifierWithoutDefaultCheckTest {
     @Test
     fun `passes when a Composable is an abstract function but without default values`() {
         @Language("kotlin")
-        val composableCode = """
-                abstract class Bleh {
-                    @Composable
-                    abstract fun Something(modifier: Modifier)
+        val composableCode =
+            """
+            abstract class Bleh {
+                @Composable
+                abstract fun Something(modifier: Modifier)
 
-                    @Composable
-                    open fun Something(modifier: Modifier) {}
-                }
-        """.trimIndent()
+                @Composable
+                open fun Something(modifier: Modifier) {}
+            }
+            """
+                .trimIndent()
 
         val errors = rule.lint(composableCode)
         assertThat(errors).isEmpty()
@@ -105,22 +116,23 @@ class ModifierWithoutDefaultCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something(modifier: Modifier = Modifier) {
-                    Row(modifier = modifier) {
-                    }
+            @Composable
+            fun Something(modifier: Modifier = Modifier) {
+                Row(modifier = modifier) {
                 }
-                @Composable
-                fun Something(modifier: Modifier = Modifier.fillMaxSize()) {
-                    Row(modifier = modifier) {
-                    }
+            }
+            @Composable
+            fun Something(modifier: Modifier = Modifier.fillMaxSize()) {
+                Row(modifier = modifier) {
                 }
-                @Composable
-                fun Something(modifier: Modifier = SomeOtherValueFromSomeConstant) {
-                    Row(modifier = modifier) {
-                    }
+            }
+            @Composable
+            fun Something(modifier: Modifier = SomeOtherValueFromSomeConstant) {
+                Row(modifier = modifier) {
                 }
-            """.trimIndent()
+            }
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }
@@ -130,12 +142,13 @@ class ModifierWithoutDefaultCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Modifier.something(modifier: Modifier) {
-                    Row(modifier = modifier) {
-                    }
+            @Composable
+            fun Modifier.something(modifier: Modifier) {
+                Row(modifier = modifier) {
                 }
-            """.trimIndent()
+            }
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }

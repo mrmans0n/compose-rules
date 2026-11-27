@@ -6,15 +6,15 @@ import dev.detekt.api.SourceLocation
 import dev.detekt.test.TestConfig
 import dev.detekt.test.lint
 import io.nlopez.compose.rules.LambdaParameterInRestartableEffect
-import io.nlopez.compose.rules.detekt.assertThat
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
 
 class LambdaParameterInRestartableEffectCheckTest {
 
-    private val testConfig = TestConfig(
-        "treatAsLambda" to listOf("MyLambda"),
-    )
+    private val testConfig =
+        TestConfig(
+            "treatAsLambda" to listOf("MyLambda"),
+        )
     private val rule = LambdaParameterInRestartableEffectCheck(testConfig)
 
     @Test
@@ -22,28 +22,29 @@ class LambdaParameterInRestartableEffectCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something(onClick: () -> Unit) {
-                    LaunchedEffect(Unit) {
-                        onClick()
-                    }
+            @Composable
+            fun Something(onClick: () -> Unit) {
+                LaunchedEffect(Unit) {
+                    onClick()
                 }
-                @Composable
-                fun Something(onClick: MyLambda) {
-                    DisposableEffect(Unit) {
-                        onClick()
-                    }
+            }
+            @Composable
+            fun Something(onClick: MyLambda) {
+                DisposableEffect(Unit) {
+                    onClick()
                 }
-                fun interface MyLambda2 {
-                    fun create()
+            }
+            fun interface MyLambda2 {
+                fun create()
+            }
+            @Composable
+            fun Something(onClick: MyLambda2) {
+                LaunchedEffect(Unit) {
+                    onClick()
                 }
-                @Composable
-                fun Something(onClick: MyLambda2) {
-                    LaunchedEffect(Unit) {
-                        onClick()
-                    }
-                }
-            """.trimIndent()
+            }
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors)
             .hasStartSourceLocations(
@@ -61,20 +62,21 @@ class LambdaParameterInRestartableEffectCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something(onClick: () -> Unit) {
-                    val latestOnClick by rememberUpdatedState(onClick)
-                    LaunchedEffect(Unit) {
-                        latestOnClick()
-                    }
+            @Composable
+            fun Something(onClick: () -> Unit) {
+                val latestOnClick by rememberUpdatedState(onClick)
+                LaunchedEffect(Unit) {
+                    latestOnClick()
                 }
-                @Composable
-                fun Something(onClick: () -> Unit) {
-                    DisposableEffect(onClick) {
-                        onClick()
-                    }
+            }
+            @Composable
+            fun Something(onClick: () -> Unit) {
+                DisposableEffect(onClick) {
+                    onClick()
                 }
-            """.trimIndent()
+            }
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }
@@ -84,21 +86,22 @@ class LambdaParameterInRestartableEffectCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something(onClick: () -> Unit) {
-                    val onClick by rememberUpdatedState(onClick)
-                    LaunchedEffect(Unit) {
-                        onClick()
-                    }
+            @Composable
+            fun Something(onClick: () -> Unit) {
+                val onClick by rememberUpdatedState(onClick)
+                LaunchedEffect(Unit) {
+                    onClick()
                 }
-                @Composable
-                fun Something(onClick: () -> Unit) {
-                    val (onClick, bleh) = something()
-                    LaunchedEffect(Unit) {
-                        onClick()
-                    }
+            }
+            @Composable
+            fun Something(onClick: () -> Unit) {
+                val (onClick, bleh) = something()
+                LaunchedEffect(Unit) {
+                    onClick()
                 }
-            """.trimIndent()
+            }
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }
@@ -108,13 +111,14 @@ class LambdaParameterInRestartableEffectCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something(onClick: () -> Unit) {
-                    LaunchedEffect(Unit) {
-                        viewModel.onClick()
-                    }
+            @Composable
+            fun Something(onClick: () -> Unit) {
+                LaunchedEffect(Unit) {
+                    viewModel.onClick()
                 }
-            """.trimIndent()
+            }
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }
@@ -124,46 +128,47 @@ class LambdaParameterInRestartableEffectCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something(onDispose: () -> Unit) {
-                    LaunchedEffect(Unit) {
-                        onDispose()
-                    }
+            @Composable
+            fun Something(onDispose: () -> Unit) {
+                LaunchedEffect(Unit) {
+                    onDispose()
                 }
-                @Composable
-                fun Something(onDispose: () -> Unit) {
-                    DisposableEffect(Unit) {
-                        onDispose(onDispose)
-                    }
+            }
+            @Composable
+            fun Something(onDispose: () -> Unit) {
+                DisposableEffect(Unit) {
+                    onDispose(onDispose)
                 }
-                @Composable
-                fun Something(onDispose: () -> Unit) {
-                    LifecycleStartEffect(Unit) {
-                        onStopOrDispose(onDispose)
-                    }
+            }
+            @Composable
+            fun Something(onDispose: () -> Unit) {
+                LifecycleStartEffect(Unit) {
+                    onStopOrDispose(onDispose)
                 }
-                @Composable
-                fun Something(onDispose: () -> Unit) {
-                    LifecycleResumeEffect(Unit) {
-                        onPauseOrDispose(onDispose)
-                    }
+            }
+            @Composable
+            fun Something(onDispose: () -> Unit) {
+                LifecycleResumeEffect(Unit) {
+                    onPauseOrDispose(onDispose)
                 }
+            }
 
-                // TODO ideally these would also be caught, but may require type resolution
-                @Composable
-                fun Something(onDispose: () -> Unit) {
-                    DisposableEffect(Unit) {
-                        onDispose { onDispose() }
-                    }
+            // TODO ideally these would also be caught, but may require type resolution
+            @Composable
+            fun Something(onDispose: () -> Unit) {
+                DisposableEffect(Unit) {
+                    onDispose { onDispose() }
                 }
-                @Composable
-                fun Something(onDispose: (Int) -> Unit) {
-                    DisposableEffect(Unit) {
-                        onDispose(0)
-                        onDispose {}
-                    }
+            }
+            @Composable
+            fun Something(onDispose: (Int) -> Unit) {
+                DisposableEffect(Unit) {
+                    onDispose(0)
+                    onDispose {}
                 }
-            """.trimIndent()
+            }
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors)
             .hasStartSourceLocations(
@@ -182,14 +187,15 @@ class LambdaParameterInRestartableEffectCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something(onDispose: () -> Unit) {
-                    val latestOnDispose by rememberUpdatedState(onDispose)
-                    DisposableEffect(Unit) {
-                        onDispose(latestOnDispose)
-                    }
+            @Composable
+            fun Something(onDispose: () -> Unit) {
+                val latestOnDispose by rememberUpdatedState(onDispose)
+                DisposableEffect(Unit) {
+                    onDispose(latestOnDispose)
                 }
-            """.trimIndent()
+            }
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }
@@ -199,14 +205,15 @@ class LambdaParameterInRestartableEffectCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something(onDispose: () -> Unit) {
-                    val latestOnDispose by rememberUpdatedState(onDispose)
-                    LifecycleStartEffect(Unit) {
-                        onStopOrDispose(latestOnDispose)
-                    }
+            @Composable
+            fun Something(onDispose: () -> Unit) {
+                val latestOnDispose by rememberUpdatedState(onDispose)
+                LifecycleStartEffect(Unit) {
+                    onStopOrDispose(latestOnDispose)
                 }
-            """.trimIndent()
+            }
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }
@@ -216,14 +223,15 @@ class LambdaParameterInRestartableEffectCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something(onDispose: () -> Unit) {
-                    val latestOnDispose by rememberUpdatedState(onDispose)
-                    LifecycleResumeEffect(Unit) {
-                        onPauseOrDispose(latestOnDispose)
-                    }
+            @Composable
+            fun Something(onDispose: () -> Unit) {
+                val latestOnDispose by rememberUpdatedState(onDispose)
+                LifecycleResumeEffect(Unit) {
+                    onPauseOrDispose(latestOnDispose)
                 }
-            """.trimIndent()
+            }
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }

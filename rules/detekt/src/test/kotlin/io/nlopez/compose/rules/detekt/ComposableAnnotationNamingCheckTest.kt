@@ -6,7 +6,6 @@ import dev.detekt.api.Config
 import dev.detekt.api.SourceLocation
 import dev.detekt.test.lint
 import io.nlopez.compose.rules.ComposableAnnotationNaming
-import io.nlopez.compose.rules.detekt.assertThat
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
 
@@ -20,7 +19,8 @@ class ComposableAnnotationNamingCheckTest {
         val code =
             """
             annotation class Banana
-            """.trimIndent()
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }
@@ -34,7 +34,8 @@ class ComposableAnnotationNamingCheckTest {
             annotation class BananaComposable
             @ComposableTargetMarker
             annotation class AppleComposable
-            """.trimIndent()
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }
@@ -48,15 +49,16 @@ class ComposableAnnotationNamingCheckTest {
             annotation class Banana
             @ComposableTargetMarker
             annotation class Apple
-            """.trimIndent()
+            """
+                .trimIndent()
         val errors = rule.lint(code)
-        assertThat(errors).hasStartSourceLocations(
-            SourceLocation(2, 18),
-            SourceLocation(4, 18),
-        )
+        assertThat(errors)
+            .hasStartSourceLocations(
+                SourceLocation(2, 18),
+                SourceLocation(4, 18),
+            )
         for (error in errors) {
-            assertThat(error)
-                .hasMessage(ComposableAnnotationNaming.ComposableAnnotationDoesNotEndWithComposable)
+            assertThat(error).hasMessage(ComposableAnnotationNaming.ComposableAnnotationDoesNotEndWithComposable)
         }
     }
 }

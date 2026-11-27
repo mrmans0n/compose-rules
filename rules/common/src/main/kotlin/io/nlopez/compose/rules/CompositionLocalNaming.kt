@@ -14,8 +14,7 @@ import org.jetbrains.kotlin.psi.KtProperty
 class CompositionLocalNaming : ComposeKtVisitor {
 
     override fun visitFile(file: KtFile, emitter: Emitter, config: ComposeKtConfig) {
-        val compositionLocals = file.findAllChildrenByClass<KtProperty>()
-            .filter { it.declaresCompositionLocal }
+        val compositionLocals = file.findAllChildrenByClass<KtProperty>().filter { it.declaresCompositionLocal }
 
         if (compositionLocals.none()) return
 
@@ -27,9 +26,11 @@ class CompositionLocalNaming : ComposeKtVisitor {
     }
 
     companion object {
-        val CompositionLocalNeedsLocalPrefix = """
+        val CompositionLocalNeedsLocalPrefix =
+            """
             CompositionLocals should be named using the `Local` prefix as an adjective, followed by a descriptive noun.
             See https://mrmans0n.github.io/compose-rules/rules/#naming-compositionlocals-properly for more information.
-        """.trimIndent()
+            """
+                .trimIndent()
     }
 }

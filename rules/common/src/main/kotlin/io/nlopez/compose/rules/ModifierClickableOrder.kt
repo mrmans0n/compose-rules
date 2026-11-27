@@ -26,15 +26,17 @@ class ModifierClickableOrder : ComposeKtVisitor {
         val initialModifierNames = function.modifierParameters(config).mapNotNull { it.name }
         val modifiers = initialModifierNames.flatMap { code.obtainAllModifierNames(it) }.toSet()
 
-        val suspiciousOrderModifiers = code.findAllChildrenByClass<KtCallExpression>()
-            .filter { it.calleeExpression?.text?.first()?.isUpperCase() == true }
-            .flatMap { callExpression ->
-                callExpression.argumentsUsingModifiers(modifiers + "Modifier")
-            }
-            // We only want chains of more than 1 modifier
-            .mapNotNull { argument -> argument.getArgumentExpression() }
-            .filterIsInstance<KtDotQualifiedExpression>()
-            .mapNotNull { chain -> chain.findCallExpressionSuspiciousOrder() }
+        val suspiciousOrderModifiers =
+            code
+                .findAllChildrenByClass<KtCallExpression>()
+                .filter { it.calleeExpression?.text?.first()?.isUpperCase() == true }
+                .flatMap { callExpression ->
+                    callExpression.argumentsUsingModifiers(modifiers + "Modifier")
+                }
+                // We only want chains of more than 1 modifier
+                .mapNotNull { argument -> argument.getArgumentExpression() }
+                .filterIsInstance<KtDotQualifiedExpression>()
+                .mapNotNull { chain -> chain.findCallExpressionSuspiciousOrder() }
 
         for (methodInvocation in suspiciousOrderModifiers) {
             emitter.report(methodInvocation, ModifierChainWithSuspiciousOrder)
@@ -71,16 +73,19 @@ class ModifierClickableOrder : ComposeKtVisitor {
                             if (argumentExpression is KtIfExpression) {
                                 // If any of the two branches from the `if` passes the same checks for sus methods,
                                 // we flag them as well.
-                                val suspicious = sequenceOf(argumentExpression.then, argumentExpression.`else`)
-                                    .filterNotNull()
-                                    // A branch can be a bare call (`clip(X)`), a qualified call
-                                    // (`Modifier.clip(X)`), or a chain (`Modifier.clip(X).padding(Y)`),
-                                    // so we walk the modifier chain it returns.
-                                    .flatMap { it.modifierChainCalls() }
-                                    .any {
-                                        it.isClipWithShape || it.isBackgroundWithShape ||
-                                            it.isBorderWithShape || it.isShadowWithShape
-                                    }
+                                val suspicious =
+                                    sequenceOf(argumentExpression.then, argumentExpression.`else`)
+                                        .filterNotNull()
+                                        // A branch can be a bare call (`clip(X)`), a qualified call
+                                        // (`Modifier.clip(X)`), or a chain (`Modifier.clip(X).padding(Y)`),
+                                        // so we walk the modifier chain it returns.
+                                        .flatMap { it.modifierChainCalls() }
+                                        .any {
+                                            it.isClipWithShape ||
+                                                it.isBackgroundWithShape ||
+                                                it.isBorderWithShape ||
+                                                it.isShadowWithShape
+                                        }
 
                                 if (suspicious) {
                                     shapeAlteringCandidate = true
@@ -125,15 +130,14 @@ class ModifierClickableOrder : ComposeKtVisitor {
 
     private val KtCallExpression.isShadowWithShape: Boolean
         // `shadow` clips its content to the shape, unless clipping is explicitly disabled via `clip = false`.
-        get() = calleeExpression?.text == "shadow" &&
-            hasShadowShape &&
-            !isShadowClipDisabled
+        get() = calleeExpression?.text == "shadow" && hasShadowShape && !isShadowClipDisabled
 
     private val KtCallExpression.hasShadowShape: Boolean
         // In `shadow(elevation, shape, ...)` the shape can be named, a recognizable `*Shape` reference, or
         // simply the second positional argument (e.g. a lower-case `shape` parameter passed through).
-        get() = valueArguments.any { it.isNamedShape || it.referencesShape } ||
-            valueArguments.getOrNull(1)?.isNamed() == false
+        get() =
+            valueArguments.any { it.isNamedShape || it.referencesShape } ||
+                valueArguments.getOrNull(1)?.isNamed() == false
 
     private val KtCallExpression.isShadowClipDisabled: Boolean
         get() {
@@ -150,58 +154,65 @@ class ModifierClickableOrder : ComposeKtVisitor {
 
     private val KtCallExpression.isZeroElevation: Boolean
         get() {
-            val elevation = valueArguments.firstOrNull { it.getArgumentName()?.asName?.asString() == "elevation" }
-                ?: valueArguments.firstOrNull()?.takeUnless { it.isNamed() }
+            val elevation =
+                valueArguments.firstOrNull { it.getArgumentName()?.asName?.asString() == "elevation" }
+                    ?: valueArguments.firstOrNull()?.takeUnless { it.isNamed() }
             return elevation?.getArgumentExpression()?.text == "0.dp"
         }
 
     // Collects the call expressions that make up a modifier chain (e.g. `Modifier.clip(X).padding(Y)`),
     // without descending into their arguments or nested blocks, so shape calls that aren't part of the
     // returned modifier (e.g. inside a `run { ... }`) are ignored.
-    private fun KtExpression.modifierChainCalls(): Sequence<KtCallExpression> = when (this) {
-        is KtCallExpression -> sequenceOf(this)
+    private fun KtExpression.modifierChainCalls(): Sequence<KtCallExpression> =
+        when (this) {
+            is KtCallExpression -> sequenceOf(this)
 
-        is KtDotQualifiedExpression ->
-            receiverExpression.modifierChainCalls() +
-                ((selectorExpression as? KtCallExpression)?.let { sequenceOf(it) } ?: emptySequence())
+            is KtDotQualifiedExpression ->
+                receiverExpression.modifierChainCalls() +
+                    ((selectorExpression as? KtCallExpression)?.let { sequenceOf(it) } ?: emptySequence())
 
-        else -> emptySequence()
-    }
+            else -> emptySequence()
+        }
 
     private val KtValueArgument.isNamedShape: Boolean
         get() = isNamed() && name == "shape"
 
     private val KtValueArgument.referencesShape: Boolean
-        get() = when (val expression = getArgumentExpression()) {
-            // MyShape()
-            is KtCallExpression -> expression.calleeExpression?.text?.endsWith("Shape") == true
+        get() =
+            when (val expression = getArgumentExpression()) {
+                // MyShape()
+                is KtCallExpression -> expression.calleeExpression?.text?.endsWith("Shape") == true
 
-            // MyShape
-            is KtReferenceExpression -> expression.text.endsWith("Shape")
+                // MyShape
+                is KtReferenceExpression -> expression.text.endsWith("Shape")
 
-            // if (x) MyShape else MyOtherShape
-            is KtIfExpression -> expression.then?.text?.endsWith("Shape") == true ||
-                expression.`else`?.text?.endsWith("Shape") == true
+                // if (x) MyShape else MyOtherShape
+                is KtIfExpression ->
+                    expression.then?.text?.endsWith("Shape") == true ||
+                        expression.`else`?.text?.endsWith("Shape") == true
 
-            // MaterialTheme.shapes.x or LocalShapes.current.x or AppShapes.x or MyThemeShapes.x
-            is KtDotQualifiedExpression -> expression.text.startsWith("MaterialTheme.shapes") ||
-                expression.text.contains("Shape")
+                // MaterialTheme.shapes.x or LocalShapes.current.x or AppShapes.x or MyThemeShapes.x
+                is KtDotQualifiedExpression ->
+                    expression.text.startsWith("MaterialTheme.shapes") || expression.text.contains("Shape")
 
-            else -> false
-        }
+                else -> false
+            }
 
     companion object {
-        private val interactionModifiers = setOf(
-            "clickable",
-            "selectable",
-            "toggleable",
-            "triStateToggleable",
-            "combinedClickable",
-        )
+        private val interactionModifiers =
+            setOf(
+                "clickable",
+                "selectable",
+                "toggleable",
+                "triStateToggleable",
+                "combinedClickable",
+            )
 
-        val ModifierChainWithSuspiciousOrder = """
+        val ModifierChainWithSuspiciousOrder =
+            """
             This order of modifiers is likely to cause visual issues. You should have your clickable modifiers after modifiers that use shapes, so that the clickable selected area takes into account the change in shape as well.
             See https://mrmans0n.github.io/compose-rules/rules/#modifier-order-matters for more information.
-        """.trimIndent()
+            """
+                .trimIndent()
     }
 }

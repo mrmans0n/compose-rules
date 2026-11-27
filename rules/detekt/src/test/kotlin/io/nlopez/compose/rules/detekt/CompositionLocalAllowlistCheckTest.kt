@@ -6,15 +6,15 @@ import dev.detekt.api.SourceLocation
 import dev.detekt.test.TestConfig
 import dev.detekt.test.lint
 import io.nlopez.compose.rules.CompositionLocalAllowlist
-import io.nlopez.compose.rules.detekt.assertThat
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
 
 class CompositionLocalAllowlistCheckTest {
 
-    private val testConfig = TestConfig(
-        "allowedCompositionLocals" to listOf("LocalBanana", "LocalPotato", "LocalPeach"),
-    )
+    private val testConfig =
+        TestConfig(
+            "allowedCompositionLocals" to listOf("LocalBanana", "LocalPotato", "LocalPeach"),
+        )
     private val rule = CompositionLocalAllowlistCheck(testConfig)
 
     @Test
@@ -22,13 +22,14 @@ class CompositionLocalAllowlistCheckTest {
         @Language("kotlin")
         val code =
             """
-                private val LocalApple = staticCompositionLocalOf<String> { "Apple" }
-                internal val LocalPlum: ProvidableCompositionLocal<String> = staticCompositionLocalOf { "Plum" }
-                val LocalPrune = compositionLocalOf { "Prune" }
-                private val LocalKiwi: ProvidableCompositionLocal<String> = compositionLocalOf { "Kiwi" }
-                private val LocalLemon = compositionLocalWithComputedDefaultOf { "Lemon" }
-                private val LocalApricot: ProvidableCompositionLocal<String> = compositionLocalWithComputedDefaultOf { "Apricot" }
-            """.trimIndent()
+            private val LocalApple = staticCompositionLocalOf<String> { "Apple" }
+            internal val LocalPlum: ProvidableCompositionLocal<String> = staticCompositionLocalOf { "Plum" }
+            val LocalPrune = compositionLocalOf { "Prune" }
+            private val LocalKiwi: ProvidableCompositionLocal<String> = compositionLocalOf { "Kiwi" }
+            private val LocalLemon = compositionLocalWithComputedDefaultOf { "Lemon" }
+            private val LocalApricot: ProvidableCompositionLocal<String> = compositionLocalWithComputedDefaultOf { "Apricot" }
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors)
             .hasStartSourceLocations(
@@ -49,10 +50,11 @@ class CompositionLocalAllowlistCheckTest {
         @Language("kotlin")
         val code =
             """
-                val LocalBanana = staticCompositionLocalOf<String> { "Banana" }
-                val LocalPotato = compositionLocalOf { "Potato" }
-                val LocalPeach = compositionLocalWithComputedDefaultOf { "Peach" }
-            """.trimIndent()
+            val LocalBanana = staticCompositionLocalOf<String> { "Banana" }
+            val LocalPotato = compositionLocalOf { "Potato" }
+            val LocalPeach = compositionLocalWithComputedDefaultOf { "Peach" }
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }

@@ -17,8 +17,9 @@ class RememberStateMissingCheckTest {
         @Language("kotlin")
         val code =
             """
-                val msof = mutableStateOf("X")
-            """.trimIndent()
+            val msof = mutableStateOf("X")
+            """
+                .trimIndent()
         rememberRuleAssertThat(code).hasNoLintViolations()
     }
 
@@ -27,26 +28,28 @@ class RememberStateMissingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun MyComposable() {
-                    val something = mutableStateOf("X")
-                }
-                @Composable
-                fun MyComposable(something: State<String> = mutableStateOf("X")) {
-                }
-            """.trimIndent()
-        rememberRuleAssertThat(code).hasLintViolationsWithoutAutoCorrect(
-            LintViolation(
-                line = 3,
-                col = 21,
-                detail = RememberStateMissing.errorMessage("mutableStateOf"),
-            ),
-            LintViolation(
-                line = 6,
-                col = 45,
-                detail = RememberStateMissing.errorMessage("mutableStateOf"),
-            ),
-        )
+            @Composable
+            fun MyComposable() {
+                val something = mutableStateOf("X")
+            }
+            @Composable
+            fun MyComposable(something: State<String> = mutableStateOf("X")) {
+            }
+            """
+                .trimIndent()
+        rememberRuleAssertThat(code)
+            .hasLintViolationsWithoutAutoCorrect(
+                LintViolation(
+                    line = 3,
+                    col = 21,
+                    detail = RememberStateMissing.errorMessage("mutableStateOf"),
+                ),
+                LintViolation(
+                    line = 6,
+                    col = 45,
+                    detail = RememberStateMissing.errorMessage("mutableStateOf"),
+                ),
+            )
     }
 
     @Test
@@ -54,14 +57,15 @@ class RememberStateMissingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun MyComposable(
-                    something: State<String> = remember { mutableStateOf("X") }
-                ) {
-                    val something = remember { mutableStateOf("X") }
-                    val something2 by remember { mutableStateOf("Y") }
-                }
-            """.trimIndent()
+            @Composable
+            fun MyComposable(
+                something: State<String> = remember { mutableStateOf("X") }
+            ) {
+                val something = remember { mutableStateOf("X") }
+                val something2 by remember { mutableStateOf("Y") }
+            }
+            """
+                .trimIndent()
         rememberRuleAssertThat(code).hasNoLintViolations()
     }
 
@@ -70,14 +74,15 @@ class RememberStateMissingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun MyComposable(
-                    something: State<String> = rememberSaveable { mutableStateOf("X") }
-                ) {
-                    val something = rememberSaveable { mutableStateOf("X") }
-                    val something2 by rememberSaveable { mutableStateOf("Y") }
-                }
-            """.trimIndent()
+            @Composable
+            fun MyComposable(
+                something: State<String> = rememberSaveable { mutableStateOf("X") }
+            ) {
+                val something = rememberSaveable { mutableStateOf("X") }
+                val something2 by rememberSaveable { mutableStateOf("Y") }
+            }
+            """
+                .trimIndent()
         rememberRuleAssertThat(code).hasNoLintViolations()
     }
 
@@ -86,8 +91,9 @@ class RememberStateMissingCheckTest {
         @Language("kotlin")
         val code =
             """
-                val dsof = derivedStateOf("X")
-            """.trimIndent()
+            val dsof = derivedStateOf("X")
+            """
+                .trimIndent()
         rememberRuleAssertThat(code).hasNoLintViolations()
     }
 
@@ -96,26 +102,28 @@ class RememberStateMissingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun MyComposable() {
-                    val something = derivedStateOf { "X" }
-                }
-                @Composable
-                fun MyComposable(something: State<String> = derivedStateOf { "X" }) {
-                }
-            """.trimIndent()
-        rememberRuleAssertThat(code).hasLintViolationsWithoutAutoCorrect(
-            LintViolation(
-                line = 3,
-                col = 21,
-                detail = RememberStateMissing.errorMessage("derivedStateOf"),
-            ),
-            LintViolation(
-                line = 6,
-                col = 45,
-                detail = RememberStateMissing.errorMessage("derivedStateOf"),
-            ),
-        )
+            @Composable
+            fun MyComposable() {
+                val something = derivedStateOf { "X" }
+            }
+            @Composable
+            fun MyComposable(something: State<String> = derivedStateOf { "X" }) {
+            }
+            """
+                .trimIndent()
+        rememberRuleAssertThat(code)
+            .hasLintViolationsWithoutAutoCorrect(
+                LintViolation(
+                    line = 3,
+                    col = 21,
+                    detail = RememberStateMissing.errorMessage("derivedStateOf"),
+                ),
+                LintViolation(
+                    line = 6,
+                    col = 45,
+                    detail = RememberStateMissing.errorMessage("derivedStateOf"),
+                ),
+            )
     }
 
     @Test
@@ -123,14 +131,15 @@ class RememberStateMissingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun MyComposable(
-                    something: State<String> = remember { derivedStateOf { "X" } }
-                ) {
-                    val something = remember { derivedStateOf { "X" } }
-                    val something2 by remember { derivedStateOf { "Y" } }
-                }
-            """.trimIndent()
+            @Composable
+            fun MyComposable(
+                something: State<String> = remember { derivedStateOf { "X" } }
+            ) {
+                val something = remember { derivedStateOf { "X" } }
+                val something2 by remember { derivedStateOf { "Y" } }
+            }
+            """
+                .trimIndent()
         rememberRuleAssertThat(code).hasNoLintViolations()
     }
 
@@ -139,66 +148,68 @@ class RememberStateMissingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun MyComposable() {
-                    val a = mutableIntListOf()
-                    val b = mutableLongListOf()
-                    val c = mutableFloatListOf()
-                    val d = mutableIntSetOf()
-                    val e = mutableLongSetOf()
-                    val f = mutableFloatSetOf()
-                    val g = mutableIntIntMapOf()
-                    val h = mutableLongLongMapOf()
-                    val i = mutableFloatFloatMapOf()
-                }
-            """.trimIndent()
-        rememberRuleAssertThat(code).hasLintViolationsWithoutAutoCorrect(
-            LintViolation(
-                line = 3,
-                col = 13,
-                detail = RememberStateMissing.errorMessage("mutableIntListOf"),
-            ),
-            LintViolation(
-                line = 4,
-                col = 13,
-                detail = RememberStateMissing.errorMessage("mutableLongListOf"),
-            ),
-            LintViolation(
-                line = 5,
-                col = 13,
-                detail = RememberStateMissing.errorMessage("mutableFloatListOf"),
-            ),
-            LintViolation(
-                line = 6,
-                col = 13,
-                detail = RememberStateMissing.errorMessage("mutableIntSetOf"),
-            ),
-            LintViolation(
-                line = 7,
-                col = 13,
-                detail = RememberStateMissing.errorMessage("mutableLongSetOf"),
-            ),
-            LintViolation(
-                line = 8,
-                col = 13,
-                detail = RememberStateMissing.errorMessage("mutableFloatSetOf"),
-            ),
-            LintViolation(
-                line = 9,
-                col = 13,
-                detail = RememberStateMissing.errorMessage("mutableIntIntMapOf"),
-            ),
-            LintViolation(
-                line = 10,
-                col = 13,
-                detail = RememberStateMissing.errorMessage("mutableLongLongMapOf"),
-            ),
-            LintViolation(
-                line = 11,
-                col = 13,
-                detail = RememberStateMissing.errorMessage("mutableFloatFloatMapOf"),
-            ),
-        )
+            @Composable
+            fun MyComposable() {
+                val a = mutableIntListOf()
+                val b = mutableLongListOf()
+                val c = mutableFloatListOf()
+                val d = mutableIntSetOf()
+                val e = mutableLongSetOf()
+                val f = mutableFloatSetOf()
+                val g = mutableIntIntMapOf()
+                val h = mutableLongLongMapOf()
+                val i = mutableFloatFloatMapOf()
+            }
+            """
+                .trimIndent()
+        rememberRuleAssertThat(code)
+            .hasLintViolationsWithoutAutoCorrect(
+                LintViolation(
+                    line = 3,
+                    col = 13,
+                    detail = RememberStateMissing.errorMessage("mutableIntListOf"),
+                ),
+                LintViolation(
+                    line = 4,
+                    col = 13,
+                    detail = RememberStateMissing.errorMessage("mutableLongListOf"),
+                ),
+                LintViolation(
+                    line = 5,
+                    col = 13,
+                    detail = RememberStateMissing.errorMessage("mutableFloatListOf"),
+                ),
+                LintViolation(
+                    line = 6,
+                    col = 13,
+                    detail = RememberStateMissing.errorMessage("mutableIntSetOf"),
+                ),
+                LintViolation(
+                    line = 7,
+                    col = 13,
+                    detail = RememberStateMissing.errorMessage("mutableLongSetOf"),
+                ),
+                LintViolation(
+                    line = 8,
+                    col = 13,
+                    detail = RememberStateMissing.errorMessage("mutableFloatSetOf"),
+                ),
+                LintViolation(
+                    line = 9,
+                    col = 13,
+                    detail = RememberStateMissing.errorMessage("mutableIntIntMapOf"),
+                ),
+                LintViolation(
+                    line = 10,
+                    col = 13,
+                    detail = RememberStateMissing.errorMessage("mutableLongLongMapOf"),
+                ),
+                LintViolation(
+                    line = 11,
+                    col = 13,
+                    detail = RememberStateMissing.errorMessage("mutableFloatFloatMapOf"),
+                ),
+            )
     }
 
     @Test
@@ -206,19 +217,20 @@ class RememberStateMissingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun MyComposable() {
-                    val a = remember { mutableIntListOf() }
-                    val b = remember { mutableLongListOf() }
-                    val c = remember { mutableFloatListOf() }
-                    val d = remember { mutableIntSetOf() }
-                    val e = remember { mutableLongSetOf() }
-                    val f = remember { mutableFloatSetOf() }
-                    val g = remember { mutableIntIntMapOf() }
-                    val h = remember { mutableLongLongMapOf() }
-                    val i = remember { mutableFloatFloatMapOf() }
-                }
-            """.trimIndent()
+            @Composable
+            fun MyComposable() {
+                val a = remember { mutableIntListOf() }
+                val b = remember { mutableLongListOf() }
+                val c = remember { mutableFloatListOf() }
+                val d = remember { mutableIntSetOf() }
+                val e = remember { mutableLongSetOf() }
+                val f = remember { mutableFloatSetOf() }
+                val g = remember { mutableIntIntMapOf() }
+                val h = remember { mutableLongLongMapOf() }
+                val i = remember { mutableFloatFloatMapOf() }
+            }
+            """
+                .trimIndent()
         rememberRuleAssertThat(code).hasNoLintViolations()
     }
 
@@ -227,14 +239,15 @@ class RememberStateMissingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun MyComposable(
-                    something: State<String> = retain { mutableStateOf("X") }
-                ) {
-                    val something = retain { mutableStateOf("X") }
-                    val something2 by retain { mutableStateOf("Y") }
-                }
-            """.trimIndent()
+            @Composable
+            fun MyComposable(
+                something: State<String> = retain { mutableStateOf("X") }
+            ) {
+                val something = retain { mutableStateOf("X") }
+                val something2 by retain { mutableStateOf("Y") }
+            }
+            """
+                .trimIndent()
         rememberRuleAssertThat(code).hasNoLintViolations()
     }
 
@@ -243,14 +256,15 @@ class RememberStateMissingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun MyComposable(
-                    something: State<String> = retain { derivedStateOf { "X" } }
-                ) {
-                    val something = retain { derivedStateOf { "X" } }
-                    val something2 by retain { derivedStateOf { "Y" } }
-                }
-            """.trimIndent()
+            @Composable
+            fun MyComposable(
+                something: State<String> = retain { derivedStateOf { "X" } }
+            ) {
+                val something = retain { derivedStateOf { "X" } }
+                val something2 by retain { derivedStateOf { "Y" } }
+            }
+            """
+                .trimIndent()
         rememberRuleAssertThat(code).hasNoLintViolations()
     }
 
@@ -259,19 +273,20 @@ class RememberStateMissingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun MyComposable() {
-                    val a = retain { mutableIntListOf() }
-                    val b = retain { mutableLongListOf() }
-                    val c = retain { mutableFloatListOf() }
-                    val d = retain { mutableIntSetOf() }
-                    val e = retain { mutableLongSetOf() }
-                    val f = retain { mutableFloatSetOf() }
-                    val g = retain { mutableIntIntMapOf() }
-                    val h = retain { mutableLongLongMapOf() }
-                    val i = retain { mutableFloatFloatMapOf() }
-                }
-            """.trimIndent()
+            @Composable
+            fun MyComposable() {
+                val a = retain { mutableIntListOf() }
+                val b = retain { mutableLongListOf() }
+                val c = retain { mutableFloatListOf() }
+                val d = retain { mutableIntSetOf() }
+                val e = retain { mutableLongSetOf() }
+                val f = retain { mutableFloatSetOf() }
+                val g = retain { mutableIntIntMapOf() }
+                val h = retain { mutableLongLongMapOf() }
+                val i = retain { mutableFloatFloatMapOf() }
+            }
+            """
+                .trimIndent()
         rememberRuleAssertThat(code).hasNoLintViolations()
     }
 }

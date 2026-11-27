@@ -34,6 +34,7 @@ develocity {
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 rootProject.name = "compose-rules"
+
 include(
     ":rules:common",
     ":rules:common-detekt",

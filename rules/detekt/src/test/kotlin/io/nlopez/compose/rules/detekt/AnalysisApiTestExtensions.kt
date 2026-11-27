@@ -43,15 +43,18 @@ internal fun <T> T.lintWithAnalysisApi(
 }
 
 @Language("kotlin")
-internal fun codeWithFakeCompose(@Language("kotlin") code: String): String = """
+internal fun codeWithFakeCompose(@Language("kotlin") code: String): String =
+    """
     package com.example.compose.fake
 
     $code
-""".trimIndent()
+"""
+        .trimIndent()
 
 @Language("kotlin")
-private fun fakeComposeRuntime(): String = codeWithFakeCompose(
-    """
+private fun fakeComposeRuntime(): String =
+    codeWithFakeCompose(
+        """
     import kotlinx.coroutines.CoroutineScope
 
     @Target(
@@ -184,10 +187,11 @@ private fun fakeComposeRuntime(): String = codeWithFakeCompose(
     fun <T> compositionLocalOf(defaultFactory: () -> T): ProvidableCompositionLocal<T> =
         ProvidableCompositionLocal(defaultFactory())
     """,
-)
+    )
 
 @Language("kotlin")
-private fun fakeCoroutines(): String = """
+private fun fakeCoroutines(): String =
+    """
     package kotlinx.coroutines
 
     interface CoroutineContext
@@ -195,4 +199,5 @@ private fun fakeCoroutines(): String = """
     interface CoroutineScope {
         val coroutineContext: CoroutineContext
     }
-""".trimIndent()
+    """
+        .trimIndent()

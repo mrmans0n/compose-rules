@@ -4,12 +4,12 @@ package io.nlopez.compose.core.util
 
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiNameIdentifierOwner
+import java.util.Deque
+import java.util.LinkedList
 import org.jetbrains.kotlin.psi.psiUtil.endOffset
 import org.jetbrains.kotlin.psi.psiUtil.parentsWithSelf
 import org.jetbrains.kotlin.psi.psiUtil.siblings
 import org.jetbrains.kotlin.psi.psiUtil.startOffset
-import java.util.Deque
-import java.util.LinkedList
 
 val PsiElementAlwaysTruePredicate: (PsiElement) -> Boolean = { true }
 
@@ -50,9 +50,8 @@ inline fun <reified T : PsiElement> PsiElement.findDirectChildrenByClass(): Sequ
     }
 }
 
-fun PsiElement.walkBackwards(stopAtParent: PsiElement? = null): Sequence<PsiElement> = parentsWithSelf
-    .flatMap { it.siblings(forward = false, withItself = true) }
-    .takeWhile { it != stopAtParent }
+fun PsiElement.walkBackwards(stopAtParent: PsiElement? = null): Sequence<PsiElement> =
+    parentsWithSelf.flatMap { it.siblings(forward = false, withItself = true) }.takeWhile { it != stopAtParent }
 
 val PsiNameIdentifierOwner.startOffsetFromName: Int
     get() = nameIdentifier?.startOffset ?: startOffset

@@ -17,12 +17,13 @@ class PreviewNaming : ComposeKtVisitor {
     override fun visitComposable(function: KtFunction, emitter: Emitter, config: ComposeKtConfig) {
         if (!function.isPreview || function.hasPreviewWrapper) return
 
-        val strategy = when (config.getString("previewNamingStrategy", "suffix")) {
-            "suffix" -> PreviewNamingType.Suffix
-            "prefix" -> PreviewNamingType.Prefix
-            "anywhere" -> PreviewNamingType.Anywhere
-            else -> PreviewNamingType.Suffix
-        }
+        val strategy =
+            when (config.getString("previewNamingStrategy", "suffix")) {
+                "suffix" -> PreviewNamingType.Suffix
+                "prefix" -> PreviewNamingType.Prefix
+                "anywhere" -> PreviewNamingType.Anywhere
+                else -> PreviewNamingType.Suffix
+            }
 
         val name = function.nameAsSafeName.asString()
         // By default, we expect Preview to be the suffix. It can be configured to be the prefix though.
@@ -67,19 +68,25 @@ class PreviewNaming : ComposeKtVisitor {
     }
 
     companion object {
-        val PreviewDoesNotStartWithPreview = """
+        val PreviewDoesNotStartWithPreview =
+            """
             Preview functions should have `Preview` as prefix, per your project's configuration.
             See https://mrmans0n.github.io/compose-rules/rules/#naming-previews-properly for more information.
-        """.trimIndent()
+            """
+                .trimIndent()
 
-        val PreviewDoesNotEndWithPreview = """
+        val PreviewDoesNotEndWithPreview =
+            """
             Preview functions should have `Preview` as suffix, per your project's configuration.
             See https://mrmans0n.github.io/compose-rules/rules/#naming-previews-properly for more information.
-        """.trimIndent()
+            """
+                .trimIndent()
 
-        val PreviewDoesNotContainPreview = """
+        val PreviewDoesNotContainPreview =
+            """
             Preview functions should contain `Preview` in their names, per your project's configuration.
             See https://mrmans0n.github.io/compose-rules/rules/#naming-previews-properly for more information.
-        """.trimIndent()
+            """
+                .trimIndent()
     }
 }

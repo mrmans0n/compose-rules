@@ -28,7 +28,8 @@ class ModifierNotUsedAtRootCheckTest {
                         }
                     }
                 }
-            """.trimIndent()
+            """
+                .trimIndent()
         modifierRuleAssertThat(code).hasNoLintViolations()
     }
 
@@ -37,39 +38,40 @@ class ModifierNotUsedAtRootCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something(modifier: Modifier = Modifier) {
-                    Row {
-                        Text("Hi", modifier = modifier)
-                    }
+            @Composable
+            fun Something(modifier: Modifier = Modifier) {
+                Row {
+                    Text("Hi", modifier = modifier)
                 }
-                @Composable
-                fun Something(modifier: Modifier = Modifier) {
-                    Potato(Modifier.fillMaxWidth()) {
-                        Text("Hi", modifier = modifier)
-                    }
+            }
+            @Composable
+            fun Something(modifier: Modifier = Modifier) {
+                Potato(Modifier.fillMaxWidth()) {
+                    Text("Hi", modifier = modifier)
                 }
-                @Composable
-                fun Something(modifier: Modifier = Modifier) {
-                    val poop = if (x) modifier else modifier.fillMaxWidth()
+            }
+            @Composable
+            fun Something(modifier: Modifier = Modifier) {
+                val poop = if (x) modifier else modifier.fillMaxWidth()
+                Column {
+                    Text("Hi", modifier = poop)
+                }
+            }
+            @Composable
+            fun Something(modifier: Modifier = Modifier) {
+                if (paella.isWellDone()) {
                     Column {
-                        Text("Hi", modifier = poop)
+                        Text("Yay", modifier)
+                    }
+                } else {
+                    Row {
+                        Text("Oh no", modifier)
                     }
                 }
-                @Composable
-                fun Something(modifier: Modifier = Modifier) {
-                    if (paella.isWellDone()) {
-                        Column {
-                            Text("Yay", modifier)
-                        }
-                    } else {
-                        Row {
-                            Text("Oh no", modifier)
-                        }
-                    }
-                }
+            }
 
-            """.trimIndent()
+            """
+                .trimIndent()
         modifierRuleAssertThat(code)
             .withEditorConfigOverride(
                 contentEmittersProperty to "Potato,Banana",
@@ -108,22 +110,21 @@ class ModifierNotUsedAtRootCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something(modifier: Modifier = Modifier) {
-                    Dialog {
-                        Text("Hi", modifier = modifier)
-                    }
+            @Composable
+            fun Something(modifier: Modifier = Modifier) {
+                Dialog {
+                    Text("Hi", modifier = modifier)
                 }
-                @Composable
-                fun Something(modifier: Modifier = Modifier) {
-                    Potato {
-                        Text("Hi", modifier = modifier)
-                    }
+            }
+            @Composable
+            fun Something(modifier: Modifier = Modifier) {
+                Potato {
+                    Text("Hi", modifier = modifier)
                 }
-            """.trimIndent()
-        modifierRuleAssertThat(code)
-            .withEditorConfigOverride(contentEmittersDenylist to "Potato")
-            .hasNoLintViolations()
+            }
+            """
+                .trimIndent()
+        modifierRuleAssertThat(code).withEditorConfigOverride(contentEmittersDenylist to "Potato").hasNoLintViolations()
     }
 
     @Test
@@ -131,65 +132,66 @@ class ModifierNotUsedAtRootCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something(modifier: Modifier = Modifier) {
-                    Row(modifier = modifier) {
-                        Text("Hi")
+            @Composable
+            fun Something(modifier: Modifier = Modifier) {
+                Row(modifier = modifier) {
+                    Text("Hi")
+                }
+            }
+            @Composable
+            fun Something(modifier: Modifier = Modifier) {
+                Potato(modifier.fillMaxWidth()) {
+                    Text("Hi")
+                }
+            }
+            @Composable
+            fun Something(modifier: Modifier = Modifier) {
+                val poop = if (x) modifier else modifier.fillMaxWidth()
+                Column(modifier = poop) {
+                    Text("Hi")
+                }
+            }
+            @Composable
+            fun Something(modifier: Modifier = Modifier) {
+                if (paella.isWellDone()) {
+                    Column(modifier) {
+                        Text("Yay")
+                    }
+                } else {
+                    Row(modifier) {
+                        Text("Oh no")
                     }
                 }
-                @Composable
-                fun Something(modifier: Modifier = Modifier) {
-                    Potato(modifier.fillMaxWidth()) {
-                        Text("Hi")
-                    }
-                }
-                @Composable
-                fun Something(modifier: Modifier = Modifier) {
-                    val poop = if (x) modifier else modifier.fillMaxWidth()
-                    Column(modifier = poop) {
-                        Text("Hi")
-                    }
-                }
-                @Composable
-                fun Something(modifier: Modifier = Modifier) {
-                    if (paella.isWellDone()) {
-                        Column(modifier) {
-                            Text("Yay")
-                        }
-                    } else {
-                        Row(modifier) {
-                            Text("Oh no")
-                        }
-                    }
-                }
-                @Composable
-                fun Something(
-                  modifier: Modifier = Modifier,
-                  content: @Composable BoxScope.() -> Unit
+            }
+            @Composable
+            fun Something(
+              modifier: Modifier = Modifier,
+              content: @Composable BoxScope.() -> Unit
+            ) {
+              MaterialTheme(
+                colorScheme = darkColorScheme()
+              ) {
+                Box(
+                  modifier = modifier
+                    .fillMaxSize()
+                    .background(
+                      color = MaterialTheme.colorScheme.background
+                    )
                 ) {
-                  MaterialTheme(
-                    colorScheme = darkColorScheme()
+                  Card(
+                    modifier = Modifier.fillMaxSize()
                   ) {
                     Box(
-                      modifier = modifier
-                        .fillMaxSize()
-                        .background(
-                          color = MaterialTheme.colorScheme.background
-                        )
+                      modifier = Modifier.padding(16.dp)
                     ) {
-                      Card(
-                        modifier = Modifier.fillMaxSize()
-                      ) {
-                        Box(
-                          modifier = Modifier.padding(16.dp)
-                        ) {
-                          content()
-                        }
-                      }
+                      content()
                     }
                   }
                 }
-            """.trimIndent()
+              }
+            }
+            """
+                .trimIndent()
         modifierRuleAssertThat(code)
             .withEditorConfigOverride(
                 contentEmittersProperty to "Potato,Banana",
@@ -202,24 +204,25 @@ class ModifierNotUsedAtRootCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something(modifier: Modifier = Modifier) {
-                    Column(modifier = modifier) {
-                        Slot { modifier: Modifier ->
-                            Row(modifier = Modifier.then(modifier)) {}
-                        }
+            @Composable
+            fun Something(modifier: Modifier = Modifier) {
+                Column(modifier = modifier) {
+                    Slot { modifier: Modifier ->
+                        Row(modifier = Modifier.then(modifier)) {}
                     }
                 }
-                @Composable
-                fun Something(modifier: Modifier = Modifier) {
-                    Column(modifier = modifier) {
-                        Slot { (modifier, _) ->
-                            val local = modifier.padding(8.dp)
-                            Row(modifier = Modifier.then(local)) {}
-                        }
+            }
+            @Composable
+            fun Something(modifier: Modifier = Modifier) {
+                Column(modifier = modifier) {
+                    Slot { (modifier, _) ->
+                        val local = modifier.padding(8.dp)
+                        Row(modifier = Modifier.then(local)) {}
                     }
                 }
-            """.trimIndent()
+            }
+            """
+                .trimIndent()
         modifierRuleAssertThat(code).hasNoLintViolations()
     }
 
@@ -228,16 +231,17 @@ class ModifierNotUsedAtRootCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something(modifier: Modifier = Modifier) {
-                    val rootModifier = modifier
-                    Column {
-                        Slot { modifier: Modifier ->
-                            Child(modifier = modifier.then(rootModifier))
-                        }
+            @Composable
+            fun Something(modifier: Modifier = Modifier) {
+                val rootModifier = modifier
+                Column {
+                    Slot { modifier: Modifier ->
+                        Child(modifier = modifier.then(rootModifier))
                     }
                 }
-            """.trimIndent()
+            }
+            """
+                .trimIndent()
         modifierRuleAssertThat(code)
             .hasLintViolationsWithoutAutoCorrect(
                 LintViolation(
@@ -253,16 +257,17 @@ class ModifierNotUsedAtRootCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something(modifier: Modifier = Modifier) {
-                    val rootModifier = modifier
-                    Column {
-                        Slot { modifier: Modifier ->
-                            Child(modifier = rootModifier, extra = modifier)
-                        }
+            @Composable
+            fun Something(modifier: Modifier = Modifier) {
+                val rootModifier = modifier
+                Column {
+                    Slot { modifier: Modifier ->
+                        Child(modifier = rootModifier, extra = modifier)
                     }
                 }
-            """.trimIndent()
+            }
+            """
+                .trimIndent()
         modifierRuleAssertThat(code)
             .hasLintViolationsWithoutAutoCorrect(
                 LintViolation(

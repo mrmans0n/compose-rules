@@ -17,13 +17,14 @@ class CompositionLocalAllowlistCheckTest {
         @Language("kotlin")
         val code =
             """
-                private val LocalApple = staticCompositionLocalOf<String> { "Apple" }
-                internal val LocalPlum: ProvidableCompositionLocal<String> = staticCompositionLocalOf { "Plum" }
-                val LocalPrune = compositionLocalOf { "Prune" }
-                private val LocalKiwi: ProvidableCompositionLocal<String> = compositionLocalOf { "Kiwi" }
-                private val LocalLemon = compositionLocalWithComputedDefaultOf { "Lemon" }
-                private val LocalApricot: ProvidableCompositionLocal<String> = compositionLocalWithComputedDefaultOf { "Apricot" }
-            """.trimIndent()
+            private val LocalApple = staticCompositionLocalOf<String> { "Apple" }
+            internal val LocalPlum: ProvidableCompositionLocal<String> = staticCompositionLocalOf { "Plum" }
+            val LocalPrune = compositionLocalOf { "Prune" }
+            private val LocalKiwi: ProvidableCompositionLocal<String> = compositionLocalOf { "Kiwi" }
+            private val LocalLemon = compositionLocalWithComputedDefaultOf { "Lemon" }
+            private val LocalApricot: ProvidableCompositionLocal<String> = compositionLocalWithComputedDefaultOf { "Apricot" }
+            """
+                .trimIndent()
         allowlistRuleAssertThat(code)
             .hasLintViolationsWithoutAutoCorrect(
                 LintViolation(
@@ -64,10 +65,11 @@ class CompositionLocalAllowlistCheckTest {
         @Language("kotlin")
         val code =
             """
-                val LocalBanana = staticCompositionLocalOf<String> { "Banana" }
-                val LocalPotato = compositionLocalOf { "Potato" }
-                val LocalPeach = compositionLocalWithComputedDefaultOf { "Peach" }
-            """.trimIndent()
+            val LocalBanana = staticCompositionLocalOf<String> { "Banana" }
+            val LocalPotato = compositionLocalOf { "Potato" }
+            val LocalPeach = compositionLocalWithComputedDefaultOf { "Peach" }
+            """
+                .trimIndent()
         allowlistRuleAssertThat(code)
             .withEditorConfigOverride(
                 compositionLocalAllowlistProperty to "LocalPotato,LocalBanana,LocalPeach",

@@ -10,36 +10,37 @@ import dev.detekt.api.Rule
 import io.nlopez.compose.core.ComposeKtVisitor
 import io.nlopez.compose.core.Emitter
 import io.nlopez.compose.core.util.isComposable
+import java.net.URI
 import org.jetbrains.kotlin.psi.KtClass
 import org.jetbrains.kotlin.psi.KtClassOrObject
 import org.jetbrains.kotlin.psi.KtElement
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtFunction
 import org.jetbrains.kotlin.psi.KtNamedDeclaration
-import java.net.URI
 
 abstract class DetektRule(
     config: Config = Config.empty,
     description: String,
     url: URI = URI("https://mrmans0n.github.io/compose-rules/"),
-) : Rule(config, description, url),
-    ComposeKtVisitor {
+) : Rule(config, description, url), ComposeKtVisitor {
 
     private val composeConfig: DetektComposeKtConfig by lazy { DetektComposeKtConfig(config) }
 
     private val emitter: Emitter = Emitter { element, message, autoCorrect ->
         // Use Entity.atName() for named declarations to report at the name identifier location
-        val entity = when (element) {
-            is KtNamedDeclaration -> Entity.atName(element)
-            is PsiElement -> Entity.from(element)
-        }
+        val entity =
+            when (element) {
+                is KtNamedDeclaration -> Entity.atName(element)
+                is PsiElement -> Entity.from(element)
+            }
 
-        val finding = Finding(
-            entity = entity,
-            message = message,
-            references = emptyList(),
-            suppressReasons = emptyList(),
-        )
+        val finding =
+            Finding(
+                entity = entity,
+                message = message,
+                references = emptyList(),
+                suppressReasons = emptyList(),
+            )
 
         report(finding)
 

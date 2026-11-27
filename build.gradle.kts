@@ -1,9 +1,17 @@
 // Copyright 2024 Nacho Lopez
 // SPDX-License-Identifier: Apache-2.0
 import com.diffplug.gradle.spotless.SpotlessExtension
+import io.github.hexay.ktrs.KtrsOptions
+import io.github.hexay.ktrs.spotless.KtrsStep
 import org.jetbrains.kotlin.gradle.dsl.JvmDefaultMode
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
+buildscript {
+    dependencies {
+        classpath(libs.ktrs)
+    }
+}
 
 plugins {
     alias(libs.plugins.kotlin.jvm) apply false
@@ -16,18 +24,19 @@ allprojects {
 
     pluginManager.apply(libs.plugins.spotless.get().pluginId)
     configure<SpotlessExtension> {
-        val ktlintVersion = libs.versions.spotless.ktlint.get()
+        // ktfmt 0.65 formatting via ktrs (native port), tuned to stay close to our previous ktlint intellij_idea style.
+        val ktfmt = KtrsStep.create(KtrsOptions.kotlinlang().withMaxWidth(120))
         kotlin {
-            target("**/*.kt")
+            target("src/**/*.kt")
             targetExclude("**/samples/**/*.kt")
-            ktlint(ktlintVersion)
+            addStep(ktfmt)
 
             licenseHeaderFile(rootProject.file("spotless/copyright.txt"))
         }
         kotlinGradle {
             target("*.kts")
             targetExclude("**/samples/**/*.kts")
-            ktlint(ktlintVersion)
+            addStep(ktfmt)
         }
     }
 

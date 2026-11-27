@@ -7,5 +7,4 @@ import io.nlopez.compose.rules.KtlintRule
 import io.nlopez.compose.rules.RememberStateMissing
 
 class RememberStateMissingCheck :
-    KtlintRule("compose:remember-missing-check"),
-    ComposeKtVisitor by RememberStateMissing()
+    KtlintRule("compose:remember-missing-check"), ComposeKtVisitor by RememberStateMissing()

@@ -6,6 +6,4 @@ import io.nlopez.compose.core.ComposeKtVisitor
 import io.nlopez.compose.rules.KtlintRule
 import io.nlopez.compose.rules.PreviewPublic
 
-class PreviewPublicCheck :
-    KtlintRule("compose:preview-public-check"),
-    ComposeKtVisitor by PreviewPublic()
+class PreviewPublicCheck : KtlintRule("compose:preview-public-check"), ComposeKtVisitor by PreviewPublic()

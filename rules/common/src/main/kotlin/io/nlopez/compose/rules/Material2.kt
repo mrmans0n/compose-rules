@@ -28,26 +28,31 @@ class Material2 : ComposeKtVisitor {
         val allowedFqNames = config.getSet("allowedFromM2", emptySet()).map { M2FqName + it } + NotInM2
 
         // Find in import list
-        val imports = file.importList?.imports.orEmpty()
-            .filterNotNull()
-            .filter { it.importedFqName?.startsWith(M2FqName) == true }
-            .filterNot { directive ->
-                allowedFqNames.any { directive.importedFqName?.startsWith(it) == true }
-            }
+        val imports =
+            file.importList
+                ?.imports
+                .orEmpty()
+                .filterNotNull()
+                .filter { it.importedFqName?.startsWith(M2FqName) == true }
+                .filterNot { directive ->
+                    allowedFqNames.any { directive.importedFqName?.startsWith(it) == true }
+                }
 
         for (directive in imports) {
             emitter.report(directive, DisallowedUsageOfMaterial2)
         }
 
         // Find usages that don't need imports (e.g. androidx.compose.material.Icons.Arrow being used directly)
-        val dotQualified = file.findAllChildrenByClass<KtDotQualifiedExpression>()
-            // Ignore the ones in imports
-            .runIfNotNull(file.importList) { imps -> filter { it.startOffset !in imps.range } }
-            // Ignore the ones in package definitions
-            .runIfNotNull(file.packageDirective) { pkg -> filter { it.startOffset !in pkg.range } }
-            // De-dup nested KtDotQualifiedExpression and only process the outermost
-            .dedupUsingOutermost()
-            .filter { it.hasReferenceToM2(allowedFqNames) }
+        val dotQualified =
+            file
+                .findAllChildrenByClass<KtDotQualifiedExpression>()
+                // Ignore the ones in imports
+                .runIfNotNull(file.importList) { imps -> filter { it.startOffset !in imps.range } }
+                // Ignore the ones in package definitions
+                .runIfNotNull(file.packageDirective) { pkg -> filter { it.startOffset !in pkg.range } }
+                // De-dup nested KtDotQualifiedExpression and only process the outermost
+                .dedupUsingOutermost()
+                .filter { it.hasReferenceToM2(allowedFqNames) }
 
         for (reference in dotQualified) {
             emitter.report(reference, DisallowedUsageOfMaterial2)
@@ -62,16 +67,18 @@ class Material2 : ComposeKtVisitor {
         return when (val expression = selectorExpression) {
             is KtCallExpression -> {
                 runCatching {
-                    val fqn = FqName(receiverExpression.text + "." + expression.calleeExpression?.text)
-                    fqn.startsWith(M2FqName) && allowlist.none { fqn.startsWith(it) }
-                }.getOrDefault(false)
+                        val fqn = FqName(receiverExpression.text + "." + expression.calleeExpression?.text)
+                        fqn.startsWith(M2FqName) && allowlist.none { fqn.startsWith(it) }
+                    }
+                    .getOrDefault(false)
             }
 
             is KtReferenceExpression -> {
                 runCatching {
-                    val fqn = FqName(text)
-                    fqn.startsWith(M2FqName) && allowlist.none { fqn.startsWith(it) }
-                }.getOrDefault(false)
+                        val fqn = FqName(text)
+                        fqn.startsWith(M2FqName) && allowlist.none { fqn.startsWith(it) }
+                    }
+                    .getOrDefault(false)
             }
 
             else -> false
@@ -80,12 +87,15 @@ class Material2 : ComposeKtVisitor {
 
     companion object {
         private val M2FqName = FqName.fromSegments(listOf("androidx", "compose", "material"))
-        private val NotInM2 = setOf(
-            M2FqName + "icons",
-        )
-        val DisallowedUsageOfMaterial2 = """
+        private val NotInM2 =
+            setOf(
+                M2FqName + "icons",
+            )
+        val DisallowedUsageOfMaterial2 =
+            """
             Compose Material 2 is disallowed by your configuration.
             See https://mrmans0n.github.io/compose-rules/rules/#dont-use-material-2 for more information.
-        """.trimIndent()
+            """
+                .trimIndent()
     }
 }

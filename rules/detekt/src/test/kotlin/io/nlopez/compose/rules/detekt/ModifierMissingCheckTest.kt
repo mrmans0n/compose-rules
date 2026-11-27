@@ -6,16 +6,16 @@ import dev.detekt.api.SourceLocation
 import dev.detekt.test.TestConfig
 import dev.detekt.test.lint
 import io.nlopez.compose.rules.ModifierMissing
-import io.nlopez.compose.rules.detekt.assertThat
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
 
 class ModifierMissingCheckTest {
 
-    private val testConfig = TestConfig(
-        "customModifiers" to listOf("BananaModifier"),
-        "contentEmittersDenylist" to listOf("PotatoDialog"),
-    )
+    private val testConfig =
+        TestConfig(
+            "customModifiers" to listOf("BananaModifier"),
+            "contentEmittersDenylist" to listOf("PotatoDialog"),
+        )
     private val rule = ModifierMissingCheck(testConfig)
 
     @Test
@@ -23,42 +23,43 @@ class ModifierMissingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something1() {
-                    Row {
+            @Composable
+            fun Something1() {
+                Row {
+                }
+            }
+            @Composable
+            fun Something2() {
+                Column(modifier = Modifier.fillMaxSize()) {
+                }
+            }
+            @Composable
+            fun Something3(): Unit {
+                SomethingElse {
+                    Box(modifier = Modifier.fillMaxSize()) {
                     }
                 }
-                @Composable
-                fun Something2() {
-                    Column(modifier = Modifier.fillMaxSize()) {
+            }
+            @Composable
+            fun Something4(): Unit {
+                SomethingElse {
+                    Box(modifier = Modifier.fillMaxSize()) {
                     }
                 }
-                @Composable
-                fun Something3(): Unit {
-                    SomethingElse {
-                        Box(modifier = Modifier.fillMaxSize()) {
-                        }
-                    }
+            }
+            @Composable
+            fun Something5(modifier: Modifier = Modifier) {
+                Row {
+                    Text("Hi!")
                 }
-                @Composable
-                fun Something4(): Unit {
-                    SomethingElse {
-                        Box(modifier = Modifier.fillMaxSize()) {
-                        }
-                    }
+            }
+            @Composable
+            fun Something6() {
+                Column(modifier = BananaModifier.fillMaxSize()) {
                 }
-                @Composable
-                fun Something5(modifier: Modifier = Modifier) {
-                    Row {
-                        Text("Hi!")
-                    }
-                }
-                @Composable
-                fun Something6() {
-                    Column(modifier = BananaModifier.fillMaxSize()) {
-                    }
-                }
-            """.trimIndent()
+            }
+            """
+                .trimIndent()
 
         val errors = rule.lint(code)
         assertThat(errors).hasTextLocations("Something1", "Something2", "Something3", "Something4", "Something6")
@@ -74,13 +75,14 @@ class ModifierMissingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Potato
-                @Composable
-                fun Something1() {
-                    Row {
-                    }
+            @Potato
+            @Composable
+            fun Something1() {
+                Row {
                 }
-            """.trimIndent()
+            }
+            """
+                .trimIndent()
 
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
@@ -91,19 +93,20 @@ class ModifierMissingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something1() {
+            @Composable
+            fun Something1() {
+                Whatever(modifier = Modifier.fillMaxSize()) {
+                }
+            }
+            @Composable
+            fun Something2(): Unit {
+                SomethingElse {
                     Whatever(modifier = Modifier.fillMaxSize()) {
                     }
                 }
-                @Composable
-                fun Something2(): Unit {
-                    SomethingElse {
-                        Whatever(modifier = Modifier.fillMaxSize()) {
-                        }
-                    }
-                }
-            """.trimIndent()
+            }
+            """
+                .trimIndent()
 
         val errors = rule.lint(code)
         assertThat(errors).hasTextLocations("Something1", "Something2")
@@ -116,67 +119,71 @@ class ModifierMissingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                private fun Something() {
-                    Row {
+            @Composable
+            private fun Something() {
+                Row {
+                }
+            }
+            @Composable
+            protected fun Something() {
+                Column(modifier = Modifier.fillMaxSize()) {
+                }
+            }
+            @Composable
+            internal fun Something() {
+                SomethingElse {
+                    Box(modifier = Modifier.fillMaxSize()) {
                     }
                 }
-                @Composable
-                protected fun Something() {
-                    Column(modifier = Modifier.fillMaxSize()) {
-                    }
+            }
+            @Composable
+            private fun Something() {
+                Whatever(modifier = Modifier.fillMaxSize()) {
                 }
-                @Composable
-                internal fun Something() {
-                    SomethingElse {
-                        Box(modifier = Modifier.fillMaxSize()) {
-                        }
-                    }
-                }
-                @Composable
-                private fun Something() {
-                    Whatever(modifier = Modifier.fillMaxSize()) {
-                    }
-                }
-            """.trimIndent()
+            }
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }
 
     @Test
     fun `public and internal visibility Composables are checked for 'public_and_internal' configuration`() {
-        val newRule = ModifierMissingCheck(
-            TestConfig("checkModifiersForVisibility" to "public_and_internal"),
-        )
+        val newRule =
+            ModifierMissingCheck(
+                TestConfig("checkModifiersForVisibility" to "public_and_internal"),
+            )
 
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something() {
-                    Row {
+            @Composable
+            fun Something() {
+                Row {
+                }
+            }
+            @Composable
+            protected fun Something() {
+                Column(modifier = Modifier.fillMaxSize()) {
+                }
+            }
+            @Composable
+            internal fun Something() {
+                SomethingElse {
+                    Box(modifier = Modifier.fillMaxSize()) {
                     }
                 }
-                @Composable
-                protected fun Something() {
-                    Column(modifier = Modifier.fillMaxSize()) {
-                    }
+            }
+            @Composable
+            private fun Something() {
+                Whatever(modifier = Modifier.fillMaxSize()) {
                 }
-                @Composable
-                internal fun Something() {
-                    SomethingElse {
-                        Box(modifier = Modifier.fillMaxSize()) {
-                        }
-                    }
-                }
-                @Composable
-                private fun Something() {
-                    Whatever(modifier = Modifier.fillMaxSize()) {
-                    }
-                }
-            """.trimIndent()
+            }
+            """
+                .trimIndent()
         val errors = newRule.lint(code)
-        assertThat(errors).hasSize(2)
+        assertThat(errors)
+            .hasSize(2)
             .hasStartSourceLocations(
                 SourceLocation(2, 5),
                 SourceLocation(12, 14),
@@ -188,38 +195,41 @@ class ModifierMissingCheckTest {
 
     @Test
     fun `all Composables are checked for 'all' configuration`() {
-        val newRule = ModifierMissingCheck(
-            TestConfig("checkModifiersForVisibility" to "all"),
-        )
+        val newRule =
+            ModifierMissingCheck(
+                TestConfig("checkModifiersForVisibility" to "all"),
+            )
 
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something() {
-                    Row {
+            @Composable
+            fun Something() {
+                Row {
+                }
+            }
+            @Composable
+            protected fun Something() {
+                Column(modifier = Modifier.fillMaxSize()) {
+                }
+            }
+            @Composable
+            internal fun Something() {
+                SomethingElse {
+                    Box(modifier = Modifier.fillMaxSize()) {
                     }
                 }
-                @Composable
-                protected fun Something() {
-                    Column(modifier = Modifier.fillMaxSize()) {
-                    }
+            }
+            @Composable
+            private fun Something() {
+                Whatever(modifier = Modifier.fillMaxSize()) {
                 }
-                @Composable
-                internal fun Something() {
-                    SomethingElse {
-                        Box(modifier = Modifier.fillMaxSize()) {
-                        }
-                    }
-                }
-                @Composable
-                private fun Something() {
-                    Whatever(modifier = Modifier.fillMaxSize()) {
-                    }
-                }
-            """.trimIndent()
+            }
+            """
+                .trimIndent()
         val errors = newRule.lint(code)
-        assertThat(errors).hasSize(4)
+        assertThat(errors)
+            .hasSize(4)
             .hasStartSourceLocations(
                 SourceLocation(2, 5),
                 SourceLocation(7, 15),
@@ -236,20 +246,21 @@ class ModifierMissingCheckTest {
         @Language("kotlin")
         val code =
             """
-                interface MyInterface {
-                    @Composable
-                    fun Something() {
-                        Row {
-                        }
-                    }
-
-                    @Composable
-                    fun Something() {
-                        Column(modifier = Modifier.fillMaxSize()) {
-                        }
+            interface MyInterface {
+                @Composable
+                fun Something() {
+                    Row {
                     }
                 }
-            """.trimIndent()
+
+                @Composable
+                fun Something() {
+                    Column(modifier = Modifier.fillMaxSize()) {
+                    }
+                }
+            }
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }
@@ -259,22 +270,23 @@ class ModifierMissingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                override fun Content() {
-                    Row {
-                    }
+            @Composable
+            override fun Content() {
+                Row {
                 }
-                @Composable
-                override fun TwitterContent() {
-                    Row {
-                    }
+            }
+            @Composable
+            override fun TwitterContent() {
+                Row {
                 }
-                @Composable
-                override fun ModalContent() {
-                    Row {
-                    }
+            }
+            @Composable
+            override fun ModalContent() {
+                Row {
                 }
-            """.trimIndent()
+            }
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }
@@ -284,12 +296,13 @@ class ModifierMissingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something(): Int {
-                    Row {
-                    }
+            @Composable
+            fun Something(): Int {
+                Row {
                 }
-            """.trimIndent()
+            }
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }
@@ -299,33 +312,34 @@ class ModifierMissingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Preview
-                @Composable
-                fun Something() {
-                    Row {
+            @Preview
+            @Composable
+            fun Something() {
+                Row {
+                }
+            }
+            @PreviewScreenSizes
+            @Composable
+            fun Something() {
+                Row {
+                }
+            }
+            @Preview
+            @Composable
+            fun Something() {
+                Column(modifier = Modifier.fillMaxSize()) {
+                }
+            }
+            @Preview
+            @Composable
+            fun Something(): Unit {
+                SomethingElse {
+                    Box(modifier = Modifier.fillMaxSize()) {
                     }
                 }
-                @PreviewScreenSizes
-                @Composable
-                fun Something() {
-                    Row {
-                    }
-                }
-                @Preview
-                @Composable
-                fun Something() {
-                    Column(modifier = Modifier.fillMaxSize()) {
-                    }
-                }
-                @Preview
-                @Composable
-                fun Something(): Unit {
-                    SomethingElse {
-                        Box(modifier = Modifier.fillMaxSize()) {
-                        }
-                    }
-                }
-            """.trimIndent()
+            }
+            """
+                .trimIndent()
 
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
@@ -336,19 +350,20 @@ class ModifierMissingCheckTest {
         @Language("kotlin")
         val code =
             """
-                fun MyDialog() {
-                    AlertDialog(
-                        onDismissRequest = { /*TODO*/ },
-                        buttons = { Text(text = "Button") },
-                        text = { Text(text = "Body") },
-                    )
-                    PotatoDialog(
-                        onDismissRequest = { /*TODO*/ },
-                        buttons = { Text(text = "Button") },
-                        text = { Text(text = "Body") },
-                    )
-                }
-            """.trimIndent()
+            fun MyDialog() {
+                AlertDialog(
+                    onDismissRequest = { /*TODO*/ },
+                    buttons = { Text(text = "Button") },
+                    text = { Text(text = "Body") },
+                )
+                PotatoDialog(
+                    onDismissRequest = { /*TODO*/ },
+                    buttons = { Text(text = "Button") },
+                    text = { Text(text = "Body") },
+                )
+            }
+            """
+                .trimIndent()
 
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
@@ -359,17 +374,18 @@ class ModifierMissingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun MyDialog() {
-                    Text(text = "Unicorn")
+            @Composable
+            fun MyDialog() {
+                Text(text = "Unicorn")
 
-                    AlertDialog(
-                        onDismissRequest = { /*TODO*/ },
-                        buttons = { Text(text = "Button") },
-                        text = { Text(text = "Body") },
-                    )
-                }
-            """.trimIndent()
+                AlertDialog(
+                    onDismissRequest = { /*TODO*/ },
+                    buttons = { Text(text = "Button") },
+                    text = { Text(text = "Body") },
+                )
+            }
+            """
+                .trimIndent()
 
         val errors = rule.lint(code)
         assertThat(errors).hasTextLocations("MyDialog")
@@ -381,12 +397,13 @@ class ModifierMissingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Modifier.Something() {
-                    Row {
-                    }
+            @Composable
+            fun Modifier.Something() {
+                Row {
                 }
-            """.trimIndent()
+            }
+            """
+                .trimIndent()
 
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()

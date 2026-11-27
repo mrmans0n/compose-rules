@@ -19,37 +19,40 @@ import org.jetbrains.kotlin.psi.KtSimpleNameExpression
 
 internal fun KtExpression.isSameResolvedValueAs(other: KtExpression): Boolean = runCatching {
     analyze(this) {
-        val resolver = object {
-            fun KtExpression.resolvedValueKey(): ResolvedValueKey? {
-                val symbol = when (this) {
-                    is KtSimpleNameExpression -> mainReference.resolveToSymbol()
+        val resolver =
+            object {
+                fun KtExpression.resolvedValueKey(): ResolvedValueKey? {
+                    val symbol =
+                        when (this) {
+                            is KtSimpleNameExpression -> mainReference.resolveToSymbol()
 
-                    is KtQualifiedExpression -> (selectorExpression as? KtSimpleNameExpression)
-                        ?.mainReference
-                        ?.resolveToSymbol()
+                            is KtQualifiedExpression ->
+                                (selectorExpression as? KtSimpleNameExpression)?.mainReference?.resolveToSymbol()
 
-                    else -> (resolveToCall() as? KaVariableAccessCall)?.signature?.symbol
-                } ?: return null
-                val symbolKey = symbol.sourcePsiSafe<KtElement>() ?: symbol
+                            else -> (resolveToCall() as? KaVariableAccessCall)?.signature?.symbol
+                        } ?: return null
+                    val symbolKey = symbol.sourcePsiSafe<KtElement>() ?: symbol
 
-                val receiverKey = when (this) {
-                    is KtQualifiedExpression -> receiverExpression.resolvedReceiverKey() ?: return null
-                    else -> null
-                }
-                return ResolvedValueKey(symbolKey, receiverKey)
-            }
-
-            private fun KtExpression.resolvedReceiverKey(): Any? = when (this) {
-                is KtSimpleNameExpression -> {
-                    val symbol = mainReference.resolveToSymbol() ?: return null
-                    symbol.sourcePsiSafe<KtElement>() ?: symbol
+                    val receiverKey =
+                        when (this) {
+                            is KtQualifiedExpression -> receiverExpression.resolvedReceiverKey() ?: return null
+                            else -> null
+                        }
+                    return ResolvedValueKey(symbolKey, receiverKey)
                 }
 
-                is KtQualifiedExpression -> resolvedValueKey()
+                private fun KtExpression.resolvedReceiverKey(): Any? =
+                    when (this) {
+                        is KtSimpleNameExpression -> {
+                            val symbol = mainReference.resolveToSymbol() ?: return null
+                            symbol.sourcePsiSafe<KtElement>() ?: symbol
+                        }
 
-                else -> null
+                        is KtQualifiedExpression -> resolvedValueKey()
+
+                        else -> null
+                    }
             }
-        }
 
         with(resolver) {
             val left = this@isSameResolvedValueAs.resolvedValueKey()
@@ -57,19 +60,22 @@ internal fun KtExpression.isSameResolvedValueAs(other: KtExpression): Boolean = 
             left != null && right != null && left == right
         }
     }
-}.getOrDefault(false)
+}
+    .getOrDefault(false)
 
 /**
- * Whether the operator is built in, like `&&` or `?:`, or calls a non-composable library function or a generated member,
- * like the `equals` of a data class.
+ * Whether the operator is built in, like `&&` or `?:`, or calls a non-composable library function or a generated
+ * member, like the `equals` of a data class.
  */
 internal fun KtBinaryExpression.isBuiltInOrLibraryOperator(): Boolean = runCatching {
     analyze(this) {
-        val symbol = this@isBuiltInOrLibraryOperator.resolveToCall()?.successfulFunctionCallOrNull()?.symbol
-            ?: return@analyze true
+        val symbol =
+            this@isBuiltInOrLibraryOperator.resolveToCall()?.successfulFunctionCallOrNull()?.symbol
+                ?: return@analyze true
         !symbol.hasComposableAnnotation() &&
             (isDeclaredInLibrary(symbol) || symbol.origin == KaSymbolOrigin.SOURCE_MEMBER_GENERATED)
     }
-}.getOrDefault(false)
+}
+    .getOrDefault(false)
 
 private data class ResolvedValueKey(val symbolKey: Any, val receiverKey: Any?)

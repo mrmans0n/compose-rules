@@ -9,6 +9,7 @@ import dev.detekt.api.RequiresAnalysisApi
 import dev.detekt.api.Rule
 import dev.detekt.api.RuleName
 import dev.detekt.api.config
+import java.net.URI
 import org.jetbrains.kotlin.analysis.api.analyze
 import org.jetbrains.kotlin.analysis.api.components.expectedType
 import org.jetbrains.kotlin.analysis.api.components.functionType
@@ -36,11 +37,8 @@ import org.jetbrains.kotlin.psi.KtTreeVisitorVoid
 import org.jetbrains.kotlin.psi.psiUtil.collectDescendantsOfType
 import org.jetbrains.kotlin.psi.psiUtil.getStrictParentOfType
 import org.jetbrains.kotlin.psi.psiUtil.siblings
-import java.net.URI
 
-/**
- * Reports Compose layouts whose only content is a conditional composable child.
- */
+/** Reports Compose layouts whose only content is a conditional composable child. */
 class ConditionHoistCheck(config: Config) :
     Rule(
         config,
@@ -51,14 +49,16 @@ class ConditionHoistCheck(config: Config) :
 
     override val ruleName: RuleName = RuleName("ConditionHoist")
 
-    private val ignoreCallsWithArgumentNames by config(
-        defaultValue = listOf(
-            "modifier",
-            "contentAlignment",
-            "horizontalArrangement",
-            "verticalAlignment",
-        ),
-    )
+    private val ignoreCallsWithArgumentNames by
+        config(
+            defaultValue =
+                listOf(
+                    "modifier",
+                    "contentAlignment",
+                    "horizontalArrangement",
+                    "verticalAlignment",
+                ),
+        )
 
     private val ignoreCallsWithArgumentNamesSet by lazy { ignoreCallsWithArgumentNames.toSet() }
 
@@ -83,15 +83,17 @@ class ConditionHoistCheck(config: Config) :
 
     private fun checkBody(body: KtExpression?) {
         body ?: return
-        val candidates = body.composableCallsInCurrentDeclaration()
-            .asSequence()
-            .filter { call -> call.isConfiguredContentEmitter() }
-            .filterNot { call -> call.hasExplicitArgumentMappedToAny(ignoreCallsWithArgumentNamesSet) }
-            .filterNot { call -> call.hasExplicitNonLambdaArguments() }
-            .mapNotNull { call -> call.singleComposableLambdaArgument() }
-            .filterNot { lambda -> lambda.hasValueParameters() }
-            .mapNotNull { lambda -> lambda.singleConditionalComposableChild() }
-            .distinct()
+        val candidates =
+            body
+                .composableCallsInCurrentDeclaration()
+                .asSequence()
+                .filter { call -> call.isConfiguredContentEmitter() }
+                .filterNot { call -> call.hasExplicitArgumentMappedToAny(ignoreCallsWithArgumentNamesSet) }
+                .filterNot { call -> call.hasExplicitNonLambdaArguments() }
+                .mapNotNull { call -> call.singleComposableLambdaArgument() }
+                .filterNot { lambda -> lambda.hasValueParameters() }
+                .mapNotNull { lambda -> lambda.singleConditionalComposableChild() }
+                .distinct()
 
         candidates.forEach(::reportConditionCouldBeHoisted)
     }
@@ -101,23 +103,26 @@ class ConditionHoistCheck(config: Config) :
         return composableLambdas.singleOrNull()
     }
 
-    private fun KtCallExpression.directLambdaArguments(): List<KtLambdaExpression> = (
-        valueArguments.mapNotNull { argument -> argument.getArgumentExpression() as? KtLambdaExpression } +
-            lambdaArguments.mapNotNull { argument -> argument.getLambdaExpression() }
-        ).distinct()
+    private fun KtCallExpression.directLambdaArguments(): List<KtLambdaExpression> =
+        (valueArguments.mapNotNull { argument -> argument.getArgumentExpression() as? KtLambdaExpression } +
+                lambdaArguments.mapNotNull { argument -> argument.getLambdaExpression() })
+            .distinct()
 
-    private fun KtCallExpression.hasExplicitNonLambdaArguments(): Boolean =
-        valueArguments.any { argument -> argument.getArgumentExpression() !is KtLambdaExpression }
+    private fun KtCallExpression.hasExplicitNonLambdaArguments(): Boolean = valueArguments.any { argument ->
+        argument.getArgumentExpression() !is KtLambdaExpression
+    }
 
     private fun KtCallExpression.isConfiguredContentEmitter(): Boolean = calleeExpression?.text in contentEmittersSet
 
-    private fun KtLambdaExpression.hasValueParameters(): Boolean = valueParameters.isNotEmpty() ||
-        runCatching {
-            analyze(this) {
-                (functionLiteral.functionType as? KaFunctionType)?.parameterTypes?.isNotEmpty() == true ||
-                    (expectedType as? KaFunctionType)?.parameterTypes?.isNotEmpty() == true
-            }
-        }.getOrDefault(false)
+    private fun KtLambdaExpression.hasValueParameters(): Boolean =
+        valueParameters.isNotEmpty() ||
+            runCatching {
+                    analyze(this) {
+                        (functionLiteral.functionType as? KaFunctionType)?.parameterTypes?.isNotEmpty() == true ||
+                            (expectedType as? KaFunctionType)?.parameterTypes?.isNotEmpty() == true
+                    }
+                }
+                .getOrDefault(false)
 
     private fun KtLambdaExpression.singleConditionalComposableChild(): KtIfExpression? {
         val body = bodyExpression ?: return null
@@ -133,28 +138,32 @@ class ConditionHoistCheck(config: Config) :
         if (!lambda.hasFunctionTypeReceiver()) return@runCatching false
 
         analyze(this) {
-            val receiverTypes = listOfNotNull(
-                (lambda.functionLiteral.functionType as? KaFunctionType)?.receiverType,
-                (lambda.expectedType as? KaFunctionType)?.receiverType,
-            )
+            val receiverTypes =
+                listOfNotNull(
+                    (lambda.functionLiteral.functionType as? KaFunctionType)?.receiverType,
+                    (lambda.expectedType as? KaFunctionType)?.receiverType,
+                )
             val receiverClasses = receiverTypes.mapNotNull { type -> type.symbol?.sourcePsiSafe<KtClassOrObject>() }
             val receiverClassIds = receiverTypes.mapNotNull { type -> type.symbol?.classId }.toSet()
             if (receiverClasses.isEmpty() && receiverClassIds.isEmpty()) return@analyze false
 
             simpleNameExpressions().any { expression ->
-                val receiverMember = when (val symbol = expression.mainReference.resolveToSymbol()) {
-                    is KaPropertySymbol -> symbol.toReceiverMember(
-                        sourceClass = symbol.sourcePsiSafe<KtProperty>()
-                            ?.getStrictParentOfType<KtClassOrObject>(),
-                    )
+                val receiverMember =
+                    when (val symbol = expression.mainReference.resolveToSymbol()) {
+                        is KaPropertySymbol ->
+                            symbol.toReceiverMember(
+                                sourceClass =
+                                    symbol.sourcePsiSafe<KtProperty>()?.getStrictParentOfType<KtClassOrObject>(),
+                            )
 
-                    is KaFunctionSymbol -> symbol.toReceiverMember(
-                        sourceClass = symbol.sourcePsiSafe<KtNamedFunction>()
-                            ?.getStrictParentOfType<KtClassOrObject>(),
-                    )
+                        is KaFunctionSymbol ->
+                            symbol.toReceiverMember(
+                                sourceClass =
+                                    symbol.sourcePsiSafe<KtNamedFunction>()?.getStrictParentOfType<KtClassOrObject>(),
+                            )
 
-                    else -> ReceiverMember()
-                }
+                        else -> ReceiverMember()
+                    }
 
                 receiverMember.sourceClass in receiverClasses ||
                     receiverMember.classId in receiverClassIds ||
@@ -162,23 +171,26 @@ class ConditionHoistCheck(config: Config) :
                     receiverMember.extensionReceiverClassId in receiverClassIds
             }
         }
-    }.getOrDefault(false)
+    }
+        .getOrDefault(false)
 
-    private fun KaCallableSymbol.toReceiverMember(sourceClass: KtClassOrObject?): ReceiverMember = ReceiverMember(
-        sourceClass = sourceClass,
-        classId = callableId?.classId,
-        extensionReceiverSourceClass = receiverParameter?.returnType?.symbol?.sourcePsiSafe<KtClassOrObject>(),
-        extensionReceiverClassId = receiverParameter?.returnType?.symbol?.classId,
-    )
+    private fun KaCallableSymbol.toReceiverMember(sourceClass: KtClassOrObject?): ReceiverMember =
+        ReceiverMember(
+            sourceClass = sourceClass,
+            classId = callableId?.classId,
+            extensionReceiverSourceClass = receiverParameter?.returnType?.symbol?.sourcePsiSafe<KtClassOrObject>(),
+            extensionReceiverClassId = receiverParameter?.returnType?.symbol?.classId,
+        )
 
     private fun KtExpression.simpleNameExpressions(): List<KtSimpleNameExpression> =
         listOfNotNull(this as? KtSimpleNameExpression) + collectDescendantsOfType()
 
-    private fun KtElement.directIfExpressions(): List<KtIfExpression> = when (this) {
-        is KtIfExpression -> listOf(this)
-        is KtBlockExpression -> statements.filterIsInstance<KtIfExpression>()
-        else -> emptyList()
-    }
+    private fun KtElement.directIfExpressions(): List<KtIfExpression> =
+        when (this) {
+            is KtIfExpression -> listOf(this)
+            is KtBlockExpression -> statements.filterIsInstance<KtIfExpression>()
+            else -> emptyList()
+        }
 
     private data class ReceiverMember(
         val sourceClass: KtClassOrObject? = null,
@@ -190,9 +202,7 @@ class ConditionHoistCheck(config: Config) :
     private fun KtIfExpression.hasContentSiblings(): Boolean {
         val before = siblings(forward = false, withItself = false)
         val after = siblings(forward = true, withItself = false)
-        return (before + after)
-            .filterIsInstance<KtElement>()
-            .any()
+        return (before + after).filterIsInstance<KtElement>().any()
     }
 
     private fun KtElement.hasEmittedComposableCall(): Boolean {
@@ -266,93 +276,96 @@ class ConditionHoistCheck(config: Config) :
     }
 
     internal companion object {
-        private val DefaultContentEmitters = setOf(
-            "BasicTextField",
-            "Box",
-            "Canvas",
-            "ClickableText",
-            "Column",
-            "Icon",
-            "Image",
-            "Layout",
-            "LazyColumn",
-            "LazyRow",
-            "LazyVerticalGrid",
-            "Row",
-            "Spacer",
-            "Text",
-            "BottomDrawer",
-            "Button",
-            "Card",
-            "Checkbox",
-            "CircularProgressIndicator",
-            "Divider",
-            "DropdownMenu",
-            "DropdownMenuItem",
-            "ExposedDropdownMenuBox",
-            "ExtendedFloatingActionButton",
-            "FloatingActionButton",
-            "IconButton",
-            "IconToggleButton",
-            "LeadingIconTab",
-            "LinearProgressIndicator",
-            "ListItem",
-            "ModalBottomSheetLayout",
-            "ModalDrawer",
-            "NavigationRail",
-            "NavigationRailItem",
-            "OutlinedButton",
-            "OutlinedTextField",
-            "RadioButton",
-            "Scaffold",
-            "ScrollableTabRow",
-            "Slider",
-            "SnackbarHost",
-            "Surface",
-            "SwipeToDismiss",
-            "Switch",
-            "Tab",
-            "TabRow",
-            "TextButton",
-            "TopAppBar",
-            "AssistChip",
-            "DatePickerDialog",
-            "DockedSearchBar",
-            "ElevatedAssistChip",
-            "ElevatedFilterChip",
-            "ElevatedSuggestionChip",
-            "FilterChip",
-            "HorizontalDivider",
-            "InputChip",
-            "InputField",
-            "ModalBottomSheet",
-            "NavigationBar",
-            "NavigationBarItem",
-            "PlainTooltip",
-            "RichTooltip",
-            "SearchBar",
-            "SuggestionChip",
-            "VerticalDivider",
-            "BottomNavigation",
-            "BottomNavigationContent",
-            "BottomNavigationSurface",
-            "FlowColumn",
-            "FlowRow",
-            "HorizontalPager",
-            "HorizontalPagerIndicator",
-            "SwipeRefresh",
-            "SwipeRefreshIndicator",
-            "TopAppBarContent",
-            "TopAppBarSurface",
-            "VerticalPager",
-            "VerticalPagerIndicator",
-            "WebView",
-        )
+        private val DefaultContentEmitters =
+            setOf(
+                "BasicTextField",
+                "Box",
+                "Canvas",
+                "ClickableText",
+                "Column",
+                "Icon",
+                "Image",
+                "Layout",
+                "LazyColumn",
+                "LazyRow",
+                "LazyVerticalGrid",
+                "Row",
+                "Spacer",
+                "Text",
+                "BottomDrawer",
+                "Button",
+                "Card",
+                "Checkbox",
+                "CircularProgressIndicator",
+                "Divider",
+                "DropdownMenu",
+                "DropdownMenuItem",
+                "ExposedDropdownMenuBox",
+                "ExtendedFloatingActionButton",
+                "FloatingActionButton",
+                "IconButton",
+                "IconToggleButton",
+                "LeadingIconTab",
+                "LinearProgressIndicator",
+                "ListItem",
+                "ModalBottomSheetLayout",
+                "ModalDrawer",
+                "NavigationRail",
+                "NavigationRailItem",
+                "OutlinedButton",
+                "OutlinedTextField",
+                "RadioButton",
+                "Scaffold",
+                "ScrollableTabRow",
+                "Slider",
+                "SnackbarHost",
+                "Surface",
+                "SwipeToDismiss",
+                "Switch",
+                "Tab",
+                "TabRow",
+                "TextButton",
+                "TopAppBar",
+                "AssistChip",
+                "DatePickerDialog",
+                "DockedSearchBar",
+                "ElevatedAssistChip",
+                "ElevatedFilterChip",
+                "ElevatedSuggestionChip",
+                "FilterChip",
+                "HorizontalDivider",
+                "InputChip",
+                "InputField",
+                "ModalBottomSheet",
+                "NavigationBar",
+                "NavigationBarItem",
+                "PlainTooltip",
+                "RichTooltip",
+                "SearchBar",
+                "SuggestionChip",
+                "VerticalDivider",
+                "BottomNavigation",
+                "BottomNavigationContent",
+                "BottomNavigationSurface",
+                "FlowColumn",
+                "FlowRow",
+                "HorizontalPager",
+                "HorizontalPagerIndicator",
+                "SwipeRefresh",
+                "SwipeRefreshIndicator",
+                "TopAppBarContent",
+                "TopAppBarSurface",
+                "VerticalPager",
+                "VerticalPagerIndicator",
+                "WebView",
+            )
 
-        val ConditionCouldBeHoisted = """
+        val ConditionCouldBeHoisted =
+            """
             Conditional expression could be hoisted out of the layout.
 
             See https://mrmans0n.github.io/compose-rules/rules/#hoist-single-conditional-layout-content for more information.
-        """.trimIndent()
+            """
+                .trimIndent()
     }
 }

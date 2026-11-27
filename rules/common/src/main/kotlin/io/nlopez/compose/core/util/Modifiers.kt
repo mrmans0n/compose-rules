@@ -16,9 +16,7 @@ import org.jetbrains.kotlin.psi.KtValueArgument
 import org.jetbrains.kotlin.psi.KtValueArgumentName
 import org.jetbrains.kotlin.psi.psiUtil.parents
 
-/**
- *  Try to get all possible names by iterating on possible name reassignments until it's stable
- */
+/** Try to get all possible names by iterating on possible name reassignments until it's stable */
 fun KtBlockExpression.obtainAllModifierNames(initialName: String): List<String> {
     val rootBlock = this
     var lastSize = 0
@@ -31,8 +29,8 @@ fun KtBlockExpression.obtainAllModifierNames(initialName: String): List<String> 
         // from outer modifier names that are not shadowed at that scope — shadowed names belong
         // to the lambda's or nested function's local modifier so aliases from them would cause
         // false positives.
-        tempModifierNames += findAllChildrenByClass<KtBlockExpression>()
-            .flatMap { block ->
+        tempModifierNames +=
+            findAllChildrenByClass<KtBlockExpression>().flatMap { block ->
                 val accessible = tempModifierNames - block.shadowedModifierNames(tempModifierNames, rootBlock)
                 if (accessible.isEmpty()) {
                     emptyList()
@@ -51,41 +49,42 @@ fun KtBlockExpression.obtainAllModifierNames(initialName: String): List<String> 
 private fun KtBlockExpression.shadowedModifierNames(
     modifierNames: Set<String>,
     stopAt: KtBlockExpression,
-): Set<String> = parents.takeWhile { it != stopAt }
-    .filterIsInstance<KtFunction>()
-    .flatMap { func ->
-        func.valueParameters.flatMap { param ->
-            when {
-                param.name != null -> listOfNotNull(param.name.takeIf { it in modifierNames })
+): Set<String> =
+    parents
+        .takeWhile { it != stopAt }
+        .filterIsInstance<KtFunction>()
+        .flatMap { func ->
+            func.valueParameters.flatMap { param ->
+                when {
+                    param.name != null -> listOfNotNull(param.name.takeIf { it in modifierNames })
 
-                // Destructured parameters like (modifier, _) store names in the declaration.
-                param.destructuringDeclaration != null ->
-                    param.destructuringDeclaration!!.entries
-                        .mapNotNull { it.name?.takeIf { it in modifierNames } }
+                    // Destructured parameters like (modifier, _) store names in the declaration.
+                    param.destructuringDeclaration != null ->
+                        param.destructuringDeclaration!!.entries.mapNotNull { it.name?.takeIf { it in modifierNames } }
 
-                else -> emptyList()
+                    else -> emptyList()
+                }
             }
         }
-    }
-    .toSet()
+        .toSet()
 
 /**
- * Find references to modifier as a property in case they try to modify or reuse the modifier that way
- * E.g. val modifier2 = if (X) modifier.blah() else modifier.bleh()
+ * Find references to modifier as a property in case they try to modify or reuse the modifier that way E.g. val
+ * modifier2 = if (X) modifier.blah() else modifier.bleh()
  */
-private fun KtBlockExpression.findModifierManipulations(contains: (String) -> Boolean): List<String> = statements
-    .filterIsInstance<KtProperty>()
-    .flatMap { property ->
-        property.findAllChildrenByClass<KtReferenceExpression>()
-            .filter { referenceExpression ->
-                val parent = referenceExpression.parent
-                parent !is KtCallExpression &&
-                    parent !is KtValueArgumentName &&
-                    contains(referenceExpression.text)
-            }
-            .map { property }
-    }
-    .mapNotNull { it.nameIdentifier?.text }
+private fun KtBlockExpression.findModifierManipulations(contains: (String) -> Boolean): List<String> =
+    statements
+        .filterIsInstance<KtProperty>()
+        .flatMap { property ->
+            property
+                .findAllChildrenByClass<KtReferenceExpression>()
+                .filter { referenceExpression ->
+                    val parent = referenceExpression.parent
+                    parent !is KtCallExpression && parent !is KtValueArgumentName && contains(referenceExpression.text)
+                }
+                .map { property }
+        }
+        .mapNotNull { it.nameIdentifier?.text }
 
 fun KtCallExpression.isUsingModifiers(
     modifierNames: Set<String>,
@@ -164,5 +163,6 @@ fun KtFunction.modifierParameter(config: ComposeKtConfig): KtParameter? {
     return modifiers.firstOrNull { it.name == "modifier" } ?: modifiers.firstOrNull()
 }
 
-fun KtFunction.modifierParameters(config: ComposeKtConfig): List<KtParameter> =
-    valueParameters.filter { it.isModifier(config) }
+fun KtFunction.modifierParameters(config: ComposeKtConfig): List<KtParameter> = valueParameters.filter {
+    it.isModifier(config)
+}

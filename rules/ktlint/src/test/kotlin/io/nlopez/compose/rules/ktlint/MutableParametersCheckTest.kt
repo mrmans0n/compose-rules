@@ -17,30 +17,32 @@ class MutableParametersCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something(a: ArrayList<String>) {}
-                @Composable
-                fun Something(a: HashSet<String>) {}
-                @Composable
-                fun Something(a: MutableMap<String, String>) {}
-            """.trimIndent()
-        mutableParamRuleAssertThat(code).hasLintViolationsWithoutAutoCorrect(
-            LintViolation(
-                line = 2,
-                col = 15,
-                detail = MutableParameters.MutableParameterInCompose,
-            ),
-            LintViolation(
-                line = 4,
-                col = 15,
-                detail = MutableParameters.MutableParameterInCompose,
-            ),
-            LintViolation(
-                line = 6,
-                col = 15,
-                detail = MutableParameters.MutableParameterInCompose,
-            ),
-        )
+            @Composable
+            fun Something(a: ArrayList<String>) {}
+            @Composable
+            fun Something(a: HashSet<String>) {}
+            @Composable
+            fun Something(a: MutableMap<String, String>) {}
+            """
+                .trimIndent()
+        mutableParamRuleAssertThat(code)
+            .hasLintViolationsWithoutAutoCorrect(
+                LintViolation(
+                    line = 2,
+                    col = 15,
+                    detail = MutableParameters.MutableParameterInCompose,
+                ),
+                LintViolation(
+                    line = 4,
+                    col = 15,
+                    detail = MutableParameters.MutableParameterInCompose,
+                ),
+                LintViolation(
+                    line = 6,
+                    col = 15,
+                    detail = MutableParameters.MutableParameterInCompose,
+                ),
+            )
     }
 
     @Test
@@ -48,11 +50,12 @@ class MutableParametersCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something(a: String, b: (Int) -> Unit) {}
-                @Composable
-                fun Something(a: State<String>) {}
-            """.trimIndent()
+            @Composable
+            fun Something(a: String, b: (Int) -> Unit) {}
+            @Composable
+            fun Something(a: State<String>) {}
+            """
+                .trimIndent()
         mutableParamRuleAssertThat(code).hasNoLintViolations()
     }
 }

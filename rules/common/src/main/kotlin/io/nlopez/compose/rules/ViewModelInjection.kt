@@ -30,12 +30,13 @@ class ViewModelInjection : ComposeKtVisitor {
 
         val bodyBlock = function.bodyBlockExpression ?: return
 
-        val knownViewModelFactories = DefaultKnownViewModelFactories +
-            config.getSet("viewModelFactories", emptySet())
+        val knownViewModelFactories = DefaultKnownViewModelFactories + config.getSet("viewModelFactories", emptySet())
 
-        bodyBlock.findAllChildrenByClass<KtProperty>()
+        bodyBlock
+            .findAllChildrenByClass<KtProperty>()
             .flatMap { property ->
-                property.findDirectChildrenByClass<KtCallExpression>()
+                property
+                    .findDirectChildrenByClass<KtCallExpression>()
                     .filter { it.calleeExpression?.text in knownViewModelFactories }
                     .filterNot { it.isNavigation(bodyBlock) }
                     .map { property to it.calleeExpression!!.text }
@@ -53,16 +54,18 @@ class ViewModelInjection : ComposeKtVisitor {
         val callExpression = property.findDirectFirstChildByClass<KtCallExpression>() ?: return
         val argumentList = callExpression.valueArgumentList ?: return
 
-        // With factories with params, we can't know for sure if they'll continue working (they might have not be accessible
+        // With factories with params, we can't know for sure if they'll continue working (they might have not be
+        // accessible
         // from the composable params). Let's filter them out.
         if (callExpression.valueArguments.isNotEmpty()) return
 
         // We also want the ViewModel type, with two possibilities to support:
         // val viewModel : VM = viewModel(...)
         // val viewModel = viewModel<VM>(...)
-        val viewModelTypeReference = property.typeReference
-            ?: property.findDirectFirstChildByClass<KtCallExpression>()?.typeArguments?.singleOrNull()
-            ?: return
+        val viewModelTypeReference =
+            property.typeReference
+                ?: property.findDirectFirstChildByClass<KtCallExpression>()?.typeArguments?.singleOrNull()
+                ?: return
 
         // Then we need to check the parameters on the FunctionNode. We want to be the last element added
         // EXCEPT in the case in which there is a function as the last parameter, in which case we want to be
@@ -83,8 +86,7 @@ class ViewModelInjection : ComposeKtVisitor {
                 // Ideally this should be:
                 //  parameterList.addParameter(newParam)
                 // but since Kotlin 1.9 we can't use these methods without crashing.
-                (parameterList.node.lastChildLeafOrSelf() as LeafPsiElement)
-                    .rawReplaceWithText("${newParam.text})")
+                (parameterList.node.lastChildLeafOrSelf() as LeafPsiElement).rawReplaceWithText("${newParam.text})")
             }
 
             // If the last element is a function, we need to preserve the trailing lambda, so we will insert
@@ -96,10 +98,8 @@ class ViewModelInjection : ComposeKtVisitor {
                     firstToken.rawReplaceWithText("($newCode, ")
                 } else {
                     // If there were 2+ params, we insert the code between the two parameters
-                    val lastToken = lastParameters.first()
-                        .node
-                        .nextCodeSibling()!!
-                        .lastChildLeafOrSelf() as LeafPsiElement
+                    val lastToken =
+                        lastParameters.first().node.nextCodeSibling()!!.lastChildLeafOrSelf() as LeafPsiElement
                     // Last token here would be the previous comma, if there were spaces between the comma
                     // and the functional type (the next sibling), we would insert ourselves at the left of it.
                     lastToken.rawReplaceWithText("${lastToken.text} $newCode,")
@@ -117,8 +117,9 @@ class ViewModelInjection : ComposeKtVisitor {
                 val preCommaIfNeeded = if (hasTrailingComma) "" else ","
                 // And if it has a trailing comma, we'll need to preserve that in the style
                 val trailingCommaIfNeeded = if (hasTrailingComma) "," else ""
-                (parameterList.node.lastChildLeafOrSelf() as LeafPsiElement)
-                    .rawReplaceWithText("$preCommaIfNeeded${newParam.text}$trailingCommaIfNeeded)")
+                (parameterList.node.lastChildLeafOrSelf() as LeafPsiElement).rawReplaceWithText(
+                    "$preCommaIfNeeded${newParam.text}$trailingCommaIfNeeded)",
+                )
             }
         }
 
@@ -129,10 +130,11 @@ class ViewModelInjection : ComposeKtVisitor {
         property.delete()
     }
 
-    private fun KtCallExpression.isNavigation(stopAt: PsiElement): Boolean = parents
-        .takeWhile { it != stopAt }
-        .filterIsInstance<KtCallExpression>()
-        .any { it.calleeExpression?.text in KnownNavigationCallExpressions }
+    private fun KtCallExpression.isNavigation(stopAt: PsiElement): Boolean =
+        parents
+            .takeWhile { it != stopAt }
+            .filterIsInstance<KtCallExpression>()
+            .any { it.calleeExpression?.text in KnownNavigationCallExpressions }
 
     companion object {
         private val KnownNavigationCallExpressions by lazy {
@@ -164,10 +166,12 @@ class ViewModelInjection : ComposeKtVisitor {
             )
         }
 
-        fun errorMessage(factoryName: String) = """
+        fun errorMessage(factoryName: String) =
+            """
             Implicit dependencies of composables should be made explicit.
             Usages of $factoryName to acquire a ViewModel should be done in composable default parameters, so that it is more testable and flexible.
             See https://mrmans0n.github.io/compose-rules/rules/#viewmodels for more information.
-        """.trimIndent()
+        """
+                .trimIndent()
     }
 }

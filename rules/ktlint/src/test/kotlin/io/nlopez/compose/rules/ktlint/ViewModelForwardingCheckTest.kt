@@ -22,7 +22,8 @@ class ViewModelForwardingCheckTest {
                 val viewModel = weaverViewModel<MyVM>()
                 AnotherComposable(viewModel)
             }
-            """.trimIndent()
+            """
+                .trimIndent()
         forwardingRuleAssertThat(code).hasNoLintViolations()
     }
 
@@ -38,7 +39,8 @@ class ViewModelForwardingCheckTest {
                     AnotherComposable(viewModel)
                 }
             }
-            """.trimIndent()
+            """
+                .trimIndent()
         forwardingRuleAssertThat(code).hasNoLintViolations()
     }
 
@@ -52,7 +54,8 @@ class ViewModelForwardingCheckTest {
                 val state by viewModel.watchAsState()
                 AnotherComposable(state, onAvatarClicked = { viewModel(AvatarClickedIntent) })
             }
-            """.trimIndent()
+            """
+                .trimIndent()
         forwardingRuleAssertThat(code).hasNoLintViolations()
     }
 
@@ -75,7 +78,8 @@ class ViewModelForwardingCheckTest {
             fun MyComposable3(viewModel: MyViewModel) {
                 AnotherComposable(vm = viewModel)
             }
-            """.trimIndent()
+            """
+                .trimIndent()
         forwardingRuleAssertThat(code)
             .withEditorConfigOverride(allowedStateHolderNames to ".*Component,.*ViewModel")
             .hasLintViolationsWithoutAutoCorrect(
@@ -114,7 +118,8 @@ class ViewModelForwardingCheckTest {
                     AnotherComposable(vm = this)
                 }
             }
-            """.trimIndent()
+            """
+                .trimIndent()
         forwardingRuleAssertThat(code)
             .withEditorConfigOverride(allowedStateHolderNames to ".*Component,.*ViewModel")
             .hasLintViolationsWithoutAutoCorrect(
@@ -148,7 +153,8 @@ class ViewModelForwardingCheckTest {
                     AnotherComposable(vm = this)
                 }
             }
-            """.trimIndent()
+            """
+                .trimIndent()
         forwardingRuleAssertThat(code)
             .withEditorConfigOverride(allowedStateHolderNames to ".*Component,.*ViewModel")
             .hasLintViolationsWithoutAutoCorrect(
@@ -182,7 +188,8 @@ class ViewModelForwardingCheckTest {
                     AnotherComposable(vm = this)
                 }
             }
-            """.trimIndent()
+            """
+                .trimIndent()
         forwardingRuleAssertThat(code)
             .withEditorConfigOverride(allowedStateHolderNames to ".*Component,.*ViewModel")
             .hasLintViolationsWithoutAutoCorrect(
@@ -216,7 +223,8 @@ class ViewModelForwardingCheckTest {
                     AnotherComposable(vm = it)
                 }
             }
-            """.trimIndent()
+            """
+                .trimIndent()
         forwardingRuleAssertThat(code)
             .withEditorConfigOverride(allowedStateHolderNames to ".*Component,.*ViewModel")
             .hasLintViolationsWithoutAutoCorrect(
@@ -250,7 +258,8 @@ class ViewModelForwardingCheckTest {
                     AnotherComposable(vm = it)
                 }
             }
-            """.trimIndent()
+            """
+                .trimIndent()
         forwardingRuleAssertThat(code)
             .withEditorConfigOverride(allowedStateHolderNames to ".*Component,.*ViewModel")
             .hasLintViolationsWithoutAutoCorrect(
@@ -312,7 +321,8 @@ class ViewModelForwardingCheckTest {
                     }
                 }
             }
-            """.trimIndent()
+            """
+                .trimIndent()
         forwardingRuleAssertThat(code).hasNoLintViolations()
     }
 
@@ -328,7 +338,8 @@ class ViewModelForwardingCheckTest {
                 val x = remember(viewModel) { "ABC" }
                 LaunchedEffect(viewModel) { }
             }
-            """.trimIndent()
+            """
+                .trimIndent()
         forwardingRuleAssertThat(code).hasNoLintViolations()
     }
 
@@ -345,7 +356,8 @@ class ViewModelForwardingCheckTest {
             fun MyComposable2(viewModel: MyStateHolder) {
                 AnotherComposable(viewModel)
             }
-            """.trimIndent()
+            """
+                .trimIndent()
         forwardingRuleAssertThat(code)
             .withEditorConfigOverride(
                 allowedStateHolderNames to ".*Component,.*StateHolder",
@@ -383,7 +395,8 @@ class ViewModelForwardingCheckTest {
             fun MyComposable3(viewModel: MyViewModel) {
                 AnotherComposableContent(vm = viewModel)
             }
-            """.trimIndent()
+            """
+                .trimIndent()
         forwardingRuleAssertThat(code)
             .withEditorConfigOverride(
                 allowedForwarding to ".*Content",
@@ -414,7 +427,8 @@ class ViewModelForwardingCheckTest {
             fun MyComposable4(viewModel: PotatoViewModel) {
                 with(viewModel) { AnotherComposable(vm = this) }
             }
-            """.trimIndent()
+            """
+                .trimIndent()
         forwardingRuleAssertThat(code)
             .withEditorConfigOverride(
                 allowedForwardingOfTypes to "PotatoViewModel",

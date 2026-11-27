@@ -21,12 +21,14 @@ class ModifierWithoutDefaultCheckTest {
     @Test
     fun `errors when a Composable has modifiers but without default values, and is able to auto fix it`() {
         @Language("kotlin")
-        val composableCode = """
-                @Composable
-                fun Something(modifier: Modifier) { }
-                @Composable
-                fun Something(modifier: Modifier = Modifier, modifier2: Modifier) { }
-        """.trimIndent()
+        val composableCode =
+            """
+            @Composable
+            fun Something(modifier: Modifier) { }
+            @Composable
+            fun Something(modifier: Modifier = Modifier, modifier2: Modifier) { }
+            """
+                .trimIndent()
 
         modifierRuleAssertThat(composableCode)
             .hasLintViolations(
@@ -47,20 +49,23 @@ class ModifierWithoutDefaultCheckTest {
                 fun Something(modifier: Modifier = Modifier) { }
                 @Composable
                 fun Something(modifier: Modifier = Modifier, modifier2: Modifier = Modifier) { }
-                """.trimIndent(),
+                """
+                    .trimIndent(),
             )
     }
 
     @Test
     fun `the autocorrect supports annotated parameters in multiline parameter lists`() {
         @Language("kotlin")
-        val composableCode = """
-                @Composable
-                fun Something(
-                    title: String,
-                    @Suppress("unused") modifier: Modifier,
-                ) { }
-        """.trimIndent()
+        val composableCode =
+            """
+            @Composable
+            fun Something(
+                title: String,
+                @Suppress("unused") modifier: Modifier,
+            ) { }
+            """
+                .trimIndent()
 
         modifierRuleAssertThat(composableCode)
             .hasLintViolation(
@@ -75,31 +80,37 @@ class ModifierWithoutDefaultCheckTest {
                     title: String,
                     @Suppress("unused") modifier: Modifier = Modifier,
                 ) { }
-                """.trimIndent(),
+                """
+                    .trimIndent(),
             )
     }
 
     @Test
     fun `the autocorrect keeps the Modifier import when the parameter type is its only usage`() {
         @Language("kotlin")
-        val code = """
-                package com.example.probe
+        val code =
+            """
+            package com.example.probe
 
-                import androidx.compose.foundation.layout.Box
-                import androidx.compose.runtime.Composable
-                import androidx.compose.ui.Modifier
+            import androidx.compose.foundation.layout.Box
+            import androidx.compose.runtime.Composable
+            import androidx.compose.ui.Modifier
 
-                @Composable
-                fun ProbeScreen(modifier: Modifier, title: String) {
-                    Box(modifier = modifier) { }
-                }
-        """.trimIndent()
+            @Composable
+            fun ProbeScreen(modifier: Modifier, title: String) {
+                Box(modifier = modifier) { }
+            }
+            """
+                .trimIndent()
 
-        val engine = KtLintRuleEngine(
-            ruleProviders = setOf(RuleV2Provider { ModifierWithoutDefaultCheck() }) +
-                StandardRuleSetProvider().getRuleProviders()
-                    .filter { it.createNewRuleInstance().ruleId.value == "standard:no-unused-imports" },
-        )
+        val engine =
+            KtLintRuleEngine(
+                ruleProviders =
+                    setOf(RuleV2Provider { ModifierWithoutDefaultCheck() }) +
+                        StandardRuleSetProvider().getRuleProviders().filter {
+                            it.createNewRuleInstance().ruleId.value == "standard:no-unused-imports"
+                        },
+            )
 
         val formatted = engine.format(Code.fromSnippet(code)) { AutocorrectDecision.ALLOW_AUTOCORRECT }
 
@@ -111,18 +122,20 @@ class ModifierWithoutDefaultCheckTest {
     @Test
     fun `passes when a Composable inside of an interface has modifiers but without default values`() {
         @Language("kotlin")
-        val composableCode = """
-                interface Bleh {
-                    @Composable
-                    fun Something(modifier: Modifier)
-                }
-                class BlehImpl : Bleh {
-                    @Composable
-                    override fun Something(modifier: Modifier) {}
-                }
+        val composableCode =
+            """
+            interface Bleh {
                 @Composable
-                actual fun Something(modifier: Modifier) {}
-        """.trimIndent()
+                fun Something(modifier: Modifier)
+            }
+            class BlehImpl : Bleh {
+                @Composable
+                override fun Something(modifier: Modifier) {}
+            }
+            @Composable
+            actual fun Something(modifier: Modifier) {}
+            """
+                .trimIndent()
 
         modifierRuleAssertThat(composableCode).hasNoLintViolations()
     }
@@ -130,15 +143,17 @@ class ModifierWithoutDefaultCheckTest {
     @Test
     fun `passes when a Composable is an abstract function but without default values`() {
         @Language("kotlin")
-        val composableCode = """
-                abstract class Bleh {
-                    @Composable
-                    abstract fun Something(modifier: Modifier)
+        val composableCode =
+            """
+            abstract class Bleh {
+                @Composable
+                abstract fun Something(modifier: Modifier)
 
-                    @Composable
-                    open fun Something(modifier: Modifier) {}
-                }
-        """.trimIndent()
+                @Composable
+                open fun Something(modifier: Modifier) {}
+            }
+            """
+                .trimIndent()
 
         modifierRuleAssertThat(composableCode).hasNoLintViolations()
     }
@@ -148,22 +163,23 @@ class ModifierWithoutDefaultCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something(modifier: Modifier = Modifier) {
-                    Row(modifier = modifier) {
-                    }
+            @Composable
+            fun Something(modifier: Modifier = Modifier) {
+                Row(modifier = modifier) {
                 }
-                @Composable
-                fun Something(modifier: Modifier = Modifier.fillMaxSize()) {
-                    Row(modifier = modifier) {
-                    }
+            }
+            @Composable
+            fun Something(modifier: Modifier = Modifier.fillMaxSize()) {
+                Row(modifier = modifier) {
                 }
-                @Composable
-                fun Something(modifier: Modifier = SomeOtherValueFromSomeConstant) {
-                    Row(modifier = modifier) {
-                    }
+            }
+            @Composable
+            fun Something(modifier: Modifier = SomeOtherValueFromSomeConstant) {
+                Row(modifier = modifier) {
                 }
-            """.trimIndent()
+            }
+            """
+                .trimIndent()
         modifierRuleAssertThat(code).hasNoLintViolations()
     }
 
@@ -172,12 +188,13 @@ class ModifierWithoutDefaultCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Modifier.something(modifier: Modifier) {
-                    Row(modifier = modifier) {
-                    }
+            @Composable
+            fun Modifier.something(modifier: Modifier) {
+                Row(modifier = modifier) {
                 }
-            """.trimIndent()
+            }
+            """
+                .trimIndent()
         modifierRuleAssertThat(code).hasNoLintViolations()
     }
 }

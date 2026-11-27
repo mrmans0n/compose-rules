@@ -17,18 +17,21 @@ private val DefaultModifierTypeNames = setOf("Modifier", "GlanceModifier")
 fun KtCallExpression.parametersBeingUsedFrom(
     parameterNames: Set<String>,
     modifierTypeNames: Set<String> = DefaultModifierTypeNames,
-): Set<String> = valueArguments.flatMap { argument ->
-    when (val expression = KtPsiUtil.deparenthesize(argument.getArgumentExpression())) {
-        // if it's MyComposable(modifier) or similar
-        is KtReferenceExpression -> listOfNotNull(expression.text.takeIf { it in parameterNames })
+): Set<String> =
+    valueArguments
+        .flatMap { argument ->
+            when (val expression = KtPsiUtil.deparenthesize(argument.getArgumentExpression())) {
+                // if it's MyComposable(modifier) or similar
+                is KtReferenceExpression -> listOfNotNull(expression.text.takeIf { it in parameterNames })
 
-        // if it's MyComposable(modifier.fillMaxWidth()) or similar,
-        // also handles MyComposable(Modifier.then(modifier)) and chained variants
-        is KtDotQualifiedExpression -> expression.parameterNamesUsedIn(parameterNames, modifierTypeNames)
+                // if it's MyComposable(modifier.fillMaxWidth()) or similar,
+                // also handles MyComposable(Modifier.then(modifier)) and chained variants
+                is KtDotQualifiedExpression -> expression.parameterNamesUsedIn(parameterNames, modifierTypeNames)
 
-        else -> emptyList()
-    }
-}.toSet()
+                else -> emptyList()
+            }
+        }
+        .toSet()
 
 private fun KtDotQualifiedExpression.parameterNamesUsedIn(
     parameterNames: Set<String>,
@@ -40,8 +43,7 @@ private fun KtDotQualifiedExpression.parameterNamesUsedIn(
     // Modifier type literal (including custom types). Arbitrary lowercase roots are excluded:
     // without type resolution we cannot tell a local Modifier variable from any other local,
     // and the heuristic produces false positives for non-Modifier chains like pipeline.then(modifier).
-    val shouldScanThenArgs = rootText in parameterNames ||
-        rootText in modifierTypeNames
+    val shouldScanThenArgs = rootText in parameterNames || rootText in modifierTypeNames
     if (shouldScanThenArgs) {
         var current: KtDotQualifiedExpression? = this@parameterNamesUsedIn
         while (current != null) {
@@ -51,9 +53,10 @@ private fun KtDotQualifiedExpression.parameterNamesUsedIn(
                     when (val expr = KtPsiUtil.deparenthesize(arg.getArgumentExpression())) {
                         is KtReferenceExpression -> if (expr.text in parameterNames) add(expr.text)
 
-                        is KtDotQualifiedExpression -> if (expr.rootExpression.text in parameterNames) {
-                            add(expr.rootExpression.text)
-                        }
+                        is KtDotQualifiedExpression ->
+                            if (expr.rootExpression.text in parameterNames) {
+                                add(expr.rootExpression.text)
+                            }
 
                         else -> {}
                     }
@@ -64,27 +67,26 @@ private fun KtDotQualifiedExpression.parameterNamesUsedIn(
     }
 }
 
-private fun KtCallExpression.ancestorsParameterNamesSequence(stopAt: PsiElement) = parents.takeWhile { it != stopAt }
-    .filterIsInstance<KtCallableDeclaration>()
-    .flatMap { it.valueParameters }
-    .flatMap { parameter ->
-        when {
-            // Normal parameters
-            parameter.name != null -> listOfNotNull(parameter.name)
+private fun KtCallExpression.ancestorsParameterNamesSequence(stopAt: PsiElement) =
+    parents
+        .takeWhile { it != stopAt }
+        .filterIsInstance<KtCallableDeclaration>()
+        .flatMap { it.valueParameters }
+        .flatMap { parameter ->
+            when {
+                // Normal parameters
+                parameter.name != null -> listOfNotNull(parameter.name)
 
-            // Destructured parameters
-            parameter.destructuringDeclaration != null ->
-                parameter.destructuringDeclaration!!
-                    .entries
-                    .mapNotNull { it.name }
+                // Destructured parameters
+                parameter.destructuringDeclaration != null ->
+                    parameter.destructuringDeclaration!!.entries.mapNotNull { it.name }
 
-            else -> emptyList()
+                else -> emptyList()
+            }
         }
-    }
 
-private fun KtCallExpression.walkbackDeclarationsUntil(stopAt: PsiElement) = walkBackwards(stopAtParent = stopAt)
-    .filterIsInstance<KtDeclarationWithInitializer>()
-    .flatMap { declaration ->
+private fun KtCallExpression.walkbackDeclarationsUntil(stopAt: PsiElement) =
+    walkBackwards(stopAtParent = stopAt).filterIsInstance<KtDeclarationWithInitializer>().flatMap { declaration ->
         when {
             declaration.name != null -> listOfNotNull(declaration.name)
             declaration is KtDestructuringDeclaration -> declaration.entries.mapNotNull { it.name }
@@ -95,9 +97,8 @@ private fun KtCallExpression.walkbackDeclarationsUntil(stopAt: PsiElement) = wal
 fun KtCallExpression.findShadowingRedeclarations(
     parameterName: String,
     stopAt: PsiElement,
-): Sequence<KtDeclarationWithInitializer> = walkbackDeclarationsUntil(stopAt = stopAt)
-    .filter { (name, _) -> name == parameterName }
-    .mapSecond()
+): Sequence<KtDeclarationWithInitializer> =
+    walkbackDeclarationsUntil(stopAt = stopAt).filter { (name, _) -> name == parameterName }.mapSecond()
 
 fun KtCallExpression.isFullyShadowed(
     parameterNames: Set<String>,

@@ -17,10 +17,11 @@ class CompositionLocalNamingCheckTest {
         @Language("kotlin")
         val code =
             """
-                val AppleLocal = staticCompositionLocalOf<String> { "Apple" }
-                val Plum: ProvidableCompositionLocal<String> = staticCompositionLocalOf { "Plum" }
-                private val Lemon = compositionLocalWithComputedDefaultOf { "Lemon" }
-            """.trimIndent()
+            val AppleLocal = staticCompositionLocalOf<String> { "Apple" }
+            val Plum: ProvidableCompositionLocal<String> = staticCompositionLocalOf { "Plum" }
+            private val Lemon = compositionLocalWithComputedDefaultOf { "Lemon" }
+            """
+                .trimIndent()
         ruleAssertThat(code)
             .hasLintViolationsWithoutAutoCorrect(
                 LintViolation(
@@ -46,10 +47,11 @@ class CompositionLocalNamingCheckTest {
         @Language("kotlin")
         val code =
             """
-                val LocalBanana = staticCompositionLocalOf<String> { "Banana" }
-                val LocalPotato = compositionLocalOf { "Potato" }
-                val LocalPeach = compositionLocalWithComputedDefaultOf { "Peach" }
-            """.trimIndent()
+            val LocalBanana = staticCompositionLocalOf<String> { "Banana" }
+            val LocalPotato = compositionLocalOf { "Potato" }
+            val LocalPeach = compositionLocalWithComputedDefaultOf { "Peach" }
+            """
+                .trimIndent()
         ruleAssertThat(code).hasNoLintViolations()
     }
 }

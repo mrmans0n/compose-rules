@@ -17,13 +17,14 @@ class ParameterNamingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun A(onClicked: () -> Boolean) { }
-                @Composable
-                fun A(onWrote: () -> Boolean) { }
-                @Composable
-                fun A(onPotatoed: Potato) { }
-            """.trimIndent()
+            @Composable
+            fun A(onClicked: () -> Boolean) { }
+            @Composable
+            fun A(onWrote: () -> Boolean) { }
+            @Composable
+            fun A(onPotatoed: Potato) { }
+            """
+                .trimIndent()
         ruleAssertThat(code)
             .withEditorConfigOverride(
                 treatAsLambda to "Potato",
@@ -52,9 +53,10 @@ class ParameterNamingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun A(blehWrote: () -> Unit, mehChanged: () -> Unit, potatoed: Potato) {}
-            """.trimIndent()
+            @Composable
+            fun A(blehWrote: () -> Unit, mehChanged: () -> Unit, potatoed: Potato) {}
+            """
+                .trimIndent()
 
         ruleAssertThat(code)
             .withEditorConfigOverride(
@@ -68,19 +70,20 @@ class ParameterNamingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun A(
-                    onClick: () -> Unit,
-                    onValueChange: (Int) -> Unit,
-                    onWrite: () -> Unit,
-                    onPotato: Potato,
-                    onEmbed: () -> Unit,
-                    onDone: () -> Unit,
-                    onFocusChanged: () -> Unit,
-                    onPlaced: (LayoutCoordinates) -> Unit,
-                    onValueChangeFinished: () -> Unit,
-                ) {}
-            """.trimIndent()
+            @Composable
+            fun A(
+                onClick: () -> Unit,
+                onValueChange: (Int) -> Unit,
+                onWrite: () -> Unit,
+                onPotato: Potato,
+                onEmbed: () -> Unit,
+                onDone: () -> Unit,
+                onFocusChanged: () -> Unit,
+                onPlaced: (LayoutCoordinates) -> Unit,
+                onValueChangeFinished: () -> Unit,
+            ) {}
+            """
+                .trimIndent()
 
         ruleAssertThat(code)
             .withEditorConfigOverride(
@@ -94,12 +97,13 @@ class ParameterNamingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun A(
-                    onSizeChanged: () -> Unit,
-                    onGloballyPositioned: () -> Unit,
-                ) {}
-            """.trimIndent()
+            @Composable
+            fun A(
+                onSizeChanged: () -> Unit,
+                onGloballyPositioned: () -> Unit,
+            ) {}
+            """
+                .trimIndent()
 
         ruleAssertThat(code)
             .withEditorConfigOverride(

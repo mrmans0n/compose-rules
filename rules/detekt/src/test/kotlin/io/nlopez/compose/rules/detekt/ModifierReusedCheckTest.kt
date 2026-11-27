@@ -6,7 +6,6 @@ import dev.detekt.api.Config
 import dev.detekt.api.SourceLocation
 import dev.detekt.test.lint
 import io.nlopez.compose.rules.ModifierReused
-import io.nlopez.compose.rules.detekt.assertThat
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
 
@@ -19,55 +18,56 @@ class ModifierReusedCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something(modifier: Modifier) {
-                    Row(modifier) {
-                        SomethingElse(modifier)
-                    }
+            @Composable
+            fun Something(modifier: Modifier) {
+                Row(modifier) {
+                    SomethingElse(modifier)
                 }
-                @Composable
-                fun Something(modifier: Modifier): Int {
-                    Column(modifier = modifier) {
-                        SomethingElse(modifier = Modifier)
-                        SomethingDifferent(modifier = modifier)
-                    }
+            }
+            @Composable
+            fun Something(modifier: Modifier): Int {
+                Column(modifier = modifier) {
+                    SomethingElse(modifier = Modifier)
+                    SomethingDifferent(modifier = modifier)
                 }
-                @Composable
-                fun BoxScope.Something(modifier: Modifier) {
-                    Column(modifier = modifier) {
-                        SomethingDifferent()
-                    }
-                    SomethingElse(modifier = modifier)
-                    SomethingElse(modifier = modifier.padding12())
+            }
+            @Composable
+            fun BoxScope.Something(modifier: Modifier) {
+                Column(modifier = modifier) {
+                    SomethingDifferent()
                 }
-                @Composable
-                fun Something(myMod: Modifier) {
-                    Column {
-                        SomethingElse(myMod)
-                        SomethingElse(myMod)
-                    }
+                SomethingElse(modifier = modifier)
+                SomethingElse(modifier = modifier.padding12())
+            }
+            @Composable
+            fun Something(myMod: Modifier) {
+                Column {
+                    SomethingElse(myMod)
+                    SomethingElse(myMod)
                 }
-                @Composable
-                fun FoundThisOneInTheWild(modifier: Modifier = Modifier) {
+            }
+            @Composable
+            fun FoundThisOneInTheWild(modifier: Modifier = Modifier) {
+                Box(
+                    modifier = modifier
+                        .size(AvatarSize.Default.size)
+                        .clip(CircleShape)
+                        .then(colorModifier)
+                ) {
                     Box(
-                        modifier = modifier
-                            .size(AvatarSize.Default.size)
-                            .clip(CircleShape)
-                            .then(colorModifier)
-                    ) {
-                        Box(
-                            modifier = modifier.padding(spacesBorderWidth)
-                        )
-                    }
+                        modifier = modifier.padding(spacesBorderWidth)
+                    )
                 }
-                @Composable
-                fun Something(modifier: Modifier, otherModifier: Modifier): Int {
-                    Column(modifier = modifier) {
-                        SomethingElse(modifier = otherModifier)
-                        SomethingDifferent(modifier = otherModifier)
-                    }
+            }
+            @Composable
+            fun Something(modifier: Modifier, otherModifier: Modifier): Int {
+                Column(modifier = modifier) {
+                    SomethingElse(modifier = otherModifier)
+                    SomethingDifferent(modifier = otherModifier)
                 }
-            """.trimIndent()
+            }
+            """
+                .trimIndent()
 
         val errors = rule.lint(code)
         assertThat(errors)
@@ -96,37 +96,38 @@ class ModifierReusedCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something(modifier: Modifier) {
-                    Column(modifier = modifier) {
-                        ChildThatReusesModifier(modifier = modifier.fillMaxWidth())
-                    }
+            @Composable
+            fun Something(modifier: Modifier) {
+                Column(modifier = modifier) {
+                    ChildThatReusesModifier(modifier = modifier.fillMaxWidth())
                 }
-                @Composable
-                fun Something(modifier: Modifier) {
-                    Column(modifier = modifier) {
-                        val newModifier = modifier.fillMaxWidth()
-                        ChildThatReusesModifier(modifier = newModifier)
-                    }
-                }
-                @Composable
-                fun Something(modifier: Modifier) {
+            }
+            @Composable
+            fun Something(modifier: Modifier) {
+                Column(modifier = modifier) {
                     val newModifier = modifier.fillMaxWidth()
-                    Column(modifier = modifier) {
-                        ChildThatReusesModifier(modifier = newModifier)
-                    }
+                    ChildThatReusesModifier(modifier = newModifier)
                 }
-                @Composable
-                fun Something(modifier: Modifier, otherModifier: Modifier) {
-                    Column(modifier = modifier) {
-                        val newModifier = modifier.fillMaxWidth()
-                        val newModifier2 = otherModifier.fillMaxWidth()
-                        ChildThatReusesModifier(modifier = newModifier)
-                        ChildThatReusesModifier(modifier = otherModifier)
-                        ChildThatReusesModifier(modifier = newModifier2)
-                    }
+            }
+            @Composable
+            fun Something(modifier: Modifier) {
+                val newModifier = modifier.fillMaxWidth()
+                Column(modifier = modifier) {
+                    ChildThatReusesModifier(modifier = newModifier)
                 }
-            """.trimIndent()
+            }
+            @Composable
+            fun Something(modifier: Modifier, otherModifier: Modifier) {
+                Column(modifier = modifier) {
+                    val newModifier = modifier.fillMaxWidth()
+                    val newModifier2 = otherModifier.fillMaxWidth()
+                    ChildThatReusesModifier(modifier = newModifier)
+                    ChildThatReusesModifier(modifier = otherModifier)
+                    ChildThatReusesModifier(modifier = newModifier2)
+                }
+            }
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors)
             .hasStartSourceLocations(
@@ -151,30 +152,31 @@ class ModifierReusedCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something(modifier: Modifier) {
+            @Composable
+            fun Something(modifier: Modifier) {
+                val tweakedModifier = Modifier.then(modifier).fillMaxWidth()
+                val reassignedModifier = modifier
+                val modifier3 = Modifier.fillMaxWidth()
+                Column(modifier = modifier) {
+                    OkComposable(modifier = newModifier)
+                    ComposableThaReusesModifier(modifier = tweakedModifier)
+                    ComposableThaReusesModifier(modifier = reassignedModifier)
+                    OkComposable(modifier = modifier3)
+                }
+                InnerComposable(modifier = tweakedModifier)
+            }
+            @Composable
+            fun Something(modifier: Modifier) {
+                Column(modifier = modifier) {
                     val tweakedModifier = Modifier.then(modifier).fillMaxWidth()
                     val reassignedModifier = modifier
-                    val modifier3 = Modifier.fillMaxWidth()
-                    Column(modifier = modifier) {
-                        OkComposable(modifier = newModifier)
-                        ComposableThaReusesModifier(modifier = tweakedModifier)
-                        ComposableThaReusesModifier(modifier = reassignedModifier)
-                        OkComposable(modifier = modifier3)
-                    }
-                    InnerComposable(modifier = tweakedModifier)
+                    OkComposable(modifier = newModifier)
+                    ComposableThaReusesModifier(modifier = tweakedModifier)
+                    ComposableThaReusesModifier(modifier = reassignedModifier)
                 }
-                @Composable
-                fun Something(modifier: Modifier) {
-                    Column(modifier = modifier) {
-                        val tweakedModifier = Modifier.then(modifier).fillMaxWidth()
-                        val reassignedModifier = modifier
-                        OkComposable(modifier = newModifier)
-                        ComposableThaReusesModifier(modifier = tweakedModifier)
-                        ComposableThaReusesModifier(modifier = reassignedModifier)
-                    }
-                }
-            """.trimIndent()
+            }
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors)
             .hasStartSourceLocations(
@@ -196,40 +198,41 @@ class ModifierReusedCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something(modifier: Modifier) {
-                    Column(modifier) {
-                        InternalComposable()
-                        Text("Hi")
-                    }
+            @Composable
+            fun Something(modifier: Modifier) {
+                Column(modifier) {
+                    InternalComposable()
+                    Text("Hi")
                 }
-                @Composable
-                fun Something(modifier: Modifier) {
-                    Column(modifier) {
-                        ComposableWithNewModifier(Modifier.fillMaxWidth())
-                        Text("Hi", modifier = Modifier.padding12())
-                    }
+            }
+            @Composable
+            fun Something(modifier: Modifier) {
+                Column(modifier) {
+                    ComposableWithNewModifier(Modifier.fillMaxWidth())
+                    Text("Hi", modifier = Modifier.padding12())
                 }
-                @Composable
-                fun Something(modifier: Modifier) {
-                    Column(modifier) {
-                        val newModifier = Modifier.weight(1f)
+            }
+            @Composable
+            fun Something(modifier: Modifier) {
+                Column(modifier) {
+                    val newModifier = Modifier.weight(1f)
+                    ComposableWithNewModifier(newModifier)
+                    Text("Hi")
+                }
+            }
+            @Composable
+            fun Something(modifier: Modifier) {
+                Column(modifier) {
+                    val newModifier = Modifier.weight(1f)
+                    if(shouldShowSomething) {
                         ComposableWithNewModifier(newModifier)
-                        Text("Hi")
+                    } else {
+                        DifferentComposableWithNewModifier(newModifier)
                     }
                 }
-                @Composable
-                fun Something(modifier: Modifier) {
-                    Column(modifier) {
-                        val newModifier = Modifier.weight(1f)
-                        if(shouldShowSomething) {
-                            ComposableWithNewModifier(newModifier)
-                        } else {
-                            DifferentComposableWithNewModifier(newModifier)
-                        }
-                    }
-                }
-            """.trimIndent()
+            }
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }
@@ -239,17 +242,18 @@ class ModifierReusedCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something(modifier: Modifier) {
-                    val rootModifier = modifier
-                    Column(modifier = rootModifier) {
-                        Slot { modifier: Modifier ->
-                            val childModifier = rootModifier.padding(8.dp)
-                            Row(modifier = childModifier) {}
-                        }
+            @Composable
+            fun Something(modifier: Modifier) {
+                val rootModifier = modifier
+                Column(modifier = rootModifier) {
+                    Slot { modifier: Modifier ->
+                        val childModifier = rootModifier.padding(8.dp)
+                        Row(modifier = childModifier) {}
                     }
                 }
-            """.trimIndent()
+            }
+            """
+                .trimIndent()
 
         val errors = rule.lint(code)
         assertThat(errors)
@@ -267,16 +271,17 @@ class ModifierReusedCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something(modifier: Modifier) {
-                    val rootModifier = modifier
-                    Column(modifier = rootModifier) {
-                        Slot { modifier: Modifier ->
-                            Row(modifier = rootModifier.then(modifier)) {}
-                        }
+            @Composable
+            fun Something(modifier: Modifier) {
+                val rootModifier = modifier
+                Column(modifier = rootModifier) {
+                    Slot { modifier: Modifier ->
+                        Row(modifier = rootModifier.then(modifier)) {}
                     }
                 }
-            """.trimIndent()
+            }
+            """
+                .trimIndent()
 
         val errors = rule.lint(code)
         assertThat(errors)
@@ -294,16 +299,17 @@ class ModifierReusedCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something(modifier: Modifier) {
-                    val rootModifier = modifier
-                    Column(modifier = rootModifier) {
-                        Slot { modifier: Modifier ->
-                            Row(modifier = modifier.then(rootModifier)) {}
-                        }
+            @Composable
+            fun Something(modifier: Modifier) {
+                val rootModifier = modifier
+                Column(modifier = rootModifier) {
+                    Slot { modifier: Modifier ->
+                        Row(modifier = modifier.then(rootModifier)) {}
                     }
                 }
-            """.trimIndent()
+            }
+            """
+                .trimIndent()
 
         val errors = rule.lint(code)
         assertThat(errors)
@@ -321,16 +327,17 @@ class ModifierReusedCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something(modifier: Modifier) {
-                    val rootModifier = modifier
-                    Column(modifier = rootModifier) {
-                        Slot { modifier: Modifier ->
-                            Child(modifier = rootModifier, extra = modifier)
-                        }
+            @Composable
+            fun Something(modifier: Modifier) {
+                val rootModifier = modifier
+                Column(modifier = rootModifier) {
+                    Slot { modifier: Modifier ->
+                        Child(modifier = rootModifier, extra = modifier)
                     }
                 }
-            """.trimIndent()
+            }
+            """
+                .trimIndent()
 
         val errors = rule.lint(code)
         assertThat(errors)
@@ -348,13 +355,14 @@ class ModifierReusedCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something(modifier: Modifier) {
-                    Column(modifier = modifier) {
-                        Icon(painter = PainterFactory.create(modifier))
-                    }
+            @Composable
+            fun Something(modifier: Modifier) {
+                Column(modifier = modifier) {
+                    Icon(painter = PainterFactory.create(modifier))
                 }
-            """.trimIndent()
+            }
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }
@@ -364,13 +372,14 @@ class ModifierReusedCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something(modifier: Modifier) {
-                    Column(modifier = modifier) {
-                        Child(model = SomePipeline.then(modifier))
-                    }
+            @Composable
+            fun Something(modifier: Modifier) {
+                Column(modifier = modifier) {
+                    Child(model = SomePipeline.then(modifier))
                 }
-            """.trimIndent()
+            }
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }
@@ -380,15 +389,16 @@ class ModifierReusedCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something(modifier: Modifier = Modifier) {
-                    if (someCondition) {
-                        Case1RootLevelComposable(modifier = modifier.background(HorizonColor.Black))
-                    } else {
-                        Case2RootLevelComposable(modifier)
-                    }
+            @Composable
+            fun Something(modifier: Modifier = Modifier) {
+                if (someCondition) {
+                    Case1RootLevelComposable(modifier = modifier.background(HorizonColor.Black))
+                } else {
+                    Case2RootLevelComposable(modifier)
                 }
-            """.trimIndent()
+            }
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }
@@ -398,37 +408,38 @@ class ModifierReusedCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something(modifier: Modifier) {
-                    Column(modifier = modifier) {
-                        TrustedFriendsMembersAppBar(
-                            onBackClicked = { viewModel.processUserIntent(BackClicked) },
-                            onDoneClicked = { viewModel.processUserIntent(DoneClicked) }
-                        )
+            @Composable
+            fun Something(modifier: Modifier) {
+                Column(modifier = modifier) {
+                    TrustedFriendsMembersAppBar(
+                        onBackClicked = { viewModel.processUserIntent(BackClicked) },
+                        onDoneClicked = { viewModel.processUserIntent(DoneClicked) }
+                    )
 
-                        val recommendedEmptyUsersContent: @Composable ((Modifier) -> Unit)? = when {
-                            !recommended.isEmpty -> null
-                            searchQuery.value.isEmpty() -> { localModifier: Modifier ->
-                                EmptyUsersList(
-                                    title = stringResource(trustedR.string.trusted_friends_members_list_empty_title),
-                                    description = stringResource(trustedR.string.trusted_friends_members_list_empty_description),
-                                    modifier = localModifier
-                                )
-                            }
-                            else -> { localModifier ->
-                                EmptyUsersList(
-                                    title = stringResource(trustedR.string.trusted_friends_search_empty_title),
-                                    description = stringResource(
-                                        trustedR.string.trusted_friends_search_empty_description,
-                                        searchQuery.value
-                                    ),
-                                    modifier = localModifier
-                                )
-                            }
+                    val recommendedEmptyUsersContent: @Composable ((Modifier) -> Unit)? = when {
+                        !recommended.isEmpty -> null
+                        searchQuery.value.isEmpty() -> { localModifier: Modifier ->
+                            EmptyUsersList(
+                                title = stringResource(trustedR.string.trusted_friends_members_list_empty_title),
+                                description = stringResource(trustedR.string.trusted_friends_members_list_empty_description),
+                                modifier = localModifier
+                            )
+                        }
+                        else -> { localModifier ->
+                            EmptyUsersList(
+                                title = stringResource(trustedR.string.trusted_friends_search_empty_title),
+                                description = stringResource(
+                                    trustedR.string.trusted_friends_search_empty_description,
+                                    searchQuery.value
+                                ),
+                                modifier = localModifier
+                            )
                         }
                     }
                 }
-            """.trimIndent()
+            }
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }
@@ -438,18 +449,19 @@ class ModifierReusedCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something(modifier: Modifier) {
-                    Row(modifier = Modifier.then(modifier)) {
-                        Column(modifier = modifier) {}
-                    }
-                }
-                @Composable
-                fun Something(modifier: Modifier) {
-                    Row(modifier = Modifier.fillMaxWidth().then(modifier)) {}
+            @Composable
+            fun Something(modifier: Modifier) {
+                Row(modifier = Modifier.then(modifier)) {
                     Column(modifier = modifier) {}
                 }
-            """.trimIndent()
+            }
+            @Composable
+            fun Something(modifier: Modifier) {
+                Row(modifier = Modifier.fillMaxWidth().then(modifier)) {}
+                Column(modifier = modifier) {}
+            }
+            """
+                .trimIndent()
 
         val errors = rule.lint(code)
         assertThat(errors)
@@ -469,53 +481,54 @@ class ModifierReusedCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something(modifier: Modifier) {
-                    Row(modifier) {
-                        val x = @Composable { modifier: Modifier ->
-                            SomethingElse(modifier)
-                        }
+            @Composable
+            fun Something(modifier: Modifier) {
+                Row(modifier) {
+                    val x = @Composable { modifier: Modifier ->
+                        SomethingElse(modifier)
                     }
                 }
-                @Composable
-                fun Something(modifier: Modifier) {
-                    Row(modifier) {
-                        val x = @Composable { (modifier, _) ->
-                            SomethingElse(modifier)
-                        }
+            }
+            @Composable
+            fun Something(modifier: Modifier) {
+                Row(modifier) {
+                    val x = @Composable { (modifier, _) ->
+                        SomethingElse(modifier)
                     }
                 }
-                @Composable
-                fun Something(modifier: Modifier) {
-                    Column(modifier) {
-                        Bleh { modifier -> Potato(modifier) }
+            }
+            @Composable
+            fun Something(modifier: Modifier) {
+                Column(modifier) {
+                    Bleh { modifier -> Potato(modifier) }
+                }
+            }
+            @Composable
+            fun Something(modifier: Modifier) {
+                Column(modifier = modifier) {
+                    Bleh { modifier: Modifier -> Row(modifier = Modifier.then(modifier)) }
+                }
+            }
+            @Composable
+            fun Something(modifier: Modifier) {
+                Row(modifier) {
+                    Slot { modifier: Modifier ->
+                        val local = modifier.padding(8.dp)
+                        Row(modifier = Modifier.then(local)) {}
                     }
                 }
-                @Composable
-                fun Something(modifier: Modifier) {
-                    Column(modifier = modifier) {
-                        Bleh { modifier: Modifier -> Row(modifier = Modifier.then(modifier)) }
+            }
+            @Composable
+            fun Something(modifier: Modifier) {
+                Row(modifier) {
+                    Slot { (modifier, _) ->
+                        val local = modifier.padding(8.dp)
+                        Row(modifier = Modifier.then(local)) {}
                     }
                 }
-                @Composable
-                fun Something(modifier: Modifier) {
-                    Row(modifier) {
-                        Slot { modifier: Modifier ->
-                            val local = modifier.padding(8.dp)
-                            Row(modifier = Modifier.then(local)) {}
-                        }
-                    }
-                }
-                @Composable
-                fun Something(modifier: Modifier) {
-                    Row(modifier) {
-                        Slot { (modifier, _) ->
-                            val local = modifier.padding(8.dp)
-                            Row(modifier = Modifier.then(local)) {}
-                        }
-                    }
-                }
-            """.trimIndent()
+            }
+            """
+                .trimIndent()
 
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
@@ -526,15 +539,16 @@ class ModifierReusedCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something(modifier: Modifier = Modifier) {
-                    @Composable fun Local(modifier: Modifier) {
-                        val local = modifier.padding(8.dp)
-                        Row(modifier = Modifier.then(local)) {}
-                    }
-                    Column(modifier = modifier) {}
+            @Composable
+            fun Something(modifier: Modifier = Modifier) {
+                @Composable fun Local(modifier: Modifier) {
+                    val local = modifier.padding(8.dp)
+                    Row(modifier = Modifier.then(local)) {}
                 }
-            """.trimIndent()
+                Column(modifier = modifier) {}
+            }
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }
@@ -544,17 +558,18 @@ class ModifierReusedCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something(modifier: Modifier = Modifier) {
-                    val rootModifier = modifier
-                    Column {
-                        Slot { modifier: Modifier ->
-                            Row(modifier = Modifier.then(modifier)) {}
-                            Box(modifier = rootModifier) {}
-                        }
+            @Composable
+            fun Something(modifier: Modifier = Modifier) {
+                val rootModifier = modifier
+                Column {
+                    Slot { modifier: Modifier ->
+                        Row(modifier = Modifier.then(modifier)) {}
+                        Box(modifier = rootModifier) {}
                     }
                 }
-            """.trimIndent()
+            }
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }
@@ -564,16 +579,17 @@ class ModifierReusedCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something(modifier: Modifier) {
-                    if (LocalInspectionMode.current) {
-                        DebugPlaceholder(modifier = modifier)
-                        return
-                    }
-                    Box(modifier = modifier) {
-                    }
+            @Composable
+            fun Something(modifier: Modifier) {
+                if (LocalInspectionMode.current) {
+                    DebugPlaceholder(modifier = modifier)
+                    return
                 }
-            """.trimIndent()
+                Box(modifier = modifier) {
+                }
+            }
+            """
+                .trimIndent()
 
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
@@ -584,35 +600,36 @@ class ModifierReusedCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something(modifier: Modifier) {
-                    Box(modifier = modifier) {
-                    }
-                    if (LocalInspectionMode.current) {
+            @Composable
+            fun Something(modifier: Modifier) {
+                Box(modifier = modifier) {
+                }
+                if (LocalInspectionMode.current) {
+                    DebugPlaceholder(modifier = modifier)
+                    return
+                }
+            }
+            @Composable
+            fun Something(modifier: Modifier) {
+                if (LocalInspectionMode.current) {
+                    Text("bleh", modifier = modifier)
+                    DebugPlaceholder(modifier = modifier)
+                    return
+                }
+                Box(modifier = modifier) {}
+            }
+            @Composable
+            fun Something(modifier: Modifier) {
+                if (LocalInspectionMode.current) {
+                    Text("bleh", modifier = modifier)
+                    if (x) {
                         DebugPlaceholder(modifier = modifier)
                         return
                     }
                 }
-                @Composable
-                fun Something(modifier: Modifier) {
-                    if (LocalInspectionMode.current) {
-                        Text("bleh", modifier = modifier)
-                        DebugPlaceholder(modifier = modifier)
-                        return
-                    }
-                    Box(modifier = modifier) {}
-                }
-                @Composable
-                fun Something(modifier: Modifier) {
-                    if (LocalInspectionMode.current) {
-                        Text("bleh", modifier = modifier)
-                        if (x) {
-                            DebugPlaceholder(modifier = modifier)
-                            return
-                        }
-                    }
-                }
-            """.trimIndent()
+            }
+            """
+                .trimIndent()
 
         val errors = rule.lint(code)
         assertThat(errors)

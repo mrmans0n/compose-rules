@@ -20,7 +20,8 @@ class PreviewNamingCheckTest {
             @Preview
             @Composable
             fun `Screen example`() { }
-            """.trimIndent()
+            """
+                .trimIndent()
 
         ruleAssertThat(code)
             .withEditorConfigOverride(
@@ -39,7 +40,8 @@ class PreviewNamingCheckTest {
                 @Preview
                 @Composable
                 fun `Screen examplePreview`() { }
-                """.trimIndent(),
+                """
+                    .trimIndent(),
             )
     }
 
@@ -51,7 +53,8 @@ class PreviewNamingCheckTest {
             @Preview
             @Composable
             fun A() { }
-            """.trimIndent()
+            """
+                .trimIndent()
         ruleAssertThat(code)
             .withEditorConfigOverride(
                 composePreviewNamingEnabled to true,
@@ -69,7 +72,8 @@ class PreviewNamingCheckTest {
                 @Preview
                 @Composable
                 fun PreviewA() { }
-                """.trimIndent(),
+                """
+                    .trimIndent(),
             )
     }
 
@@ -81,7 +85,8 @@ class PreviewNamingCheckTest {
             @Preview
             @Composable
             fun A() { }
-            """.trimIndent()
+            """
+                .trimIndent()
         ruleAssertThat(code)
             .withEditorConfigOverride(
                 composePreviewNamingEnabled to true,
@@ -99,7 +104,8 @@ class PreviewNamingCheckTest {
                 @Preview
                 @Composable
                 fun APreview() { }
-                """.trimIndent(),
+                """
+                    .trimIndent(),
             )
     }
 
@@ -111,7 +117,8 @@ class PreviewNamingCheckTest {
             @Preview
             @Composable
             fun APreview() { }
-            """.trimIndent()
+            """
+                .trimIndent()
         ruleAssertThat(code)
             .withEditorConfigOverride(
                 composePreviewNamingEnabled to true,
@@ -128,7 +135,8 @@ class PreviewNamingCheckTest {
             @Preview
             @Composable
             fun PreviewA() { }
-            """.trimIndent()
+            """
+                .trimIndent()
         ruleAssertThat(code)
             .withEditorConfigOverride(
                 composePreviewNamingEnabled to true,
@@ -145,7 +153,8 @@ class PreviewNamingCheckTest {
             @Preview
             @Composable
             fun BananaPreviewPotato() { }
-            """.trimIndent()
+            """
+                .trimIndent()
         ruleAssertThat(code)
             .withEditorConfigOverride(
                 composePreviewNamingEnabled to true,
@@ -168,7 +177,8 @@ class PreviewNamingCheckTest {
             @PreviewWrapperProvider(CustomThemeWrapper::class)
             @Composable
             fun SomeFeatureListLoaded() { }
-            """.trimIndent()
+            """
+                .trimIndent()
         ruleAssertThat(code)
             .withEditorConfigOverride(
                 composePreviewNamingEnabled to true,

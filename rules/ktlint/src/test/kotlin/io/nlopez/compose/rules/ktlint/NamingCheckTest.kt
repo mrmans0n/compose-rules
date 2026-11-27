@@ -17,9 +17,10 @@ class NamingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun myComposable(): Something { }
-            """.trimIndent()
+            @Composable
+            fun myComposable(): Something { }
+            """
+                .trimIndent()
         namingRuleAssertThat(code).hasNoLintViolations()
     }
 
@@ -28,9 +29,10 @@ class NamingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun ProfilePresenter(): Something { }
-            """.trimIndent()
+            @Composable
+            fun ProfilePresenter(): Something { }
+            """
+                .trimIndent()
         namingRuleAssertThat(code)
             .withEditorConfigOverride(
                 allowedComposeNamingNames to ".*Presenter",
@@ -43,11 +45,12 @@ class NamingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun MyComposable() { }
-                @Composable
-                fun MyComposable(): Unit { }
-            """.trimIndent()
+            @Composable
+            fun MyComposable() { }
+            @Composable
+            fun MyComposable(): Unit { }
+            """
+                .trimIndent()
         namingRuleAssertThat(code).hasNoLintViolations()
     }
 
@@ -56,17 +59,18 @@ class NamingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun MyComposable() = Text("bleh")
+            @Composable
+            fun MyComposable() = Text("bleh")
 
-                val composable: Something
-                    @Composable get() { }
+            val composable: Something
+                @Composable get() { }
 
-                val composable: Something
-                    @Composable get() = OtherComposable()
+            val composable: Something
+                @Composable get() = OtherComposable()
 
-                val whatever = @Composable { }
-            """.trimIndent()
+            val whatever = @Composable { }
+            """
+                .trimIndent()
         namingRuleAssertThat(code).hasNoLintViolations()
     }
 
@@ -75,16 +79,18 @@ class NamingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun MyComposable(): Something { }
-            """.trimIndent()
-        namingRuleAssertThat(code).hasLintViolationsWithoutAutoCorrect(
-            LintViolation(
-                line = 2,
-                col = 5,
-                detail = Naming.ComposablesThatReturnResultsShouldBeLowercase,
-            ),
-        )
+            @Composable
+            fun MyComposable(): Something { }
+            """
+                .trimIndent()
+        namingRuleAssertThat(code)
+            .hasLintViolationsWithoutAutoCorrect(
+                LintViolation(
+                    line = 2,
+                    col = 5,
+                    detail = Naming.ComposablesThatReturnResultsShouldBeLowercase,
+                ),
+            )
     }
 
     @Test
@@ -92,10 +98,11 @@ class NamingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Suppress("ComposableNaming")
-                @Composable
-                fun MyComposable(): Something { }
-            """.trimIndent()
+            @Suppress("ComposableNaming")
+            @Composable
+            fun MyComposable(): Something { }
+            """
+                .trimIndent()
         namingRuleAssertThat(code).hasNoLintViolations()
     }
 
@@ -104,24 +111,26 @@ class NamingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun myComposable() { }
+            @Composable
+            fun myComposable() { }
 
-                @Composable
-                fun myComposable(): Unit { }
-            """.trimIndent()
-        namingRuleAssertThat(code).hasLintViolationsWithoutAutoCorrect(
-            LintViolation(
-                line = 2,
-                col = 5,
-                detail = Naming.ComposablesThatDoNotReturnResultsShouldBeCapitalized,
-            ),
-            LintViolation(
-                line = 5,
-                col = 5,
-                detail = Naming.ComposablesThatDoNotReturnResultsShouldBeCapitalized,
-            ),
-        )
+            @Composable
+            fun myComposable(): Unit { }
+            """
+                .trimIndent()
+        namingRuleAssertThat(code)
+            .hasLintViolationsWithoutAutoCorrect(
+                LintViolation(
+                    line = 2,
+                    col = 5,
+                    detail = Naming.ComposablesThatDoNotReturnResultsShouldBeCapitalized,
+                ),
+                LintViolation(
+                    line = 5,
+                    col = 5,
+                    detail = Naming.ComposablesThatDoNotReturnResultsShouldBeCapitalized,
+                ),
+            )
     }
 
     @Test
@@ -129,14 +138,15 @@ class NamingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Suppress("ComposableNaming")
-                @Composable
-                fun myComposable() { }
+            @Suppress("ComposableNaming")
+            @Composable
+            fun myComposable() { }
 
-                @Suppress("ComposableNaming")
-                @Composable
-                fun myComposable(): Unit { }
-            """.trimIndent()
+            @Suppress("ComposableNaming")
+            @Composable
+            fun myComposable(): Unit { }
+            """
+                .trimIndent()
         namingRuleAssertThat(code).hasNoLintViolations()
     }
 
@@ -145,12 +155,13 @@ class NamingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Potato.myComposable() { }
+            @Composable
+            fun Potato.myComposable() { }
 
-                @Composable
-                fun Banana.myComposable(): Unit { }
-            """.trimIndent()
+            @Composable
+            fun Banana.myComposable(): Unit { }
+            """
+                .trimIndent()
 
         namingRuleAssertThat(code).hasNoLintViolations()
     }
@@ -160,9 +171,10 @@ class NamingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                operator fun invoke() { }
-            """.trimIndent()
+            @Composable
+            operator fun invoke() { }
+            """
+                .trimIndent()
 
         namingRuleAssertThat(code).hasNoLintViolations()
     }
@@ -172,11 +184,12 @@ class NamingCheckTest {
         @Language("kotlin")
         val code =
             """
-                interface Bleh {
-                    @Composable
-                    override fun component() { }
-                }
-            """.trimIndent()
+            interface Bleh {
+                @Composable
+                override fun component() { }
+            }
+            """
+                .trimIndent()
 
         namingRuleAssertThat(code).hasNoLintViolations()
     }

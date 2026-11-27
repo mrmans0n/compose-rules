@@ -10,8 +10,8 @@ import io.nlopez.compose.core.Emitter
 import io.nlopez.compose.core.util.isAnnotatedWith
 import io.nlopez.compose.rules.DetektRule
 import io.nlopez.compose.rules.ModifierMissing
-import org.jetbrains.kotlin.psi.KtFunction
 import java.net.URI
+import org.jetbrains.kotlin.psi.KtFunction
 
 class ModifierMissingCheck(config: Config) :
     DetektRule(

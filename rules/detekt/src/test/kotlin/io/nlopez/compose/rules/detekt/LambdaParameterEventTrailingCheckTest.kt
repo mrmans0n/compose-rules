@@ -6,7 +6,6 @@ import dev.detekt.api.Config
 import dev.detekt.api.SourceLocation
 import dev.detekt.test.lint
 import io.nlopez.compose.rules.LambdaParameterEventTrailing
-import io.nlopez.compose.rules.detekt.assertThat
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
 
@@ -19,11 +18,12 @@ class LambdaParameterEventTrailingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something(modifier: Modifier = Modifier, onClick: () -> Unit) {
-                    Text("Hello")
-                }
-            """.trimIndent()
+            @Composable
+            fun Something(modifier: Modifier = Modifier, onClick: () -> Unit) {
+                Text("Hello")
+            }
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors)
             .hasStartSourceLocations(
@@ -39,11 +39,12 @@ class LambdaParameterEventTrailingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something(onClick: () -> Unit, modifier: Modifier = Modifier) {
-                    Text("Hello")
-                }
-            """.trimIndent()
+            @Composable
+            fun Something(onClick: () -> Unit, modifier: Modifier = Modifier) {
+                Text("Hello")
+            }
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }
@@ -53,11 +54,12 @@ class LambdaParameterEventTrailingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something(modifier: Modifier = Modifier, on: @Composable () -> Unit) {
-                    Text("Hello")
-                }
-            """.trimIndent()
+            @Composable
+            fun Something(modifier: Modifier = Modifier, on: @Composable () -> Unit) {
+                Text("Hello")
+            }
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }
@@ -67,9 +69,10 @@ class LambdaParameterEventTrailingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun something(modifier: Modifier = Modifier, onClick: () -> Unit) {}
-            """.trimIndent()
+            @Composable
+            fun something(modifier: Modifier = Modifier, onClick: () -> Unit) {}
+            """
+                .trimIndent()
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
     }

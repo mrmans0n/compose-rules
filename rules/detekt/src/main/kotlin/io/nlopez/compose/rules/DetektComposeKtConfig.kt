@@ -6,8 +6,8 @@ import dev.detekt.api.Config
 import io.nlopez.compose.core.ComposeKtConfig
 
 /**
- * Manages the configuration for detekt rules. Results will be memoized, as config shouldn't be changing
- * during the lifetime of a rule.
+ * Manages the configuration for detekt rules. Results will be memoized, as config shouldn't be changing during the
+ * lifetime of a rule.
  */
 internal class DetektComposeKtConfig(private val config: Config) : ComposeKtConfig {
     private val cache = mutableMapOf<String, Any?>()
@@ -18,26 +18,25 @@ internal class DetektComposeKtConfig(private val config: Config) : ComposeKtConf
     override fun getInt(key: String, default: Int): Int =
         valueOrPut(key) { config.valueOrDefault(key, default) } ?: default
 
-    override fun getString(key: String, default: String?): String? = valueOrPut(key) {
-        if (default == null) {
-            config.valueOrNull(key)
-        } else {
-            config.valueOrDefault(key, default)
+    override fun getString(key: String, default: String?): String? =
+        valueOrPut(key) {
+            if (default == null) {
+                config.valueOrNull(key)
+            } else {
+                config.valueOrDefault(key, default)
+            }
         }
-    }
 
-    override fun getList(key: String, default: List<String>): List<String> = valueOrPut(key) {
-        try {
-            // Try to get as a list first (detekt 2.0 native list support)
-            config.valueOrNull<List<String>>(key)
-        } catch (e: ClassCastException) {
-            // Fall back to string parsing for backward compatibility
-            config.valueOrNull<String>(key)
-                ?.split(',', ';')
-                ?.map { it.trim() }
-                ?.filter { it.isNotEmpty() }
+    override fun getList(key: String, default: List<String>): List<String> =
+        valueOrPut(key) {
+            try {
+                // Try to get as a list first (detekt 2.0 native list support)
+                config.valueOrNull<List<String>>(key)
+            } catch (e: ClassCastException) {
+                // Fall back to string parsing for backward compatibility
+                config.valueOrNull<String>(key)?.split(',', ';')?.map { it.trim() }?.filter { it.isNotEmpty() }
+            } ?: default
         } ?: default
-    } ?: default
 
     override fun getSet(key: String, default: Set<String>): Set<String> =
         valueOrPut(key) { getList(key, default.toList()).toSet() } ?: default

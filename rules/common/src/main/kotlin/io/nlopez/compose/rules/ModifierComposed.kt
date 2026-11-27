@@ -27,10 +27,12 @@ class ModifierComposed : ComposeKtVisitor {
 
         // Otherwise, check the return statement expression
         val bodyBlockExpression = function.bodyBlockExpression ?: return
-        val returnsComposed = bodyBlockExpression.findDirectChildrenByClass<KtReturnExpression>()
-            .mapNotNull { it.returnedExpression }
-            .filterIsInstance<KtCallExpression>()
-            .any { it.calleeExpression?.text == "composed" }
+        val returnsComposed =
+            bodyBlockExpression
+                .findDirectChildrenByClass<KtReturnExpression>()
+                .mapNotNull { it.returnedExpression }
+                .filterIsInstance<KtCallExpression>()
+                .any { it.calleeExpression?.text == "composed" }
 
         if (returnsComposed) {
             emitter.report(function, ComposedModifier)
@@ -38,10 +40,12 @@ class ModifierComposed : ComposeKtVisitor {
     }
 
     companion object {
-        val ComposedModifier = """
+        val ComposedModifier =
+            """
             Using composed for modifiers is not recommended anymore, due to the performance issues it creates.
             You should consider migrating this modifier to be based on Modifier.Node instead.
             See https://mrmans0n.github.io/compose-rules/rules/#avoid-modifier-extension-factory-functions for more information.
-        """.trimIndent()
+            """
+                .trimIndent()
     }
 }

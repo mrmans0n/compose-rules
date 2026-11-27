@@ -8,15 +8,14 @@ import io.nlopez.compose.rules.functional.FunctionalTestUtils.ktlintCheckTask
 import io.nlopez.compose.rules.functional.FunctionalTestUtils.writeFile
 import io.nlopez.compose.rules.functional.FunctionalTestUtils.writeGradleProperties
 import io.nlopez.compose.rules.functional.FunctionalTestUtils.writeSettings
+import java.io.File
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
-import java.io.File
 
 /** Runs the published Compose ruleset with the ktlint CLI from Gradle. */
 class KtlintFunctionalTest {
 
-    @TempDir
-    lateinit var projectDir: File
+    @TempDir lateinit var projectDir: File
 
     @Test
     fun `ModifierMissing is detected via the ktlint CLI`() {
@@ -39,10 +38,12 @@ class KtlintFunctionalTest {
             """,
         )
 
-        val result = createGradleRunner(
-            projectDir = projectDir,
-            arguments = listOf("ktlintCheck"),
-        ).buildAndFail()
+        val result =
+            createGradleRunner(
+                    projectDir = projectDir,
+                    arguments = listOf("ktlintCheck"),
+                )
+                .buildAndFail()
 
         // Build should fail due to violations
         result.assertOutputContains("compose:modifier-missing-check")
@@ -98,10 +99,12 @@ class KtlintFunctionalTest {
             """,
         )
 
-        val result = createGradleRunner(
-            projectDir = projectDir,
-            arguments = listOf("ktlintCheck"),
-        ).buildAndFail()
+        val result =
+            createGradleRunner(
+                    projectDir = projectDir,
+                    arguments = listOf("ktlintCheck"),
+                )
+                .buildAndFail()
 
         // Build should fail due to multiple violations
         result.assertOutputContains(
@@ -133,10 +136,12 @@ class KtlintFunctionalTest {
             """,
         )
 
-        val result = createGradleRunner(
-            projectDir = projectDir,
-            arguments = listOf("ktlintCheck"),
-        ).build()
+        val result =
+            createGradleRunner(
+                    projectDir = projectDir,
+                    arguments = listOf("ktlintCheck"),
+                )
+                .build()
 
         result.assertTaskSucceeded(":ktlintCheck")
     }

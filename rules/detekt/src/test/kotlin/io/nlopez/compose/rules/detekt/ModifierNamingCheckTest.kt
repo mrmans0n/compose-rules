@@ -6,7 +6,6 @@ import dev.detekt.api.Config
 import dev.detekt.api.SourceLocation
 import dev.detekt.test.lint
 import io.nlopez.compose.rules.ModifierNaming
-import io.nlopez.compose.rules.detekt.assertThat
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
 
@@ -19,11 +18,12 @@ class ModifierNamingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something1(m: Modifier) {}
-                @Composable
-                fun Something2(m: Modifier, m2: Modifier) {}
-            """.trimIndent()
+            @Composable
+            fun Something1(m: Modifier) {}
+            @Composable
+            fun Something2(m: Modifier, m2: Modifier) {}
+            """
+                .trimIndent()
 
         val errors = rule.lint(code)
         assertThat(errors)
@@ -43,11 +43,12 @@ class ModifierNamingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something1(modifier: Modifier) {}
-                @Composable
-                fun Something2(modifier: Modifier, otherModifier: Modifier) {}
-            """.trimIndent()
+            @Composable
+            fun Something1(modifier: Modifier) {}
+            @Composable
+            fun Something2(modifier: Modifier, otherModifier: Modifier) {}
+            """
+                .trimIndent()
 
         val errors = rule.lint(code)
         assertThat(errors).isEmpty()
@@ -58,9 +59,10 @@ class ModifierNamingCheckTest {
         @Language("kotlin")
         val code =
             """
-                @Composable
-                fun Something1(myModifier: Modifier) {}
-            """.trimIndent()
+            @Composable
+            fun Something1(myModifier: Modifier) {}
+            """
+                .trimIndent()
 
         val errors = rule.lint(code)
         assertThat(errors).hasStartSourceLocation(2, 16)

@@ -19,7 +19,8 @@ class PreviewPublicCheckTest {
             """
             @Composable
             fun MyComposable() { }
-            """.trimIndent()
+            """
+                .trimIndent()
         ruleAssertThat(code).hasNoLintViolations()
     }
 
@@ -34,19 +35,21 @@ class PreviewPublicCheckTest {
             @CombinedPreviews
             @Composable
             fun MyComposable() { }
-            """.trimIndent()
-        ruleAssertThat(code).hasLintViolations(
-            LintViolation(
-                line = 3,
-                col = 5,
-                detail = PreviewPublic.ComposablesPreviewShouldNotBePublic,
-            ),
-            LintViolation(
-                line = 6,
-                col = 5,
-                detail = PreviewPublic.ComposablesPreviewShouldNotBePublic,
-            ),
-        )
+            """
+                .trimIndent()
+        ruleAssertThat(code)
+            .hasLintViolations(
+                LintViolation(
+                    line = 3,
+                    col = 5,
+                    detail = PreviewPublic.ComposablesPreviewShouldNotBePublic,
+                ),
+                LintViolation(
+                    line = 6,
+                    col = 5,
+                    detail = PreviewPublic.ComposablesPreviewShouldNotBePublic,
+                ),
+            )
     }
 
     @Test
@@ -62,14 +65,16 @@ class PreviewPublicCheckTest {
             @Composable
             internal fun MyComposable(user: User) {
             }
-            """.trimIndent()
+            """
+                .trimIndent()
         ruleAssertThat(code).hasNoLintViolations()
     }
 
     @Test
     fun `autofix makes private the public preview`() {
         @Language("kotlin")
-        val badCode = """
+        val badCode =
+            """
             @Preview
             @Composable
             fun MyComposable(user: User) {
@@ -78,10 +83,12 @@ class PreviewPublicCheckTest {
             @Composable
             fun MyComposable(user: User) {
             }
-        """.trimIndent()
+            """
+                .trimIndent()
 
         @Language("kotlin")
-        val expectedCode = """
+        val expectedCode =
+            """
             @Preview
             @Composable
             private fun MyComposable(user: User) {
@@ -90,7 +97,8 @@ class PreviewPublicCheckTest {
             @Composable
             private fun MyComposable(user: User) {
             }
-        """.trimIndent()
+            """
+                .trimIndent()
         ruleAssertThat(badCode).isFormattedAs(expectedCode)
     }
 }

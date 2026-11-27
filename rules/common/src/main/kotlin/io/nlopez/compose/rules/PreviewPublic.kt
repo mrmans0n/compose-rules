@@ -24,20 +24,23 @@ class PreviewPublic : ComposeKtVisitor {
             //  function.addModifier(KtTokens.PRIVATE_KEYWORD)
 
             // For now we need to do it by hand with ASTNode: find the "fun" modifier, and prepend "private".
-            val node = function.node.findChildByType(org.jetbrains.kotlin.lexer.KtTokens.FUN_KEYWORD)
-                ?.firstChildLeafOrSelf() as? LeafPsiElement
-                ?: return@report
+            val node =
+                function.node.findChildByType(org.jetbrains.kotlin.lexer.KtTokens.FUN_KEYWORD)?.firstChildLeafOrSelf()
+                    as? LeafPsiElement ?: return@report
             node.rawReplaceWithText(
-                org.jetbrains.kotlin.lexer.KtTokens.PRIVATE_KEYWORD.value + " " +
+                org.jetbrains.kotlin.lexer.KtTokens.PRIVATE_KEYWORD.value +
+                    " " +
                     org.jetbrains.kotlin.lexer.KtTokens.FUN_KEYWORD.value,
             )
         }
     }
 
     companion object {
-        val ComposablesPreviewShouldNotBePublic = """
+        val ComposablesPreviewShouldNotBePublic =
+            """
             Composables annotated with @Preview that are used only for previewing the UI should not be public.
             See https://mrmans0n.github.io/compose-rules/rules/#preview-composables-should-not-be-public for more information.
-        """.trimIndent()
+            """
+                .trimIndent()
     }
 }

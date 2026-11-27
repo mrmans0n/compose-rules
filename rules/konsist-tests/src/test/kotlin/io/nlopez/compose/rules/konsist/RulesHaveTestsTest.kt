@@ -13,12 +13,9 @@ class RulesHaveTestsTest {
     @ParameterizedTest
     @ValueSource(strings = ["KtlintRule", "DetektRule"])
     fun `ensure all rules have a unit test`(baseClass: String) {
-        Konsist.scopeFromProduction()
-            .classes()
-            .withParentNamed(baseClass)
-            .assertTrue { clazz ->
-                // Rules share names across ktlint and detekt, so the test must live in the same module
-                clazz.testClasses { it.hasNameContaining(clazz.name) && it.moduleName == clazz.moduleName }.isNotEmpty()
-            }
+        Konsist.scopeFromProduction().classes().withParentNamed(baseClass).assertTrue { clazz ->
+            // Rules share names across ktlint and detekt, so the test must live in the same module
+            clazz.testClasses { it.hasNameContaining(clazz.name) && it.moduleName == clazz.moduleName }.isNotEmpty()
+        }
     }
 }
